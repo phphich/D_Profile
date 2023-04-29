@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <br><br>
+    <div class="jumbotron jumbotron">
+      <div class="mt-4 p-5 bg-primary text-white rounded">
+        <h1 class="display-4">Welcome to Digital Profile System</h1>
+        <p class="lead"><h2>ยินดีต้อนรับสู่ Digital Profile System</h2>
+          ระบบจัดเก็บรวบรวมประวัติและข้อมูลของบุคลากรในองค์กร
+        </p>
+      </div>
+    <div>
+        <br>
+        <p class="text-center">
+            <img src="{% static '/images/dbt.png' %}" width="250px" height="150px">
+            <img src="{% static '/images/dbt.png' %}" width="250px" height="150px">
+            <img src="{% static '/images/dbt.png' %}" width="250px" height="150px">
+
+        </p>
+    </div>
+    </div>
+{% endblock %}
