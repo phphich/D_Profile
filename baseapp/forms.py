@@ -1,6 +1,30 @@
 from django import forms
 from .models import *
 
+class FacultyForm(forms.ModelForm):
+    class Meta:
+        model = Faculty
+        fields = ('name_th', 'name_en', 'university', 'address', 'telephone', 'website', 'vision', 'slogan')
+        widgets = {
+            'name_th': forms.TextInput(attrs={'class': 'form-control',  'size': 110, 'maxlength': 100}),
+            'name_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'university': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control', 'size': 25, 'maxlength': 20}),
+            'website': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'vision': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
+            'slogan': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+        }
+        labels = {
+            'name_th': 'ชื่อสาขา (ไทย)',
+            'name_en': 'ชื่อสาขา (อังกฤษ)',
+            'name_sh': 'ชื่อย่อ',
+        }
+    def deleteForm(self):
+        self.fields['name_th'].widget.attrs['readonly'] = True
+        self.fields['name_en'].widget.attrs['readonly'] = True
+        self.fields['name_sh'].widget.attrs['readonly'] = True
+
 class DivisionForm(forms.ModelForm):
     class Meta:
         model = Division
@@ -32,12 +56,12 @@ class CurriculumForm(forms.ModelForm):
         model = Curriculumn
         fields = ('name_th', 'name_en', 'name_th_sh', 'name_en_sh', 'level', 'studyTime', 'division')
         widgets = {
-            'name_th': forms.TextInput(attrs={'class': 'form-control',  'size': 55, 'maxlength': 50}),
-            'name_en': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 35}),
-            'name_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 35}),
+            'name_th': forms.TextInput(attrs={'class': 'form-control',  'size': 110, 'maxlength': 100}),
+            'name_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'name_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control'}),
-            'studyTime': forms.IntegerField(attrs={'class': 'form-control', 'Min': 2}),
+            'studyTime': forms.NumberInput(attrs={'class': 'form-control', 'Min': 2}),
             'division':forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
@@ -67,6 +91,16 @@ class PersonnelForm(forms.ModelForm):
             ("ชาย", "ชาย"),
             ("หญิง", "หญิง"),
         )
+        STATUS_CHOICES = (
+            ("อาจารย์", "อาจารย์"),
+            ("ผู้ช่วยศาสตราจารย์", "ผู้ช่วยศาสตราจารย์"),
+            ("รองศาสตราจารย์", "รองศาสตราจารย์"),
+            ("ศาสตราจารย์", "ศาสตราจารย์"),
+            ("นาย", "นาย"),
+            ("นาง", "นาง"),
+            ("นางสาว", "นางสาว"),
+
+        )
         model = Personnel
         fields = ('email', 's_id', 'firstName', 'lastName', 'status', 'gender', 'address',
                   'birthDate', 'hiringDate', 'picture', 'division')
@@ -75,9 +109,9 @@ class PersonnelForm(forms.ModelForm):
             's_id': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
             'firstName': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'lastName': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
+            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control', 'size': 35}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
-            'gender': forms.Select(choices=GENDER_CHOICES, attrs={'class': 'form-control'}),
+            'gender': forms.RadioSelect(choices=GENDER_CHOICES, attrs={'class': 'form-control'}),
             'birthDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'hiringDate': forms.NumberInput(attrs={'class': 'form-control', type: 'date'}),
             'picture': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
@@ -125,12 +159,12 @@ class EducationForm(forms.ModelForm):
         fields = ('level', 'degree_th', 'degree_en','degree_th_sh','degree_en_sh','yearGraduate','institute','personnel')
         widgets = {
             'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control',  'size': 35}),
-            'degree_th': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'degree_en': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 35}),
-            'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 35}),
-            'name_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 35}),
-            'yearGraduate': forms.IntegerField(attrs={'class': 'form-control', 'size': 10, 'maxlength': 4}),
-            'institute': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'degree_th': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'degree_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'name_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'yearGraduate': forms.NumberInput(attrs={'class': 'form-control', 'size': 20}),
+            'institute': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'personnel':forms.HiddenInput(),
         }
         labels = {

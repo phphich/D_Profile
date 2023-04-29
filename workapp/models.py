@@ -12,7 +12,8 @@ class Command(models.Model):
     detail = models.TextField(default=None)
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     def __str__(self):
-        return self.commandId + " " + self.topic + " (" + str(self.commandDate)+ ")"
+        return self.personnel.status + self.personnel.firstName + " " + self.personnel.lastName +\
+               "  " + self.commandId + " " + self.topic + " (" + str(self.commandDate)+ ")"
 
 class Leave(models.Model):
     startDate = models.DateField(default=None)
@@ -25,7 +26,9 @@ class Leave(models.Model):
     reason = models.CharField(max_length=255, default=None)
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     def __str__(self):
-        return self.leaveType + " : " + str(self.startDate) + " - " + str(self.endDate) + self.leaveType + " (" + str(self.days) + ")"
+        return self.personnel.status + self.personnel.firstName + " " + self.personnel.lastName + \
+                "  " + self.leaveType + " : " + str(self.startDate) + " - " + str(self.endDate) + \
+                "  " + self.leaveType + " (" + str(self.days) + ")"
 
 class Trainning(models.Model):
     startDate = models.DateField(default=None)
@@ -40,8 +43,9 @@ class Trainning(models.Model):
     budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     def __str__(self):
-        return self.topic + " : " + str(self.startDate) + " - " + str(self.endDate) + self.leaveType + " (" + str(
-            self.days) + ")"
+        return self.personnel.status + self.personnel.firstName + " " + self.personnel.lastName + \
+               "  " + self.topic + " : " + str(self.startDate) + " - " + str(self.endDate) + \
+               " (" + str(self.days) + ")"
 
 class Performance(models.Model):
     getDate = models.DateField(default=None)
