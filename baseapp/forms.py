@@ -101,8 +101,13 @@ class PersonnelForm(forms.ModelForm):
             ("นางสาว", "นางสาว"),
 
         )
+        TYPE_CHOICES = (
+            ('สายวิชาการ', 'สายวิชาการ'),
+            ('สายสนับสนุน', 'สายสนับสนุน'),
+        )
+
         model = Personnel
-        fields = ('email', 's_id', 'firstName', 'lastName', 'status', 'gender', 'address',
+        fields = ('email', 's_id', 'firstName', 'lastName', 'status', 'type', 'gender', 'address',
                   'birthDate', 'hiringDate', 'picture', 'division')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
@@ -110,6 +115,7 @@ class PersonnelForm(forms.ModelForm):
             'firstName': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'lastName': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control', 'size': 35}),
+            'type': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control', 'size': 35}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'gender': forms.RadioSelect(choices=GENDER_CHOICES, attrs={'class': 'form-control'}),
             'birthDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -124,6 +130,7 @@ class PersonnelForm(forms.ModelForm):
             'firstName': 'ชื่อ',
             'lastName': 'สกุล',
             'status': 'ตำแหน่ง',
+            'type': 'ประเภท',
             'gender': 'เพศ',
             'address': 'ที่อยู่',
             'birthDate': 'วันเดือนปีเกิด',

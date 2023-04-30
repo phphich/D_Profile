@@ -37,6 +37,7 @@ class Personnel(models.Model):
     firstName = models.CharField(max_length=50, default="")
     lastName = models.CharField(max_length=50, default="")
     status  = models.CharField(max_length=30, default="อาจารย์")
+    type = models.CharField(max_length=10, default="")
     gender = models.CharField(max_length=15, default="ชาย")
     address = models.TextField(default="")
     birthDate = models.DateField(default=None)
