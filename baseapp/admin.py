@@ -1,5 +1,6 @@
 from django.contrib import admin
 from baseapp.models import *
+
 admin.site.register(Faculty)
 admin.site.register(Division)
 admin.site.register(Curriculumn)

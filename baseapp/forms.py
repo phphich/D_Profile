@@ -226,7 +226,7 @@ class PersonCurriculumForm(forms.ModelForm):
         fields = (
             'status', 'personnel', 'curriculum')
         widgets = {
-            'status': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control', 'size': 55}),
+            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control', 'size': 55}),
             'personnel': forms.Select(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'curriculum': forms.HiddenInput(),
         }
