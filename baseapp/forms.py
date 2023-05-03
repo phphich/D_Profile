@@ -4,7 +4,7 @@ from .models import *
 class FacultyForm(forms.ModelForm):
     class Meta:
         model = Faculty
-        fields = ('name_th', 'name_en', 'university', 'address', 'telephone', 'website', 'vision', 'slogan')
+        fields = ('name_th', 'name_en', 'university', 'address', 'telephone', 'website', 'vision', 'philosophy')
         widgets = {
             'name_th': forms.TextInput(attrs={'class': 'form-control',  'size': 110, 'maxlength': 100}),
             'name_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
@@ -13,17 +13,30 @@ class FacultyForm(forms.ModelForm):
             'telephone': forms.TextInput(attrs={'class': 'form-control', 'size': 25, 'maxlength': 20}),
             'website': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'vision': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
-            'slogan': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'philosophy': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
         }
         labels = {
-            'name_th': 'ชื่อสาขา (ไทย)',
-            'name_en': 'ชื่อสาขา (อังกฤษ)',
-            'name_sh': 'ชื่อย่อ',
+            'name_th': 'ชื่อคณะ (ไทย)',
+            'name_en': 'ชื่อคณะ (อังกฤษ)',
+            'name_sh': 'ชื่อย่อคณะ',
+            'university' : 'ชื่อมหาวิทยาลัย',
+            'address': 'ที่อยู่',
+            'telephone': 'เบอร์โทรศัพท์',
+            'website': 'เว็บไซต์คณะ',
+            'vision': 'วิสัยทัศน์',
+            'philosophy': 'ปรัชญา',
+
         }
     def deleteForm(self):
         self.fields['name_th'].widget.attrs['readonly'] = True
         self.fields['name_en'].widget.attrs['readonly'] = True
         self.fields['name_sh'].widget.attrs['readonly'] = True
+        self.fields['university'].widget.attrs['readonly'] = True
+        self.fields['address'].widget.attrs['readonly'] = True
+        self.fields['telephone'].widget.attrs['readonly'] = True
+        self.fields['website'].widget.attrs['readonly'] = True
+        self.fields['vision'].widget.attrs['readonly'] = True
+        self.fields['philosophy'].widget.attrs['readonly'] = True
 
 class DivisionForm(forms.ModelForm):
     class Meta:
@@ -53,7 +66,7 @@ class CurriculumForm(forms.ModelForm):
             ("ปริญญาโท", "ปริญญาโท"),
             ("ปริญญาเอก", "ปริญญาเอก"),
         )
-        model = Curriculumn
+        model = Curriculum
         fields = ('name_th', 'name_en', 'name_th_sh', 'name_en_sh', 'level', 'studyTime', 'division')
         widgets = {
             'name_th': forms.TextInput(attrs={'class': 'form-control',  'size': 110, 'maxlength': 100}),
@@ -84,7 +97,6 @@ class CurriculumForm(forms.ModelForm):
         self.fields['studyTime'].widget.attrs['readonly'] = True
         self.fields['division'].widget.attrs['readonly'] = True
 
-
 class PersonnelForm(forms.ModelForm):
     class Meta:
         GENDER_CHOICES = (
@@ -107,13 +119,15 @@ class PersonnelForm(forms.ModelForm):
         )
 
         model = Personnel
-        fields = ('email', 's_id', 'firstName', 'lastName', 'status', 'type', 'gender', 'address',
+        fields = ('email', 'sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
                   'birthDate', 'hiringDate', 'picture', 'division')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
-            's_id': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
-            'firstName': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'lastName': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'sId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
+            'firstname_th': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'lastname_th': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'firstname_en': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'lastname_en': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control', 'size': 35}),
             'type': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control', 'size': 35}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
@@ -126,25 +140,30 @@ class PersonnelForm(forms.ModelForm):
 
         labels = {
             'email': 'อีเมล์',
-            's_id': 'เลขที่ตำแหน่ง',
-            'firstName': 'ชื่อ',
-            'lastName': 'สกุล',
+            'sId': 'เลขที่ตำแหน่ง',
+            'firstname_th': 'ชื่อ (ไทย)',
+            'lastname_th': 'สกุล (ไทย)',
+            'firstname_en': 'ชื่อ (อังกฤษ)',
+            'lastname_en': 'สกุล (อังกฤษ)',
             'status': 'ตำแหน่ง',
             'type': 'ประเภท',
             'gender': 'เพศ',
             'address': 'ที่อยู่',
             'birthDate': 'วันเดือนปีเกิด',
-            'hiringDate': 'วันเริ่มทำงาน',
+            'hiringDate': 'วันที่เริ่มบรรจุเข้าทำงาน',
             'picture': 'รูปภาพ',
-            'division':'สาขา',
+            'division':'สังกัดสาขา',
         }
 
     def deleteForm(self):
         self.fields['email'].widget.attrs['readonly'] = True
-        self.fields['s_id'].widget.attrs['readonly'] = True
-        self.fields['firstName'].widget.attrs['readonly'] = True
-        self.fields['lastName'].widget.attrs['readonly'] = True
+        self.fields['sId'].widget.attrs['readonly'] = True
+        self.fields['firstname_th'].widget.attrs['readonly'] = True
+        self.fields['lastname_th'].widget.attrs['readonly'] = True
+        self.fields['firstname_en'].widget.attrs['readonly'] = True
+        self.fields['lastname_en'].widget.attrs['readonly'] = True
         self.fields['status'].widget.attrs['readonly'] = True
+        self.fields['type'].widget.attrs['readonly'] = True
         self.fields['gender'].widget.attrs['readonly'] = True
         self.fields['address'].widget.attrs['readonly'] = True
         self.fields['birthDate'].widget.attrs['readonly'] = True
@@ -198,31 +217,34 @@ class EducationForm(forms.ModelForm):
 class ExpertiseForm(forms.ModelForm):
     class Meta:
         model = Expertise
-        fields = ('topic', 'detail', 'personnel')
+        fields = ('topic', 'detail','experience', 'personnel')
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 120, 'maxlength': 100}),
             'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows':5}),
+            'experience': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
             'personnel':forms.HiddenInput(),
         }
         labels = {
             'topic': 'เรื่อง/ประเด็นที่เชี่ยวชาญ',
             'detail': 'รายละเอียด',
+            'experience': 'ประสบการณ์/ผลงาน',
             'personnel': 'บุคลากร',
         }
 
     def deleteForm(self):
         self.fields['topic'].widget.attrs['readonly'] = True
         self.fields['detail'].widget.attrs['readonly'] = True
+        self.fields['experience'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
 
-class PersonCurriculumForm(forms.ModelForm):
+class CurrAffiliation(forms.ModelForm):
     class Meta:
         STATUS_CHOICES = (
             ("ผู้รับผิดชอบหลักสูตร", "ผู้รับผิดชอบหลักสูตร"),
             ("กรรมการประจำหลักสูตร", "กรรมการประจำหลักสูตร"),
             ("อาจารย์ประจำหลักสูตร", "อาจารย์ประจำหลักสูตร"),
         )
-        model = PersonCurriculum
+        model = CurrAffiliation
         fields = (
             'status', 'personnel', 'curriculum')
         widgets = {

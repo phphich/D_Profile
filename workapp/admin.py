@@ -3,5 +3,8 @@ from workapp.models import *
 
 admin.site.register(Command)
 admin.site.register(Leave)
-admin.site.register(Trainning)
+admin.site.register(Training)
+admin.site.register(Research)
+admin.site.register(SocialService)
 admin.site.register(Performance)
+

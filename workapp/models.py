@@ -2,13 +2,13 @@ from django.db import models
 from baseapp.models import *
 
 class Command(models.Model):
-    commandId = models.CharField(max_length=15, default="")
-    commandDate = models.DateField(default=None)
+    comId = models.CharField(max_length=30, default="")
+    comDate = models.DateField(default=None)
     fiscalYear = models.IntegerField(default=0)
     eduYear = models.IntegerField(default=0)
     eduSemeter = models.CharField(max_length=10, default="")
-    topic = models.CharField(max_length=255, default=None)
     mission = models.CharField(max_length=50, default="การจัดการเรียนการสอน")
+    topic = models.TextField(default=None)
     detail = models.TextField(default=None)
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     def __str__(self):
@@ -21,7 +21,6 @@ class Leave(models.Model):
     days = models.IntegerField(default=1)
     fiscalYear = models.IntegerField(default=0)
     eduYear = models.IntegerField(default=0)
-    eduSemeter = models.IntegerField(default=0)
     leaveType = models.CharField(max_length=50, default=None)
     reason = models.CharField(max_length=255, default=None)
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
@@ -30,7 +29,7 @@ class Leave(models.Model):
                 "  " + self.leaveType + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                 "  " + self.leaveType + " (" + str(self.days) + ")"
 
-class Trainning(models.Model):
+class Training(models.Model):
     startDate = models.DateField(default=None)
     endDate = models.DateField(default=None)
     days = models.IntegerField(default=1)
@@ -47,6 +46,43 @@ class Trainning(models.Model):
                "  " + self.topic + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                " (" + str(self.days) + ")"
 
+class Research(models.Model):
+    fiscalYear = models.IntegerField(default=0)
+    title_th = models.TextField(default="")
+    title_en = models.TextField(default="")
+    objective = models.TextField(default="")
+    percent_resp = models.IntegerField(default=100)
+    budget = models.FloatField(default=0.00)
+    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
+    source = models.CharField(max_length=255, default="")
+    keyword = models.TextField(default="")
+    percent_success = models.IntegerField(default=0)
+    publish_method = models.TextField(default="")
+    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return self.personnel.status + self.personnel.firstName + " " + self.personnel.lastName + \
+               "  " + self.title_th + " : " + str(self.budget)
+
+class SocialService(models.Model):
+    startDate = models.DateField(default=None)
+    endDate = models.DateField(default=None)
+    days = models.IntegerField(default=1)
+    fiscalYear = models.IntegerField(default=0)
+    eduYear = models.IntegerField(default=0)
+    eduSemeter = models.IntegerField(default=0)
+    topic = models.FloatField(default=0.00)
+    objective = models.TextField(default="")
+    place = models.CharField(max_length=255, default="")
+    budget = models.FloatField(default=0.00)
+    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
+    source = models.CharField(max_length=255, default="")
+    receiver = models.CharField(max_length=255, default="")
+    num_receiver = models.IntegerField(default = 0)
+    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return self.personnel.status + self.personnel.firstName + " " + self.personnel.lastName + \
+               "  " + self.topic + " : " + self.place
+
 class Performance(models.Model):
     getDate = models.DateField(default=None)
     fiscalYear = models.IntegerField(default=0)
@@ -56,9 +92,7 @@ class Performance(models.Model):
     detail = models.TextField(default=None)
     budget = models.FloatField(default=0.00)
     budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
+    source = models.CharField(max_length=255, default="")
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.topic + " : " + str(self.getDate)
-
-
-
