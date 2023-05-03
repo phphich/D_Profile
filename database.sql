@@ -125,7 +125,7 @@ CREATE TABLE `auth_user` (
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$600000$gv2SDgFI5Ok4Mg4fLwQyyU$KN8+rvEfUWDxTVO4+s1GmK9mu+0lDwm/UmFyCARmMsw=',NULL,1,'admin','','','admin@rmuti.ac.th',1,1,'2023-05-03 09:14:40.509613');
+INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$600000$gv2SDgFI5Ok4Mg4fLwQyyU$KN8+rvEfUWDxTVO4+s1GmK9mu+0lDwm/UmFyCARmMsw=','2023-05-03 09:43:09.650565',1,'admin','','','admin@rmuti.ac.th',1,1,'2023-05-03 09:14:40.509613');
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -233,7 +233,7 @@ CREATE TABLE `baseapp_curriculum` (
   PRIMARY KEY (`id`),
   KEY `baseapp_curriculum_division_id_fda5c50e_fk_baseapp_division_id` (`division_id`),
   CONSTRAINT `baseapp_curriculum_division_id_fda5c50e_fk_baseapp_division_id` FOREIGN KEY (`division_id`) REFERENCES `baseapp_division` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -242,6 +242,7 @@ CREATE TABLE `baseapp_curriculum` (
 
 LOCK TABLES `baseapp_curriculum` WRITE;
 /*!40000 ALTER TABLE `baseapp_curriculum` DISABLE KEYS */;
+INSERT INTO `baseapp_curriculum` VALUES (1,'บริหารธุรกิจบัณฑิต (เทคโนโลยีธุรกิจดิจิทัล)','Bachelor\'s of Business Administration (Digital Business Technology)','บธ.บ. (เทคโนโลยีธุรกิจดิจิทัล)','B.BA. (Digital Business Technology)','ปริญญาตรี',4,1);
 /*!40000 ALTER TABLE `baseapp_curriculum` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -258,7 +259,7 @@ CREATE TABLE `baseapp_division` (
   `name_en` varchar(50) NOT NULL,
   `name_sh` varchar(10) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -267,6 +268,7 @@ CREATE TABLE `baseapp_division` (
 
 LOCK TABLES `baseapp_division` WRITE;
 /*!40000 ALTER TABLE `baseapp_division` DISABLE KEYS */;
+INSERT INTO `baseapp_division` VALUES (1,'ระบบสารสนเทศ','Information System','BIS');
 /*!40000 ALTER TABLE `baseapp_division` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -378,7 +380,7 @@ CREATE TABLE `baseapp_faculty` (
   `vision` longtext NOT NULL,
   `philosophy` varchar(128) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -387,6 +389,7 @@ CREATE TABLE `baseapp_faculty` (
 
 LOCK TABLES `baseapp_faculty` WRITE;
 /*!40000 ALTER TABLE `baseapp_faculty` DISABLE KEYS */;
+INSERT INTO `baseapp_faculty` VALUES (1,'คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ','Faculty of Business Administration and Technology','มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน วิทยาเขตขอนแก่น','อาคาร 1 มทร.อีสาน วิทยาเขตขอนแก่น','043-336371','้http://fbait.rmuti.ac.th','LERD','Best and Good');
 /*!40000 ALTER TABLE `baseapp_faculty` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -417,7 +420,7 @@ CREATE TABLE `baseapp_personnel` (
   UNIQUE KEY `email` (`email`),
   KEY `baseapp_personnel_division_id_fb67c60a_fk_baseapp_division_id` (`division_id`),
   CONSTRAINT `baseapp_personnel_division_id_fb67c60a_fk_baseapp_division_id` FOREIGN KEY (`division_id`) REFERENCES `baseapp_division` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -426,6 +429,7 @@ CREATE TABLE `baseapp_personnel` (
 
 LOCK TABLES `baseapp_personnel` WRITE;
 /*!40000 ALTER TABLE `baseapp_personnel` DISABLE KEYS */;
+INSERT INTO `baseapp_personnel` VALUES (1,'phichayapak.ph@rmuti.ac.th','412','พิชญะภาคย์','พิพิธพัฒน์ไพสิฐ','Phitchayaphak','Phiphitphatphaisit','อาจารย์','สายวิชาการ','ชาย','255/7 หมู่ 5 ต.พระลับ อ.เมือง จ.ขอนแก่น 40000','2515-12-07','2541-06-22','static/images/personnels/phichayaphak.jpg',1);
 /*!40000 ALTER TABLE `baseapp_personnel` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -451,7 +455,7 @@ CREATE TABLE `django_admin_log` (
   CONSTRAINT `django_admin_log_content_type_id_c4bce8eb_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
   CONSTRAINT `django_admin_log_user_id_c564eba6_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`),
   CONSTRAINT `django_admin_log_chk_1` CHECK ((`action_flag` >= 0))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -460,6 +464,7 @@ CREATE TABLE `django_admin_log` (
 
 LOCK TABLES `django_admin_log` WRITE;
 /*!40000 ALTER TABLE `django_admin_log` DISABLE KEYS */;
+INSERT INTO `django_admin_log` VALUES (1,'2023-05-03 09:45:09.761567','1','คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน วิทยาเขตขอนแก่น',1,'[{\"added\": {}}]',8,1),(2,'2023-05-03 09:45:35.096738','1','ระบบสารสนเทศ (BIS)',1,'[{\"added\": {}}]',7,1),(3,'2023-05-03 09:47:06.120025','1','บริหารธุรกิจบัณฑิต (เทคโนโลยีธุรกิจดิจิทัล)',1,'[{\"added\": {}}]',13,1);
 /*!40000 ALTER TABLE `django_admin_log` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -758,4 +763,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-03 16:15:53
+-- Dump completed on 2023-05-03 16:54:44
