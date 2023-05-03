@@ -21,6 +21,7 @@
             <td class="text-center">{{ personnel.gender }}</td>
             <td class="text-start">{{ personnel.division.name_th }}</td>
             <td class="text-center">
+                <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-info"> <i class="fa fa-search"> </i> </a>
                 <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> </a>
                 <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
             </td>

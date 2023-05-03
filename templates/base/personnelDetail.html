@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <h1> รายละเอียดบุคลากร </h1>
+    <h2> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }}</h2>
+    <hr class="text-primary">
+    <table class="table table-primary table-striped table-hover">
+        <tr>
+            <th>เลขที่ตำแหน่ง</th>
+            <td>{{ personnel.sId }}</td>
+        </tr>
+        <tr>
+            <th>ชื่อ (ภาษาไทย) </th>
+            <td>{{ personnel.firstname_th}}</td>
+        </tr>
+        <tr>
+            <th>สกุล (ภาษาไทย) </th>
+            <td>{{ personnel.lastname_en }}</td>
+        </tr>
+        <tr>
+            <th>ชื่อ (ภาษาอังกฤษ) </th>
+            <td>{{ personnel.firstname_en }}</td>
+        </tr>
+        <tr>
+            <th>นามสกุล (ภาษาอังกฤษ) </th>
+            <td>{{ personnel.lastname_en }}</td>
+        </tr>
+        <tr>
+            <th>ประเภทบุคลากร</th>
+            <td>{{ personnel.type }}</td>
+        </tr>
+        <tr>
+            <th>ที่อยู่</th>
+            <td>{{ personnel.address }}</td>
+        </tr>
+         <tr>
+            <th>เพศ</th>
+            <td>{{ personnel.gender }}</td>
+        </tr>
+        <tr>
+            <th>วันเดือนปีเกิด</th>
+            <td>{{ personnel.birthDate }}</td>
+        </tr>
+        <tr>
+            <th>วันที่เริ่มบรรจุเข้าทำงาน</th>
+            <td>{{ personnel.hiringDate }}</td>
+        </tr>
+        <tr>
+            <th>รูปประจำตัว</th>
+            <td>{{ personnel.picture }}</td>
+{#            <td><img src="/{% personnel.picture %}" width="200px" height="300px" class="img-fluid"> </td>#}
+        </tr>
+    </table>
+
+        <p class="text-center">
+            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                 <i class="fa fa-rotate-back"></i> Back
+            </button>
+        </p>
+
+{% endblock %}

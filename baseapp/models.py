@@ -39,7 +39,7 @@ class Personnel(models.Model):
     firstname_en = models.CharField(max_length=50, default="")
     lastname_en = models.CharField(max_length=50, default="")
     status  = models.CharField(max_length=30, default="อาจารย์")
-    type = models.CharField(max_length=10, default="")
+    type = models.CharField(max_length=10, default="สายวิชาการ")
     gender = models.CharField(max_length=15, default="ชาย")
     address = models.TextField(default="")
     birthDate = models.DateField(default=None)
@@ -57,7 +57,9 @@ class Education(models.Model):
     degree_en_sh = models.CharField(max_length=50, default="")
     yearGraduate = models.IntegerField(default=0)
     institute = models.CharField(max_length=100, default="")
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelEducation', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderEducation', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th +\
                " " + self.degree_th + " " + str(self.yearGraduate)
@@ -66,15 +68,20 @@ class Expertise(models.Model):
     topic = models.CharField(max_length=100, default=None)
     detail = models.TextField(default=None)
     experience = models.TextField(default=None)
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelExpertise', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderExpertise', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th + \
                " - " + self.topic
 
 class CurrAffiliation(models.Model):
     status = models.CharField(max_length=30, default="อาจารย์ประจำหลักสูตร")
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     curriculum = models.ForeignKey(Curriculum, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelCurrAffiliation', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCurrAffiliation', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return self.curriculum.name_th + "  (" + self.status + ")"
 
@@ -83,5 +90,7 @@ class Documents(models.Model):
     refId=models.IntegerField(default=0)
     filename = models.CharField(max_length=100, default=None)
     filetype = models.CharField(max_length=30, default=None)
+    uploadDate = models.DateTimeField(auto_now_add=True)
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     file = models.FileField(upload_to='static/documents/', default=None)
+

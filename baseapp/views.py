@@ -24,6 +24,10 @@ def personnelNew(request):
         context = {'form': form}
         return render(request, 'base/personnelNew.html', context)
 
+def personnelDetail(request, id):
+    personnel = Personnel.objects.filter(id=id).first()
+    context = {'personnel':personnel}
+    return render(request, 'base/personnelDetail.html', context)
 
 def personnelUpdate(request, id):
     personnel = get_object_or_404(Personnel, id=id)
