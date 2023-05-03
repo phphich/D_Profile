@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from django.contrib.admin.widgets import AdminDateWidget
 
 class FacultyForm(forms.ModelForm):
     class Meta:
@@ -119,8 +120,8 @@ class PersonnelForm(forms.ModelForm):
         )
 
         model = Personnel
-        fields = ('email', 'sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
-                  'birthDate', 'hiringDate', 'picture', 'division')
+        fields = ('sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
+                  'birthDate', 'hiringDate', 'picture', 'email', 'division')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
             'sId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
@@ -128,12 +129,12 @@ class PersonnelForm(forms.ModelForm):
             'lastname_th': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'firstname_en': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'lastname_en': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control', 'size': 35}),
-            'type': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control', 'size': 35}),
+            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control'}),
+            'type': forms.RadioSelect(choices=TYPE_CHOICES, attrs={'class': ''}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
-            'gender': forms.RadioSelect(choices=GENDER_CHOICES, attrs={'class': 'form-control'}),
+            'gender': forms.RadioSelect(choices=GENDER_CHOICES, attrs={'class': ''}),
             'birthDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'hiringDate': forms.NumberInput(attrs={'class': 'form-control', type: 'date'}),
+            'hiringDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'picture': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'division': forms.Select(attrs={'class': 'form-control'}),
         }
@@ -154,6 +155,9 @@ class PersonnelForm(forms.ModelForm):
             'picture': 'รูปภาพ',
             'division':'สังกัดสาขา',
         }
+
+    def updateForm(self):
+        self.fields['email'].widget.attrs['readonly'] = True
 
     def deleteForm(self):
         self.fields['email'].widget.attrs['readonly'] = True
@@ -184,7 +188,7 @@ class EducationForm(forms.ModelForm):
         model = Education
         fields = ('level', 'degree_th', 'degree_en','degree_th_sh','degree_en_sh','yearGraduate','institute','personnel')
         widgets = {
-            'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control',  'size': 35}),
+            'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control'}),
             'degree_th': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'degree_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
@@ -248,9 +252,9 @@ class CurrAffiliation(forms.ModelForm):
         fields = (
             'status', 'personnel', 'curriculum')
         widgets = {
-            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control', 'size': 55}),
-            'personnel': forms.Select(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'curriculum': forms.HiddenInput(),
+            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control'}),
+            'personnel': forms.Select(attrs={'class': 'form-control'}),
+            'curriculum': forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
             'status': 'ตำแหน่งในหลักสูตร',

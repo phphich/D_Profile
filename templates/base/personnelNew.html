@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1>New Category Adding </h1>
+    <h1> เพิ่มข้อมูลบุคลากร </h1>
     <form method="POST" enctype="multipart/form-data" class="form form-control text-primary">
         {% csrf_token %}
         {{ form.as_p }}
