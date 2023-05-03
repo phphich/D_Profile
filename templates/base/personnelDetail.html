@@ -4,10 +4,10 @@
     <h1> รายละเอียดบุคลากร </h1>
     <h2> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }}</h2>
     <hr class="text-primary">
-    <table class="table table-primary table-striped table-hover">
+    <table class="table table-info table-striped table-hover">
         <tr>
-            <th>เลขที่ตำแหน่ง</th>
-            <td>{{ personnel.sId }}</td>
+            <th class="col-2">เลขที่ตำแหน่ง</th>
+            <td class="col-10">{{ personnel.sId }}</td>
         </tr>
         <tr>
             <th>ชื่อ (ภาษาไทย) </th>
@@ -30,6 +30,14 @@
             <td>{{ personnel.type }}</td>
         </tr>
         <tr>
+            <th>ตำแหน่ง </th>
+            <td>{{ personnel.status }}</td>
+        </tr>
+        <tr>
+            <th>สังกัดสาขา</th>
+            <td>{{ personnel.division.name_th }}</td>
+        </tr>
+        <tr>
             <th>ที่อยู่</th>
             <td>{{ personnel.address }}</td>
         </tr>
@@ -46,10 +54,16 @@
             <td>{{ personnel.hiringDate }}</td>
         </tr>
         <tr>
+            <th>อีเมล์</th>
+            <td>{{ personnel.email }}</td>
+        </tr>
+        <tr>
             <th>รูปประจำตัว</th>
             <td>{{ personnel.picture }}</td>
 {#            <td><img src="/{% personnel.picture %}" width="200px" height="300px" class="img-fluid"> </td>#}
         </tr>
+
+
     </table>
 
         <p class="text-center">
