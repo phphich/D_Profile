@@ -2,22 +2,103 @@
 {% load static %}
 
 {% block content %}
-    <br><br>
+    <br>
     <div class="jumbotron jumbotron">
-      <div class="mt-4 p-5 bg-primary text-white rounded">
-        <h1 class="display-4">Welcome to Digital Profile System</h1>
-        <p class="lead"><h2>ยินดีต้อนรับสู่ Digital Profile System</h2>
-          ระบบจัดเก็บรวบรวมประวัติและข้อมูลของบุคลากรในองค์กร
-        </p>
-      </div>
-    <div>
-        <br>
-        <p class="text-center">
-            <img src="{% static '/images/dbt.png' %}" width="250px" height="150px">
-            <img src="{% static '/images/dbt.png' %}" width="250px" height="150px">
-            <img src="{% static '/images/dbt.png' %}" width="250px" height="150px">
-
-        </p>
+        <div class="mt-4 p-5 bg-primary text-white rounded text-end">
+            <h1 class="display-4">Welcome to Digital Profile System</h1>
+            <p class="lead">
+            <h2>ยินดีต้อนรับสู่ Digital Profile System</h2>
+            <h3>ระบบบริหารจัดการข้อมูลประจำตัวบุคลากรรายบุคคลในองค์กร </h3>
+            </p>
+        </div>
     </div>
+    <br><br>
+    <div class="row text-center container-fluid justify-content-center">
+{#        <div class="col-3 card bg-primary text-white" style="background-image: url('{% static 'images/bg.jpg' %}') no-repeat;width: 100px; height: 150px;">#}
+            <div class="col-3 card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">ข้อมูลพื้นฐานส่วนตัว</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3 card bg-info">
+            <div class="card-body">
+                <h5 class="card-title">คำสั่งที่ได้รับมอบหมาย</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3 card bg-light">
+            <div class="card-body">
+                <h5 class="card-title">การวิจัย</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
     </div>
+    <br>
+    <div class="row text-center container-fluid justify-content-center">
+        <div class="col-3 card bg-secondary  text-warning">
+            <div class="card-body">
+                <h5 class="card-title">การให้บริการทางวิชาการแก่สังคม</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3 card bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">การฝึกอบรม/สัมมนา</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3 card bg-danger  text-white">
+            <div class="card-body">
+                <h5 class="card-title">ประวัติการลา</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row text-center container-fluid justify-content-center">
+        <div class="col-3 card bg-success  text-white">
+            <div class="card-body">
+                <h5 class="card-title">ผลงานและรางวัล</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3 card">
+            <div class="card-body">
+                <h5 class="card-title">อื่น ๆ</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3 card">
+            <div class="card-body">
+                <h5 class="card-title">อื่น ๆ</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                    card's content.</p>
+            </div>
+        </div>
+    </div>
+    <br><br><br>
 {% endblock %}

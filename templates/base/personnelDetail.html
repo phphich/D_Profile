@@ -59,8 +59,7 @@
         </tr>
         <tr>
             <th>รูปประจำตัว</th>
-            <td>{{ personnel.picture }}</td>
-{#            <td><img src="/{% personnel.picture %}" width="200px" height="300px" class="img-fluid"> </td>#}
+            <td><img src="{% static personnel.picture %}" width="200px" height="300px" class="img-fluid"> </td>
         </tr>
 
 
@@ -68,8 +67,9 @@
 
         <p class="text-center">
             <button type="button" class="btn btn-secondary" onclick="history.back()">
-                 <i class="fa fa-rotate-back"></i> Back
+                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
+            <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> แก้ไข </a>
         </p>
 
 {% endblock %}
