@@ -75,7 +75,7 @@ class CurriculumForm(forms.ModelForm):
             'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'name_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control'}),
-            'studyTime': forms.NumberInput(attrs={'class': 'form-control', 'Min': 2}),
+            'studyTime': forms.NumberInput(attrs={'class': 'form-control', 'Min': 1}),
             'division':forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
@@ -85,7 +85,7 @@ class CurriculumForm(forms.ModelForm):
             'name_en_sh': 'ชื่อย่อปริญญา (อังกฤษ)',
             'level': 'ระดับการศึกษา',
             'studyTime': 'ระยะเวลาของหลักสูตร',
-            'division': 'สาขา',
+            'division': 'หน่วยงานที่รับผิดชอบ',
         }
 
 
@@ -120,9 +120,10 @@ class PersonnelForm(forms.ModelForm):
         )
 
         model = Personnel
-        fields = ('sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
-                  'birthDate', 'hiringDate', 'picture', 'email', 'division')
+        fields = ('id', 'sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'division', 'gender', 'address',
+                  'birthDate', 'hiringDate', 'picture', 'email')
         widgets = {
+            'id': forms.HiddenInput(),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
             'sId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
             'firstname_th': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
@@ -157,7 +158,7 @@ class PersonnelForm(forms.ModelForm):
         }
 
     def updateForm(self):
-        self.fields['email'].widget.attrs['readonly'] = True
+        self.fields['email'].widget.attrs['readonly'] = False
 
     def deleteForm(self):
         self.fields['email'].widget.attrs['readonly'] = True
@@ -186,26 +187,29 @@ class EducationForm(forms.ModelForm):
             ("ประกาศนียบัตร", "ประกาศนียบัตร"),
         )
         model = Education
-        fields = ('level', 'degree_th', 'degree_en','degree_th_sh','degree_en_sh','yearGraduate','institute','personnel')
+        fields = ('level', 'degree_th', 'degree_en','degree_th_sh','degree_en_sh','yearGraduate','institute', 'personnel', 'recorder')
         widgets = {
             'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control'}),
             'degree_th': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'degree_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
-            'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'name_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'degree_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'degree_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'yearGraduate': forms.NumberInput(attrs={'class': 'form-control', 'size': 20}),
             'institute': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'personnel':forms.HiddenInput(),
+            'recorder':forms.HiddenInput(),
         }
         labels = {
             'level': 'ระดับการศึกษา',
-            'degree_th': 'ชื่อปริญญา (ไทย)',
-            'degree_en': 'ชื่อปริญญา (อังกฤษ)',
-            'degree_th_sh': 'ชื่อย่อปริญญา (ไทย)',
-            'degree_en_sh': 'ชื่อย่อปริญญา (อังกฤษ)',
+            'degree_th': 'ชื่อวุฒิการศึกษา (ไทย)',
+            'degree_en': 'ชื่อวุฒิการศึกษา (อังกฤษ)',
+            'degree_th_sh': 'ชื่อย่อวุฒิการศึกษา (ไทย)',
+            'degree_en_sh': 'ชื่อย่อวุฒิการศึกษา (อังกฤษ)',
             'yearGraduate': 'ปีที่สำเร็จการศึกษา',
-            'institute': 'จากสถาบันการศึกษา',
+            'institute': 'ชื่อสถาบันการศึกษา',
             'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก',
+
         }
 
     def deleteForm(self):
@@ -221,18 +225,20 @@ class EducationForm(forms.ModelForm):
 class ExpertiseForm(forms.ModelForm):
     class Meta:
         model = Expertise
-        fields = ('topic', 'detail','experience', 'personnel')
+        fields = ('topic', 'detail','experience', 'personnel', 'recorder')
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 120, 'maxlength': 100}),
             'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows':5}),
             'experience': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'personnel':forms.HiddenInput(),
+            'personnel': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
         }
         labels = {
             'topic': 'เรื่อง/ประเด็นที่เชี่ยวชาญ',
             'detail': 'รายละเอียด',
             'experience': 'ประสบการณ์/ผลงาน',
             'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก',
         }
 
     def deleteForm(self):
@@ -241,7 +247,7 @@ class ExpertiseForm(forms.ModelForm):
         self.fields['experience'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
 
-class CurrAffiliation(forms.ModelForm):
+class CurrAffiliationForm(forms.ModelForm):
     class Meta:
         STATUS_CHOICES = (
             ("ผู้รับผิดชอบหลักสูตร", "ผู้รับผิดชอบหลักสูตร"),
@@ -250,21 +256,24 @@ class CurrAffiliation(forms.ModelForm):
         )
         model = CurrAffiliation
         fields = (
-            'status', 'personnel', 'curriculum')
+            'curriculum', 'personnel', 'status', 'recorder')
         widgets = {
-            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control'}),
+            'curriculum': forms.HiddenInput(attrs={'class': 'form-control', 'readonly':'readonly'}),
             'personnel': forms.Select(attrs={'class': 'form-control'}),
-            'curriculum': forms.Select(attrs={'class': 'form-control'}),
+            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control'}),
+            'recorder': forms.HiddenInput(attrs={'class': 'form-control', 'readonly':'readonly'}),
         }
         labels = {
-            'status': 'ตำแหน่งในหลักสูตร',
-            'personnel': 'บุคลากร',
             'curriculum': 'หลักสูตร',
+            'personnel': 'บุคลากร',
+            'status': 'ตำแหน่งในหลักสูตร',
+            'recorder': 'ผู้บันทึก',
         }
 
     def deleteForm(self):
-        self.fields['status'].widget.attrs['readonly'] = True
-        self.fields['personnel'].widget.attrs['readonly'] = True
         self.fields['curriculum'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
+        self.fields['status'].widget.attrs['readonly'] = True
+
 
 

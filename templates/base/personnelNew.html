@@ -1,16 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h1> เพิ่มข้อมูลบุคลากร </h1>
+    <h2><i class="fa fa-user-plus"></i> เพิ่มข้อมูลบุคลากร </h2>
+    <hr class="text-primary">
     <form method="POST" enctype="multipart/form-data" class="form form-control text-primary">
         {% csrf_token %}
         {{ form.as_p }}
+        <label for="passwd">รหัสผ่าน</label>
+        <input type="password" id="passwd" name="passwd" class="form-control" minlength="4" required>
+        <label for="confpasswd">ยืนยันรหัสผ่าน</label>
+        <input type="password" id="confpasswd" name="confpasswd" class="form-control" minlength="4" required>
         <p class="text-center">
             <button type="button" class="btn btn-secondary" onclick="history.back()">
                  <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
-            <button type="submit" class="btn btn-lg btn-success">
+            <button type="submit" class="btn btn-success">
                  <i class="fa-solid fa-floppy-disk"></i> บันทึก
             </button>
         </p>
+
+
     </form>
 {% endblock %}

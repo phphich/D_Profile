@@ -19,6 +19,12 @@ class Division(models.Model):
     name_sh = models.CharField(max_length=10, default="")
     def __str__(self):
         return str(self.name_th) + " (" + self.name_sh + ")"
+    def getCurriculum(self):
+        curriculums = Curriculum.objects.filter(division=self)
+        return curriculums
+    def getPersonnels(self):
+        personnels = Personnel.objects.filter(division=self).order_by('firstname_th', 'lastname_th')
+        return personnels
 
 class Curriculum(models.Model):
     name_th= models.CharField(max_length=100, default="")
@@ -30,6 +36,9 @@ class Curriculum(models.Model):
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.name_th
+    def getCurrAffiliation(self):
+        currAffilaitions = CurrAffiliation.objects.filter(curriculum=self)
+        return currAffilaitions
 
 class Personnel(models.Model):
     email = models.CharField(max_length=30, unique=True, default="")
@@ -48,6 +57,15 @@ class Personnel(models.Model):
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.status + self.firstname_th +  " " + self.lastname_th
+    def getEducations(self):
+        educations = Education.objects.filter(personnel=self).order_by('yearGraduate')
+        return educations
+    def getExpertise(self):
+        expertises = Expertise.objects.filter(personnel=self).order_by('id')
+        return expertises
+    def getCurrAffiliation(self):
+        curraffiliations = CurrAffiliation.objects.filter(personnel=self).order_by('id')
+        return curraffiliations
 
 class Education(models.Model):
     level = models.CharField(max_length=30, default="")
@@ -81,7 +99,6 @@ class CurrAffiliation(models.Model):
     personnel = models.ForeignKey(Personnel, related_name='PersonnelCurrAffiliation', on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderCurrAffiliation', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
-
     def __str__(self):
         return self.curriculum.name_th + "  (" + self.status + ")"
 

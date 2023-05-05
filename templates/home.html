@@ -5,28 +5,41 @@
     <br>
     <div class="jumbotron jumbotron">
         <div class="mt-4 p-5 bg-primary text-white rounded text-end">
-            <h1 class="display-4">Welcome to Digital Profile System</h1>
-            <p class="lead">
-            <h2>ยินดีต้อนรับสู่ Digital Profile System</h2>
-            <h3>ระบบบริหารจัดการข้อมูลประจำตัวบุคลากรรายบุคคลในองค์กร </h3>
-            </p>
+            <div class="row">
+                <div class="col-2">
+                    <img src="{% static 'images/dprofile.png' %}">
+                </div>
+                <div class="col-10">
+                    <h1 class="display-4"><b>Welcome to Digital Profile System</b></h1>
+                    <p class="lead">
+                    <h2>ยินดีต้อนรับสู่ Digital Profile System</h2>
+                    <h3>ระบบบริหารจัดการข้อมูลประจำตัวบุคลากรรายบุคคลในองค์กร </h3>
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
     <br><br>
     <div class="row text-center container-fluid justify-content-center">
-{#        <div class="col-3 card bg-primary text-white" style="background-image: url('{% static 'images/bg.jpg' %}') no-repeat;width: 100px; height: 150px;">#}
-            <div class="col-3 card bg-primary text-white">
+        {#        <div class="col-3 card bg-primary text-white" style="background-image: url('{% static 'images/bg.jpg' %}') no-repeat;width: 100px; height: 150px;">#}
+        <div class="col-3 card bg-primary text-white">
             <div class="card-body">
-                <h5 class="card-title">ข้อมูลพื้นฐานส่วนตัว</h5>
+                <div class="row">
+                    <div class="col-2 text-lg-start"><h2 class="fas fa-id-card text-lg-start"></h2></div>
+                    <div class="col-10"><h5 class="card-title"> ข้อมูลพื้นฐานส่วนตัว</h5></div>
+                </div>
                 <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's content.</p>
             </div>
         </div>
         <div class="col-1"></div>
-        <div class="col-3 card bg-info">
+        <div class="col-3 card bg-info text-white">
             <div class="card-body">
-                <h5 class="card-title">คำสั่งที่ได้รับมอบหมาย</h5>
+                <div class="row">
+                    <div class="col-2 text-lg-start"><h2 class="fas fa-clipboard-list text-lg-start"></h2></div>
+                    <div class="col-10"><h5 class="card-title">คำสั่งที่ได้รับมอบหมาย</h5></div>
+                </div>
                 <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's content.</p>
@@ -35,7 +48,10 @@
         <div class="col-1"></div>
         <div class="col-3 card bg-light">
             <div class="card-body">
-                <h5 class="card-title">การวิจัย</h5>
+                <div class="row">
+                    <div class="col-2 text-lg-start"><h2 class="fas fa-flask text-lg-start"></h2></div>
+                    <div class="col-10"><h5 class="card-title">การวิจัย</h5></div>
+                </div>
                 <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's content.</p>
@@ -44,9 +60,12 @@
     </div>
     <br>
     <div class="row text-center container-fluid justify-content-center">
-        <div class="col-3 card bg-secondary  text-warning">
+        <div class="col-3 card bg-secondary text-warning">
             <div class="card-body">
-                <h5 class="card-title">การให้บริการทางวิชาการแก่สังคม</h5>
+                <div class="row">
+                    <div class="col-2 text-lg-start"><h2 class="fas fa-people-carry text-lg-start"></h2></div>
+                    <div class="col-10"><h5 class="card-title">การบริการทางวิชาการแก่สังคม</h5></div>
+                </div>
                 <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's content.</p>
@@ -55,7 +74,10 @@
         <div class="col-1"></div>
         <div class="col-3 card bg-warning">
             <div class="card-body">
-                <h5 class="card-title">การฝึกอบรม/สัมมนา</h5>
+                <div class="row">
+                    <div class="col-2 text-lg-start"><h2 class="fa-solid fa-puzzle-piece text-lg-start"></h2></div>
+                    <div class="col-10"><h5 class="card-title">การฝึกอบรม/สัมมนา</h5></div>
+                </div>
                 <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's content.</p>
@@ -64,7 +86,10 @@
         <div class="col-1"></div>
         <div class="col-3 card bg-danger  text-white">
             <div class="card-body">
-                <h5 class="card-title">ประวัติการลา</h5>
+                <div class="row">
+                    <div class="col-2 text-lg-start"><h2 class="fa-solid fa-person-hiking text-lg-start"></h2></div>
+                    <div class="col-10"><h5 class="card-title">ประวัติการลา</h5></div>
+                </div>
                 <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's content.</p>
@@ -75,7 +100,10 @@
     <div class="row text-center container-fluid justify-content-center">
         <div class="col-3 card bg-success  text-white">
             <div class="card-body">
-                <h5 class="card-title">ผลงานและรางวัล</h5>
+                <div class="row">
+                    <div class="col-2 text-lg-start"><h2 class="fa-solid fa-award text-lg-start"></h2></div>
+                    <div class="col-10"><h5 class="card-title">ผลงานและรางวัล</h5></div>
+                </div>
                 <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
                     card's content.</p>

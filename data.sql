@@ -16,21 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `auth_group`
---
-
-DROP TABLE IF EXISTS `auth_group`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `auth_group` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(150) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `auth_group`
 --
 
@@ -40,25 +25,6 @@ LOCK TABLES `auth_group` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `auth_group_permissions`
---
-
-DROP TABLE IF EXISTS `auth_group_permissions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `auth_group_permissions` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `group_id` int NOT NULL,
-  `permission_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `auth_group_permissions_group_id_permission_id_0cd325b0_uniq` (`group_id`,`permission_id`),
-  KEY `auth_group_permissio_permission_id_84c5c92e_fk_auth_perm` (`permission_id`),
-  CONSTRAINT `auth_group_permissio_permission_id_84c5c92e_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`),
-  CONSTRAINT `auth_group_permissions_group_id_b120cbf9_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `auth_group_permissions`
 --
 
@@ -66,24 +32,6 @@ LOCK TABLES `auth_group_permissions` WRITE;
 /*!40000 ALTER TABLE `auth_group_permissions` DISABLE KEYS */;
 /*!40000 ALTER TABLE `auth_group_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `auth_permission`
---
-
-DROP TABLE IF EXISTS `auth_permission`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `auth_permission` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `content_type_id` int NOT NULL,
-  `codename` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `auth_permission_content_type_id_codename_01ab375a_uniq` (`content_type_id`,`codename`),
-  CONSTRAINT `auth_permission_content_type_id_2f476e4b_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `auth_permission`
@@ -96,57 +44,14 @@ INSERT INTO `auth_permission` VALUES (1,'Can add log entry',1,'add_logentry'),(2
 UNLOCK TABLES;
 
 --
--- Table structure for table `auth_user`
---
-
-DROP TABLE IF EXISTS `auth_user`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `auth_user` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `password` varchar(128) NOT NULL,
-  `last_login` datetime(6) DEFAULT NULL,
-  `is_superuser` tinyint(1) NOT NULL,
-  `username` varchar(150) NOT NULL,
-  `first_name` varchar(150) NOT NULL,
-  `last_name` varchar(150) NOT NULL,
-  `email` varchar(254) NOT NULL,
-  `is_staff` tinyint(1) NOT NULL,
-  `is_active` tinyint(1) NOT NULL,
-  `date_joined` datetime(6) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `auth_user`
 --
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$600000$hpHdCcRlr2D8mTNjHTko8J$gztH7jU/ojBGQIJmt6OF5cHiykJv5BRxArvIa5C19rI=','2023-05-03 15:11:02.112758',1,'admin','','','admin@rmuti.ac.th',1,1,'2023-05-03 15:02:27.419352');
+INSERT INTO `auth_user` VALUES (1,'pbkdf2_sha256$600000$hpHdCcRlr2D8mTNjHTko8J$gztH7jU/ojBGQIJmt6OF5cHiykJv5BRxArvIa5C19rI=','2023-05-05 00:36:39.915211',1,'admin','','','admin@rmuti.ac.th',1,1,'2023-05-03 15:02:27.419352');
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `auth_user_groups`
---
-
-DROP TABLE IF EXISTS `auth_user_groups`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `auth_user_groups` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `group_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `auth_user_groups_user_id_group_id_94350c0c_uniq` (`user_id`,`group_id`),
-  KEY `auth_user_groups_group_id_97559544_fk_auth_group_id` (`group_id`),
-  CONSTRAINT `auth_user_groups_group_id_97559544_fk_auth_group_id` FOREIGN KEY (`group_id`) REFERENCES `auth_group` (`id`),
-  CONSTRAINT `auth_user_groups_user_id_6a12ed8b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `auth_user_groups`
@@ -158,25 +63,6 @@ LOCK TABLES `auth_user_groups` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `auth_user_user_permissions`
---
-
-DROP TABLE IF EXISTS `auth_user_user_permissions`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `auth_user_user_permissions` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `permission_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `auth_user_user_permissions_user_id_permission_id_14a6b632_uniq` (`user_id`,`permission_id`),
-  KEY `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm` (`permission_id`),
-  CONSTRAINT `auth_user_user_permi_permission_id_1fbb5f2c_fk_auth_perm` FOREIGN KEY (`permission_id`) REFERENCES `auth_permission` (`id`),
-  CONSTRAINT `auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `auth_user_user_permissions`
 --
 
@@ -186,59 +72,14 @@ LOCK TABLES `auth_user_user_permissions` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `baseapp_curraffiliation`
---
-
-DROP TABLE IF EXISTS `baseapp_curraffiliation`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_curraffiliation` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `status` varchar(30) NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `curriculum_id` bigint NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `baseapp_curraffiliat_curriculum_id_74dc74ff_fk_baseapp_c` (`curriculum_id`),
-  KEY `baseapp_curraffiliat_personnel_id_4f64cdf7_fk_baseapp_p` (`personnel_id`),
-  KEY `baseapp_curraffiliat_recorder_id_5103e558_fk_baseapp_p` (`recorder_id`),
-  CONSTRAINT `baseapp_curraffiliat_curriculum_id_74dc74ff_fk_baseapp_c` FOREIGN KEY (`curriculum_id`) REFERENCES `baseapp_curriculum` (`id`),
-  CONSTRAINT `baseapp_curraffiliat_personnel_id_4f64cdf7_fk_baseapp_p` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `baseapp_curraffiliat_recorder_id_5103e558_fk_baseapp_p` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `baseapp_curraffiliation`
 --
 
 LOCK TABLES `baseapp_curraffiliation` WRITE;
 /*!40000 ALTER TABLE `baseapp_curraffiliation` DISABLE KEYS */;
+INSERT INTO `baseapp_curraffiliation` VALUES (1,'อาจารย์ประจำหลักสูตร','2023-05-05 11:42:45.736177',1,1,1),(3,'อาจารย์ประจำหลักสูตร','2023-05-05 14:04:46.619821',1,4,1),(6,'ผู้รับผิดชอบหลักสูตร','2023-05-05 14:10:03.000880',4,10,1),(7,'อาจารย์ประจำหลักสูตร','2023-05-05 14:10:14.484199',4,4,1),(9,'อาจารย์ประจำหลักสูตร','2023-05-05 14:18:05.563198',1,9,1),(18,'อาจารย์ประจำหลักสูตร','2023-05-05 14:38:07.447182',3,11,1);
 /*!40000 ALTER TABLE `baseapp_curraffiliation` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `baseapp_curriculum`
---
-
-DROP TABLE IF EXISTS `baseapp_curriculum`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_curriculum` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `name_th` varchar(100) NOT NULL,
-  `name_en` varchar(100) NOT NULL,
-  `name_th_sh` varchar(50) NOT NULL,
-  `name_en_sh` varchar(50) NOT NULL,
-  `level` varchar(30) NOT NULL,
-  `studyTime` int NOT NULL,
-  `division_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `baseapp_curriculum_division_id_fda5c50e_fk_baseapp_division_id` (`division_id`),
-  CONSTRAINT `baseapp_curriculum_division_id_fda5c50e_fk_baseapp_division_id` FOREIGN KEY (`division_id`) REFERENCES `baseapp_division` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `baseapp_curriculum`
@@ -246,25 +87,9 @@ CREATE TABLE `baseapp_curriculum` (
 
 LOCK TABLES `baseapp_curriculum` WRITE;
 /*!40000 ALTER TABLE `baseapp_curriculum` DISABLE KEYS */;
-INSERT INTO `baseapp_curriculum` VALUES (1,'บริหารธุรกิจบัณฑิต (สาขาเทคโนโลยีธุรกิจดิจิทัล)','Bachelor\'s of Business Administration (Digital Business Technology)','บธ.บ. (เทคโนโลยีธุรกิจดิจิทัล)','B.BA. (Digital Business Technology)','ปริญญาตรี',4,1);
+INSERT INTO `baseapp_curriculum` VALUES (1,'บริหารธุรกิจบัณฑิต (สาขาเทคโนโลยีธุรกิจดิจิทัล)','Bachelor\'s of Business Administration (Digital Business Technology)','บธ.บ. (เทคโนโลยีธุรกิจดิจิทัล)','B.BA. (Digital Business Technology)','ปริญญาตรี',4,1),(3,'บริหารธุรกิจบัณฑิต (สาขาการจัดการ)','Bachelor\'s of Business Administration (Management)','บธ.บ. (การจัดการ)','B.BA. (Management)','ปริญญาตรี',4,4),(4,'บริหารธุรกิจบัณฑิต (การตลาด)','ฺBachelor\'s of Business Administration (Marketing)','บธ.บ. (การตลาด)','B.BA. (Margeting)','ปริญญาโท',3,3);
 /*!40000 ALTER TABLE `baseapp_curriculum` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `baseapp_division`
---
-
-DROP TABLE IF EXISTS `baseapp_division`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_division` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `name_th` varchar(50) NOT NULL,
-  `name_en` varchar(50) NOT NULL,
-  `name_sh` varchar(10) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `baseapp_division`
@@ -272,31 +97,9 @@ CREATE TABLE `baseapp_division` (
 
 LOCK TABLES `baseapp_division` WRITE;
 /*!40000 ALTER TABLE `baseapp_division` DISABLE KEYS */;
-INSERT INTO `baseapp_division` VALUES (1,'ระบบสารสนเทศ','Information System','ฺBIS');
+INSERT INTO `baseapp_division` VALUES (1,'ระบบสารสนเทศ','Information System','ฺBIS'),(2,'การบัญชี','Accounting','BAC'),(3,'การตลาด','Marketing','BMK'),(4,'การจัดการ','Management','BMG');
 /*!40000 ALTER TABLE `baseapp_division` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `baseapp_documents`
---
-
-DROP TABLE IF EXISTS `baseapp_documents`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_documents` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `doctype` varchar(15) NOT NULL,
-  `refId` int NOT NULL,
-  `filename` varchar(100) NOT NULL,
-  `filetype` varchar(30) NOT NULL,
-  `uploadDate` datetime(6) NOT NULL,
-  `file` varchar(100) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `baseapp_documents_personnel_id_d8623a6c_fk_baseapp_personnel_id` (`personnel_id`),
-  CONSTRAINT `baseapp_documents_personnel_id_d8623a6c_fk_baseapp_personnel_id` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `baseapp_documents`
@@ -308,63 +111,14 @@ LOCK TABLES `baseapp_documents` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `baseapp_education`
---
-
-DROP TABLE IF EXISTS `baseapp_education`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_education` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `level` varchar(30) NOT NULL,
-  `degree_th` varchar(100) NOT NULL,
-  `degree_en` varchar(100) NOT NULL,
-  `degree_th_sh` varchar(50) NOT NULL,
-  `degree_en_sh` varchar(50) NOT NULL,
-  `yearGraduate` int NOT NULL,
-  `institute` varchar(100) NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `baseapp_education_personnel_id_2adcd2d8_fk_baseapp_personnel_id` (`personnel_id`),
-  KEY `baseapp_education_recorder_id_38379db0_fk_baseapp_personnel_id` (`recorder_id`),
-  CONSTRAINT `baseapp_education_personnel_id_2adcd2d8_fk_baseapp_personnel_id` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `baseapp_education_recorder_id_38379db0_fk_baseapp_personnel_id` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `baseapp_education`
 --
 
 LOCK TABLES `baseapp_education` WRITE;
 /*!40000 ALTER TABLE `baseapp_education` DISABLE KEYS */;
+INSERT INTO `baseapp_education` VALUES (1,'ปริญญาตรี','บริหารธุรกิจบัณฑิต (ระบบสารสนเทศ)','Bachelor\'s of Business Administration (Information System)','บธ.บ. (ระบบสารสนเทศ)','B.BA. (Information System)',2541,'สถาบันเทคโนโลยีราชมงคล','2023-05-05 03:44:49.186653',1,1),(2,'ปริญญาโท','บริหารธุรกิจบัณฑิต (ระบบสารสนเทศ)dddd','Bachelor\'s of Business Administration (Information System)dddd','บธ.บ. (ระบบสารสนเทศ)ddd','B.BA. (Information System)',2545,'สจพ.','2023-05-05 03:47:58.185136',1,1),(5,'ปริญญาเอก','ปรัชญาดุษฏีบัณฑิต (สารสนเทศศึกษา)','Doctoral Philosophy (Information Studies)','ป.รด. (สารสนเทศศึกษา)','Ph.D. (Information Studies)',2561,'มหาวิทยาลัยขอนแก่น','2023-05-05 05:10:56.356046',1,1),(7,'ปริญญาตรี','บริหารธุรกิจบัณฑิต (ระบบสารสนเทศ)','Bachelor\'s of Business Administration (Information System)','บธ.บ. (ระบบสารสนเทศ)','ฺB.BA. (Information System)',2540,'สถาบันเทคโนโลยีราชมงคล','2023-05-05 08:01:48.547444',9,9);
 /*!40000 ALTER TABLE `baseapp_education` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `baseapp_expertise`
---
-
-DROP TABLE IF EXISTS `baseapp_expertise`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_expertise` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `topic` varchar(100) NOT NULL,
-  `detail` longtext NOT NULL,
-  `experience` longtext NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `baseapp_expertise_personnel_id_8b0457dc_fk_baseapp_personnel_id` (`personnel_id`),
-  KEY `baseapp_expertise_recorder_id_5711daad_fk_baseapp_personnel_id` (`recorder_id`),
-  CONSTRAINT `baseapp_expertise_personnel_id_8b0457dc_fk_baseapp_personnel_id` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `baseapp_expertise_recorder_id_5711daad_fk_baseapp_personnel_id` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `baseapp_expertise`
@@ -372,29 +126,9 @@ CREATE TABLE `baseapp_expertise` (
 
 LOCK TABLES `baseapp_expertise` WRITE;
 /*!40000 ALTER TABLE `baseapp_expertise` DISABLE KEYS */;
+INSERT INTO `baseapp_expertise` VALUES (1,'การจัดการฐานข้อมูลกกกก','หกดหฟดกกหฟดฟหดกดห\r\nหกฟดฟห\r\nหกดฟหด','กฟหดฟหกด\r\nหกฟด\r\nฟหกดฟหหฟดฟหดฟหด','2023-05-05 06:18:13.740563',1,1),(2,'การเขียนโปรแกรม','หกดหฟดฟห','ดฟหดฟหดฟหด','2023-05-05 06:18:23.302141',1,1),(3,'การวิเคราะห์และออกแบบระบบ','กฟหดฟหด','กหดฟหดฟหดกฟหดกหฟด','2023-05-05 06:18:35.188762',1,1);
 /*!40000 ALTER TABLE `baseapp_expertise` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `baseapp_faculty`
---
-
-DROP TABLE IF EXISTS `baseapp_faculty`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_faculty` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `name_th` varchar(100) NOT NULL,
-  `name_en` varchar(100) NOT NULL,
-  `university` varchar(100) NOT NULL,
-  `address` longtext NOT NULL,
-  `telephone` varchar(20) NOT NULL,
-  `website` varchar(50) NOT NULL,
-  `vision` longtext NOT NULL,
-  `philosophy` varchar(128) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `baseapp_faculty`
@@ -407,69 +141,14 @@ INSERT INTO `baseapp_faculty` VALUES (1,'คณะบริหารธุรก
 UNLOCK TABLES;
 
 --
--- Table structure for table `baseapp_personnel`
---
-
-DROP TABLE IF EXISTS `baseapp_personnel`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `baseapp_personnel` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `email` varchar(30) NOT NULL,
-  `sId` varchar(15) NOT NULL,
-  `firstname_th` varchar(50) NOT NULL,
-  `lastname_th` varchar(50) NOT NULL,
-  `firstname_en` varchar(50) NOT NULL,
-  `lastname_en` varchar(50) NOT NULL,
-  `status` varchar(30) NOT NULL,
-  `type` varchar(10) NOT NULL,
-  `gender` varchar(15) NOT NULL,
-  `address` longtext NOT NULL,
-  `birthDate` date NOT NULL,
-  `hiringDate` date NOT NULL,
-  `picture` varchar(100) NOT NULL,
-  `division_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
-  KEY `baseapp_personnel_division_id_fb67c60a_fk_baseapp_division_id` (`division_id`),
-  CONSTRAINT `baseapp_personnel_division_id_fb67c60a_fk_baseapp_division_id` FOREIGN KEY (`division_id`) REFERENCES `baseapp_division` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `baseapp_personnel`
 --
 
 LOCK TABLES `baseapp_personnel` WRITE;
 /*!40000 ALTER TABLE `baseapp_personnel` DISABLE KEYS */;
-INSERT INTO `baseapp_personnel` VALUES (1,'phichayapak.ph@rmuti.ac.th','1','ก','ก','a','a','อาจารย์','สายวิชาการ','ชาย','aaa','2515-12-07','2541-06-22','static/images/personnels/6-1-2565_14-37-08_FyN2Goo.jpg',1);
+INSERT INTO `baseapp_personnel` VALUES (1,'phichayapak.ph@rmuti.ac.th','412','พิชญะภาคย์','พิพิธพัฒน์ไพสิฐ','Phitchayaphak','Phiphitphatphaisit','อาจารย์','สายวิชาการ','ชาย','255/7000','2515-12-07','2541-06-22','images/personnels/1.jpg',1),(4,'khemporn.su@rmuti.ac.th','333','เข็มพร','สุ่มมาตร','Khemporn','Summart','อาจารย์','สายวิชาการ','หญิง','3333','1111-01-01','2222-02-02','images/personnels/4.png',2),(9,'supaporn.an@hotmail.com','555','สุภาภรณ์','อนุภาพไพรบูรณ์','Supaporn','Anuphapphaiboon','อาจารย์','สายวิชาการ','หญิง','KKC','1111-01-01','2222-02-02','images/personnels/9.png',1),(10,'nathaporn.ji@rmuti.ac.th','111','นัฏพร','จิรเจษฏา','Nathaporn','Jirajesada','ผู้ช่วยศาสตราจารย์','สายวิชาการ','หญิง','HP Home Khonkean','2514-12-13','2537-01-01','images/personnels/10.png',3),(11,'Jirathikarn.ji@hotmail.com','4444','จิรัตติกาล','จิระพัน','Jirathikarn','Jiraphan','อาจารย์','สายวิชาการ','หญิง','MK','1010-01-01','2020-02-01','images/personnels/11.png',2);
 /*!40000 ALTER TABLE `baseapp_personnel` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `django_admin_log`
---
-
-DROP TABLE IF EXISTS `django_admin_log`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `django_admin_log` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `action_time` datetime(6) NOT NULL,
-  `object_id` longtext,
-  `object_repr` varchar(200) NOT NULL,
-  `action_flag` smallint unsigned NOT NULL,
-  `change_message` longtext NOT NULL,
-  `content_type_id` int DEFAULT NULL,
-  `user_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `django_admin_log_content_type_id_c4bce8eb_fk_django_co` (`content_type_id`),
-  KEY `django_admin_log_user_id_c564eba6_fk_auth_user_id` (`user_id`),
-  CONSTRAINT `django_admin_log_content_type_id_c4bce8eb_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
-  CONSTRAINT `django_admin_log_user_id_c564eba6_fk_auth_user_id` FOREIGN KEY (`user_id`) REFERENCES `auth_user` (`id`),
-  CONSTRAINT `django_admin_log_chk_1` CHECK ((`action_flag` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `django_admin_log`
@@ -477,25 +156,9 @@ CREATE TABLE `django_admin_log` (
 
 LOCK TABLES `django_admin_log` WRITE;
 /*!40000 ALTER TABLE `django_admin_log` DISABLE KEYS */;
-INSERT INTO `django_admin_log` VALUES (1,'2023-05-03 15:12:02.639192','1','คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน วิทยาเขตขอนแก่น',1,'[{\"added\": {}}]',8,1),(2,'2023-05-03 15:12:20.364925','1','ระบบสารสนเทศ (ฺBIS)',1,'[{\"added\": {}}]',7,1),(3,'2023-05-03 15:12:41.871198','1','บริหารธุรกิจบัณฑิต (สาขาเทคโนโลยีธุรกิจดิจิทัล)',1,'[{\"added\": {}}]',13,1);
+INSERT INTO `django_admin_log` VALUES (1,'2023-05-03 15:12:02.639192','1','คณะบริหารธุรกิจและเทคโนโลยีสารสนเทศ มหาวิทยาลัยเทคโนโลยีราชมงคลอีสาน วิทยาเขตขอนแก่น',1,'[{\"added\": {}}]',8,1),(2,'2023-05-03 15:12:20.364925','1','ระบบสารสนเทศ (ฺBIS)',1,'[{\"added\": {}}]',7,1),(3,'2023-05-03 15:12:41.871198','1','บริหารธุรกิจบัณฑิต (สาขาเทคโนโลยีธุรกิจดิจิทัล)',1,'[{\"added\": {}}]',13,1),(4,'2023-05-05 00:37:03.711992','2','การบัญชี (Acc.)',1,'[{\"added\": {}}]',7,1),(5,'2023-05-05 00:37:17.437423','3','การตลาด (BMK)',1,'[{\"added\": {}}]',7,1),(6,'2023-05-05 00:37:26.830761','2','การบัญชี (BAC)',2,'[{\"changed\": {\"fields\": [\"Name sh\"]}}]',7,1);
 /*!40000 ALTER TABLE `django_admin_log` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `django_content_type`
---
-
-DROP TABLE IF EXISTS `django_content_type`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `django_content_type` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `app_label` varchar(100) NOT NULL,
-  `model` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `django_content_type_app_label_model_76bd3d3b_uniq` (`app_label`,`model`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `django_content_type`
@@ -508,22 +171,6 @@ INSERT INTO `django_content_type` VALUES (1,'admin','logentry'),(3,'auth','group
 UNLOCK TABLES;
 
 --
--- Table structure for table `django_migrations`
---
-
-DROP TABLE IF EXISTS `django_migrations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `django_migrations` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `app` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `applied` datetime(6) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `django_migrations`
 --
 
@@ -532,22 +179,6 @@ LOCK TABLES `django_migrations` WRITE;
 INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2023-05-03 13:58:57.540472'),(2,'auth','0001_initial','2023-05-03 13:59:18.209716'),(3,'admin','0001_initial','2023-05-03 13:59:27.225095'),(4,'admin','0002_logentry_remove_auto_add','2023-05-03 13:59:27.530399'),(5,'admin','0003_logentry_add_action_flag_choices','2023-05-03 13:59:27.808406'),(6,'contenttypes','0002_remove_content_type_name','2023-05-03 13:59:31.576049'),(7,'auth','0002_alter_permission_name_max_length','2023-05-03 13:59:33.395474'),(8,'auth','0003_alter_user_email_max_length','2023-05-03 13:59:35.811221'),(9,'auth','0004_alter_user_username_opts','2023-05-03 13:59:35.857635'),(10,'auth','0005_alter_user_last_login_null','2023-05-03 13:59:37.488002'),(11,'auth','0006_require_contenttypes_0002','2023-05-03 13:59:37.640176'),(12,'auth','0007_alter_validators_add_error_messages','2023-05-03 13:59:37.730582'),(13,'auth','0008_alter_user_username_max_length','2023-05-03 13:59:41.867161'),(14,'auth','0009_alter_user_last_name_max_length','2023-05-03 13:59:45.971696'),(15,'auth','0010_alter_group_name_max_length','2023-05-03 13:59:47.805650'),(16,'auth','0011_update_proxy_permissions','2023-05-03 13:59:47.851624'),(17,'auth','0012_alter_user_first_name_max_length','2023-05-03 13:59:49.826931'),(18,'baseapp','0001_initial','2023-05-03 14:00:27.897693'),(19,'sessions','0001_initial','2023-05-03 14:00:30.010491'),(20,'workapp','0001_initial','2023-05-03 14:01:18.466032');
 /*!40000 ALTER TABLE `django_migrations` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `django_session`
---
-
-DROP TABLE IF EXISTS `django_session`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `django_session` (
-  `session_key` varchar(40) NOT NULL,
-  `session_data` longtext NOT NULL,
-  `expire_date` datetime(6) NOT NULL,
-  PRIMARY KEY (`session_key`),
-  KEY `django_session_expire_date_a5c62663` (`expire_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `django_session`
@@ -559,34 +190,6 @@ LOCK TABLES `django_session` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `workapp_command`
---
-
-DROP TABLE IF EXISTS `workapp_command`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `workapp_command` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `comId` varchar(30) NOT NULL,
-  `comDate` date NOT NULL,
-  `fiscalYear` int NOT NULL,
-  `eduYear` int NOT NULL,
-  `eduSemeter` varchar(10) NOT NULL,
-  `mission` varchar(50) NOT NULL,
-  `topic` longtext NOT NULL,
-  `detail` longtext NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `workapp_command_personnel_id_a0bced0c_fk_baseapp_personnel_id` (`personnel_id`),
-  KEY `workapp_command_recorder_id_06b235ed_fk_baseapp_personnel_id` (`recorder_id`),
-  CONSTRAINT `workapp_command_personnel_id_a0bced0c_fk_baseapp_personnel_id` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `workapp_command_recorder_id_06b235ed_fk_baseapp_personnel_id` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `workapp_command`
 --
 
@@ -594,33 +197,6 @@ LOCK TABLES `workapp_command` WRITE;
 /*!40000 ALTER TABLE `workapp_command` DISABLE KEYS */;
 /*!40000 ALTER TABLE `workapp_command` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `workapp_leave`
---
-
-DROP TABLE IF EXISTS `workapp_leave`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `workapp_leave` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `startDate` date NOT NULL,
-  `endDate` date NOT NULL,
-  `days` int NOT NULL,
-  `fiscalYear` int NOT NULL,
-  `eduYear` int NOT NULL,
-  `leaveType` varchar(50) NOT NULL,
-  `reason` varchar(255) NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `workapp_leave_personnel_id_84cc093a_fk_baseapp_personnel_id` (`personnel_id`),
-  KEY `workapp_leave_recorder_id_36b265d1_fk_baseapp_personnel_id` (`recorder_id`),
-  CONSTRAINT `workapp_leave_personnel_id_84cc093a_fk_baseapp_personnel_id` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `workapp_leave_recorder_id_36b265d1_fk_baseapp_personnel_id` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `workapp_leave`
@@ -632,35 +208,6 @@ LOCK TABLES `workapp_leave` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `workapp_performance`
---
-
-DROP TABLE IF EXISTS `workapp_performance`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `workapp_performance` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `getDate` date NOT NULL,
-  `fiscalYear` int NOT NULL,
-  `eduYear` int NOT NULL,
-  `eduSemeter` int NOT NULL,
-  `topic` varchar(255) NOT NULL,
-  `detail` longtext NOT NULL,
-  `budget` double NOT NULL,
-  `budgetType` varchar(30) NOT NULL,
-  `source` varchar(255) NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `workapp_performance_personnel_id_d4658b3e_fk_baseapp_p` (`personnel_id`),
-  KEY `workapp_performance_recorder_id_a3649e47_fk_baseapp_personnel_id` (`recorder_id`),
-  CONSTRAINT `workapp_performance_personnel_id_d4658b3e_fk_baseapp_p` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `workapp_performance_recorder_id_a3649e47_fk_baseapp_personnel_id` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `workapp_performance`
 --
 
@@ -668,37 +215,6 @@ LOCK TABLES `workapp_performance` WRITE;
 /*!40000 ALTER TABLE `workapp_performance` DISABLE KEYS */;
 /*!40000 ALTER TABLE `workapp_performance` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `workapp_research`
---
-
-DROP TABLE IF EXISTS `workapp_research`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `workapp_research` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `fiscalYear` int NOT NULL,
-  `title_th` longtext NOT NULL,
-  `title_en` longtext NOT NULL,
-  `objective` longtext NOT NULL,
-  `percent_resp` int NOT NULL,
-  `budget` double NOT NULL,
-  `budgetType` varchar(30) NOT NULL,
-  `source` varchar(255) NOT NULL,
-  `keyword` longtext NOT NULL,
-  `percent_success` int NOT NULL,
-  `publish_method` longtext NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `workapp_research_personnel_id_dfb5d04c_fk_baseapp_personnel_id` (`personnel_id`),
-  KEY `workapp_research_recorder_id_0674ef61_fk_baseapp_personnel_id` (`recorder_id`),
-  CONSTRAINT `workapp_research_personnel_id_dfb5d04c_fk_baseapp_personnel_id` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `workapp_research_recorder_id_0674ef61_fk_baseapp_personnel_id` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `workapp_research`
@@ -710,40 +226,6 @@ LOCK TABLES `workapp_research` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `workapp_socialservice`
---
-
-DROP TABLE IF EXISTS `workapp_socialservice`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `workapp_socialservice` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `startDate` date NOT NULL,
-  `endDate` date NOT NULL,
-  `days` int NOT NULL,
-  `fiscalYear` int NOT NULL,
-  `eduYear` int NOT NULL,
-  `eduSemeter` int NOT NULL,
-  `topic` double NOT NULL,
-  `objective` longtext NOT NULL,
-  `place` varchar(255) NOT NULL,
-  `budget` double NOT NULL,
-  `budgetType` varchar(30) NOT NULL,
-  `source` varchar(255) NOT NULL,
-  `receiver` varchar(255) NOT NULL,
-  `num_receiver` int NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `workapp_socialservic_personnel_id_6077a67c_fk_baseapp_p` (`personnel_id`),
-  KEY `workapp_socialservic_recorder_id_7ece6878_fk_baseapp_p` (`recorder_id`),
-  CONSTRAINT `workapp_socialservic_personnel_id_6077a67c_fk_baseapp_p` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `workapp_socialservic_recorder_id_7ece6878_fk_baseapp_p` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Dumping data for table `workapp_socialservice`
 --
 
@@ -751,36 +233,6 @@ LOCK TABLES `workapp_socialservice` WRITE;
 /*!40000 ALTER TABLE `workapp_socialservice` DISABLE KEYS */;
 /*!40000 ALTER TABLE `workapp_socialservice` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `workapp_training`
---
-
-DROP TABLE IF EXISTS `workapp_training`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `workapp_training` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `startDate` date NOT NULL,
-  `endDate` date NOT NULL,
-  `days` int NOT NULL,
-  `fiscalYear` int NOT NULL,
-  `eduYear` int NOT NULL,
-  `eduSemeter` int NOT NULL,
-  `topic` varchar(255) NOT NULL,
-  `place` varchar(255) NOT NULL,
-  `budget` double NOT NULL,
-  `budgetType` varchar(30) NOT NULL,
-  `recordDate` datetime(6) NOT NULL,
-  `personnel_id` bigint NOT NULL,
-  `recorder_id` bigint NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `workapp_training_personnel_id_6c2478b3_fk_baseapp_personnel_id` (`personnel_id`),
-  KEY `workapp_training_recorder_id_21f847a5_fk_baseapp_personnel_id` (`recorder_id`),
-  CONSTRAINT `workapp_training_personnel_id_6c2478b3_fk_baseapp_personnel_id` FOREIGN KEY (`personnel_id`) REFERENCES `baseapp_personnel` (`id`),
-  CONSTRAINT `workapp_training_recorder_id_21f847a5_fk_baseapp_personnel_id` FOREIGN KEY (`recorder_id`) REFERENCES `baseapp_personnel` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `workapp_training`
@@ -800,4 +252,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-05-03 22:43:26
+-- Dump completed on 2023-05-05 22:58:28

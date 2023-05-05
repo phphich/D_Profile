@@ -1,75 +1,103 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <h1> รายละเอียดบุคลากร </h1>
-    <h2> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }}</h2>
+    <div class="row">
+        <div class="col-10">
+            <h2><i class="fa fa-user"></i> รายละเอียดบุคลากร </h2>
+            <h3> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
+                สังกัด: {{ personnel.division }}
+            </h3>
+        </div>
+        <div class="col-2">
+            <img src="{% static personnel.picture %}" width="100px" height="auto" style="margin-top:10px;">
+        </div>
+    </div>
+
+
     <hr class="text-primary">
     <table class="table table-info table-striped table-hover">
-        <tr>
-            <th class="col-2">เลขที่ตำแหน่ง</th>
-            <td class="col-10">{{ personnel.sId }}</td>
+        <tr class="text-primary">
+            <th class="col-3">เลขที่ตำแหน่ง</th>
+            <td class="col-9">{{ personnel.sId }}</td>
         </tr>
-        <tr>
-            <th>ชื่อ (ภาษาไทย) </th>
-            <td>{{ personnel.firstname_th}}</td>
+        <tr class="text-primary">
+            <th>ชื่อ (ภาษาไทย)</th>
+            <td>{{ personnel.firstname_th }}</td>
         </tr>
-        <tr>
-            <th>สกุล (ภาษาไทย) </th>
+        <tr class="text-primary">
+            <th>สกุล (ภาษาไทย)</th>
             <td>{{ personnel.lastname_en }}</td>
         </tr>
-        <tr>
-            <th>ชื่อ (ภาษาอังกฤษ) </th>
+        <tr class="text-primary">
+            <th>ชื่อ (ภาษาอังกฤษ)</th>
             <td>{{ personnel.firstname_en }}</td>
         </tr>
-        <tr>
-            <th>นามสกุล (ภาษาอังกฤษ) </th>
+        <tr class="text-primary">
+            <th>นามสกุล (ภาษาอังกฤษ)</th>
             <td>{{ personnel.lastname_en }}</td>
         </tr>
-        <tr>
+        <tr class="text-primary">
             <th>ประเภทบุคลากร</th>
             <td>{{ personnel.type }}</td>
         </tr>
-        <tr>
-            <th>ตำแหน่ง </th>
+        <tr class="text-primary">
+            <th>ตำแหน่ง</th>
             <td>{{ personnel.status }}</td>
         </tr>
-        <tr>
+        <tr class="text-primary">
             <th>สังกัดสาขา</th>
             <td>{{ personnel.division.name_th }}</td>
         </tr>
-        <tr>
+        <tr class="text-primary">
             <th>ที่อยู่</th>
             <td>{{ personnel.address }}</td>
         </tr>
-         <tr>
+        <tr class="text-primary">
             <th>เพศ</th>
             <td>{{ personnel.gender }}</td>
         </tr>
-        <tr>
+        <tr class="text-primary">
             <th>วันเดือนปีเกิด</th>
             <td>{{ personnel.birthDate }}</td>
         </tr>
-        <tr>
+        <tr class="text-primary">
             <th>วันที่เริ่มบรรจุเข้าทำงาน</th>
             <td>{{ personnel.hiringDate }}</td>
         </tr>
-        <tr>
+        <tr class="text-primary">
             <th>อีเมล์</th>
             <td>{{ personnel.email }}</td>
         </tr>
-        <tr>
+        <tr class="text-primary">
             <th>รูปประจำตัว</th>
-            <td><img src="{% static personnel.picture %}" width="200px" height="300px" class="img-fluid"> </td>
+            <td><img src="{% static personnel.picture %}" width="200px" height="auto" style="margin-top:10px;"></td>
         </tr>
 
 
     </table>
+    <div class="row">
+        <div class="col-5">
+            <p class="text-center">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fa fa-rotate-back"></i> ย้อนกลับ
+                </button>
+                <button type="button" class="btn btn-secondary"
+                        onclick="location.href='{% url 'personnelUpdate' personnel.id %}'">
+                    <i class="fa fa-tools"></i> แก้ไข
+                </button>
+            </p>
+        </div>
+        <div class="col-5">
+            <p class="text-center">
+                <button type="button" class="btn btn-info" onclick="location.href='{% url 'educationList' personnel.division.id personnel.id  %}'">
+                    <i class="fa fa-graduation-cap"></i> การศึกษา
+                </button>
+                <button type="button" class="btn btn-primary" onclick="location.href='{% url 'expertiseList' personnel.division.id personnel.id %}'">
+                    <i class="fa fa-directions"></i> ความเชี่ยวชาญ
+                </button>
+            </p>
+        </div>
+    </div>
 
-        <p class="text-center">
-            <button type="button" class="btn btn-secondary" onclick="history.back()">
-                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
-            </button>
-            <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> แก้ไข </a>
-        </p>
 
 {% endblock %}
