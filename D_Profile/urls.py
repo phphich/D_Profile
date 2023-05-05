@@ -24,6 +24,7 @@ from workapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', baseapp.views.home, name='home'),
     path('baseapp/', include('baseapp.urls')),
-    path('', baseapp.views.home, name='home')
+    path('workapp/', include('workapp.urls')),
 ]

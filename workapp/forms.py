@@ -63,7 +63,7 @@ class LeaveForm(forms.ModelForm):
         )
         SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('ฤดูร้อน', 'ฤดูร้อน'))
         model = Leave
-        fields = ('startDate', 'endDate', 'days', 'fiscalYear', 'eduYear', 'leaveType', 'reason', 'personnel')
+        fields = ('startDate', 'endDate', 'days', 'fiscalYear', 'eduYear', 'leaveType', 'reason', 'personnel','recorder')
         widgets = {
             'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type':'date'}),
             'endDate': forms.NumberInput(attrs={'class': 'form-control', 'type':'date'}),
@@ -72,7 +72,8 @@ class LeaveForm(forms.ModelForm):
             'eduSemeter': forms.RadioSelect(choices=SEMETER_CHOICES, attrs={'class': ''}),
             'leaveType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
             'reason':forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
-            'personnel': forms.HiddenInput(),
+            'personnel':forms.HiddenInput(),
+            'recorder':forms.HiddenInput(),
         }
         labels = {
             'startDate': 'วันที่เริ่มต้น',
@@ -82,7 +83,8 @@ class LeaveForm(forms.ModelForm):
             'eduYear': 'ปีการศึกษา',
             'leaveType': 'ประเภทการลา',
             'reason': 'เหตุผลประกอบการลา',
-            'personnel': 'บุคลากร'
+            'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก'
         }
 
         def deleteForm(self):
@@ -156,7 +158,7 @@ class ResearchForm(forms.ModelForm):
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
         model = Research
-        fields = ('fiscalYear', 'title_th', 'title_en', 'objective', 'percent_rest', 'budget', 'budgetType','source','keyword', 'percent_success', 'publish_method', 'personnel')
+        fields = ('fiscalYear', 'title_th', 'title_en', 'objective', 'percent_resp', 'budget', 'budgetType','source','keyword', 'percent_success', 'publish_method', 'personnel')
         widgets = {
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'title_th': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows':3}),
@@ -274,7 +276,7 @@ class Performance(forms.ModelForm):
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
         model = Performance
-        fields = ('getDate', 'fiscalYear', 'eduYear', 'eduSemeter', 'topic', 'detail', 'budget', 'budgetType', 'source' 'personnel')
+        fields = ('getDate', 'fiscalYear', 'eduYear', 'eduSemeter', 'topic', 'detail', 'budget', 'budgetType', 'source', 'personnel')
         widgets = {
             'getDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),

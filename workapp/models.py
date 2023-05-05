@@ -1,6 +1,25 @@
 from django.db import models
 from baseapp.models import *
 
+# def getCommand(self):
+#     commands = Command.objects.filter(personnel=self).order_by('id')
+#     return commands
+# def getResearch(self):
+#     researchs = Research.objects.filter(personnel=self).order_by('id')
+#     return researchs
+# def getSocialService(self):
+#     socialServices = SocialService.objects.filter(personnel=self).order_by('id')
+#     return socialServices
+# def getTraining(self):
+#     trainings = Training.objects.filter(personnel=self).order_by('id')
+#     return trainings
+# def getLeave(self):
+#     leaves = Leave.objects.filter(personnel=self).order_by('id')
+#     return leaves
+# def getPerformance(self):
+#     performances = Performance.objects.filter(personnel=self).order_by('id')
+#     return performances
+
 class Command(models.Model):
     comId = models.CharField(max_length=30, default="")
     comDate = models.DateField(default=None)
@@ -32,6 +51,7 @@ class Leave(models.Model):
         return self.personnel.status + self.personnel.firstName + " " + self.personnel.lastName + \
                 "  " + self.leaveType + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                 "  " + self.leaveType + " (" + str(self.days) + ")"
+
 
 class Training(models.Model):
     startDate = models.DateField(default=None)
