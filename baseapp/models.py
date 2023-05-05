@@ -58,7 +58,7 @@ class Personnel(models.Model):
     def __str__(self):
         return self.status + self.firstname_th +  " " + self.lastname_th
     def getEducations(self):
-        educations = Education.objects.filter(personnel=self).order_by('yearGraduate')
+        educations = Education.objects.filter(personnel=self).order_by('-yearGraduate')
         return educations
     def getExpertise(self):
         expertises = Expertise.objects.filter(personnel=self).order_by('id')

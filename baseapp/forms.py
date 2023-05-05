@@ -187,15 +187,15 @@ class EducationForm(forms.ModelForm):
             ("ประกาศนียบัตร", "ประกาศนียบัตร"),
         )
         model = Education
-        fields = ('level', 'degree_th', 'degree_en','degree_th_sh','degree_en_sh','yearGraduate','institute', 'personnel', 'recorder')
+        fields = ('level', 'degree_th', 'degree_en','degree_th_sh','degree_en_sh','institute','yearGraduate', 'personnel', 'recorder')
         widgets = {
             'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control'}),
             'degree_th': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'degree_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'degree_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'degree_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
-            'yearGraduate': forms.NumberInput(attrs={'class': 'form-control', 'size': 20}),
             'institute': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'yearGraduate': forms.NumberInput(attrs={'class': 'form-control', 'size': 20}),
             'personnel':forms.HiddenInput(),
             'recorder':forms.HiddenInput(),
         }
@@ -205,8 +205,8 @@ class EducationForm(forms.ModelForm):
             'degree_en': 'ชื่อวุฒิการศึกษา (อังกฤษ)',
             'degree_th_sh': 'ชื่อย่อวุฒิการศึกษา (ไทย)',
             'degree_en_sh': 'ชื่อย่อวุฒิการศึกษา (อังกฤษ)',
-            'yearGraduate': 'ปีที่สำเร็จการศึกษา',
             'institute': 'ชื่อสถาบันการศึกษา',
+            'yearGraduate': 'ปีที่สำเร็จการศึกษา',
             'personnel': 'บุคลากร',
             'recorder': 'ผู้บันทึก',
 
