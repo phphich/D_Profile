@@ -19,8 +19,8 @@ def leaveList(request, divisionId=None, personnelId=None):
             personnel = Personnel.objects.filter(id=personnelId).first()
         else:
             personnel = division.getPersonnels().first()
-    # leaves = personnel.PersonnelLeave.all().order_by('-startDate')
-    leaves = personnel.PersonnelLeave.all()
+    leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
+    # scores = Score.objects.filter(student_id=stdid, problem_id__in=problems).order_by('problem__objid')
 
     context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'leaves':leaves}
     return render(request, 'work/leaveList.html', context)
