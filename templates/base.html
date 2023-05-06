@@ -30,7 +30,12 @@
                         {% for message in messages %}
                             <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                 <b>ผิดพลาด!</b> โปรดตรวจสอบและแก้ไขให้ถูกต้อง
+                                {% if message.tags == 'success' %}
+                                    <b>ดำเนินการสำเร็จ!</b>
+                                {% else %}
+                                    <b>การดำเนินการผิดพลาด!</b> โปรดตรวจสอบและแก้ไขให้ถูกต้อง
+                                {% endif %}
+
                                 <g class="text-danger"> "{{ message }}" </g>
                             </div>
                         {% endfor %}

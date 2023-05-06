@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.models import Max
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from workapp.models import *
@@ -20,15 +22,30 @@ def leaveList(request, divisionId=None, personnelId=None):
         else:
             personnel = division.getPersonnels().first()
     leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
-    # scores = Score.objects.filter(student_id=stdid, problem_id__in=problems).order_by('problem__objid')
+    # leaves = personnel.getLeave()
 
     context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'leaves':leaves}
     return render(request, 'work/leaveList.html', context)
 
-def leaveDetail(request, id):
-    pass
-
 def leaveNew(request, id):
+    personnel = get_object_or_404(Personnel, id=id)
+    if request.method == 'POST':
+        form = LeaveForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('leaveList', divisionId=personnel.division.id, personnelId=personnel.id)
+        else:
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'work/leaveNew.html', context)
+    else:
+        today = datetime.date.today()
+        currentYear = today.year
+
+        form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'work/leaveNew.html', context)
+
+def leaveDetail(request, id):
     pass
 
 def leaveUpdate(request, id):

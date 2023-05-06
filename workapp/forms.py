@@ -61,15 +61,14 @@ class LeaveForm(forms.ModelForm):
             ("การลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน", "การลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน"),
             ("ลาไปปฏิบัติงานในองค์กรระหว่างประเทศ","ลาไปปฏิบัติงานในองค์กรระหว่างประเทศ")
         )
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('ฤดูร้อน', 'ฤดูร้อน'))
         model = Leave
-        fields = ('startDate', 'endDate', 'days', 'fiscalYear', 'eduYear', 'leaveType', 'reason', 'personnel','recorder')
+        fields = ('fiscalYear','leaveType', 'eduYear', 'startDate', 'endDate', 'days', 'reason', 'personnel','recorder')
         widgets = {
             'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type':'date'}),
             'endDate': forms.NumberInput(attrs={'class': 'form-control', 'type':'date'}),
             'days': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduSemeter': forms.RadioSelect(choices=SEMETER_CHOICES, attrs={'class': ''}),
+            'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'leaveType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
             'reason':forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'personnel':forms.HiddenInput(),

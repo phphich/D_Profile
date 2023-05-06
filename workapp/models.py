@@ -52,7 +52,6 @@ class Leave(models.Model):
                 "  " + self.leaveType + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                 "  " + self.leaveType + " (" + str(self.days) + ")"
 
-
 class Training(models.Model):
     startDate = models.DateField(default=None)
     endDate = models.DateField(default=None)

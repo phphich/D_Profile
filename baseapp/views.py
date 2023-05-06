@@ -299,7 +299,6 @@ def expertiseList(request, divisionId=None, personnelId=None):
     context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/expertiseList.html', context)
 
-
 def expertiseNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     if request.method == 'POST':

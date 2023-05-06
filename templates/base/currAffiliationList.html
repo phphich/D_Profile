@@ -7,7 +7,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-12">
+        <div class="col-5">
             <form method="post" class="form-control text-success">
                 {% csrf_token %}
                 <label for="curriculumId">เลือกหลักสูตร </label>
@@ -23,6 +23,8 @@
 {#                <input type="hidden" name="act" value="select">#}
             </form>
         </div>
+        <div class="col-1 text-center align-middle"> </div>
+        <div class="col-6"></div>
     </div>
 
     {% if curriculum != None %}
