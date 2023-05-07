@@ -62,7 +62,7 @@
         </table>
 
         <div id="newCurrAff" class="collapse">
-            <form method="post" class="form-control">
+            <form method="post" class="form-control text-primary">
                 {% csrf_token %}
                 {{ form.as_table }}
                 <input type="hidden" name="curriculumId" value="{{ curriculum.id }}">

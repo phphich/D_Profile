@@ -1,3 +1,5 @@
+import fileinput
+
 from django.db import models
 from baseapp.models import *
 
@@ -48,9 +50,19 @@ class Leave(models.Model):
     recorder = models.ForeignKey(Personnel, related_name='RecorderLeave', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
-        return self.personnel.status + self.personnel.firstName + " " + self.personnel.lastName + \
-                "  " + self.leaveType + " : " + str(self.startDate) + " - " + str(self.endDate) + \
+        return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th +\
+                "  " + self.leaveType+ " : " + str(self.startDate) + " - " + str(self.endDate) + \
                 "  " + self.leaveType + " (" + str(self.days) + ")"
+    def getLeaveFiles(self):
+        leaveFiles = LeaveFile.objects.filter(leave=self)
+        return leaveFiles
+
+class LeaveFile(models.Model):
+    file = models.FileField(upload_to='static/documents/leave', default=None, null=True, blank=True)
+    filetype = models.CharField(max_length=50, default=None)
+    leave = models.ForeignKey(Leave, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return "File: " +   ", filetype: "   +  ", leave "
 
 class Training(models.Model):
     startDate = models.DateField(default=None)

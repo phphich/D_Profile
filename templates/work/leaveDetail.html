@@ -1,59 +1,169 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+    <style>
+        a.filelink {
+            box-shadow: inset 0 0 0 0 #54b3d6;
+            color: #54b3d6;
+            margin: 0 -.25rem;
+            padding: 0 .25rem;
+            transition: color .3s ease-in-out, box-shadow .3s ease-in-out;
+            text-decoration: none;
+        }
+        a.filelink:hover {
+            box-shadow: inset 100px 0 0 0 #ef0505;
+            color: white;
+            text-decoration: none;
+            background-color: #0a53be;
+        }
+    </style>
+
     <div class="row">
         <div class="col-10">
-            <h2><i class="fa fa-user-graduate"></i> รายละเอียดวุฒิการศึกษา </h2>
+            <h2><i class="fa fa-person-hiking"></i> รายละเอียดการลา </h2>
             <h3>
-                {{ education.personnel.status }}{{ education.personnel.firstname_th }} {{ education.personnel.lastname_th }},
-                สังกัด: {{ education.personnel.division }}
+                {{ leave.personnel.status }}{{ leave.personnel.firstname_th }} {{ leave.personnel.lastname_th }},
+                สังกัด: {{ leave.personnel.division }}
             </h3>
         </div>
         <div class="col-2">
-            <img src="{% static education.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;">
+            <img src="{% static leave.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;">
         </div>
     </div>
 
     <hr class="text-primary">
     <table class="table table-info table-striped table-hover">
         <tr class="text-primary">
-            <th class="col-3">ระดับการศึกษา</th>
-            <td class="col-9">{{ education.level }}</td>
+            <th class="col-3">ปีงบประมาณ</th>
+            <td class="col-9">{{ leave.fiscalYear }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ชื่อวุฒิการศึกษา <br>(ภาษาไทย)</th>
-            <td>{{ education.degree_th }}</td>
+            <th>ปีการศึกษา</th>
+            <td>{{ leave.eduYear }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ชื่อวุฒิการศึกษา<br>(ภาษาอังกฤษ)</th>
-            <td>{{ education.degree_en }}</td>
+            <th>ประเภทการลา</th>
+            <td>{{ leave.leaveType }}</td>
         </tr>
         <tr class="text-primary">
-            <th class="col-3">ชื่อย่อวุฒิการศึกษา <br>(ภาษาไทย)</th>
-            <td class="col-9">{{ education.degree_th_sh }}</td>
+            <th class="col-3">วันที่เริ่มต้น</th>
+            <td class="col-9">{{ leave.startDate }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ชื่อย่อวุฒิการศึกษา <br>(ภาษาอังกฤษ)</th>
-            <td>{{ education.degree_en_sh }}</td>
+            <th>วันที่สิ้นสุด</th>
+            <td>{{ leave.endDate }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ชื่อสถาบันการศึกษา</th>
-            <td>{{ education.institute }}</td>
+            <th>จำนวนวันลา</th>
+            <td>{{ leave.days }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ปีที่สำเร็จการศึกษา</th>
-            <td>{{ education.yearGraduate }}</td>
+            <th>เหตุผลประกอบการลา</th>
+            <td>{{ leave.reason }}</td>
         </tr>
     </table>
 
     <p class="text-center">
-        <button type="button" class="btn btn-secondary" onclick="history.back()">
+        <button type="button" class="btn btn-secondary"
+                onclick="location.href='{% url 'leaveList' leave.personnel.division.id leave.personnel.id %}'">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
         <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'educationUpdate' education.id  %}'">
+                onclick="location.href='{% url 'leaveUpdate' leave.id %}'">
             <i class="fa fa-tools"></i> แก้ไข
         </button>
     </p>
 
+    <div class="row">
+        <div class="col-12 text-success">
+            <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>
+             <p class="text-info">
+                 {% if leave.getLeaveFiles|length == 0 %}
+                     <div class="alert-warning">....ยังไม่ได้อัพโหลดเอกสารประกอบไว้ในระบบ....</div>
+                 {% else %}
+                     <div class="row">
+                     {% for f in leave.getLeaveFiles %}
+                             <div class="col-3">
+                                 <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
+                                 {% if f.filetype == "pdf" %}
+                                     <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
+                                          class="img-thumbnail">
+                                 {% else %}
+                                     {% if f.filetype == "doc" or f.filetype == "docx" %}
+                                         <img src="{% static 'images/iconfiles/doc-icon.png' %}" width="80px"
+                                              class="img-thumbnail">
+                                     {% else %}
+                                         {% if f.filetype == "xls" or f.filetype == "xlsx" %}
+                                             <img src="{% static 'images/iconfiles/xls-icon.png' %}" width="80px"
+                                                  class="img-thumbnail">
+                                         {% else %}
+                                             {% if f.filetype == "ppt" or f.filetype == "pptx" %}
+                                                 <img src="{% static 'images/iconfiles/ppt-icon.png' %}" width="80px"
+                                                      class="img-thumbnail">
+                                             {% else %}
+                                                 {% if f.filetype == "jpg" or f.filetype == "png" or f.filetype == "jpeg" or f.filetype == "gif" %}
+                                                     <img src="{% static 'images/iconfiles/img-icon.png' %}"
+                                                          width="80px" class="img-thumbnail">
+                                                 {% else %}
+                                                     <img src="{% static 'images/iconfiles/txt-icon.png' %}"
+                                                          width="80px" class="img-thumbnail">
+                                                 {% endif %}
+                                             {% endif %}
+                                         {% endif %}
+                                     {% endif %}
+                                 {% endif %}
+                                 <br>
+                                 {% if f.file.name|length|get_digit:"-1" > 30 %}
+                                    {{ f.file.name|slice:"0:30" }}...
+                                 {% else %}
+                                    {{ f.file.name }}
+                                 {% endif %}
+                                </a>
+                                <a href="{% url 'leaveDeleteFile' f.id %}" onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
+                                    <i class="fas fa-minus text-danger"></i>
+                                </a>
+                             </div>
+                     {% endfor %}
+                     </div>
+                     {% if leave.getLeaveFiles|length > 1 %}
+                        <div class="row">
+                            <div class="col-3">
+                                <a href="{% url 'leaveDeleteFileAll' leave.id %}"
+                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
+                                    <i class="fas fa-trash text-white"></i>
+                                    ลบไฟล์เอกสารแนบทั้งหมด!
+                                </a>
+                            </div>
+                            <div class="col-9"></div>
+                         </div>
+                     {% endif %}
+                 {% endif %}
+             </p>
+        </div>
+    </div>
+
+    <br><br>
+    <h5 class="text-danger"><i class="fa fa-book"></i> อัพโหลดไฟล์เอกสารแนบ: </h5>
+    <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th" >
+        {% csrf_token %}
+        <div class="row text-danger">
+            <div class="col-3">
+                {{ fileForm.as_table }}
+            </div>
+            <div class="col-9" id="fileList">
+                <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทย </i></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5 text-center">
+                <input type="hidden" name="id" value="{{ leave.id }}">
+            </div>
+            <div class="col-2 text-center" id="upload">
+                <br>
+                <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload"></i> อัพโหลด! </button>
+                <br>
+            </div>
+            <div class="col-5 text-center"></div>
+        </div>
+    </form>
 {% endblock %}

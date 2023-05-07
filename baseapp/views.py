@@ -127,10 +127,10 @@ def personnelNew(request):
                 return render(request, 'base/personnelNew.html', context)
             newForm = form.save(commit=False)
             email = newForm.email
-            filepath = newForm.picture.name
+            filepath = newForm.picture.name.lowwer()
             filepath = filepath.replace(' ', '_')
             point = filepath.rfind('.')
-            ext = filepath[point:]
+            ext = filepath[point:].lowwer()
             filenames = filepath.split('/')
             filename = 'images/personnels/' + filenames[len(filenames) - 1]
             newForm.save()
@@ -172,7 +172,6 @@ def personnelUpdate(request, id):
                 ext = filepath[point:]
                 filenames = filepath.split('/')
                 filename = 'images/personnels/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหลด
-                print("file name1:" + filename)
                 updateForm.save()
                 personnel = get_object_or_404(Personnel, id=id)
                 newfilename = 'images/personnels/' + str(personnel.id) + ext  # ชื่อไฟล์ที่ระบบกำหนด

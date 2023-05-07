@@ -3,51 +3,85 @@
 {% fontawesome_6_static %}
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" href="{% static 'stylesheets/bt502/css/bootstrap.css' %}">
-    <script src="{% static 'stylesheets/bt502/js/bootstrap.bundle.js'%}"></script>
-    <script type="text/javascript" src="{% static 'stylesheets/layout/scripts/jquery.min.js'%}"></script>
+    <script src="{% static 'stylesheets/bt502/js/bootstrap.bundle.js' %}"></script>
+    <script type="text/javascript" src="{% static 'stylesheets/layout/scripts/jquery.min.js' %}"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-
     <title>Digital Profile System</title>
+
+    <style>
+        input[type="file"]::file-selector-button {
+            border: 2px solid #a9ebfa;
+            padding: 0.2em 0.4em;
+            border-radius: 0.2em;
+            background-color: #4476f8;
+            transition: 1s;
+            color: #b6d4fe;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background-color: #f8b5b2;
+            border: 2px solid #fa4f4f;
+            color: #1e2125;
+        }
+    </style>
+
+    <script>
+        updateList = function () {
+            var output = document.getElementById('fileList');
+            var input = document.getElementById('id_file');
+            var children = "";
+            output.innerHTML = "";
+
+            for (var i = 0; i < input.files.length; ++i) {
+                children += "<input type=text size=100 readonly disabled value='" + input.files.item(i).name +
+                    "' class='form-control text-dark bg-light'  />";
+            }
+            if (children != "") {
+                output.innerHTML = children;
+            }
+
+
+        }
+    </script>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col col-12 bg-primary text-white">
-                {% include 'header.html' %}
-            </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col col-12 bg-primary text-white">
+            {% include 'header.html' %}
         </div>
-        <div class="row">
-            <div class="col col-3 text-white" style="background-color: #b6d4fe;">
-                <br>
-                {% include 'menu.html' %}
-                <br>
-            </div>
-            <div class="col col-9 bg-white text-primary">
-                {% block info %}
-                    {%  if messages|length > 0 %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                {% if message.tags == 'success' %}
-                                    <b>ดำเนินการสำเร็จ!</b>
-                                {% else %}
-                                    <b>การดำเนินการผิดพลาด!</b> โปรดตรวจสอบและแก้ไขให้ถูกต้อง
-                                {% endif %}
-
-                                <g class="text-danger"> "{{ message }}" </g>
-                            </div>
-                        {% endfor %}
-                    {%  endif %}
-                {% endblock %}
-
-                {% block content %}
-                {% endblock %}
-            </div>
-        </div>
-
     </div>
+    <div class="row">
+        <div class="col col-3 text-white" style="background-color: #b6d4fe;">
+            <br>
+            {% include 'menu.html' %}
+            <br>
+        </div>
+        <div class="col col-9 bg-white text-primary">
+            {% block info %}
+                {% if messages|length > 0 %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            {% if message.tags == 'success' %}
+                                <b>ดำเนินการสำเร็จ!</b>
+                            {% else %}
+                                <b>การดำเนินการผิดพลาด!</b> โปรดตรวจสอบและแก้ไขให้ถูกต้อง
+                            {% endif %}
+
+                            <g class="text-danger"> "{{ message }}"</g>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endblock %}
+
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+</div>
 
 </body>
 </html>

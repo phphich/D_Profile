@@ -4,8 +4,11 @@ from django.db.models import Max
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from workapp.models import *
 from workapp.forms import *
+from baseapp.models import *
+from baseapp.forms import *
 import os
 from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
 
 #Leave CRUD
 def leaveList(request, divisionId=None, personnelId=None):
@@ -33,28 +36,151 @@ def leaveNew(request, id):
         form = LeaveForm(data=request.POST)
         if form.is_valid():
             form.save()
-            return redirect('leaveList', divisionId=personnel.division.id, personnelId=personnel.id)
+            leave = Leave.objects.last()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลเข้าสู่ระบบเรียบร้อย")
+            return redirect('leaveDetail', id=leave.id)
+            # return redirect('leaveList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form, 'personnel': personnel}
             return render(request, 'work/leaveNew.html', context)
     else:
         today = datetime.date.today()
         currentYear = today.year
-
         form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leaveNew.html', context)
 
 def leaveDetail(request, id):
-    pass
+    leave = Leave.objects.filter(id=id).first()
+    if request.method == 'POST':
+        fileForm = LeaveFileForm(request.POST, request.FILES)
+        if fileForm.is_valid():
+            files = request.FILES.getlist("file")
+            newFileForm = fileForm.save(commit=False)
+            success = True
+            fileerror=""
+            for f in files:
+                filepath = f.name
+                filepath = filepath.replace(' ', '_')
+                filepath = filepath.replace('+', '')
+                filepath = filepath.replace('%', '')
+                filepath = filepath.replace('#', '')
+                filepath = filepath.replace('่', '')
+                filepath = filepath.replace('้', '')
+                filepath = filepath.replace('ิ', '')
+                filepath = filepath.replace('ี', '')
+                filepath = filepath.replace('๊', '')
+                filepath = filepath.replace('๋', '')
+                filepath = filepath.replace('ุ', '')
+                filepath = filepath.replace('ู', '')
+                filepath = filepath.replace('ั', '')
+                filepath = filepath.replace('(', '')
+                filepath = filepath.replace(')', '')
+                filepath = filepath.replace('[', '')
+                filepath = filepath.replace(']', '')
+                filepath = filepath.replace('{', '')
+                filepath = filepath.replace('}', '')
+                point = filepath.rfind('.')
+                ext = filepath[point:]
+                filenames = filepath.split('/')
+                filename = 'documents/leave/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
+                lf, created = LeaveFile.objects.get_or_create(file=f, leave=leave, filetype=ext[1:])
+                lf.save()
+                leaveFile = LeaveFile.objects.last()
+                newfilename = '['+ str(leave.id) + '_' + str(leaveFile.id)+ ']-' + filenames[len(filenames) - 1]   # ชื่อไฟล์ที่ระบบกำหนด
+                leaveFile.file.name = newfilename
+                leaveFile.save()
+                try:
+                    os.rename('static/' + filename, 'static/documents/leave/' + leaveFile.file.name)
+                except:
+                    fileerror = fileerror + leaveFile.file.name + ", "
+                    success=False
+            if success==True:
+                messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+            else:
+                messages.add_message(request, messages.WARNING, "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'fileForm':fileForm}
+            return render(request, 'work/leaveDetail.html', context)
+    # else:
+    fileForm = LeaveFileForm(initial={'leave':leave, 'filetype':'Unknow'})
+    context={'fileForm': fileForm, 'leave': leave}
+    return render(request, 'work/leaveDetail.html', context)
 
 def leaveUpdate(request, id):
-    pass
+    leave = get_object_or_404(Leave, id=id)
+    personnel = leave.personnel
+    form = LeaveForm(data=request.POST or None, instance=leave)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลเรียบร้อย")
+            return redirect('leaveDetail', id=leave.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'work/leaveUpdate.html', context)
+    else:
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'work/leaveUpdate.html', context)
 
 def leaveDelete(request, id):
-    pass
+    leave = get_object_or_404(Leave, id=id)
+    form = LeaveForm(data=request.POST or None, instance=leave)
+    if request.method == 'POST':
+        #ลบไฟล์
+        fileList = LeaveFile.objects.filter(leave=leave)
+        for f in fileList:
+            fname = f.file.name
+            if os.path.exists('static/documents/leave/' + fname):
+                try:
+                    os.remove('static/documents/leave/' +fname)  # file exits, delete it
+                except:
+                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                finally:
+                    f.delete()
+        leave.delete()
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการลาสำเร็จ")
+        return redirect('leaveList', divisionId=leave.personnel.division.id, personnelId=leave.personnel.id)
+    else:
+        form.deleteForm()
+        context = {'form': form, 'leave':leave, 'personnel': leave.personnel}
+        return render(request, 'work/leaveDelete.html', context)
 
+def leaveDeleteFile(request, id):
+    leaveFile = get_object_or_404(LeaveFile, id=id)
+    leave = leaveFile.leave
+    fname = leaveFile.file.name
+    if os.path.exists('static/documents/leave/' + fname):
+        try:
+            os.remove('static/documents/leave/' + fname)  # file exits, delete it
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+        except:
+            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+    leaveFile.delete()
+    return redirect('leaveDetail', id=leave.id)
 
-
+def leaveDeleteFileAll(request, id):
+    leave = get_object_or_404(Leave, id=id)
+    leaveFiles = leave.getLeaveFiles()
+    success = True
+    fileerror = ""
+    for leaveFile in leaveFiles:
+        fname = leaveFile.file.name
+        if os.path.exists('static/documents/leave/' + fname):
+            try:
+                os.remove('static/documents/leave/' + fname)  # file exits, delete it
+            except:
+                success=False
+                fileerror = fileerror +  fname + ", "
+            finally:
+                leaveFile.delete()
+    if success==True:
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
+    return redirect('leaveDetail', id=leave.id)
 
 

@@ -8,6 +8,10 @@ urlpatterns = [
     path('<id>/leaveNew', views.leaveNew, name='leaveNew'),
     path('<id>/leaveUpdate', views.leaveUpdate, name='leaveUpdate'),
     path('<id>/leaveDelete', views.leaveDelete, name='leaveDelete'),
+    path('<id>/leaveDeleteFile', views.leaveDeleteFile, name='leaveDeleteFile'),
+    path('<id>/leaveDeleteFileAll', views.leaveDeleteFileAll, name='leaveDeleteFileAll'),
+
+
 
 
 ]

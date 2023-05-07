@@ -258,9 +258,9 @@ class CurrAffiliationForm(forms.ModelForm):
         fields = (
             'curriculum', 'personnel', 'status', 'recorder')
         widgets = {
-            'curriculum': forms.HiddenInput(attrs={'class': 'form-control', 'readonly':'readonly'}),
-            'personnel': forms.Select(attrs={'class': 'form-control'}),
-            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control'}),
+            'curriculum': forms.HiddenInput(attrs={'class': 'form-control text-primary', 'readonly':'readonly'}),
+            'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control text-primary'}),
             'recorder': forms.HiddenInput(attrs={'class': 'form-control', 'readonly':'readonly'}),
         }
         labels = {
@@ -275,5 +275,26 @@ class CurrAffiliationForm(forms.ModelForm):
         self.fields['personnel'].widget.attrs['readonly'] = True
         self.fields['status'].widget.attrs['readonly'] = True
 
+class DocumentsForm(forms.ModelForm):
+    class Meta:
+        model = Documents
+        fields = (
+            'file', 'doctype', 'refId', 'filename', 'filetype', 'personnel')
+        widgets = {
+            'file': forms.FileInput(attrs={'multiple': True}),
+            'doctype': forms.HiddenInput(),
+            'refId': forms.HiddenInput(),
+            'filename': forms.HiddenInput(),
+            'filetype': forms.HiddenInput(),
+            'personnel': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'ไฟล์เอกสารประกอบ',
+            'doctype': 'ชนิดไฟล์',
+            'refId': 'รหัสอ้างอิง',
+            'filename': 'ชื่อไฟล์',
+            'filetype': 'ชนิดไฟล์',
+            'personnel': 'ผู้บันทึก',
+        }
 
 
