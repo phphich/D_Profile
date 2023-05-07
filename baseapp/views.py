@@ -4,7 +4,7 @@ from baseapp.models import *
 from baseapp.forms import *
 import os
 from django.contrib import messages
-
+from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 
 def home(request):
     return render(request, 'home.html')
@@ -114,6 +114,14 @@ def personnelList(request):
     context = {'personnels': personnels}
     return render(request, 'base/personnelList.html', context)
 
+def personnelListPage(request, pageNo=None):
+    iterm_per_page =5
+    if pageNo == None:
+        pageNo = 1
+    personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
+    personnels_page = Paginator(personnels, iterm_per_page)
+    context = {'personnels': personnels_page.page(pageNo)}
+    return render(request, 'base/personnelListPage.html', context)
 
 def personnelNew(request):
     if request.method == 'POST':
@@ -127,10 +135,10 @@ def personnelNew(request):
                 return render(request, 'base/personnelNew.html', context)
             newForm = form.save(commit=False)
             email = newForm.email
-            filepath = newForm.picture.name.lowwer()
+            filepath = newForm.picture.name
             filepath = filepath.replace(' ', '_')
             point = filepath.rfind('.')
-            ext = filepath[point:].lowwer()
+            ext = filepath[point:]
             filenames = filepath.split('/')
             filename = 'images/personnels/' + filenames[len(filenames) - 1]
             newForm.save()
@@ -141,7 +149,7 @@ def personnelNew(request):
             if os.path.exists('static/' + personnel.picture.name):
                 os.remove('static/' + personnel.picture.name)  # file exits, delete it
             os.rename('static/' + filename, 'static/' + personnel.picture.name)
-            return redirect('personnelList')
+            return redirect('personnelListPage', pageNo=1)
         else:
             context = {'form': form}
             return render(request, 'base/personnelNew.html', context)
@@ -149,7 +157,6 @@ def personnelNew(request):
         form = PersonnelForm()
         context = {'form': form}
         return render(request, 'base/personnelNew.html', context)
-
 
 def personnelDetail(request, id):
     personnel = Personnel.objects.filter(id=id).first()
@@ -184,7 +191,7 @@ def personnelUpdate(request, id):
                 os.rename('static/' + filename, 'static/' + personnel.picture.name)
             else:
                 form.save()
-            return redirect('personnelList')
+            return redirect('personnelListPage', pageNo=1)
         else:
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/personnelUpdate.html', context)
@@ -204,7 +211,7 @@ def personnelDelete(request, id):
         # delete picture file
         if os.path.exists('static/' + picturefile):
             os.remove('static/' + picturefile)  # file exits, delete it
-        return redirect('personnelList')
+        return redirect('personnelListPage', pageNo=1)
     else:
         form.deleteForm()
         context = {'form': form, 'personnel': personnel}

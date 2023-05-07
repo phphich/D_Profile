@@ -9,7 +9,7 @@
             </h3>
         </div>
         <div class="col-2">
-            <img src="{% static personnel.picture %}" width="100px" height="auto" style="margin-top:10px;">
+            <img src="{% static personnel.picture %}" width="100px" height="auto" style="margin-top:10px;" class="rounded-circle">
         </div>
     </div>
 
@@ -37,16 +37,12 @@
             <td>{{ personnel.lastname_en }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ประเภทบุคลากร</th>
-            <td>{{ personnel.type }}</td>
-        </tr>
-        <tr class="text-primary">
             <th>ตำแหน่ง</th>
             <td>{{ personnel.status }}</td>
         </tr>
         <tr class="text-primary">
-            <th>สังกัดสาขา</th>
-            <td>{{ personnel.division.name_th }}</td>
+            <th>ประเภทบุคลากร</th>
+            <td>{{ personnel.type }}</td>
         </tr>
         <tr class="text-primary">
             <th>ที่อยู่</th>
@@ -63,6 +59,10 @@
         <tr class="text-primary">
             <th>วันที่เริ่มบรรจุเข้าทำงาน</th>
             <td>{{ personnel.hiringDate }}</td>
+        </tr>
+        <tr class="text-primary">
+            <th>สังกัดสาขา</th>
+            <td>{{ personnel.division.name_th }}</td>
         </tr>
         <tr class="text-primary">
             <th>อีเมล์</th>

@@ -4,11 +4,12 @@
 {% block content %}
     <h2 class="text-primary"><i class="fa fa-user-group"></i> รายชื่อบุคลากรในสังกัด </h2>
     <hr class="text-primary">
-    <table class="table table-primary table-striped table-hover table-bordered">
+    <table class="table table-primary table-striped table-hover">
         <tr class="bg-white text-primary ">
-            <th class="col-1 text-center">ประเภท</th>
-            <th class="col-2 text-center">ตำแหน่ง </th>
+            <th class="col-1"></th>
             <th class="col-3">ชื่อ - สกุล </th>
+            <th class="col-2">ตำแหน่ง </th>
+            <th class="col-1 text-center">ประเภท</th>
             <th class="col-1 text-center">เพศ</th>
             <th class="col-2">สังกัด</th>
             <th class="col col-2"><a href="{% url 'personnelNew' %}" class="btn btn-sm btn-info text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มบุคลากร </a></th>
@@ -16,9 +17,10 @@
 
     {% for personnel in personnels %}
         <tr class="text-primary">
+            <td class="text-center"><img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle" width="50px"></td>
+            <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
+            <td>{{ personnel.status }}</td>
             <td class="text-center">{{ personnel.type }}</td>
-            <td class="text-center">{{ personnel.status }}</td>
-            <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }} </td>
             <td class="text-center">{{ personnel.gender }}</td>
             <td>{{ personnel.division.name_th }}</td>
             <td class="text-center">

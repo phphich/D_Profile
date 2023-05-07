@@ -10,8 +10,10 @@
     <a href="{% url 'curriculumList' %}"
        class="list-group-item list-group-item-action list-group-item-light text-dark">
         <i class="fa fa-user-graduate"></i> หลักสูตร </a>
-
-    <a href="{% url 'personnelList' %}"
+{#    <a href="{% url 'personnelList' %}"#}
+{#       class="list-group-item list-group-item-action list-group-item-light text-primary">#}
+{#        <i class="fa fa-user-group"></i> บุคลากร </a>#}
+    <a href="{% url 'personnelListPage' 1 %}"
        class="list-group-item list-group-item-action list-group-item-light text-primary">
         <i class="fa fa-user-group"></i> บุคลากร </a>
     <a href="{% url 'educationList' %}"

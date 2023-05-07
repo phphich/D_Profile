@@ -13,6 +13,7 @@ urlpatterns = [
     path('<id>/curriculumDelete', views.curriculumDelete, name='curriculumDelete'),
 
     path('personnelList', views.personnelList, name='personnelList' ),
+    path('<pageNo>/personnelListPage', views.personnelListPage, name='personnelListPage' ),
     path('personnelNew', views.personnelNew, name='personnelNew' ),
     path('<id>/personnelDetail', views.personnelDetail, name='personnelDetail'),
     path('<id>/personnelUpdate', views.personnelUpdate, name='personnelUpdate'),

@@ -120,8 +120,8 @@ class PersonnelForm(forms.ModelForm):
         )
 
         model = Personnel
-        fields = ('id', 'sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'division', 'gender', 'address',
-                  'birthDate', 'hiringDate', 'picture', 'email')
+        fields = ('id', 'sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
+                  'birthDate', 'hiringDate', 'division', 'picture', 'email')
         widgets = {
             'id': forms.HiddenInput(),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),

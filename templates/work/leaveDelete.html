@@ -21,7 +21,11 @@
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>
              <p class="text-info">
                  {% if leave.getLeaveFiles|length == 0 %}
-                     <div class="alert-warning">....ยังไม่ได้อัพโหลดเอกสารประกอบไว้ในระบบ....</div>
+                     <div class="row">
+                         <div class="col-2"></div>
+                         <div class="alert-warning col-8 text-center"><br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบไว้ในระบบ....<br><br></div>
+                         <div class="col-2"></div>
+                     </div>
                  {% else %}
                      <div class="row">
                      {% for f in leave.getLeaveFiles %}
@@ -54,16 +58,31 @@
                                          {% endif %}
                                      {% endif %}
                                  {% endif %}
-                                  <br>
+                                 <br>
                                  {% if f.file.name|length|get_digit:"-1" > 30 %}
                                     {{ f.file.name|slice:"0:30" }}...
                                  {% else %}
                                     {{ f.file.name }}
                                  {% endif %}
                                 </a>
+                                <a href="{% url 'leaveDeleteFile' f.id %}" onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
+                                    <i class="fas fa-minus text-danger"></i>
+                                </a>
                              </div>
                      {% endfor %}
                      </div>
+                     {% if leave.getLeaveFiles|length > 1 %}
+                        <div class="row">
+                            <div class="col-3">
+                                <a href="{% url 'leaveDeleteFileAll' leave.id %}"
+                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
+                                    <i class="fas fa-trash text-white"></i>
+                                    ลบไฟล์เอกสารแนบทั้งหมด!
+                                </a>
+                            </div>
+                            <div class="col-9"></div>
+                         </div>
+                     {% endif %}
                  {% endif %}
              </p>
         </div>

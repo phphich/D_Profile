@@ -37,7 +37,8 @@
         <hr class="text-primary">
         <table class="table table-info table-striped table-hover">
             <tr class="text-primary">
-                <th class="col-6">ชื่อผู้รับผิดชอบ</th>
+                <th class="col-1"> </th>
+                <th class="col-5">ชื่อผู้รับผิดชอบ</th>
                 <th class="col-4 text-center">หน้าที่</th>
                 <th class="col-2">
                     <button data-bs-toggle="collapse" data-bs-target="#newCurrAff"
@@ -48,6 +49,9 @@
             </tr>
             {% for currAff in curriculum.getCurrAffiliation %}
                 <tr class="text-primary">
+                    <td class="text-center">
+                        <img src="{% static currAff.personnel.picture %}" class="rounded-circle" width="50px">
+                    </td>
                     <td>
                         {{ currAff.personnel.status }}{{ currAff.personnel.firstname_th }} {{ currAff.personnel.lastname_th }}
                     </td>

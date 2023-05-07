@@ -55,58 +55,72 @@ def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
     if request.method == 'POST':
         fileForm = LeaveFileForm(request.POST, request.FILES)
-        if fileForm.is_valid():
-            files = request.FILES.getlist("file")
-            newFileForm = fileForm.save(commit=False)
-            success = True
-            fileerror=""
-            for f in files:
-                filepath = f.name
-                filepath = filepath.replace(' ', '_')
-                filepath = filepath.replace('+', '')
-                filepath = filepath.replace('%', '')
-                filepath = filepath.replace('#', '')
-                filepath = filepath.replace('่', '')
-                filepath = filepath.replace('้', '')
-                filepath = filepath.replace('ิ', '')
-                filepath = filepath.replace('ี', '')
-                filepath = filepath.replace('๊', '')
-                filepath = filepath.replace('๋', '')
-                filepath = filepath.replace('ุ', '')
-                filepath = filepath.replace('ู', '')
-                filepath = filepath.replace('ั', '')
-                filepath = filepath.replace('(', '')
-                filepath = filepath.replace(')', '')
-                filepath = filepath.replace('[', '')
-                filepath = filepath.replace(']', '')
-                filepath = filepath.replace('{', '')
-                filepath = filepath.replace('}', '')
-                point = filepath.rfind('.')
-                ext = filepath[point:]
-                filenames = filepath.split('/')
-                filename = 'documents/leave/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
-                lf, created = LeaveFile.objects.get_or_create(file=f, leave=leave, filetype=ext[1:])
-                lf.save()
-                leaveFile = LeaveFile.objects.last()
-                newfilename = '['+ str(leave.id) + '_' + str(leaveFile.id)+ ']-' + filenames[len(filenames) - 1]   # ชื่อไฟล์ที่ระบบกำหนด
-                leaveFile.file.name = newfilename
-                leaveFile.save()
-                try:
-                    os.rename('static/' + filename, 'static/documents/leave/' + leaveFile.file.name)
-                except:
-                    fileerror = fileerror + leaveFile.file.name + ", "
-                    success=False
-            if success==True:
-                messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+        urlForm = LeaveURLForm(request.POST)
+        if request.POST['action'] == 'uploadfile':
+            if fileForm.is_valid():
+                files = request.FILES.getlist("file")
+                newFileForm = fileForm.save(commit=False)
+                success = True
+                fileerror=""
+                for f in files:
+                    filepath = f.name
+                    filepath = filepath.replace(' ', '_')
+                    filepath = filepath.replace('+', '')
+                    filepath = filepath.replace('%', '')
+                    filepath = filepath.replace('#', '')
+                    filepath = filepath.replace('่', '')
+                    filepath = filepath.replace('้', '')
+                    filepath = filepath.replace('ิ', '')
+                    filepath = filepath.replace('ี', '')
+                    filepath = filepath.replace('ื', '')
+                    filepath = filepath.replace('ึ', '')
+                    filepath = filepath.replace('๊', '')
+                    filepath = filepath.replace('๋', '')
+                    filepath = filepath.replace('ุ', '')
+                    filepath = filepath.replace('ู', '')
+                    filepath = filepath.replace('ั', '')
+                    filepath = filepath.replace('(', '')
+                    filepath = filepath.replace(')', '')
+                    filepath = filepath.replace('[', '')
+                    filepath = filepath.replace(']', '')
+                    filepath = filepath.replace('{', '')
+                    filepath = filepath.replace('}', '')
+                    point = filepath.rfind('.')
+                    ext = filepath[point:]
+                    filenames = filepath.split('/')
+                    filename = 'documents/leave/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
+                    lf, created = LeaveFile.objects.get_or_create(file=f, leave=leave, filetype=ext[1:])
+                    lf.save()
+                    leaveFile = LeaveFile.objects.last()
+                    newfilename = '['+ str(leave.id) + '_' + str(leaveFile.id)+ ']-' + filenames[len(filenames) - 1]   # ชื่อไฟล์ที่ระบบกำหนด
+                    leaveFile.file.name = newfilename
+                    leaveFile.save()
+                    try:
+                        os.rename('static/' + filename, 'static/documents/leave/' + leaveFile.file.name)
+                    except:
+                        fileerror = fileerror + leaveFile.file.name + ", "
+                        leaveFile.delete()
+                        success=False
+                if success==True:
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                else:
+                    messages.add_message(request, messages.WARNING, "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
             else:
-                messages.add_message(request, messages.WARNING, "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
-        else:
-            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-            context = {'fileForm':fileForm}
-            return render(request, 'work/leaveDetail.html', context)
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
+                return render(request, 'work/leaveDetail.html', context)
+        else: # upload link
+            if urlForm.is_valid():
+                urlForm.save()
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์ss")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
+                return render(request, 'work/leaveDetail.html', context)
     # else:
     fileForm = LeaveFileForm(initial={'leave':leave, 'filetype':'Unknow'})
-    context={'fileForm': fileForm, 'leave': leave}
+    urlForm = LeaveURLForm(initial={'leave':leave})
+    context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave}
     return render(request, 'work/leaveDetail.html', context)
 
 def leaveUpdate(request, id):
@@ -184,3 +198,17 @@ def leaveDeleteFileAll(request, id):
     return redirect('leaveDetail', id=leave.id)
 
 
+def leaveDeleteURL(request, id):
+    leaveURL = get_object_or_404(LeaveURL, id=id)
+    leave = leaveURL.leave
+    leaveURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    return redirect('leaveDetail', id=leave.id)
+
+def leaveDeleteURLAll(request, id):
+    leave = get_object_or_404(Leave, id=id)
+    leaveURLs = leave.getLeaveURLs()
+    for leaveURL in leaveURLs:
+        leaveURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    return redirect('leaveDetail', id=leave.id)

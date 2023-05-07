@@ -37,7 +37,7 @@ class Curriculum(models.Model):
     def __str__(self):
         return self.name_th
     def getCurrAffiliation(self):
-        currAffilaitions = CurrAffiliation.objects.filter(curriculum=self)
+        currAffilaitions = CurrAffiliation.objects.filter(curriculum=self).order_by('status')
         return currAffilaitions
 
 class Personnel(models.Model):
@@ -48,7 +48,7 @@ class Personnel(models.Model):
     firstname_en = models.CharField(max_length=50, default="")
     lastname_en = models.CharField(max_length=50, default="")
     status  = models.CharField(max_length=30, default="อาจารย์")
-    type = models.CharField(max_length=10, default="สายวิชาการ")
+    type = models.CharField(max_length=30, default="สายวิชาการ")
     gender = models.CharField(max_length=15, default="ชาย")
     address = models.TextField(default="")
     birthDate = models.DateField(default=None)

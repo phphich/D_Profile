@@ -107,7 +107,7 @@ class LeaveFileForm(forms.ModelForm):
         fields = ('file', 'filetype', 'leave')
         widgets = {
             'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
-                                           'accept': 'application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.slideshow,application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
                                            'onchange': 'javascript:updateList();'}),
             'filetype': forms.HiddenInput(),
             'leave': forms.HiddenInput(),
@@ -117,7 +117,18 @@ class LeaveFileForm(forms.ModelForm):
             'filetype': 'ชนิดไฟล์',
             'leave': 'ใบลา',
         }
-
+class LeaveURLForm(forms.ModelForm):
+    class Meta:
+        model = LeaveURL
+        fields = ('url', 'leave')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control',}),
+            'leave': forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'leave': 'ใบลา',
+        }
 
 class TrainignForm(forms.ModelForm):
     class Meta:

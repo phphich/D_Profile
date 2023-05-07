@@ -56,13 +56,22 @@ class Leave(models.Model):
     def getLeaveFiles(self):
         leaveFiles = LeaveFile.objects.filter(leave=self)
         return leaveFiles
+    def getLeaveURLs(self):
+        leaveURLs = LeaveURL.objects.filter(leave=self)
+        return leaveURLs
 
 class LeaveFile(models.Model):
     file = models.FileField(upload_to='static/documents/leave', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     leave = models.ForeignKey(Leave, on_delete=models.CASCADE, default=None)
     def __str__(self):
-        return "File: " +   ", filetype: "   +  ", leave "
+        return "(" + str(self.id) + "_" + str(self.leave.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
+
+class LeaveURL(models.Model):
+    url = models.URLField(max_length=255, default=None)
+    leave = models.ForeignKey(Leave, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return "[" + str(self.leave.id) + "_" + str(self.id) + "]_"+ self.url
 
 class Training(models.Model):
     startDate = models.DateField(default=None)

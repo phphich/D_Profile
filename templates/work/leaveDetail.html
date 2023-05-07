@@ -10,6 +10,7 @@
             transition: color .3s ease-in-out, box-shadow .3s ease-in-out;
             text-decoration: none;
         }
+
         a.filelink:hover {
             box-shadow: inset 100px 0 0 0 #ef0505;
             color: white;
@@ -76,94 +77,162 @@
 
     <div class="row">
         <div class="col-12 text-success">
-            <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>
-             <p class="text-info">
-                 {% if leave.getLeaveFiles|length == 0 %}
-                     <div class="alert-warning">....ยังไม่ได้อัพโหลดเอกสารประกอบไว้ในระบบ....</div>
-                 {% else %}
-                     <div class="row">
-                     {% for f in leave.getLeaveFiles %}
-                             <div class="col-3">
-                                 <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
-                                 {% if f.filetype == "pdf" %}
-                                     <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
-                                          class="img-thumbnail">
-                                 {% else %}
-                                     {% if f.filetype == "doc" or f.filetype == "docx" %}
-                                         <img src="{% static 'images/iconfiles/doc-icon.png' %}" width="80px"
-                                              class="img-thumbnail">
-                                     {% else %}
-                                         {% if f.filetype == "xls" or f.filetype == "xlsx" %}
-                                             <img src="{% static 'images/iconfiles/xls-icon.png' %}" width="80px"
-                                                  class="img-thumbnail">
-                                         {% else %}
-                                             {% if f.filetype == "ppt" or f.filetype == "pptx" %}
-                                                 <img src="{% static 'images/iconfiles/ppt-icon.png' %}" width="80px"
-                                                      class="img-thumbnail">
-                                             {% else %}
-                                                 {% if f.filetype == "jpg" or f.filetype == "png" or f.filetype == "jpeg" or f.filetype == "gif" %}
-                                                     <img src="{% static 'images/iconfiles/img-icon.png' %}"
-                                                          width="80px" class="img-thumbnail">
-                                                 {% else %}
-                                                     <img src="{% static 'images/iconfiles/txt-icon.png' %}"
-                                                          width="80px" class="img-thumbnail">
-                                                 {% endif %}
-                                             {% endif %}
-                                         {% endif %}
-                                     {% endif %}
-                                 {% endif %}
-                                 <br>
-                                 {% if f.file.name|length|get_digit:"-1" > 30 %}
-                                    {{ f.file.name|slice:"0:30" }}...
-                                 {% else %}
-                                    {{ f.file.name }}
-                                 {% endif %}
+            <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
+                <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
+                    <i class="fa fa-plus text-primary"></i>
+                </button>
+            </h5>
+            <p class="text-info">
+                {% if leave.getLeaveFiles|length == 0 %}
+                    <div class="row">
+                        <div class="col-2"></div>
+                        <div class="alert-warning col-8 text-center">
+                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบไว้ในระบบ....<br><br></div>
+                        <div class="col-2"></div>
+                    </div>
+                {% else %}
+                    <div class="row">
+                        {% for f in leave.getLeaveFiles %}
+                            <div class="col-3">
+                                <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
+                                    {% if f.filetype == "pdf" %}
+                                        <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
+                                             class="img-thumbnail">
+                                    {% else %}
+                                        {% if f.filetype == "doc" or f.filetype == "docx" %}
+                                            <img src="{% static 'images/iconfiles/doc-icon.png' %}" width="80px"
+                                                 class="img-thumbnail">
+                                        {% else %}
+                                            {% if f.filetype == "xls" or f.filetype == "xlsx" %}
+                                                <img src="{% static 'images/iconfiles/xls-icon.png' %}" width="80px"
+                                                     class="img-thumbnail">
+                                            {% else %}
+                                                {% if f.filetype == "ppt" or f.filetype == "pptx" %}
+                                                    <img src="{% static 'images/iconfiles/ppt-icon.png' %}" width="80px"
+                                                         class="img-thumbnail">
+                                                {% else %}
+                                                    {% if f.filetype == "jpg" or f.filetype == "png" or f.filetype == "jpeg" or f.filetype == "gif" %}
+                                                        <img src="{% static 'images/iconfiles/img-icon.png' %}"
+                                                             width="80px" class="img-thumbnail">
+                                                    {% else %}
+                                                        <img src="{% static 'images/iconfiles/txt-icon.png' %}"
+                                                             width="80px" class="img-thumbnail">
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                    <br>
+                                    {% if f.file.name|length|get_digit:"-1" > 30 %}
+                                        {{ f.file.name|slice:"0:30" }}...
+                                    {% else %}
+                                        {{ f.file.name }}
+                                    {% endif %}
                                 </a>
-                                <a href="{% url 'leaveDeleteFile' f.id %}" onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
+                                <a href="{% url 'leaveDeleteFile' f.id %}"
+                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
                                     <i class="fas fa-minus text-danger"></i>
                                 </a>
-                             </div>
-                     {% endfor %}
-                     </div>
-                     {% if leave.getLeaveFiles|length > 1 %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if leave.getLeaveFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
                                 <a href="{% url 'leaveDeleteFileAll' leave.id %}"
-                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
+                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
+                                   class="btn btn-danger">
                                     <i class="fas fa-trash text-white"></i>
                                     ลบไฟล์เอกสารแนบทั้งหมด!
                                 </a>
                             </div>
                             <div class="col-9"></div>
-                         </div>
-                     {% endif %}
-                 {% endif %}
-             </p>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </p>
         </div>
     </div>
+    <br>
+    <div id="uploadfiles" class="collapse">
+        <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
+            {% csrf_token %}
+            <div class="row text-danger">
+                <div class="col-3">
+                    {{ fileForm.as_table }}
+                </div>
+                <div class="col-9" id="fileList">
+                    <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทย </i>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-5 text-center">
+                    <input type="hidden" name="id" value="{{ leave.id }}">
+                    <input type="hidden" name="action" value="uploadfile">
+                </div>
+                <div class="col-2 text-center" id="upload">
+                    <br>
+                    <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload"></i> อัพโหลดไฟล์เอกสาร
+                    </button>
+                    <br>
+                </div>
+                <div class="col-5 text-center"></div>
+            </div>
+        </form>
+    </div>
+    <br>
 
-    <br><br>
-    <h5 class="text-danger"><i class="fa fa-book"></i> อัพโหลดไฟล์เอกสารแนบ: </h5>
-    <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th" >
-        {% csrf_token %}
-        <div class="row text-danger">
-            <div class="col-3">
-                {{ fileForm.as_table }}
-            </div>
-            <div class="col-9" id="fileList">
-                <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทย </i></p>
-            </div>
+    <div class="row">
+        <div class="col-12 text-success">
+            <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
+                <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                    <i class="fa fa-plus text-primary"></i>
+                </button>
+            </h5>
         </div>
-        <div class="row">
-            <div class="col-5 text-center">
+
+        <p class="text-primary">
+            <ul class="list-group">
+                {% for link in leave.getLeaveURLs %}
+                    <li class="list-group-item text-primary">
+                        <a href={{ link.url }} class="filelink" target="_blank">
+                            <i class="fas fa-caret-right"></i> {{ link }}
+                        </a>
+                        <a href="{% url 'leaveDeleteURL' link.id %}" onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
+                            <i class="fas fa-minus text-danger"></i>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if leave.getLeaveURLs|length > 1 %}
+                <div class="row">
+                    <div class="col-3">
+                        <a href="{% url 'leaveDeleteURLAll' leave.id %}"
+                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
+                            <i class="fas fa-trash text-white"></i>
+                            ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
+                        </a>
+                    </div>
+                    <div class="col-9"></div>
+                </div>
+            {% endif %}
+        </p>
+    </div>
+    <div id="uploadlinks" class="collapse">
+        <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
+            {% csrf_token %}
+            {{ urlForm.as_table }}
+            <p class="text-center">
+                <br>
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
+                </button>
                 <input type="hidden" name="id" value="{{ leave.id }}">
-            </div>
-            <div class="col-2 text-center" id="upload">
-                <br>
-                <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload"></i> อัพโหลด! </button>
-                <br>
-            </div>
-            <div class="col-5 text-center"></div>
-        </div>
-    </form>
+                <input type="hidden" name="action" value="uploadlink">
+            </p>
+        </form>
+    </div>
+    <br>
 {% endblock %}

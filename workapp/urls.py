@@ -10,9 +10,8 @@ urlpatterns = [
     path('<id>/leaveDelete', views.leaveDelete, name='leaveDelete'),
     path('<id>/leaveDeleteFile', views.leaveDeleteFile, name='leaveDeleteFile'),
     path('<id>/leaveDeleteFileAll', views.leaveDeleteFileAll, name='leaveDeleteFileAll'),
-
-
-
+    path('<id>/leaveDeleteURL', views.leaveDeleteURL, name='leaveDeleteURL'),
+    path('<id>/leaveDeleteURLAll', views.leaveDeleteURLAll, name='leaveDeleteURLAll'),
 
 ]
 
