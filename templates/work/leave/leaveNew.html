@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-10">
+            <h2><i class="fa fa-person-hiking"></i> บันทึกข้อมูลการลา </h2>
+            <h4> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
+                สังกัด: {{ personnel.division }} </h4>
+        </div>
+        <div class="col-2">
+            <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;">
+        </div>
+    </div>
+    <hr class="text-primary">
+    <form method="POST" enctype="multipart/form-data" class="form form-control text-primary">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-12">
+                {{ form.as_p }}
+            </div>
+        </div>
+        <hr class="text-primary">
+        <div class="row text-primary">
+            <div class="col-3">
+                {{ fileForm.as_p }}
+            </div>
+            <div class="col-9" id="fileList">
+            </div>
+        </div>
+
+        <p class="text-center">
+            <br>
+            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-floppy-disk"></i> บันทึก
+            </button>
+            <input type="hidden" name="personnelId" value="{{ personnel.id }}">
+            <input type="hidden" name="divisionId" value="{{ personnel.division.id }}">
+        </p>
+    </form>
+{% endblock %}

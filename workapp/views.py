@@ -28,7 +28,7 @@ def leaveList(request, divisionId=None, personnelId=None):
     # leaves = personnel.getLeave()
 
     context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'leaves':leaves}
-    return render(request, 'work/leaveList.html', context)
+    return render(request, 'work/leave/leaveList.html', context)
 
 def leaveNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
@@ -43,13 +43,13 @@ def leaveNew(request, id):
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form, 'personnel': personnel}
-            return render(request, 'work/leaveNew.html', context)
+            return render(request, 'work/leave/leaveNew.html', context)
     else:
         today = datetime.date.today()
         currentYear = today.year
         form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'work/leaveNew.html', context)
+        return render(request, 'work/leave/leaveNew.html', context)
 
 def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
@@ -108,7 +108,7 @@ def leaveDetail(request, id):
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
-                return render(request, 'work/leaveDetail.html', context)
+                return render(request, 'work/leave/leaveDetail.html', context)
         else: # upload link
             if urlForm.is_valid():
                 urlForm.save()
@@ -116,12 +116,12 @@ def leaveDetail(request, id):
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์ss")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
-                return render(request, 'work/leaveDetail.html', context)
+                return render(request, 'work/leave/leaveDetail.html', context)
     # else:
     fileForm = LeaveFileForm(initial={'leave':leave, 'filetype':'Unknow'})
     urlForm = LeaveURLForm(initial={'leave':leave})
     context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave}
-    return render(request, 'work/leaveDetail.html', context)
+    return render(request, 'work/leave/leaveDetail.html', context)
 
 def leaveUpdate(request, id):
     leave = get_object_or_404(Leave, id=id)
@@ -135,10 +135,10 @@ def leaveUpdate(request, id):
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form, 'personnel': personnel}
-            return render(request, 'work/leaveUpdate.html', context)
+            return render(request, 'work/leave/leaveUpdate.html', context)
     else:
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'work/leaveUpdate.html', context)
+        return render(request, 'work/leave/leaveUpdate.html', context)
 
 def leaveDelete(request, id):
     leave = get_object_or_404(Leave, id=id)
@@ -161,7 +161,7 @@ def leaveDelete(request, id):
     else:
         form.deleteForm()
         context = {'form': form, 'leave':leave, 'personnel': leave.personnel}
-        return render(request, 'work/leaveDelete.html', context)
+        return render(request, 'work/leave/leaveDelete.html', context)
 
 def leaveDeleteFile(request, id):
     leaveFile = get_object_or_404(LeaveFile, id=id)

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fa fa-person-hiking"></i> ประวัติการลาของบุคลากร </h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-5">
+            <form method="post" class="form-control text-success">
+                {% csrf_token %}
+                <label for="divisionId">เลือกสาขาที่สังกัด</label>
+                <select name="divisionId" onchange="this.form.submit();" class="form-control text-success">
+                    {% for div in divisions %}
+                        {% if div == division %}
+                            <option value="{{ div.id }}" selected> {{ div }}</option>
+                        {% else %}
+                            <option value="{{ div.id }}"> {{ div }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="personnelId">
+            </form>
+        </div>
+        <div class="col-1 text-center align-middle">
+            {% if division != None %}
+                <br>
+                <h2><i class="fas fa-angle-double-right text-lg-center text-success"></i></h2>
+            {% endif %}
+        </div>
+        <div class="col-6">
+            {% if division != None %}
+                <form method="post" class="form-control text-success">
+                    {% csrf_token %}
+                    <label for="personnelId">เลือกบุคลากร</label>
+                    <select name="personnelId" onchange="this.form.submit();" class="form-control text-success">
+                        {% for person in division.getPersonnels %}
+                            {% if person == personnel %}
+                                <option value="{{ person.id }}" selected> {{ person }}</option>
+                            {% else %}
+                                <option value="{{ person.id }}"> {{ person }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <input type="hidden" name="divisionId" value="{{ division.id }}">
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if personnel != None %}
+        <div class="row">
+            <div class="col-10"> <br>
+                <h4 class="align-bottom"> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
+                    สังกัด: {{ personnel.division }} </h4>
+            </div>
+            <div class="col-2">
+                <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:5px;" class="rounded-circle">
+            </div>
+        </div>
+        <hr class="text-primary">
+        <table class="table table-info table-striped table-hover">
+            <tr class="text-primary">
+                <th class="text-center col-2">ปีงบประมาณ</th>
+                <th class="col-4">ประเภทการลา</th>
+                <th class="col-3">ระหว่างวันที่</th>
+                <th class="col-1">จำนวนวัน </th>
+                <th class="col col-2"><a href="{% url 'leaveNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มข้อมูลการลา </a></th>
+            </tr>
+            {% for leave in leaves  %}
+                <tr class="text-primary">
+                    <td class="text-center">{{ leave.fiscalYear }}</td>
+                    <td>{{ leave.leaveType }}</td>
+                    <td>{{ leave.startDate }} - {{ leave.endDate }}</td>
+                    <td class="text-center">{{ leave.days }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'leaveDetail' leave.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>
+                        <a href="{% url 'leaveUpdate' leave.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> </a>
+                        <a href="{% url 'leaveDelete' leave.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+{% endblock %}

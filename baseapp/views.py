@@ -14,7 +14,7 @@ def home(request):
 def divisionList(request):
     divisions = Division.objects.all().order_by('name_th')
     context = {'divisions': divisions}
-    return render(request, 'base/divisionList.html', context)
+    return render(request, 'base/division/divisionList.html', context)
 
 
 def divisionNew(request):
@@ -25,11 +25,11 @@ def divisionNew(request):
             return redirect('divisionList')
         else:
             context = {'form': form}
-            return render(request, 'base/divisionNew.html', context)
+            return render(request, 'base/division/divisionNew.html', context)
     else:
         form = DivisionForm()
         context = {'form': form}
-        return render(request, 'base/divisionNew.html', context)
+        return render(request, 'base/division/divisionNew.html', context)
 
 
 def divisionUpdate(request, id):
@@ -41,10 +41,10 @@ def divisionUpdate(request, id):
             return redirect('divisionList')
         else:
             context = {'form': form}
-            return render(request, 'base/divisionUpdate.html')
+            return render(request, 'base/division/divisionUpdate.html')
     else:
         context = {'form': form}
-        return render(request, 'base/divisionUpdate.html', context)
+        return render(request, 'base/division/divisionUpdate.html', context)
 
 
 def divisionDelete(request, id):
@@ -56,14 +56,14 @@ def divisionDelete(request, id):
     else:
         form.deleteForm()
         context = {'form': form, 'division': division}
-        return render(request, 'base/divisionDelete.html', context)
+        return render(request, 'base/division/divisionDelete.html', context)
 
 
 # Curriculum CRUD.
 def curriculumList(request):
     curriculums = Curriculum.objects.all().order_by('name_th')
     context = {'curriculums': curriculums}
-    return render(request, 'base/curriculumList.html', context)
+    return render(request, 'base/curriculum/curriculumList.html', context)
 
 
 def curriculumNew(request):
@@ -74,11 +74,11 @@ def curriculumNew(request):
             return redirect('curriculumList')
         else:
             context = {'form': form}
-            return render(request, 'base/curriculumNew.html', context)
+            return render(request, 'base/curriculum/curriculumNew.html', context)
     else:
         form = CurriculumForm()
         context = {'form': form}
-        return render(request, 'base/curriculumNew.html', context)
+        return render(request, 'base/curriculum/curriculumNew.html', context)
 
 
 def curriculumUpdate(request, id):
@@ -90,10 +90,10 @@ def curriculumUpdate(request, id):
             return redirect('curriculumList')
         else:
             context = {'form': form}
-            return render(request, 'base/curriculumUpdate.html')
+            return render(request, 'base/curriculum/curriculumUpdate.html')
     else:
         context = {'form': form}
-        return render(request, 'base/curriculumUpdate.html', context)
+        return render(request, 'base/curriculum/curriculumUpdate.html', context)
 
 
 def curriculumDelete(request, id):
@@ -105,14 +105,14 @@ def curriculumDelete(request, id):
     else:
         form.deleteForm()
         context = {'form': form, 'curriculum': curriculum}
-        return render(request, 'base/curriculumDelete.html', context)
+        return render(request, 'base/curriculum/curriculumDelete.html', context)
 
 
 # Personnel CRUD.
 def personnelList(request):
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     context = {'personnels': personnels}
-    return render(request, 'base/personnelList.html', context)
+    return render(request, 'base/personnel/personnelList.html', context)
 
 def personnelListPage(request, pageNo=None):
     iterm_per_page =5
@@ -121,7 +121,7 @@ def personnelListPage(request, pageNo=None):
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
     context = {'personnels': personnels_page.page(pageNo)}
-    return render(request, 'base/personnelListPage.html', context)
+    return render(request, 'base/personnel/personnelListPage.html', context)
 
 def personnelNew(request):
     if request.method == 'POST':
@@ -132,7 +132,7 @@ def personnelNew(request):
             if passwd != confpasswd:
                 messages.add_message(request, messages.WARNING, "กำหนดรหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน!")
                 context = {'form': form}
-                return render(request, 'base/personnelNew.html', context)
+                return render(request, 'base/personnel/personnelNew.html', context)
             newForm = form.save(commit=False)
             email = newForm.email
             filepath = newForm.picture.name
@@ -152,16 +152,16 @@ def personnelNew(request):
             return redirect('personnelListPage', pageNo=1)
         else:
             context = {'form': form}
-            return render(request, 'base/personnelNew.html', context)
+            return render(request, 'base/personnel/personnelNew.html', context)
     else:
         form = PersonnelForm()
         context = {'form': form}
-        return render(request, 'base/personnelNew.html', context)
+        return render(request, 'base/personnel/personnelNew.html', context)
 
 def personnelDetail(request, id):
     personnel = Personnel.objects.filter(id=id).first()
     context = {'personnel': personnel}
-    return render(request, 'base/personnelDetail.html', context)
+    return render(request, 'base/personnel/personnelDetail.html', context)
 
 
 def personnelUpdate(request, id):
@@ -194,12 +194,12 @@ def personnelUpdate(request, id):
             return redirect('personnelListPage', pageNo=1)
         else:
             context = {'form': form, 'personnel': personnel}
-            return render(request, 'base/personnelUpdate.html', context)
+            return render(request, 'base/personnel/personnelUpdate.html', context)
     else:
         form = PersonnelForm(instance=personnel)
         form.updateForm()
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/personnelUpdate.html', context)
+        return render(request, 'base/personnel/personnelUpdate.html', context)
 
 
 def personnelDelete(request, id):
@@ -215,7 +215,7 @@ def personnelDelete(request, id):
     else:
         form.deleteForm()
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/personelDelete.html', context)
+        return render(request, 'base/personnel/personelDelete.html', context)
 
 
 # Education CRUD.
@@ -233,7 +233,7 @@ def educationList(request, divisionId=None, personnelId=None):
         else:
             personnel = division.getPersonnels().first()
     context = {'divisions': divisions, 'division': division, 'personnel': personnel}
-    return render(request, 'base/educationList.html', context)
+    return render(request, 'base/education/educationList.html', context)
 
 
 def educationNew(request, id):
@@ -246,16 +246,16 @@ def educationNew(request, id):
             return redirect('educationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             context = {'form': form, 'personnel': personnel}
-            return render(request, 'base/educationNew.html', context)
+            return render(request, 'base/education/educationNew.html', context)
     else:
         form = EducationForm(initial={'personnel': personnel, 'recorder': personnel})
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/educationNew.html', context)
+        return render(request, 'base/education/educationNew.html', context)
 
 def educationDetail(request, id):
     education = Education.objects.filter(id=id).first()
     context = {'education': education}
-    return render(request, 'base/educationDetail.html', context)
+    return render(request, 'base/education/educationDetail.html', context)
 
 def educationUpdate(request, id):
     education = get_object_or_404(Education, id=id)
@@ -268,10 +268,10 @@ def educationUpdate(request, id):
             return redirect('educationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             context = {'form': form, 'personnel': personnel}
-            return render(request, 'base/educationUpdate.html', context)
+            return render(request, 'base/education/educationUpdate.html', context)
     else:
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/educationUpdate.html', context)
+        return render(request, 'base/education/educationUpdate.html', context)
 
 
 def educationDelete(request, id):
@@ -285,7 +285,7 @@ def educationDelete(request, id):
     else:
         form.deleteForm()
         context = {'form': form, 'personnel': education.personnel}
-        return render(request, 'base/educationDelete.html', context)
+        return render(request, 'base/education/educationDelete.html', context)
 
 
 # Expertise CRUD.
@@ -303,7 +303,7 @@ def expertiseList(request, divisionId=None, personnelId=None):
         else:
             personnel = division.getPersonnels().first()
     context = {'divisions': divisions, 'division': division, 'personnel': personnel}
-    return render(request, 'base/expertiseList.html', context)
+    return render(request, 'base/expertise/expertiseList.html', context)
 
 def expertiseNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
@@ -314,17 +314,17 @@ def expertiseNew(request, id):
             return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             context = {'form': form, 'personnel': personnel}
-            return render(request, 'base/expertiseNew.html', context)
+            return render(request, 'base/expertise/expertiseNew.html', context)
     else:
         form = ExpertiseForm(initial={'personnel': personnel, 'recorder': personnel})
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/expertiseNew.html', context)
+        return render(request, 'base/expertise/expertiseNew.html', context)
 
 
 def expertiseDetail(request, id):
     expertise = Expertise.objects.filter(id=id).first()
     context = {'expertise': expertise}
-    return render(request, 'base/expertiseDetail.html', context)
+    return render(request, 'base/expertise/expertiseDetail.html', context)
 
 
 def expertiseUpdate(request, id):
@@ -338,10 +338,10 @@ def expertiseUpdate(request, id):
             return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             context = {'form': form, 'personnel': personnel}
-            return render(request, 'base/expertiseUpdate.html', context)
+            return render(request, 'base/expertise/expertiseUpdate.html', context)
     else:
         context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/expertiseUpdate.html', context)
+        return render(request, 'base/expertise/expertiseUpdate.html', context)
 
 
 def expertiseDelete(request, id):
@@ -355,7 +355,7 @@ def expertiseDelete(request, id):
     else:
         form.deleteForm()
         context = {'form': form, 'personnel': expertise.personnel}
-        return render(request, 'base/expertiseDelete.html', context)
+        return render(request, 'base/expertise/expertiseDelete.html', context)
 
 # CurrAffiliation CRUD.
 def currAffiliationList(request, curriculumId = None):
@@ -393,7 +393,7 @@ def currAffiliationList(request, curriculumId = None):
 
     form = CurrAffiliationForm(initial={'curriculum': curriculum, 'recorder': recorder})
     context = {'curriculums': curriculums, 'curriculum': curriculum, 'form': form}
-    return render(request, 'base/currAffiliationList.html', context)
+    return render(request, 'base/currAffiliation/currAffiliationList.html', context)
 
 def currAffiliationDelete(request,id):
     currAffiliation = get_object_or_404(CurrAffiliation, id=id)
