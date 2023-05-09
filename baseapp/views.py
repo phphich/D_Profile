@@ -128,12 +128,13 @@ def personnelListPage(request, pageNo=None):
         count = div.getCountPersonnel()
         listDivPersonCount[div.name_th] = count
     # ทำ Plotly Graph
-    productsAll = Products.objects.all()
-    products = []
-    amounts = []
-    for item in productsAll:
-        products.append(item.name)
-        amounts.append(item.getSaleAmount())
+    # productsAll = Products.objects.all()
+    # products = []
+    # amounts = []
+    # for item in productsAll:
+    #     products.append(item.name)
+    #     amounts.append(item.getSaleAmount())
+    #     ..............
     # กรณีอ่านค่าจากบางฟิลด์ใน model มาใช้งาน
     # products = Products.objects.values_list('name', 'samplesale__amount')
     # df = pd.DataFrame(products,  columns=['Product', 'Amount'])
