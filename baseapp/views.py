@@ -118,8 +118,16 @@ def personnelListPage(request, pageNo=None):
     iterm_per_page =5
     if pageNo == None:
         pageNo = 1
+    division = Division.objects.all().order_by('name_th')
+    listDivPersonCount = {}
+    for div in division:
+        count = div.getCountPersonnel()
+        listDivPersonCount[div.name_th] = count
+    # ทำ Plotly Graph
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
+
+    personnelCountWithDivision = Personnel.getCountWithDivision()
     context = {'personnels': personnels_page.page(pageNo)}
     return render(request, 'base/personnel/personnelListPage.html', context)
 

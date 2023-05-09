@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.db.models import F, Sum, Count
 
 class Faculty(models.Model):
     name_th = models.CharField(max_length=100, default="")
@@ -25,6 +26,9 @@ class Division(models.Model):
     def getPersonnels(self):
         personnels = Personnel.objects.filter(division=self).order_by('firstname_th', 'lastname_th')
         return personnels
+    def getCountPersonnel(self):
+        count = Personnel.objects.filter(order=self).aggregate(count=Count('id'))
+        return count['count']
 
 class Curriculum(models.Model):
     name_th= models.CharField(max_length=100, default="")
