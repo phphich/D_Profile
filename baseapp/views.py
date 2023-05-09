@@ -6,9 +6,9 @@ import os
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 
-# import plotly.graph_objs as go
-# import pandas as pd
-# import plotly.express as px
+import plotly.graph_objs as go
+import pandas as pd
+import plotly.express as px
 
 def home(request):
     return render(request, 'home.html')
@@ -123,18 +123,18 @@ def personnelListPage(request, pageNo=None):
     if pageNo == None:
         pageNo = 1
     division = Division.objects.all().order_by('name_th')
-    listDivPersonCount = {}
+    listDivName = []
+    listDivCountPersonnel=[]
     for div in division:
-        count = div.getCountPersonnel()
-        listDivPersonCount[div.name_th] = count
-    # ทำ Plotly Graph
-    # productsAll = Products.objects.all()
-    # products = []
-    # amounts = []
-    # for item in productsAll:
-    #     products.append(item.name)
-    #     amounts.append(item.getSaleAmount())
-    #     ..............
+        listDivName.append(div.name_th)
+        listDivCountPersonnel.append(div.getCountPersonnel())
+        dataFrame = pd.DataFrame({'สาขา':listDivName, 'จำนวน':listDivCountPersonnel}, columns=['สาขา','จำนวน'])
+    fig = px.bar(dataFrame, x='สาขา', y='จำนวน', title='จำนวนบุคลากรแยกตามสาขา')
+    fig.update_layout(autosize=False, width=500, height=300,
+                      margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
+                      paper_bgcolor = "aliceblue")
+    chart = fig.to_html()
+
     # กรณีอ่านค่าจากบางฟิลด์ใน model มาใช้งาน
     # products = Products.objects.values_list('name', 'samplesale__amount')
     # df = pd.DataFrame(products,  columns=['Product', 'Amount'])
@@ -149,7 +149,7 @@ def personnelListPage(request, pageNo=None):
 
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
-    context = {'personnels': personnels_page.page(pageNo)}
+    context = {'personnels': personnels_page.page(pageNo), 'chart':chart}
     return render(request, 'base/personnel/personnelListPage.html', context)
 
 def personnelNew(request):
