@@ -27,7 +27,7 @@ class Division(models.Model):
         personnels = Personnel.objects.filter(division=self).order_by('firstname_th', 'lastname_th')
         return personnels
     def getCountPersonnel(self):
-        count = Personnel.objects.filter(order=self).aggregate(count=Count('id'))
+        count = Personnel.objects.filter(division=self).aggregate(count=Count('id'))
         return count['count']
 
 class Curriculum(models.Model):

@@ -6,6 +6,10 @@ import os
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 
+# import plotly.graph_objs as go
+# import pandas as pd
+# import plotly.express as px
+
 def home(request):
     return render(request, 'home.html')
 
@@ -124,10 +128,26 @@ def personnelListPage(request, pageNo=None):
         count = div.getCountPersonnel()
         listDivPersonCount[div.name_th] = count
     # ทำ Plotly Graph
+    productsAll = Products.objects.all()
+    products = []
+    amounts = []
+    for item in productsAll:
+        products.append(item.name)
+        amounts.append(item.getSaleAmount())
+    # กรณีอ่านค่าจากบางฟิลด์ใน model มาใช้งาน
+    # products = Products.objects.values_list('name', 'samplesale__amount')
+    # df = pd.DataFrame(products,  columns=['Product', 'Amount'])
+    # ..................
+    # df = pd.DataFrame({"Product":products, "Amount":amounts}, columns=['Product', 'Amount'])
+    # fig = px.bar(df, x='Product', y='Amount', title="แผนภูมิแท่งแสดงยอดขายแยกตามรายชื่อสินค้า")
+    # fig.update_layout(autosize = False, width = 600,  height = 400,
+    #                   margin = dict(l=10, r=10, b=100, t=100, pad=5 ),
+    #                   paper_bgcolor = "aliceblue",)
+    # chart = fig.to_html()
+    # context = {'chart':chart}
+
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
-
-    personnelCountWithDivision = Personnel.getCountWithDivision()
     context = {'personnels': personnels_page.page(pageNo)}
     return render(request, 'base/personnel/personnelListPage.html', context)
 
