@@ -146,10 +146,13 @@ def personnelListPage(request, pageNo=None):
     #                   paper_bgcolor = "aliceblue",)
     # chart = fig.to_html()
     # context = {'chart':chart}
-
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
-    context = {'personnels': personnels_page.page(pageNo), 'chart':chart}
+    c = Personnel.objects.all().count()
+    cm = Personnel.objects.filter(gender='ชาย').count()
+    cfm = Personnel.objects.filter(gender='หญิง').count()
+    personnelCount = {'all': c, 'male': cm, 'female': cfm}
+    context = {'personnels': personnels_page.page(pageNo), 'chart':chart, 'countall':c, 'countmale':cm, 'countfemale':cfm}
     return render(request, 'base/personnel/personnelListPage.html', context)
 
 def personnelNew(request):

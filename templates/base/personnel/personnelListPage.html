@@ -7,35 +7,40 @@
     <table class="table table-primary table-striped table-hover">
         <tr class="bg-white text-primary">
             <th class="col-1"></th>
-            <th class="col-3">ชื่อ - สกุล </th>
-            <th class="col-2">ตำแหน่ง </th>
+            <th class="col-3">ชื่อ - สกุล</th>
+            <th class="col-2">ตำแหน่ง</th>
             <th class="col-1 text-center">ประเภท</th>
             <th class="col-1 text-center">เพศ</th>
             <th class="col-2">สังกัด</th>
-            <th class="col col-2"><a href="{% url 'personnelNew' %}" class="btn btn-sm btn-info text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มบุคลากร </a></th>
+            <th class="col col-2"><a href="{% url 'personnelNew' %}" class="btn btn-sm btn-info text-white"
+                                     style="width: 100%"><i class="fa fa-plus"></i> เพิ่มบุคลากร </a></th>
         </tr>
 
-    {% for personnel in personnels %}
-        <tr class="text-primary">
-            <td class="text-center">
-                <a href="{% url 'personnelDetail' personnel.id %}">
-                    <img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle" width="50px">
-                </a>
-            </td>
-            <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
-            <td>{{ personnel.status }}</td>
-            <td class="text-center">{{ personnel.type }}</td>
-            <td class="text-center">{{ personnel.gender }}</td>
-            <td>{{ personnel.division.name_th }}</td>
-            <td class="text-center">
-                <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>
-                <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> </a>
-                <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
-            </td>
-        </tr>
-    {% endfor %}
+        {% for personnel in personnels %}
+            <tr class="text-primary">
+                <td class="text-center">
+                    <a href="{% url 'personnelDetail' personnel.id %}">
+                        <img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                             width="50px">
+                    </a>
+                </td>
+                <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
+                <td>{{ personnel.status }}</td>
+                <td class="text-center">{{ personnel.type }}</td>
+                <td class="text-center">{{ personnel.gender }}</td>
+                <td>{{ personnel.division.name_th }}</td>
+                <td class="text-center">
+                    <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light"> <i
+                            class="fa fa-search"> </i> </a>
+                    <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary"> <i
+                            class="fa fa-tools"> </i> </a>
+                    <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger"> <i
+                            class="fa fa-trash"> </i> </a>
+                </td>
+            </tr>
+        {% endfor %}
     </table>
-    <br>
+
     {% if personnels.has_other_pages %}
         <div class="row">
             <div class="col-12 text-center ">
@@ -65,13 +70,49 @@
             </div>
         </div>
     {% endif %}
-
+    <br>
     <div class="row text-center align-content-center">
         <div class="col-md-1"></div>
-        <div class="col-md-10 text-center" style="alignment: center">
+        <div class="col-md-5 text-center" style="alignment: center; vertical-align: middle">
+            <br><br>
+            <div class="row">
+                <div class="col-4">
+                    <div class="card" style="width: 10rem;">
+                        <img class="card-img-top" style="width: 70px; height: 70px; align:center"
+                             src="{% static 'images/iconfiles/male_female.png' %}" alt="All Personnel">
+                        <div class="card-body" style="background-color: #bfe2e9">
+                            <p class="card-text text-success" style="font-size:70px;"><strong> {{ countall }} </strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card" style="width: 10rem;">
+                        <img class="card-img-top" style="width: 50px; height: 50px; align:center"
+                             src="{% static 'images/iconfiles/male.png' %}" alt="Male Personnel">
+                        <div class="card-body" style="background-color: #cbccce">
+                            <p class="card-text text-dark-50" style="font-size:50px;"><strong> {{ countmale }} </strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card" style="width: 10rem;">
+                        <img class="card-img-top" style="width: 50px; height: 50px; align:center"
+                             src="{% static 'images/iconfiles/female.png' %}" alt="Female Personnel">
+                        <div class="card-body" style="background-color: #dfc2c4">
+                            <p class="card-text text-dark-50" style="font-size:50px;">
+                                <strong> {{ countfemale }} </strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5 text-center" style="alignment: right">
             {{ chart | safe }}
         </div>
         <div class="col-md-1"></div>
     </div>
     <br><br>
+
 {% endblock %}
