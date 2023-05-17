@@ -51,6 +51,19 @@ def leaveNew(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveNew.html', context)
 
+def fileNameCleansing(filename):
+    find = [' ', '+', '%', '#','$','@','!', '^','&','*',',',
+            'ั', '่','้','๊','๋','์',
+            'ิ','ี','ึ', 'ื','ุ','ู',
+            '(',')','[',']','{','}',
+            ]
+    for f in find:
+        if f == ' ':
+            filename = filename.replace(f, '_')
+        else:
+            filename = filename.replace(f, '')
+    return filename
+
 def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
     if request.method == 'POST':
@@ -63,28 +76,7 @@ def leaveDetail(request, id):
                 success = True
                 fileerror=""
                 for f in files:
-                    filepath = f.name
-                    filepath = filepath.replace(' ', '_')
-                    filepath = filepath.replace('+', '')
-                    filepath = filepath.replace('%', '')
-                    filepath = filepath.replace('#', '')
-                    filepath = filepath.replace('่', '')
-                    filepath = filepath.replace('้', '')
-                    filepath = filepath.replace('ิ', '')
-                    filepath = filepath.replace('ี', '')
-                    filepath = filepath.replace('ื', '')
-                    filepath = filepath.replace('ึ', '')
-                    filepath = filepath.replace('๊', '')
-                    filepath = filepath.replace('๋', '')
-                    filepath = filepath.replace('ุ', '')
-                    filepath = filepath.replace('ู', '')
-                    filepath = filepath.replace('ั', '')
-                    filepath = filepath.replace('(', '')
-                    filepath = filepath.replace(')', '')
-                    filepath = filepath.replace('[', '')
-                    filepath = filepath.replace(']', '')
-                    filepath = filepath.replace('{', '')
-                    filepath = filepath.replace('}', '')
+                    filepath = fileNameCleansing(f.name)
                     point = filepath.rfind('.')
                     ext = filepath[point:]
                     filenames = filepath.split('/')
