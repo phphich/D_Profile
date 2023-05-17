@@ -10,6 +10,21 @@ import os
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
 
+
+# ฟังก์ชันสำหรับตัดอักขระจากชื่อไฟล์ที่ระบบไม่รองรับ
+def fileNameCleansing(filename):
+    find = [' ', '+', '%', '#','$','@','!', '^','&','*',',',
+            'ั', '่','้','๊','๋','์',
+            'ิ','ี','ึ', 'ื','ุ','ู',
+            '(',')','[',']','{','}',
+            ]
+    for f in find:
+        if f == ' ':
+            filename = filename.replace(f, '_')
+        else:
+            filename = filename.replace(f, '')
+    return filename
+
 #Leave CRUD
 def leaveList(request, divisionId=None, personnelId=None):
     division = None
@@ -37,7 +52,7 @@ def leaveNew(request, id):
         if form.is_valid():
             form.save()
             leave = Leave.objects.last()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลเข้าสู่ระบบเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการลาเข้าสู่ระบบเรียบร้อย")
             return redirect('leaveDetail', id=leave.id)
             # return redirect('leaveList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
@@ -50,19 +65,6 @@ def leaveNew(request, id):
         form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveNew.html', context)
-
-def fileNameCleansing(filename):
-    find = [' ', '+', '%', '#','$','@','!', '^','&','*',',',
-            'ั', '่','้','๊','๋','์',
-            'ิ','ี','ึ', 'ื','ุ','ู',
-            '(',')','[',']','{','}',
-            ]
-    for f in find:
-        if f == ' ':
-            filename = filename.replace(f, '_')
-        else:
-            filename = filename.replace(f, '')
-    return filename
 
 def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
@@ -106,7 +108,7 @@ def leaveDetail(request, id):
                 urlForm.save()
                 messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
             else:
-                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์ss")
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
                 return render(request, 'work/leave/leaveDetail.html', context)
     # else:
@@ -122,7 +124,7 @@ def leaveUpdate(request, id):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการลาเรียบร้อย")
             return redirect('leaveDetail', id=leave.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
@@ -204,3 +206,43 @@ def leaveDeleteURLAll(request, id):
         leaveURL.delete()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
     return redirect('leaveDetail', id=leave.id)
+
+#Training CRUD
+def trainingList(request, divisionId=None, personnelId=None):
+    division = None
+    personnel = None
+    divisions = Division.objects.all().order_by('name_th')
+    if request.method == 'POST':
+        divisionId = request.POST['divisionId']
+        personnelId = request.POST['personnelId']
+    if divisionId is not None:
+        division = Division.objects.filter(id=divisionId).first()
+        if personnelId != "":
+            personnel = Personnel.objects.filter(id=personnelId).first()
+        else:
+            personnel = division.getPersonnels().first()
+    trainings = Training.objects.filter(personnel=personnel).order_by('-startDate')
+
+    context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'trainings':trainings}
+    return render(request, 'work/training/trainingList.html', context)
+
+def trainingNew(request, id):
+    personnel = get_object_or_404(Personnel, id=id)
+    if request.method == 'POST':
+        form = TrainignForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            training = Training.objects.last()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการฝึกอบรม/สัมมนาเข้าสู่ระบบเรียบร้อย")
+            # return redirect('trainingDetail', id=training.id)
+            return redirect('home')
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'work/training/trainingNew.html', context)
+    else:
+        today = datetime.date.today()
+        currentYear = today.year
+        form = TrainignForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'work/training/trainingNew.html', context)

@@ -13,5 +13,10 @@ urlpatterns = [
     path('<id>/leaveDeleteURL', views.leaveDeleteURL, name='leaveDeleteURL'),
     path('<id>/leaveDeleteURLAll', views.leaveDeleteURLAll, name='leaveDeleteURLAll'),
 
+    path('trainingList', views.trainingList, name='trainingList'),
+    path('<divisionId>/<personnelId>/trainingList', views.trainingList, name='trainingList'),
+    path('<id>/trainingNew', views.trainingNew, name='trainingNew'),
+
+
 ]
 
