@@ -45,27 +45,6 @@ def leaveList(request, divisionId=None, personnelId=None):
     context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'leaves':leaves}
     return render(request, 'work/leave/leaveList.html', context)
 
-def leaveNew(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
-    if request.method == 'POST':
-        form = LeaveForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            leave = Leave.objects.last()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการลาเข้าสู่ระบบเรียบร้อย")
-            return redirect('leaveDetail', id=leave.id)
-            # return redirect('leaveList', divisionId=personnel.division.id, personnelId=personnel.id)
-        else:
-            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-            context = {'form': form, 'personnel': personnel}
-            return render(request, 'work/leave/leaveNew.html', context)
-    else:
-        today = datetime.date.today()
-        currentYear = today.year
-        form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
-        context = {'form': form, 'personnel': personnel}
-        return render(request, 'work/leave/leaveNew.html', context)
-
 def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
     if request.method == 'POST':
@@ -116,6 +95,27 @@ def leaveDetail(request, id):
     urlForm = LeaveURLForm(initial={'leave':leave})
     context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave}
     return render(request, 'work/leave/leaveDetail.html', context)
+
+def leaveNew(request, id):
+    personnel = get_object_or_404(Personnel, id=id)
+    if request.method == 'POST':
+        form = LeaveForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            leave = Leave.objects.last()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการลาเข้าสู่ระบบเรียบร้อย")
+            return redirect('leaveDetail', id=leave.id)
+            # return redirect('leaveList', divisionId=personnel.division.id, personnelId=personnel.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'work/leave/leaveNew.html', context)
+    else:
+        today = datetime.date.today()
+        currentYear = today.year
+        form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'work/leave/leaveNew.html', context)
 
 def leaveUpdate(request, id):
     leave = get_object_or_404(Leave, id=id)
@@ -225,6 +225,57 @@ def trainingList(request, divisionId=None, personnelId=None):
 
     context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'trainings':trainings}
     return render(request, 'work/training/trainingList.html', context)
+
+def trainingDetail(request, id):
+    training = Training.objects.filter(id=id).first()
+    if request.method == 'POST':
+        fileForm = TrainingFileForm(request.POST, request.FILES)
+        urlForm = TrainingURLForm(request.POST)
+        if request.POST['action'] == 'uploadfile':
+            if fileForm.is_valid():
+                files = request.FILES.getlist("file")
+                newFileForm = fileForm.save(commit=False)
+                success = True
+                fileerror=""
+                for f in files:
+                    filepath = fileNameCleansing(f.name)
+                    point = filepath.rfind('.')
+                    ext = filepath[point:]
+                    filenames = filepath.split('/')
+                    filename = 'documents/training/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
+                    lf, created = TrainingFile.objects.get_or_create(file=f, training=training, filetype=ext[1:])
+                    lf.save()
+                    trainingFile = TrainingFile.objects.last()
+                    newfilename = '['+ str(training.id) + '_' + str(trainingFile.id)+ ']-' + filenames[len(filenames) - 1]   # ชื่อไฟล์ที่ระบบกำหนด
+                    trainingFile.file.name = newfilename
+                    trainingFile.save()
+                    try:
+                        os.rename('static/' + filename, 'static/documents/training/' + trainingFile.file.name)
+                    except:
+                        fileerror = fileerror + trainingFile.file.name + ", "
+                        trainingFile.delete()
+                        success=False
+                if success==True:
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                else:
+                    messages.add_message(request, messages.WARNING, "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'training': training}
+                return render(request, 'work/training/trainingDetail.html', context)
+        else: # upload link
+            if urlForm.is_valid():
+                urlForm.save()
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'training': training}
+                return render(request, 'work/training/trainingDetail.html', context)
+    # else:
+    fileForm = TrainingFileForm(initial={'training':training, 'filetype':'Unknow'})
+    urlForm = TrainingURLForm(initial={'training':training})
+    context={'fileForm': fileForm, 'urlForm':urlForm, 'training': training}
+    return render(request, 'work/training/trainingDetail.html', context)
 
 def trainingNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)

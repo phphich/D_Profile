@@ -110,6 +110,19 @@ class Training(models.Model):
                "  " + self.topic + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                " (" + str(self.days) + ")"
 
+class TrainingFile(models.Model):
+    file = models.FileField(upload_to='static/documents/leave', default=None, null=True, blank=True)
+    filetype = models.CharField(max_length=50, default=None)
+    training = models.ForeignKey(Training, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return "(" + str(self.training.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
+
+class TrainingURL(models.Model):
+    url = models.URLField(max_length=255, default=None)
+    training = models.ForeignKey(Training, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return "[" + str(self.training.id) + "_" + str(self.id) + "]_"+ self.url
+
 class Research(models.Model):
     fiscalYear = models.IntegerField(default=0)
     title_th = models.TextField(default="")

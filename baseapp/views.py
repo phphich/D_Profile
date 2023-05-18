@@ -125,16 +125,19 @@ def personnelListPage(request, pageNo=None):
     division = Division.objects.all().order_by('name_th')
     listDivName = []
     listDivCountPersonnel=[]
-    for div in division:
-        listDivName.append(div.name_th)
-        listDivCountPersonnel.append(div.getCountPersonnel())
-        dataFrame = pd.DataFrame({'สาขา':listDivName, 'จำนวน':listDivCountPersonnel}, columns=['สาขา','จำนวน'])
-    fig = px.bar(dataFrame, x='สาขา', y='จำนวน', title='จำนวนบุคลากรแยกตามสาขา')
-    fig.update_layout(autosize=False, width=500, height=300,
-                      margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
-                      paper_bgcolor = "aliceblue")
-    chart = fig.to_html()
+    if division.count() != 0:
+        for div in division:
+            listDivName.append(div.name_th)
+            listDivCountPersonnel.append(div.getCountPersonnel())
+            dataFrame = pd.DataFrame({'สาขา':listDivName, 'จำนวน':listDivCountPersonnel}, columns=['สาขา','จำนวน'])
 
+        fig = px.bar(dataFrame, x='สาขา', y='จำนวน', title='จำนวนบุคลากรแยกตามสาขา')
+        fig.update_layout(autosize=False, width=600, height=400,
+                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
+                          paper_bgcolor = "aliceblue")
+        chart = fig.to_html()
+    else:
+        chart=None
     # กรณีอ่านค่าจากบางฟิลด์ใน model มาใช้งาน
     # products = Products.objects.values_list('name', 'samplesale__amount')
     # df = pd.DataFrame(products,  columns=['Product', 'Amount'])

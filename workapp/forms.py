@@ -184,6 +184,36 @@ class TrainignForm(forms.ModelForm):
             self.fields['budgetType'].widget.attrs['readonly'] = True
             self.fields['personnel'].widget.attrs['readonly'] = True
 
+class TrainingFileForm(forms.ModelForm):
+    class Meta:
+        model = TrainingFile
+        fields = ('file', 'filetype', 'training')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'training': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'training': 'การฝึกอบรม/สัมมนา',
+        }
+
+class TrainingURLForm(forms.ModelForm):
+    class Meta:
+        model = TrainingURL
+        fields = ('url', 'training')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control',}),
+            'training': forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'leave': 'การฝึกอบรม/สัมมนา',
+        }
+
 
 class ResearchForm(forms.ModelForm):
     class Meta:

@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('trainingList', views.trainingList, name='trainingList'),
     path('<divisionId>/<personnelId>/trainingList', views.trainingList, name='trainingList'),
+    path('<id>/trainingDetail', views.trainingDetail, name='trainingDetail'),
     path('<id>/trainingNew', views.trainingNew, name='trainingNew'),
 
 
