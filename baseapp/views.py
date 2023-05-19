@@ -11,6 +11,12 @@ import pandas as pd
 import plotly.express as px
 
 def home(request):
+    faculty = Faculty.objects.first()
+    if faculty is not None:
+        request.session['sess_faculty'] = faculty.name_en
+    else:
+        request.session['sess_faculty'] = "[N/A]"
+
     return render(request, 'home.html')
 
 

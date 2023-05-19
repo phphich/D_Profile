@@ -21,30 +21,26 @@
 
     <div class="row">
         <div class="col-10">
-            <h2><i class="fa fa-person-hiking"></i> รายละเอียดการฝึกอบรม/สัมมนา </h2>
+            <h2><i class="fa fa-person-dots-from-line"></i>รายละเอียดการฝึกอบรม/สัมมนา </h2>
             <h3>
                 {{ training.personnel.status }}{{ training.personnel.firstname_th }} {{ training.personnel.lastname_th }},
                 สังกัด: {{ training.personnel.division }}
             </h3>
         </div>
         <div class="col-2">
-            <img src="{% static training.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;">
+            <img src="{% static training.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;" class="rounded-circle">
         </div>
     </div>
 
     <hr class="text-primary">
     <table class="table table-info table-striped table-hover">
         <tr class="text-primary">
-            <th class="col-3">ปีงบประมาณ</th>
-            <td class="col-9">{{ training.fiscalYear }}</td>
+            <th class="col-3">หัวข้อฝึกอบรม/สัมมนา</th>
+            <td class="col-9">{{ training.topic }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ปีการศึกษา</th>
-            <td>{{ training.eduYear }}</td>
-        </tr>
-        <tr class="text-primary">
-            <th>ประเภทการลา</th>
-            <td>{{ training.trainingType }}</td>
+            <th>สถานที่</th>
+            <td>{{ training.place }}</td>
         </tr>
         <tr class="text-primary">
             <th class="col-3">วันที่เริ่มต้น</th>
@@ -55,12 +51,28 @@
             <td>{{ training.endDate }}</td>
         </tr>
         <tr class="text-primary">
-            <th>จำนวนวันลา</th>
+            <th>จำนวนวัน</th>
             <td>{{ training.days }}</td>
         </tr>
         <tr class="text-primary">
-            <th>เหตุผลประกอบการลา</th>
-            <td>{{ training.reason }}</td>
+            <th>ปีงบประมาณ</th>
+            <td>{{ training.fiscalYear  }}</td>
+        </tr>
+        <tr class="text-primary">
+            <th>ปีการศึกษา</th>
+            <td>{{ training.eduYear  }}</td>
+        </tr>
+        <tr class="text-primary">
+            <th>ภาคเรียนที่</th>
+            <td>{{ training.eduSemeter}}</td>
+        </tr>
+        <tr class="text-primary">
+            <th>งบประมาณที่ใช้</th>
+            <td>{{ training.budget }}</td>
+        </tr>
+        <tr class="text-primary">
+            <th>ประเภทงบประมาณ</th>
+            <td>{{ training.budgetType }}</td>
         </tr>
     </table>
 
@@ -90,7 +102,7 @@
                         {{ fileForm.as_table }}
                     </div>
                     <div class="col-9" id="fileList">
-                        <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทย </i>
+                        <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทยหรือใช้สัญลักษณ์พิเศษ </i>
                         </p>
                     </div>
                 </div>
@@ -110,7 +122,7 @@
             </form>
         </div>
             <p class="text-info">
-                {% if training.gettrainingFiles|length == 0 %}
+                {% if training.getTrainingFiles|length == 0 %}
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
@@ -119,7 +131,7 @@
                     </div>
                 {% else %}
                     <div class="row">
-                        {% for f in training.gettrainingFiles %}
+                        {% for f in training.getTrainingFiles %}
                             <div class="col-3">
                                 <a href="{% static 'documents/training/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.filetype == "pdf" %}
@@ -163,7 +175,7 @@
                             </div>
                         {% endfor %}
                     </div>
-                    {% if training.gettrainingFiles|length > 1 %}
+                    {% if training.getTrainingFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
                                 <a href="{% url 'trainingDeleteFileAll' training.id %}"
@@ -206,7 +218,7 @@
         </div>
         <p class="text-primary">
             <ul class="list-group">
-                {% for link in training.gettrainingURLs %}
+                {% for link in training.getTrainingURLs %}
                     <li class="list-group-item text-primary">
                         <a href={{ link.url }} class="filelink" target="_blank">
                             <i class="fas fa-caret-right"></i> {{ link }}
@@ -218,7 +230,7 @@
                 {% endfor %}
             </ul>
 
-            {% if training.gettrainingURLs|length > 1 %}
+            {% if training.getTrainingURLs|length > 1 %}
                 <div class="row">
                     <div class="col-3">
                         <a href="{% url 'trainingDeleteURLAll' training.id %}"

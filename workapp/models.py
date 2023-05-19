@@ -109,9 +109,15 @@ class Training(models.Model):
         return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " + self.topic + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                " (" + str(self.days) + ")"
+    def getTrainingFiles(self):
+        trainingFiles = TrainingFile.objects.filter(training=self)
+        return trainingFiles
+    def getTrainingURLs(self):
+        trainingURLs = TrainingURL.objects.filter(training=self)
+        return trainingURLs
 
 class TrainingFile(models.Model):
-    file = models.FileField(upload_to='static/documents/leave', default=None, null=True, blank=True)
+    file = models.FileField(upload_to='static/documents/training', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     training = models.ForeignKey(Training, on_delete=models.CASCADE, default=None)
     def __str__(self):

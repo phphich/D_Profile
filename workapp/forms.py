@@ -23,7 +23,7 @@ class CommandForm(forms.ModelForm):
             'mission': forms.Select(choices=MISSION_CHOICES, attrs={'class': 'form-control'}),
             'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
             'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'personnel': forms.HiddenInput(),
+            'personnel': forms.HiddenInput(),  # ผู้บันทึก
         }
 
         labels = {
@@ -35,7 +35,7 @@ class CommandForm(forms.ModelForm):
             'mission': 'พันธะกิจ',
             'topic': 'เรื่อง',
             'detail': 'รายละเอียด',
-            'personnel': 'บุคลากร'
+            'personnel': 'ผู้บันทึก'
         }
 
         def deleteForm(self):
@@ -47,7 +47,7 @@ class CommandForm(forms.ModelForm):
             self.fields['mission'].widget.attrs['readonly'] = True
             self.fields['topic'].widget.attrs['readonly'] = True
             self.fields['detail'].widget.attrs['readonly'] = True
-            self.fields['personnel'].widget.attrs['readonly'] = True
+            self.fields['personnel'].widget.attrs['readonly'] = True  # ผู้บันทึก
 
 
 class LeaveForm(forms.ModelForm):
@@ -99,6 +99,7 @@ class LeaveForm(forms.ModelForm):
         self.fields['leaveType'].widget.attrs['readonly'] = True
         self.fields['reason'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
+        self.fields['recorder'].widget.attrs['readonly'] = True
 
 
 class LeaveFileForm(forms.ModelForm):
@@ -117,18 +118,21 @@ class LeaveFileForm(forms.ModelForm):
             'filetype': 'ชนิดไฟล์',
             'leave': 'ใบลา',
         }
+
+
 class LeaveURLForm(forms.ModelForm):
     class Meta:
         model = LeaveURL
         fields = ('url', 'leave')
         widgets = {
-            'url': forms.URLInput(attrs={'class': 'form-control',}),
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
             'leave': forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
             'leave': 'ใบลา',
         }
+
 
 class TrainignForm(forms.ModelForm):
     class Meta:
@@ -141,48 +145,51 @@ class TrainignForm(forms.ModelForm):
         )
         model = Training
         fields = (
-            'startDate', 'endDate', 'days', 'fiscalYear', 'eduYear', 'eduSemeter', 'topic', 'place', 'budget',
-            'budgetType',
-            'personnel')
+            'topic', 'place', 'fiscalYear', 'startDate', 'endDate', 'days', 'eduYear', 'eduSemeter', 'budget',
+            'budgetType', 'personnel', 'recorder')
         widgets = {
+            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'place': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'endDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'days': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
-            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
-            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'place': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
             'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
             'personnel': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
         }
         labels = {
             'startDate': 'วันที่เริ่มต้น',
             'endDate': 'วันที่สิ้นสุด',
-            'days': 'จำนวนวันที่ลา',
+            'days': 'จำนวนวัน',
             'fiscalYear': 'ปีงบประมาณ',
             'eduYear': 'ปีการศึกษา',
             'eduSemeter': 'ภาคเรียนที่',
             'topic': 'หัวข้ออบรม/ดูงาน',
             'place': 'สถานที่ฝึกอบรม/ดูงาน',
-            'budget': 'งบประมาณ',
+            'budget': 'งบประมาณที่ใช้',
             'budgetType': 'ประเภทงบประมาณ',
-            'personnel': 'บุคลากร'
+            'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก',
         }
 
-        def deleteForm(self):
-            self.fields['startDate'].widget.attrs['readonly'] = True
-            self.fields['endDate'].widget.attrs['readonly'] = True
-            self.fields['days'].widget.attrs['readonly'] = True
-            self.fields['fiscalYear'].widget.attrs['readonly'] = True
-            self.fields['eduYear'].widget.attrs['readonly'] = True
-            self.fields['eduSemeter'].widget.attrs['readonly'] = True
-            self.fields['topic'].widget.attrs['readonly'] = True
-            self.fields['place'].widget.attrs['readonly'] = True
-            self.fields['budget'].widget.attrs['readonly'] = True
-            self.fields['budgetType'].widget.attrs['readonly'] = True
-            self.fields['personnel'].widget.attrs['readonly'] = True
+    def deleteForm(self):
+        self.fields['topic'].widget.attrs['readonly'] = True
+        self.fields['place'].widget.attrs['readonly'] = True
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['startDate'].widget.attrs['readonly'] = True
+        self.fields['endDate'].widget.attrs['readonly'] = True
+        self.fields['days'].widget.attrs['readonly'] = True
+        self.fields['eduYear'].widget.attrs['readonly'] = True
+        self.fields['eduSemeter'].widget.attrs['readonly'] = True
+        self.fields['budget'].widget.attrs['readonly'] = True
+        self.fields['budgetType'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
+        self.fields['recorder'].widget.attrs['readonly'] = True
+
 
 class TrainingFileForm(forms.ModelForm):
     class Meta:
@@ -201,12 +208,13 @@ class TrainingFileForm(forms.ModelForm):
             'training': 'การฝึกอบรม/สัมมนา',
         }
 
+
 class TrainingURLForm(forms.ModelForm):
     class Meta:
         model = TrainingURL
         fields = ('url', 'training')
         widgets = {
-            'url': forms.URLInput(attrs={'class': 'form-control',}),
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
             'training': forms.HiddenInput(),
         }
         labels = {
@@ -257,19 +265,19 @@ class ResearchForm(forms.ModelForm):
             'personnel': 'บุคลากร'
         }
 
-        def deleteForm(self):
-            self.fields['fiscalYear'].widget.attrs['readonly'] = True
-            self.fields['topic_th'].widget.attrs['readonly'] = True
-            self.fields['topic_en'].widget.attrs['readonly'] = True
-            self.fields['objective'].widget.attrs['readonly'] = True
-            self.fields['percen_resp'].widget.attrs['readonly'] = True
-            self.fields['budget'].widget.attrs['readonly'] = True
-            self.fields['budgetType'].widget.attrs['readonly'] = True
-            self.fields['source'].widget.attrs['readonly'] = True
-            self.fields['keyword'].widget.attrs['readonly'] = True
-            self.fields['percent_success'].widget.attrs['readonly'] = True
-            self.fields['publish_method'].widget.attrs['readonly'] = True
-            self.fields['personnel'].widget.attrs['readonly'] = True
+    def deleteForm(self):
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['topic_th'].widget.attrs['readonly'] = True
+        self.fields['topic_en'].widget.attrs['readonly'] = True
+        self.fields['objective'].widget.attrs['readonly'] = True
+        self.fields['percen_resp'].widget.attrs['readonly'] = True
+        self.fields['budget'].widget.attrs['readonly'] = True
+        self.fields['budgetType'].widget.attrs['readonly'] = True
+        self.fields['source'].widget.attrs['readonly'] = True
+        self.fields['keyword'].widget.attrs['readonly'] = True
+        self.fields['percent_success'].widget.attrs['readonly'] = True
+        self.fields['publish_method'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
 
 
 class SocialServiceForm(forms.ModelForm):
@@ -321,22 +329,22 @@ class SocialServiceForm(forms.ModelForm):
             'personnel': 'บุคลากร'
         }
 
-        def deleteForm(self):
-            self.fields['startDate'].widget.attrs['readonly'] = True
-            self.fields['endDate'].widget.attrs['readonly'] = True
-            self.fields['days'].widget.attrs['readonly'] = True
-            self.fields['fiscalYear'].widget.attrs['readonly'] = True
-            self.fields['eduYear'].widget.attrs['readonly'] = True
-            self.fields['eduSemeter'].widget.attrs['readonly'] = True
-            self.fields['topic'].widget.attrs['readonly'] = True
-            self.fields['objective'].widget.attrs['readonly'] = True
-            self.fields['place'].widget.attrs['readonly'] = True
-            self.fields['budget'].widget.attrs['readonly'] = True
-            self.fields['budgetType'].widget.attrs['readonly'] = True
-            self.fields['source'].widget.attrs['readonly'] = True
-            self.fields['receiver'].widget.attrs['readonly'] = True
-            self.fields['num_receiver'].widget.attrs['readonly'] = True
-            self.fields['personnel'].widget.attrs['readonly'] = True
+    def deleteForm(self):
+        self.fields['startDate'].widget.attrs['readonly'] = True
+        self.fields['endDate'].widget.attrs['readonly'] = True
+        self.fields['days'].widget.attrs['readonly'] = True
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['eduYear'].widget.attrs['readonly'] = True
+        self.fields['eduSemeter'].widget.attrs['readonly'] = True
+        self.fields['topic'].widget.attrs['readonly'] = True
+        self.fields['objective'].widget.attrs['readonly'] = True
+        self.fields['place'].widget.attrs['readonly'] = True
+        self.fields['budget'].widget.attrs['readonly'] = True
+        self.fields['budgetType'].widget.attrs['readonly'] = True
+        self.fields['source'].widget.attrs['readonly'] = True
+        self.fields['receiver'].widget.attrs['readonly'] = True
+        self.fields['num_receiver'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
 
 
 class Performance(forms.ModelForm):
@@ -376,14 +384,14 @@ class Performance(forms.ModelForm):
             'personnel': 'บุคลากร'
         }
 
-        def deleteForm(self):
-            self.fields['getDate'].widget.attrs['readonly'] = True
-            self.fields['fiscalYear'].widget.attrs['readonly'] = True
-            self.fields['eduYear'].widget.attrs['readonly'] = True
-            self.fields['eduSemeter'].widget.attrs['readonly'] = True
-            self.fields['topic'].widget.attrs['readonly'] = True
-            self.fields['detail'].widget.attrs['readonly'] = True
-            self.fields['budget'].widget.attrs['readonly'] = True
-            self.fields['budgetType'].widget.attrs['readonly'] = True
-            self.fields['source'].widget.attrs['readonly'] = True
-            self.fields['personnel'].widget.attrs['readonly'] = True
+    def deleteForm(self):
+        self.fields['getDate'].widget.attrs['readonly'] = True
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['eduYear'].widget.attrs['readonly'] = True
+        self.fields['eduSemeter'].widget.attrs['readonly'] = True
+        self.fields['topic'].widget.attrs['readonly'] = True
+        self.fields['detail'].widget.attrs['readonly'] = True
+        self.fields['budget'].widget.attrs['readonly'] = True
+        self.fields['budgetType'].widget.attrs['readonly'] = True
+        self.fields['source'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True

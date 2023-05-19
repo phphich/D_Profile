@@ -1,23 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-    <style>
-        a.filelink {
-            box-shadow: inset 0 0 0 0 #54b3d6;
-            color: #54b3d6;
-            margin: 0 -.25rem;
-            padding: 0 .25rem;
-            transition: color .3s ease-in-out, box-shadow .3s ease-in-out;
-            text-decoration: none;
-        }
-
-        a.filelink:hover {
-            box-shadow: inset 100px 0 0 0 #ef0505;
-            color: white;
-            text-decoration: none;
-            background-color: #0a53be;
-        }
-    </style>
 
     <div class="row">
         <div class="col-10">
@@ -28,7 +11,7 @@
             </h3>
         </div>
         <div class="col-2">
-            <img src="{% static leave.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;">
+            <img src="{% static leave.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;"  class="rounded-circle">
         </div>
     </div>
 
@@ -90,7 +73,7 @@
                         {{ fileForm.as_table }}
                     </div>
                     <div class="col-9" id="fileList">
-                        <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทย </i>
+                        <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทยหรือใช้สัญลักษณ์พิเศษ </i>
                         </p>
                     </div>
                 </div>

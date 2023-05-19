@@ -17,7 +17,12 @@ urlpatterns = [
     path('<divisionId>/<personnelId>/trainingList', views.trainingList, name='trainingList'),
     path('<id>/trainingDetail', views.trainingDetail, name='trainingDetail'),
     path('<id>/trainingNew', views.trainingNew, name='trainingNew'),
-
+    path('<id>/trainingUpdate', views.trainingUpdate, name='trainingUpdate'),
+    path('<id>/trainingDelete', views.trainingDelete, name='trainingDelete'),
+    path('<id>/trainingDeleteFile', views.trainingDeleteFile, name='trainingDeleteFile'),
+    path('<id>/trainingDeleteFileAll', views.trainingDeleteFileAll, name='trainingDeleteFileAll'),
+    path('<id>/trainingDeleteURL', views.trainingDeleteURL, name='trainingDeleteURL'),
+    path('<id>/trainingDeleteURLAll', views.trainingDeleteURLAll, name='trainingDeleteURLAll'),
 
 ]
 

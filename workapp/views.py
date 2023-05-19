@@ -149,6 +149,9 @@ def leaveDelete(request, id):
                     messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
                 finally:
                     f.delete()
+        urlList = LeaveURL.objects.filter(leave=leave)
+        for u in urlList:
+            u.delete()
         leave.delete()
         messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการลาสำเร็จ")
         return redirect('leaveList', divisionId=leave.personnel.division.id, personnelId=leave.personnel.id)
@@ -221,7 +224,7 @@ def trainingList(request, divisionId=None, personnelId=None):
             personnel = Personnel.objects.filter(id=personnelId).first()
         else:
             personnel = division.getPersonnels().first()
-    trainings = Training.objects.filter(personnel=personnel).order_by('-startDate')
+    trainings = Training.objects.filter(personnel=personnel).order_by('-fiscalYear', '-startDate')
 
     context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'trainings':trainings}
     return render(request, 'work/training/trainingList.html', context)
@@ -285,8 +288,8 @@ def trainingNew(request, id):
             form.save()
             training = Training.objects.last()
             messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการฝึกอบรม/สัมมนาเข้าสู่ระบบเรียบร้อย")
-            # return redirect('trainingDetail', id=training.id)
-            return redirect('home')
+            return redirect('trainingDetail', id=training.id)
+            # return redirect('home')
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form, 'personnel': personnel}
@@ -297,3 +300,96 @@ def trainingNew(request, id):
         form = TrainignForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/training/trainingNew.html', context)
+    
+def trainingUpdate(request, id):
+    training = get_object_or_404(Training, id=id)
+    personnel = training.personnel
+    form = TrainignForm(data=request.POST or None, instance=training)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
+            return redirect('trainingDetail', id=training.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'work/training/trainingUpdate.html', context)
+    else:
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'work/training/trainingUpdate.html', context)
+
+def trainingDelete(request, id):
+    training = get_object_or_404(Training, id=id)
+    form = TrainignForm(data=request.POST or None, instance=training)
+    if request.method == 'POST':
+        #ลบไฟล์
+        fileList = TrainingFile.objects.filter(training=training)
+        for f in fileList:
+            fname = f.file.name
+            if os.path.exists('static/documents/training/' + fname):
+                try:
+                    os.remove('static/documents/training/' +fname)  # file exits, delete it
+                except:
+                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                finally:
+                    f.delete()
+        urlList =TrainingURL.objects.filter(training=training)
+        for u in urlList:
+            u.delete()
+        training.delete()
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาสำเร็จ")
+        return redirect('trainingList', divisionId=training.personnel.division.id, personnelId=training.personnel.id)
+    else:
+        form.deleteForm()
+        context = {'form': form, 'training':training, 'personnel': training.personnel}
+        return render(request, 'work/training/trainingDelete.html', context)
+
+def trainingDeleteFile(request, id):
+    trainingFile = get_object_or_404(TrainingFile, id=id)
+    training = trainingFile.training
+    fname = trainingFile.file.name
+    if os.path.exists('static/documents/training/' + fname):
+        try:
+            os.remove('static/documents/training/' + fname)  # file exits, delete it
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+        except:
+            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+    trainingFile.delete()
+    return redirect('trainingDetail', id=training.id)
+
+def trainingDeleteFileAll(request, id):
+    training = get_object_or_404(Training, id=id)
+    trainingFiles = training.getTrainingFiles()
+    success = True
+    fileerror = ""
+    for trainingFile in trainingFiles:
+        fname = trainingFile.file.name
+        if os.path.exists('static/documents/training/' + fname):
+            try:
+                os.remove('static/documents/training/' + fname)  # file exits, delete it
+            except:
+                success=False
+                fileerror = fileerror +  fname + ", "
+            finally:
+                trainingFile.delete()
+    if success==True:
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
+    return redirect('trainingDetail', id=training.id)
+
+
+def trainingDeleteURL(request, id):
+    trainingURL = get_object_or_404(TrainingURL, id=id)
+    training = trainingURL.training
+    trainingURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    return redirect('trainingDetail', id=training.id)
+
+def trainingDeleteURLAll(request, id):
+    training = get_object_or_404(Training, id=id)
+    trainingURLs = training.getTrainingURLs()
+    for trainingURL in trainingURLs:
+        trainingURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    return redirect('trainingDetail', id=training.id)
