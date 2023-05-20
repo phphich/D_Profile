@@ -115,6 +115,11 @@ class Training(models.Model):
     def getTrainingURLs(self):
         trainingURLs = TrainingURL.objects.filter(training=self)
         return trainingURLs
+    def getSemeter(self):
+        if self.eduSemeter== 3:
+            return "ฤดูร้อน"
+        else:
+            return self.eduSemeter
 
 class TrainingFile(models.Model):
     file = models.FileField(upload_to='static/documents/training', default=None, null=True, blank=True)
@@ -228,6 +233,18 @@ class Performance(models.Model):
     def __str__(self):
         return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " + self.topic + " : " + str(self.getDate)
+    def getPerformanceFiles(self):
+        performanceFiles = PerformanceFile.objects.filter(performance=self)
+        return performanceFiles
+    def getPerformanceURLs(self):
+        performanceURLs = PerformanceURL.objects.filter(performance=self)
+        return performanceURLs
+    def getSemeter(self):
+        if self.eduSemeter== 3:
+            return "ฤดูร้อน"
+        else:
+            return self.eduSemeter
+
 
 class PerformanceFile(models.Model):
     file = models.FileField(upload_to='static/documents/performance', default=None, null=True, blank=True)

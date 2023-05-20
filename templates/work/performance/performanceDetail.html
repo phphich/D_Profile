@@ -1,59 +1,66 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
     <div class="row">
         <div class="col-10">
-            <h2><i class="fa fa-person-hiking"></i> รายละเอียดการลา </h2>
+            <h2><i class="fas fa-award text-warning"></i> รายละเอียดการรับตำแหน่ง/ผลงาน/รางวัล</h2>
             <h3>
-                {{ leave.personnel.status }}{{ leave.personnel.firstname_th }} {{ leave.personnel.lastname_th }},
-                สังกัด: {{ leave.personnel.division }}
+                {{ performance.personnel.status }}{{ performance.personnel.firstname_th }} {{ performance.personnel.lastname_th }},
+                สังกัด: {{ performance.personnel.division }}
             </h3>
         </div>
         <div class="col-2">
-            <img src="{% static leave.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;"  class="rounded-circle">
+            <img src="{% static performance.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;" class="rounded-circle">
         </div>
     </div>
 
     <hr class="text-primary">
     <table class="table table-info table-striped table-hover">
         <tr class="text-primary">
-            <th class="col-3">ปีงบประมาณ</th>
-            <td class="col-9">{{ leave.fiscalYear }}</td>
+            <th>ปีงบประมาณ</th>
+            <td>{{ performance.fiscalYear  }}</td>
         </tr>
         <tr class="text-primary">
-            <th>ประเภทการลา</th>
-            <td>{{ leave.leaveType }}</td>
+            <th class="col-3">ชื่อผลงาน/รางวัล</th>
+            <td class="col-9">{{ performance.topic }}</td>
+        </tr>
+        <tr class="text-primary">
+            <th class="col-3">รายละเอียด</th>
+            <td class="col-9">{{ performance.detail }}</td>
+        </tr>
+        <tr class="text-primary">
+            <th>จาก/ผู้มอบ</th>
+            <td>{{ performance.source }}</td>
+        </tr>
+        <tr class="text-primary">
+            <th class="col-3">วันที่ได้รับ</th>
+            <td class="col-9">{{ performance.getDate }}</td>
         </tr>
         <tr class="text-primary">
             <th>ปีการศึกษา</th>
-            <td>{{ leave.eduYear }}</td>
+            <td>{{ performance.eduYear  }}</td>
         </tr>
         <tr class="text-primary">
-            <th class="col-3">วันที่เริ่มต้น</th>
-            <td class="col-9">{{ leave.startDate }}</td>
+            <th>ภาคเรียนที่</th>
+            <td>{{ performance.getSemeter }}</td>
         </tr>
         <tr class="text-primary">
-            <th>วันที่สิ้นสุด</th>
-            <td>{{ leave.endDate }}</td>
+            <th>งบประมาณที่ใช้</th>
+            <td>{{ performance.budget }}</td>
         </tr>
         <tr class="text-primary">
-            <th>จำนวนวันลา</th>
-            <td>{{ leave.days }}</td>
-        </tr>
-        <tr class="text-primary">
-            <th>เหตุผลประกอบการลา</th>
-            <td>{{ leave.reason }}</td>
+            <th>ประเภทงบประมาณ</th>
+            <td>{{ performance.budgetType }}</td>
         </tr>
     </table>
 
     <p class="text-center">
         <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'leaveList' leave.personnel.division.id leave.personnel.id %}'">
+                onclick="location.href='{% url 'performanceList' performance.personnel.division.id performance.personnel.id %}'">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
         <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'leaveUpdate' leave.id %}'">
+                onclick="location.href='{% url 'performanceUpdate' performance.id %}'">
             <i class="fa fa-tools"></i> แก้ไข
         </button>
     </p>
@@ -79,7 +86,7 @@
                 </div>
                 <div class="row">
                     <div class="col-5 text-center">
-                        <input type="hidden" name="id" value="{{ leave.id }}">
+                        <input type="hidden" name="id" value="{{ performance.id }}">
                         <input type="hidden" name="action" value="uploadfile">
                     </div>
                     <div class="col-2 text-center" id="upload">
@@ -93,7 +100,7 @@
             </form>
         </div>
             <p class="text-info">
-                {% if leave.getLeaveFiles|length == 0 %}
+                {% if performance.getPerformanceFiles|length == 0 %}
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
@@ -102,9 +109,9 @@
                     </div>
                 {% else %}
                     <div class="row">
-                        {% for f in leave.getLeaveFiles %}
+                        {% for f in performance.getPerformanceFiles %}
                             <div class="col-3">
-                                <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
+                                <a href="{% static 'documents/performance/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.filetype == "pdf" %}
                                         <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
                                              class="img-thumbnail">
@@ -139,17 +146,17 @@
                                         {{ f.file.name }}
                                     {% endif %}
                                 </a>
-                                <a href="{% url 'leaveDeleteFile' f.id %}"
+                                <a href="{% url 'performanceDeleteFile' f.id %}"
                                    onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
                                     <i class="fas fa-minus text-danger"></i>
                                 </a>
                             </div>
                         {% endfor %}
                     </div>
-                    {% if leave.getLeaveFiles|length > 1 %}
+                    {% if performance.getPerformanceFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
-                                <a href="{% url 'leaveDeleteFileAll' leave.id %}"
+                                <a href="{% url 'performanceDeleteFileAll' performance.id %}"
                                    onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
                                    class="btn btn-danger">
                                     <i class="fas fa-trash text-white"></i>
@@ -182,29 +189,29 @@
                     <button type="submit" class="btn btn-success">
                         <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
                     </button>
-                    <input type="hidden" name="id" value="{{ leave.id }}">
+                    <input type="hidden" name="id" value="{{ performance.id }}">
                     <input type="hidden" name="action" value="uploadlink">
                 </p>
             </form>
         </div>
         <p class="text-primary">
             <ul class="list-group">
-                {% for link in leave.getLeaveURLs %}
+                {% for link in performance.getPerformanceURLs %}
                     <li class="list-group-item text-primary">
                         <a href={{ link.url }} class="filelink" target="_blank">
                             <i class="fas fa-caret-right"></i> {{ link }}
                         </a>
-                        <a href="{% url 'leaveDeleteURL' link.id %}" onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
+                        <a href="{% url 'performanceDeleteURL' link.id %}" onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
                             <i class="fas fa-minus text-danger"></i>
                         </a>
                     </li>
                 {% endfor %}
             </ul>
 
-            {% if leave.getLeaveURLs|length > 1 %}
+            {% if performance.getPerformanceURLs|length > 1 %}
                 <div class="row">
                     <div class="col-3">
-                        <a href="{% url 'leaveDeleteURLAll' leave.id %}"
+                        <a href="{% url 'performanceDeleteURLAll' performance.id %}"
                            onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
                             <i class="fas fa-trash text-white"></i>
                             ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!

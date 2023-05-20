@@ -2,10 +2,14 @@ from django.db.models import Max
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from baseapp.models import *
 from baseapp.forms import *
-import os
+
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
+import os
 import plotly.graph_objs as go
 import pandas as pd
 import plotly.express as px
@@ -13,19 +17,21 @@ import plotly.express as px
 def home(request):
     faculty = Faculty.objects.first()
     if faculty is not None:
-        request.session['sess_faculty'] = faculty.name_en
+        request.session['sess_faculty'] = faculty.name_th
+        request.session['sess_university'] = faculty.university
     else:
-        request.session['sess_faculty'] = "[N/A]"
+        request.session['sess_faculty'] = "Faculty: [N/A]"
+        request.session['sess_university'] = "University: [N/A]"
 
     return render(request, 'home.html')
 
 
 # Division CRUD.
+# @login_required(login_url='userLogin')
 def divisionList(request):
     divisions = Division.objects.all().order_by('name_th')
     context = {'divisions': divisions}
     return render(request, 'base/division/divisionList.html', context)
-
 
 def divisionNew(request):
     if request.method == 'POST':
@@ -125,7 +131,7 @@ def personnelList(request):
     return render(request, 'base/personnel/personnelList.html', context)
 
 def personnelListPage(request, pageNo=None):
-    iterm_per_page =5
+    iterm_per_page = 10
     if pageNo == None:
         pageNo = 1
     division = Division.objects.all().order_by('name_th')
@@ -144,17 +150,7 @@ def personnelListPage(request, pageNo=None):
         chart = fig.to_html()
     else:
         chart=None
-    # กรณีอ่านค่าจากบางฟิลด์ใน model มาใช้งาน
-    # products = Products.objects.values_list('name', 'samplesale__amount')
-    # df = pd.DataFrame(products,  columns=['Product', 'Amount'])
-    # ..................
-    # df = pd.DataFrame({"Product":products, "Amount":amounts}, columns=['Product', 'Amount'])
-    # fig = px.bar(df, x='Product', y='Amount', title="แผนภูมิแท่งแสดงยอดขายแยกตามรายชื่อสินค้า")
-    # fig.update_layout(autosize = False, width = 600,  height = 400,
-    #                   margin = dict(l=10, r=10, b=100, t=100, pad=5 ),
-    #                   paper_bgcolor = "aliceblue",)
-    # chart = fig.to_html()
-    # context = {'chart':chart}
+
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
     c = Personnel.objects.all().count()
@@ -190,6 +186,16 @@ def personnelNew(request):
             if os.path.exists('static/' + personnel.picture.name):
                 os.remove('static/' + personnel.picture.name)  # file exits, delete it
             os.rename('static/' + filename, 'static/' + personnel.picture.name)
+            # สร้าง user ในระบบ authen ของ Django ---
+            id = personnel.email
+            email = personnel.email
+            password = passwd
+            user = User.objects.create_user(id, email, password)
+            user.first_name = personnel.firstname_en
+            user.last_name = personnel.lastname_en
+            user.is_staff = True
+            user.save()
+            # -------
             return redirect('personnelListPage', pageNo=1)
         else:
             context = {'form': form}
@@ -208,6 +214,7 @@ def personnelDetail(request, id):
 def personnelUpdate(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     oldpicture = personnel.picture.name  # รูปเดิม
+    oldemail = personnel.email  # อีเมล์เดิม
     if request.method == 'POST':
         form = PersonnelForm(data=request.POST, instance=personnel, files=request.FILES)
         if form.is_valid():
@@ -232,6 +239,12 @@ def personnelUpdate(request, id):
                 os.rename('static/' + filename, 'static/' + personnel.picture.name)
             else:
                 form.save()
+            # กรณีมีการอัพเดทอีเมล์
+            if personnel.email != oldemail:
+                user = User.objects.filter(username=oldemail).first()
+                user.username = personnel.email
+                user.email = personnel.email
+                user.save()
             return redirect('personnelListPage', pageNo=1)
         else:
             context = {'form': form, 'personnel': personnel}
@@ -248,10 +261,13 @@ def personnelDelete(request, id):
     picturefile = personnel.picture.name
     form = PersonnelForm(data=request.POST or None, instance=personnel)
     if request.method == 'POST':
+        user = User.objects.filter(username=personnel.email).first()
+        user.delete()
         personnel.delete()
         # delete picture file
         if os.path.exists('static/' + picturefile):
             os.remove('static/' + picturefile)  # file exits, delete it
+
         return redirect('personnelListPage', pageNo=1)
     else:
         form.deleteForm()

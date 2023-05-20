@@ -4,7 +4,7 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <h2><i class="fa fa-person-hiking"></i> ประวัติการลาของบุคลากร </h2>
+            <h2><i class="fas fa-award text-warning"></i> ประวัติการรับตำแหน่ง/ผลงาน/รางวัล </h2>
         </div>
     </div>
     <div class="row">
@@ -63,29 +63,29 @@
         <hr class="text-primary">
         <table class="table table-info table-striped table-hover">
             <tr class="text-primary">
-                <th class="text-center col-2">ปีงบประมาณ</th>
-                <th class="col-4">ประเภทการลา</th>
-                <th class="col-3">ระหว่างวันที่</th>
-                <th class="col-1">จำนวนวัน </th>
-                <th class="col col-2"><a href="{% url 'leaveNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มข้อมูลการลา </a></th>
+                <th class="col-1 text-center">ปีงบประมาณ</th>
+                <th class="col-4">ชื่อผลงาน/รางวัล</th>
+                <th class="col-3">ได้รับจาก</th>
+                <th class="col-2 text-center">วันที่ได้รับ</th>
+                <th class="col col-2"><a href="{% url 'performanceNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มการฝึกอบรม/สัมมนา </a></th>
             </tr>
 
             {% fiscalValue "" as nYear %}
-            {% for leave in leaves  %}
+            {% for performance in performances  %}
                 <tr class="text-primary">
                     <td class="text-center">
-                        {% if nYear != leave.fiscalYear %}
-                            {% fiscalValue leave.fiscalYear as nYear %}
+                        {% if nYear != performance.fiscalYear %}
+                            {% fiscalValue performance.fiscalYear as nYear %}
                             {{ nYear }}
                         {% endif %}
                     </td>
-                    <td>{{ leave.leaveType }}</td>
-                    <td>{{ leave.startDate }} - {{ leave.endDate }}</td>
-                    <td class="text-center">{{ leave.days }}</td>
+                    <td>{{ performance.topic }}</td>
+                    <td>{{ performance.source }}</td>
+                    <td class="text-center">{{ performance.getDate }}</td>
                     <td class="text-center">
-                        <a href="{% url 'leaveDetail' leave.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>
-                        <a href="{% url 'leaveUpdate' leave.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> </a>
-                        <a href="{% url 'leaveDelete' leave.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                        <a href="{% url 'performanceDetail' performance.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>
+                        <a href="{% url 'performanceUpdate' performance.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> </a>
+                        <a href="{% url 'performanceDelete' performance.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
                     </td>
                 </tr>
             {% endfor %}

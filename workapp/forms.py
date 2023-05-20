@@ -11,15 +11,15 @@ class CommandForm(forms.ModelForm):
             ("ทำนุบำรุงศิลปวัฒนธรรม", "การทำนุบำรุงศิลปวัฒนธรรม"),
             ("สนองโครงการอันเนื่องมาจากพระราชดำริ", "สนองโครงการอันเนื่องมาจากพระราชดำริ"),
         )
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('ฤดูร้อน', 'ฤดูร้อน'))
+        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
         model = Command
-        fields = ('comId', 'comDate', 'fiscalYear', 'eduYear', 'eduSemeter', 'mission', 'topic', 'detail', 'personnel')
+        fields = ( 'eduYear', 'eduSemeter','comId', 'comDate', 'fiscalYear', 'mission', 'topic', 'detail', 'personnel')
         widgets = {
             'comId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
             'comDate': forms.TextInput(attrs={'class': 'form-control'}),
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduSemeter': forms.RadioSelect(choices=SEMETER_CHOICES, attrs={'class': ''}),
+            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
             'mission': forms.Select(choices=MISSION_CHOICES, attrs={'class': 'form-control'}),
             'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
             'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
@@ -27,11 +27,11 @@ class CommandForm(forms.ModelForm):
         }
 
         labels = {
+            'eduYear': 'ปีการศึกษา',
+            'eduSemeter': 'ภาคเรียนที่',
             'comId': 'เลขที่คำสั่ง',
             'comDate': 'วันที่ออกคำสั่ง',
             'fiscalYear': 'ปีงบประมาณ',
-            'eduYear': 'ปีการศึกษา',
-            'eduSemeter': 'ภาคเรียนที่',
             'mission': 'พันธะกิจ',
             'topic': 'เรื่อง',
             'detail': 'รายละเอียด',
@@ -65,7 +65,7 @@ class LeaveForm(forms.ModelForm):
         )
         model = Leave
         fields = (
-            'fiscalYear', 'eduYear', 'leaveType', 'startDate', 'endDate', 'days', 'reason', 'personnel',
+            'fiscalYear', 'leaveType', 'eduYear', 'startDate', 'endDate', 'days', 'reason', 'personnel',
             'recorder')
         widgets = {
             'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -136,7 +136,7 @@ class LeaveURLForm(forms.ModelForm):
 
 class TrainignForm(forms.ModelForm):
     class Meta:
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('ฤดูร้อน', 'ฤดูร้อน'))
+        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
         TYPE_CHOICES = (
             ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
             ('งบประมาณรายได้', 'งบประมาณรายได้'),
@@ -144,8 +144,7 @@ class TrainignForm(forms.ModelForm):
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
         model = Training
-        fields = (
-            'topic', 'place', 'fiscalYear', 'startDate', 'endDate', 'days', 'eduYear', 'eduSemeter', 'budget',
+        fields = ('fiscalYear','topic', 'place',  'startDate', 'endDate', 'days', 'eduYear', 'eduSemeter', 'budget',
             'budgetType', 'personnel', 'recorder')
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
@@ -156,8 +155,9 @@ class TrainignForm(forms.ModelForm):
             'days': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
             'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
-            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0 }),
+            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
+                                                                    'onchange': 'javascript:updateBudget();'}),
             'personnel': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
         }
@@ -168,8 +168,8 @@ class TrainignForm(forms.ModelForm):
             'fiscalYear': 'ปีงบประมาณ',
             'eduYear': 'ปีการศึกษา',
             'eduSemeter': 'ภาคเรียนที่',
-            'topic': 'หัวข้ออบรม/ดูงาน',
-            'place': 'สถานที่ฝึกอบรม/ดูงาน',
+            'topic': 'หัวข้ออบรม/สัมมนา',
+            'place': 'สถานที่ฝึกอบรม/สัมมนา',
             'budget': 'งบประมาณที่ใช้',
             'budgetType': 'ประเภทงบประมาณ',
             'personnel': 'บุคลากร',
@@ -219,7 +219,7 @@ class TrainingURLForm(forms.ModelForm):
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
-            'leave': 'การฝึกอบรม/สัมมนา',
+            'training': 'การฝึกอบรม/สัมมนา',
         }
 
 
@@ -242,8 +242,9 @@ class ResearchForm(forms.ModelForm):
             'title_en': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'objective': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
             'percent_resp': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
-            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0 }),
+            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
+                                                                    'onchange': 'javascript:updateBudget();'}),
             'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
             'keyword': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
             'percent_success': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
@@ -282,7 +283,7 @@ class ResearchForm(forms.ModelForm):
 
 class SocialServiceForm(forms.ModelForm):
     class Meta:
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('ฤดูร้อน', 'ฤดูร้อน'))
+        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
         TYPE_CHOICES = (
             ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
             ('งบประมาณรายได้', 'งบประมาณรายได้'),
@@ -300,12 +301,13 @@ class SocialServiceForm(forms.ModelForm):
             'days': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'edulYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduSemeter': forms.RadioSelect(choices=SEMETER_CHOICES, attrs={'class': ''}),
+            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
             'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
             'objective': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
             'place': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
-            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0 }),
+            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
+                                                                    'onchange': 'javascript:updateBudget();'}),
             'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
             'receiver': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
             'num_receiver': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
@@ -347,9 +349,9 @@ class SocialServiceForm(forms.ModelForm):
         self.fields['personnel'].widget.attrs['readonly'] = True
 
 
-class Performance(forms.ModelForm):
+class PerformanceForm(forms.ModelForm):
     class Meta:
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('ฤดูร้อน', 'ฤดูร้อน'))
+        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
         TYPE_CHOICES = (
             ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
             ('งบประมาณรายได้', 'งบประมาณรายได้'),
@@ -357,31 +359,34 @@ class Performance(forms.ModelForm):
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
         model = Performance
-        fields = ('getDate', 'fiscalYear', 'eduYear', 'eduSemeter', 'topic', 'detail', 'budget', 'budgetType', 'source',
-                  'personnel')
+        fields = ('fiscalYear','topic', 'detail', 'source','getDate',  'eduYear', 'eduSemeter',  'budget', 'budgetType',
+                  'personnel', 'recorder')
         widgets = {
+            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
             'getDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduSemeter': forms.RadioSelect(choices=SEMETER_CHOICES, attrs={'class': ''}),
-            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
-            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
+            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
+            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
+                                                                    'onchange': 'javascript:updateBudget();'}),
             'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
             'personnel': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
         }
         labels = {
             'getDate': 'วันที่ได้รางวัล/ผลงาน',
             'fiscalYear': 'ปีงบประมาณ',
             'eduYear': 'ปีการศึกษา',
             'eduSemeter': 'ภาคเรียนที่',
-            'topic': 'เรื่อง/รางวัล/ผลงาน',
+            'topic': 'ชื่อผลงาน/รางวัล',
             'detail': 'รายละเอียด',
             'budget': 'งบประมาณ',
             'budgetType': 'ประเภทงบประมาณ',
-            'source': 'หน่วยงานเจ้าของงบประมาณ',
-            'personnel': 'บุคลากร'
+            'source': 'จาก/ผู้มอบ',
+            'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก',
         }
 
     def deleteForm(self):
@@ -395,3 +400,36 @@ class Performance(forms.ModelForm):
         self.fields['budgetType'].widget.attrs['readonly'] = True
         self.fields['source'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
+        self.fields['recorder'].widget.attrs['readonly'] = True
+
+class PerformanceFileForm(forms.ModelForm):
+    class Meta:
+        model = PerformanceFile
+        fields = ('file', 'filetype', 'performance')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'performance': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'performance': 'การฝึกอบรม/สัมมนา',
+        }
+
+
+class PerformanceURLForm(forms.ModelForm):
+    class Meta:
+        model = PerformanceURL
+        fields = ('url', 'performance')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'performance': forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'performance': 'การฝึกอบรม/สัมมนา',
+        }
+

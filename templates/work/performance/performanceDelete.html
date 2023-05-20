@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-10">
-            <h2><i class="fa fa-person-dots-from-line"></i> ลบข้อมูลการฝึกอบรม/สัมมนา </h2>
+            <h2><i class="fas fa-award text-warning"></i> ลบข้อมูลการรับตำแหน่ง/ผลงาน/รางวัล </h2>
             <h4> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
                 สังกัด: {{ personnel.division }} </h4>
         </div>
@@ -21,7 +21,7 @@
             <div class="col-12 text-success">
                 <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>
                 <p class="text-info">
-                    {% if training.getTrainingFiles|length == 0 %}
+                    {% if performance.getPerformanceFiles|length == 0 %}
                         <div class="row">
                             <div class="col-2"></div>
                             <div class="alert-warning col-8 text-center"><br>....ไม่มีเอกสารแนบข้อมูลการฝึกอบรม/สัมมนา....<br><br>
@@ -30,9 +30,9 @@
                         </div>
                     {% else %}
                         <div class="row">
-                            {% for f in training.getTrainingFiles %}
+                            {% for f in performance.getPerformanceFiles %}
                                 <div class="col-3">
-                                    <a href="{% static 'documents/training/' %}{{ f.file }}" class="filelink"
+                                    <a href="{% static 'documents/performance/' %}{{ f.file }}" class="filelink"
                                        target="_blank">
                                         {% if f.filetype == "pdf" %}
                                             <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
@@ -88,7 +88,7 @@
             </div>
             <p class="text-primary">
             <ul class="list-group">
-                {% for link in training.getTrainingURLs %}
+                {% for link in performance.getPerformanceURLs %}
                     <li class="list-group-item text-primary">
                         <a href={{ link.url }} class="filelink" target="_blank">
                             <i class="fas fa-caret-right"></i> {{ link }}
@@ -104,8 +104,8 @@
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
             <button type="submit" class="btn btn-danger"
-                    onclick="return confirm('โปรดยืนยันการลบข้อมูลการฝึกอบรม/สัมมนานี้' )">
-                <i class="fa-solid fa-trash"></i> ลบข้อมูลการฝึกอบรม/สัมมนา
+                    onclick="return confirm('โปรดยืนยันการลบข้อมูลผลงาน/รางวัลนี้' )">
+                <i class="fa-solid fa-trash"></i> ลบข้อมูลการรับตำแหน่ง/ผลงาน/รางวัล
             </button>
         </p>
     </form>

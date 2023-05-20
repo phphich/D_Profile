@@ -6,10 +6,10 @@
         <i class="fa fa-home"></i> Home </a>
 
     <a href="{% url 'divisionList' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-dark">
+       class="list-group-item list-group-item-action list-group-item-light text-info">
         <i class="fa fa-layer-group"></i> สาขา </a>
     <a href="{% url 'curriculumList' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-dark">
+       class="list-group-item list-group-item-action list-group-item-light text-info">
         <i class="fa fa-graduation-cap"></i> หลักสูตร </a>
 {#    <a href="{% url 'personnelList' %}"#}
 {#       class="list-group-item list-group-item-action list-group-item-light text-primary">#}
@@ -26,7 +26,7 @@
        <i class="fa-solid fa-sun"></i> ความเชี่ยวชาญ </a>
 
     <a href="{% url 'currAffiliationList' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-info">
+       class="list-group-item list-group-item-action list-group-item-light" style="color: rgba(239,88,116,0.89)">
         <i class="fas fa-users-cog"></i> การบริหารหลักสูตร </a>
 
 
@@ -48,8 +48,8 @@
     <a href="{% url 'leaveList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
         <i class="fa-solid fa-person-hiking"></i> การลา <i class="fas fa-check"></i> </a>
     <i class="fa-solid fa-person-walking-luggage"></i>
-    <a href="" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fa-solid fa-award"></i> ผลงาน/รางวัล </a>
+    <a href="{% url 'performanceList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
+        <i class="fa-solid fa-award"></i> การรับตำแหน่ง/ผลงาน/รางวัล <i class="fas fa-check"></i> </a>
 </div>
 <br>
 

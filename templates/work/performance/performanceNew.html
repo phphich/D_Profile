@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-10">
-            <h2><i class="fa fa-person-hiking"></i> บันทึกข้อมูลการลา </h2>
+            <h2><i class="fas fa-award text-warning"></i> เพิ่มข้อมูลการรับตำแหน่ง/ผลงาน/รางวัล </h2>
             <h4> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
                 สังกัด: {{ personnel.division }} </h4>
         </div>
@@ -12,8 +12,7 @@
         </div>
     </div>
     <hr class="text-primary">
-
-    <form method="POST" enctype="multipart/form-data" class="form form-control text-primary">
+    <form method="POST" enctype="multipart/form-data" class="form form-control text-primary ">
         {% csrf_token %}
         <div class="row">
             <div class="col-12">

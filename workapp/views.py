@@ -6,24 +6,10 @@ from workapp.models import *
 from workapp.forms import *
 from baseapp.models import *
 from baseapp.forms import *
-import os
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-
-
-# ฟังก์ชันสำหรับตัดอักขระจากชื่อไฟล์ที่ระบบไม่รองรับ
-def fileNameCleansing(filename):
-    find = [' ', '+', '%', '#','$','@','!', '^','&','*',',',
-            'ั', '่','้','๊','๋','์',
-            'ิ','ี','ึ', 'ื','ุ','ู',
-            '(',')','[',']','{','}',
-            ]
-    for f in find:
-        if f == ' ':
-            filename = filename.replace(f, '_')
-        else:
-            filename = filename.replace(f, '')
-    return filename
+import os
+from workapp import common
 
 #Leave CRUD
 def leaveList(request, divisionId=None, personnelId=None):
@@ -57,7 +43,7 @@ def leaveDetail(request, id):
                 success = True
                 fileerror=""
                 for f in files:
-                    filepath = fileNameCleansing(f.name)
+                    filepath = common.fileNameCleansing(f.name)
                     point = filepath.rfind('.')
                     ext = filepath[point:]
                     filenames = filepath.split('/')
@@ -111,9 +97,11 @@ def leaveNew(request, id):
             context = {'form': form, 'personnel': personnel}
             return render(request, 'work/leave/leaveNew.html', context)
     else:
-        today = datetime.date.today()
-        currentYear = today.year
-        form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
+        fiscalYear = common.getCurrentFiscalYear()
+        eduYear = common.getCurrentEduYear()
+        currentDate = common.getCurrentDate()
+        form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':fiscalYear, 'eduYear':eduYear,
+                                  'startDate':currentDate, 'endDate':currentDate,'days':1})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveNew.html', context)
 
@@ -241,7 +229,7 @@ def trainingDetail(request, id):
                 success = True
                 fileerror=""
                 for f in files:
-                    filepath = fileNameCleansing(f.name)
+                    filepath = common.fileNameCleansing(f.name)
                     point = filepath.rfind('.')
                     ext = filepath[point:]
                     filenames = filepath.split('/')
@@ -295,9 +283,13 @@ def trainingNew(request, id):
             context = {'form': form, 'personnel': personnel}
             return render(request, 'work/training/trainingNew.html', context)
     else:
-        today = datetime.date.today()
-        currentYear = today.year
-        form = TrainignForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':currentYear, 'eduYear':currentYear})
+        fiscalYear = common.getCurrentFiscalYear()
+        eduYear = common.getCurrentEduYear()
+        eduSemeter = common.getCurrentEduSemeter()
+        currentDate = common.getCurrentDate()
+        form = TrainignForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':fiscalYear,
+                                     'eduYear':eduYear, 'eduSemeter':eduSemeter, 'startDate':currentDate, 'endDate':currentDate,
+                                     'days':1})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/training/trainingNew.html', context)
     
@@ -393,3 +385,200 @@ def trainingDeleteURLAll(request, id):
         trainingURL.delete()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
     return redirect('trainingDetail', id=training.id)
+
+# Performance CRUD
+def performanceList(request, divisionId=None, personnelId=None):
+    division = None
+    personnel = None
+    divisions = Division.objects.all().order_by('name_th')
+    if request.method == 'POST':
+        divisionId = request.POST['divisionId']
+        personnelId = request.POST['personnelId']
+    if divisionId is not None:
+        division = Division.objects.filter(id=divisionId).first()
+        if personnelId != "":
+            personnel = Personnel.objects.filter(id=personnelId).first()
+        else:
+            personnel = division.getPersonnels().first()
+    performances = Performance.objects.filter(personnel=personnel).order_by('-fiscalYear', '-getDate')
+
+    context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'performances': performances}
+    return render(request, 'work/performance/performanceList.html', context)
+
+
+def performanceDetail(request, id):
+    performance = Performance.objects.filter(id=id).first()
+    if request.method == 'POST':
+        fileForm = PerformanceFileForm(request.POST, request.FILES)
+        urlForm = PerformanceURLForm(request.POST)
+        if request.POST['action'] == 'uploadfile':
+            if fileForm.is_valid():
+                files = request.FILES.getlist("file")
+                newFileForm = fileForm.save(commit=False)
+                success = True
+                fileerror = ""
+                for f in files:
+                    filepath = fileNameCleansing(f.name)
+                    point = filepath.rfind('.')
+                    ext = filepath[point:]
+                    filenames = filepath.split('/')
+                    filename = 'documents/performance/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
+                    lf, created = PerformanceFile.objects.get_or_create(file=f, performance=performance, filetype=ext[1:])
+                    lf.save()
+                    performanceFile = PerformanceFile.objects.last()
+                    newfilename = '[' + str(performance.id) + '_' + str(performanceFile.id) + ']-' + filenames[
+                        len(filenames) - 1]  # ชื่อไฟล์ที่ระบบกำหนด
+                    performanceFile.file.name = newfilename
+                    performanceFile.save()
+                    try:
+                        os.rename('static/' + filename, 'static/documents/performance/' + performanceFile.file.name)
+                    except:
+                        fileerror = fileerror + performanceFile.file.name + ", "
+                        performanceFile.delete()
+                        success = False
+                if success == True:
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                else:
+                    messages.add_message(request, messages.WARNING,
+                                         "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
+                return render(request, 'work/performance/performanceDetail.html', context)
+        else:  # upload link
+            if urlForm.is_valid():
+                urlForm.save()
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
+                return render(request, 'work/performance/performanceDetail.html', context)
+    # else:
+    fileForm = PerformanceFileForm(initial={'performance': performance, 'filetype': 'Unknow'})
+    urlForm = PerformanceURLForm(initial={'performance': performance})
+    context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
+    return render(request, 'work/performance/performanceDetail.html', context)
+
+
+def performanceNew(request, id):
+    personnel = get_object_or_404(Personnel, id=id)
+    if request.method == 'POST':
+        form = PerformanceForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            performance = Performance.objects.last()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลผลงาน/รางวัล เข้าสู่ระบบเรียบร้อย")
+            return redirect('performanceDetail', id=performance.id)
+            # return redirect('home')
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'work/performance/performanceNew.html', context)
+    else:
+        fiscalYear = common.getCurrentFiscalYear()
+        eduYear = common.getCurrentEduYear()
+        eduSemeter = common.getCurrentEduSemeter()
+        currentData = common.getCurrentDate()
+        form = PerformanceForm(
+            initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
+                     'getDate':currentData})
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'work/performance/performanceNew.html', context)
+
+
+def performanceUpdate(request, id):
+    performance = get_object_or_404(Performance, id=id)
+    personnel = performance.personnel
+    form = PerformanceForm(data=request.POST or None, instance=performance)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
+            return redirect('performanceDetail', id=performance.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'work/performance/performanceUpdate.html', context)
+    else:
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'work/performance/performanceUpdate.html', context)
+
+
+def performanceDelete(request, id):
+    performance = get_object_or_404(Performance, id=id)
+    form = PerformanceForm(data=request.POST or None, instance=performance)
+    if request.method == 'POST':
+        # ลบไฟล์
+        fileList = PerformanceFile.objects.filter(performance=performance)
+        for f in fileList:
+            fname = f.file.name
+            if os.path.exists('static/documents/performance/' + fname):
+                try:
+                    os.remove('static/documents/performance/' + fname)  # file exits, delete it
+                except:
+                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                finally:
+                    f.delete()
+        urlList = PerformanceURL.objects.filter(performance=performance)
+        for u in urlList:
+            u.delete()
+        performance.delete()
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาสำเร็จ")
+        return redirect('performanceList', divisionId=performance.personnel.division.id, personnelId=performance.personnel.id)
+    else:
+        form.deleteForm()
+        context = {'form': form, 'performance': performance, 'personnel': performance.personnel}
+        return render(request, 'work/performance/performanceDelete.html', context)
+
+
+def performanceDeleteFile(request, id):
+    performanceFile = get_object_or_404(PerformanceFile, id=id)
+    performance = performanceFile.performance
+    fname = performanceFile.file.name
+    if os.path.exists('static/documents/performance/' + fname):
+        try:
+            os.remove('static/documents/performance/' + fname)  # file exits, delete it
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+        except:
+            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+    performanceFile.delete()
+    return redirect('performanceDetail', id=performance.id)
+
+
+def performanceDeleteFileAll(request, id):
+    performance = get_object_or_404(Performance, id=id)
+    performanceFiles = performance.getPerformanceFiles()
+    success = True
+    fileerror = ""
+    for performanceFile in performanceFiles:
+        fname = performanceFile.file.name
+        if os.path.exists('static/documents/performance/' + fname):
+            try:
+                os.remove('static/documents/performance/' + fname)  # file exits, delete it
+            except:
+                success = False
+                fileerror = fileerror + fname + ", "
+            finally:
+                performanceFile.delete()
+    if success == True:
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+    return redirect('performanceDetail', id=performance.id)
+
+
+def performanceDeleteURL(request, id):
+    performanceURL = get_object_or_404(PerformanceURL, id=id)
+    performance = performanceURL.performance
+    performanceURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    return redirect('performanceDetail', id=performance.id)
+
+
+def performanceDeleteURLAll(request, id):
+    performance = get_object_or_404(Performance, id=id)
+    performanceURLs = performance.getPerformanceURLs()
+    for performanceURL in performanceURLs:
+        performanceURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    return redirect('performanceDetail', id=performance.id)
