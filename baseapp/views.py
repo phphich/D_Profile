@@ -14,6 +14,8 @@ import plotly.graph_objs as go
 import pandas as pd
 import plotly.express as px
 
+iterm_per_page = 10
+
 def home(request):
     faculty = Faculty.objects.first()
     if faculty is not None:
@@ -125,13 +127,12 @@ def curriculumDelete(request, id):
 
 
 # Personnel CRUD.
-def personnelList(request):
+def personnelListOld(request):
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     context = {'personnels': personnels}
-    return render(request, 'base/personnel/personnelList.html', context)
+    return render(request, 'base/personnel/personnelListOld.html', context)
 
-def personnelListPage(request, pageNo=None):
-    iterm_per_page = 10
+def personnelList(request, pageNo=None):
     if pageNo == None:
         pageNo = 1
     division = Division.objects.all().order_by('name_th')
@@ -153,12 +154,11 @@ def personnelListPage(request, pageNo=None):
 
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
-    c = Personnel.objects.all().count()
+    count = Personnel.objects.all().count()
     cm = Personnel.objects.filter(gender='ชาย').count()
     cfm = Personnel.objects.filter(gender='หญิง').count()
-    personnelCount = {'all': c, 'male': cm, 'female': cfm}
-    context = {'personnels': personnels_page.page(pageNo), 'chart':chart, 'countall':c, 'countmale':cm, 'countfemale':cfm}
-    return render(request, 'base/personnel/personnelListPage.html', context)
+    context = {'personnels': personnels_page.page(pageNo), 'chart':chart, 'count':count, 'countmale':cm, 'countfemale':cfm}
+    return render(request, 'base/personnel/personnelList.html', context)
 
 def personnelNew(request):
     if request.method == 'POST':
@@ -196,7 +196,7 @@ def personnelNew(request):
             user.is_staff = True
             user.save()
             # -------
-            return redirect('personnelListPage', pageNo=1)
+            return redirect('personnelList', pageNo=1)
         else:
             context = {'form': form}
             return render(request, 'base/personnel/personnelNew.html', context)
@@ -245,7 +245,7 @@ def personnelUpdate(request, id):
                 user.username = personnel.email
                 user.email = personnel.email
                 user.save()
-            return redirect('personnelListPage', pageNo=1)
+            return redirect('personnelList', pageNo=1)
         else:
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/personnel/personnelUpdate.html', context)
@@ -268,7 +268,7 @@ def personnelDelete(request, id):
         if os.path.exists('static/' + picturefile):
             os.remove('static/' + picturefile)  # file exits, delete it
 
-        return redirect('personnelListPage', pageNo=1)
+        return redirect('personnelList', pageNo=1)
     else:
         form.deleteForm()
         context = {'form': form, 'personnel': personnel}
@@ -289,6 +289,10 @@ def educationList(request, divisionId=None, personnelId=None):
             personnel = Personnel.objects.filter(id=personnelId).first()
         else:
             personnel = division.getPersonnels().first()
+    else:
+        division = Division.objects.all().order_by('name_th').first()
+        personnel = division.getPersonnels().first()
+
     context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/education/educationList.html', context)
 
@@ -359,6 +363,9 @@ def expertiseList(request, divisionId=None, personnelId=None):
             personnel = Personnel.objects.filter(id=personnelId).first()
         else:
             personnel = division.getPersonnels().first()
+    else:
+        division = Division.objects.all().order_by('name_th').first()
+        personnel =  division.getPersonnels().first()
     context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/expertise/expertiseList.html', context)
 

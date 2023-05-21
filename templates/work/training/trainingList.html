@@ -57,7 +57,7 @@
                     สังกัด: {{ personnel.division }} </h4>
             </div>
             <div class="col-2">
-                <img src="{% static personnel.picture %}" width="100px" height="auto" style="margin-top:5px;" class="rounded-circle">
+                <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:5px;" class="rounded-circle">
             </div>
         </div>
         <hr class="text-primary">
@@ -91,5 +91,37 @@
                 </tr>
             {% endfor %}
         </table>
+        
+         {% if trainings.has_other_pages %}
+            <div class="row">
+                <div class="col-12 text-center ">
+                    <div class="btn-group text-center" role="group" aria-label="Item pagination">
+                        {% if trainings.has_previous %}
+                            <a href="{% url 'trainingList' personnel.id division.id trainings.previous_page_number %}"
+                               class="btn btn-outline-primary">&laquo;</a>
+                        {% endif %}
+
+                        {% for page_number in trainings.paginator.page_range %}
+                            {% if trainings.number == page_number %}
+                                <button class="btn btn-outline-primary active">
+                                    <span>{{ page_number  }} <span class="sr-only">(current)</span></span>
+                                </button>
+                            {% else %}
+                                <a href="{% url 'trainingList' personnel.id division.id page_number %}" class="btn btn-outline-primary">
+                                    {{ page_number }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if trainings.has_next %}
+                            <a href="{% url 'trainingList' personnel.id division.id trainings.next_page_number %}"
+                               class="btn btn-outline-primary">&raquo;</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <p class="text-end text-info">[ข้อมูลการฝึกอบรม/สัมมนา: {{ count }} ครั้ง]</p>
+        <br>
     {% endif %}
 {% endblock %}

@@ -12,8 +12,9 @@ urlpatterns = [
     path('<id>/curriculumUpdate', views.curriculumUpdate, name='curriculumUpdate'),
     path('<id>/curriculumDelete', views.curriculumDelete, name='curriculumDelete'),
 
+    # path('personnelList', views.personnelList, name='personnelList' ),
     path('personnelList', views.personnelList, name='personnelList' ),
-    path('<pageNo>/personnelListPage', views.personnelListPage, name='personnelListPage' ),
+    path('<pageNo>/personnelList', views.personnelList, name='personnelList' ),
     path('personnelNew', views.personnelNew, name='personnelNew' ),
     path('<id>/personnelDetail', views.personnelDetail, name='personnelDetail'),
     path('<id>/personnelUpdate', views.personnelUpdate, name='personnelUpdate'),

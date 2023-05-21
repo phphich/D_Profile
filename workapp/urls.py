@@ -4,7 +4,9 @@ from workapp import views
 urlpatterns = [
     # การลา
     path('leaveList', views.leaveList, name='leaveList'),
+    path('<pageNo>/leaveList', views.leaveList, name='leaveList'),
     path('<divisionId>/<personnelId>/leaveList', views.leaveList, name='leaveList'),
+    path('<divisionId>/<personnelId>/<pageNo>/leaveList', views.leaveList, name='leaveList'),
     path('<id>/leaveDetail', views.leaveDetail, name='leaveDetail'),
     path('<id>/leaveNew', views.leaveNew, name='leaveNew'),
     path('<id>/leaveUpdate', views.leaveUpdate, name='leaveUpdate'),
@@ -16,7 +18,9 @@ urlpatterns = [
 
     # การฝึกอบรม/สัมมนา
     path('trainingList', views.trainingList, name='trainingList'),
+    path('<pageNo>/trainingList', views.trainingList, name='trainingList'),
     path('<divisionId>/<personnelId>/trainingList', views.trainingList, name='trainingList'),
+    path('<divisionId>/<personnelId>/<pageNo>/trainingList', views.trainingList, name='trainingList'),
     path('<id>/trainingDetail', views.trainingDetail, name='trainingDetail'),
     path('<id>/trainingNew', views.trainingNew, name='trainingNew'),
     path('<id>/trainingUpdate', views.trainingUpdate, name='trainingUpdate'),
@@ -28,7 +32,9 @@ urlpatterns = [
 
     # ผลงาน/รางวัล 
     path('performanceList', views.performanceList, name='performanceList'),
+    path('<pageNo>/performanceList', views.performanceList, name='performanceList'),
     path('<divisionId>/<personnelId>/performanceList', views.performanceList, name='performanceList'),
+    path('<divisionId>/<personnelId>/<pageNo>/performanceList', views.performanceList, name='performanceList'),
     path('<id>/performanceDetail', views.performanceDetail, name='performanceDetail'),
     path('<id>/performanceNew', views.performanceNew, name='performanceNew'),
     path('<id>/performanceUpdate', views.performanceUpdate, name='performanceUpdate'),

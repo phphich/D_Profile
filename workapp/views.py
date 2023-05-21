@@ -7,12 +7,17 @@ from workapp.forms import *
 from baseapp.models import *
 from baseapp.forms import *
 from django.contrib import messages
+from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 from django.core.files.storage import FileSystemStorage
 import os
 from workapp import common
 
+iterm_per_page = 5
 #Leave CRUD
-def leaveList(request, divisionId=None, personnelId=None):
+def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
+    # iterm_per_page = 2
+    if pageNo == None:
+        pageNo = 1
     division = None
     personnel = None
     divisions = Division.objects.all().order_by('name_th')
@@ -25,10 +30,15 @@ def leaveList(request, divisionId=None, personnelId=None):
             personnel = Personnel.objects.filter(id=personnelId).first()
         else:
             personnel = division.getPersonnels().first()
+    else:
+        division = Division.objects.all().order_by('name_th').first()
+        personnel = division.getPersonnels().first()
     leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
-    # leaves = personnel.getLeave()
+    count = leaves.count()
+    leaves_page = Paginator(leaves, iterm_per_page)
 
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'leaves':leaves}
+    context = {'divisions': divisions, 'division': division, 'personnel': personnel,
+               'leaves': leaves_page.page(pageNo), 'count':count}
     return render(request, 'work/leave/leaveList.html', context)
 
 def leaveDetail(request, id):
@@ -199,7 +209,9 @@ def leaveDeleteURLAll(request, id):
     return redirect('leaveDetail', id=leave.id)
 
 #Training CRUD
-def trainingList(request, divisionId=None, personnelId=None):
+def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
+    if pageNo == None:
+        pageNo = 1
     division = None
     personnel = None
     divisions = Division.objects.all().order_by('name_th')
@@ -212,9 +224,15 @@ def trainingList(request, divisionId=None, personnelId=None):
             personnel = Personnel.objects.filter(id=personnelId).first()
         else:
             personnel = division.getPersonnels().first()
-    trainings = Training.objects.filter(personnel=personnel).order_by('-fiscalYear', '-startDate')
+    else:
+        division = Division.objects.all().order_by('name_th').first()
+        personnel = division.getPersonnels().first()
 
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'trainings':trainings}
+    trainings = Training.objects.filter(personnel=personnel).order_by('-fiscalYear', '-startDate')
+    count = trainings.count()
+    trainings_page = Paginator(trainings, iterm_per_page)
+    context = {'divisions': divisions, 'division': division, 'personnel': personnel,
+               'trainings':trainings_page.page(pageNo),  'count':count}
     return render(request, 'work/training/trainingList.html', context)
 
 def trainingDetail(request, id):
@@ -387,7 +405,9 @@ def trainingDeleteURLAll(request, id):
     return redirect('trainingDetail', id=training.id)
 
 # Performance CRUD
-def performanceList(request, divisionId=None, personnelId=None):
+def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
+    if pageNo == None:
+        pageNo = 1
     division = None
     personnel = None
     divisions = Division.objects.all().order_by('name_th')
@@ -400,11 +420,16 @@ def performanceList(request, divisionId=None, personnelId=None):
             personnel = Personnel.objects.filter(id=personnelId).first()
         else:
             personnel = division.getPersonnels().first()
+    else:
+        division = Division.objects.all().order_by('name_th').first()
+        personnel = division.getPersonnels().first()
+
     performances = Performance.objects.filter(personnel=personnel).order_by('-fiscalYear', '-getDate')
-
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'performances': performances}
+    count = performances.count()
+    performances_page = Paginator(performances, iterm_per_page)
+    context = {'divisions': divisions, 'division': division, 'personnel': personnel,
+               'performances': performances_page.page(pageNo), 'count':count}
     return render(request, 'work/performance/performanceList.html', context)
-
 
 def performanceDetail(request, id):
     performance = Performance.objects.filter(id=id).first()
