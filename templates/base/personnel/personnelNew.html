@@ -12,12 +12,14 @@
         <br>
         <label for="id_userType">ความรับผิดชอบในระบบ</label> <br>
         {% if firstTime == True %}
-            <input type="radio" id="id_userType" name="userType" value="admin" checked>ผู้ดูแลระบบ <br>
-            <input type="radio" id="id_userType" name="userType" value="personnel" disabled><i class="text-secondary">บุคลากร </i> <br>
-            <input type="radio" id="id_userType" name="userType" value="staff" disabled><i class="text-secondary">เจ้าหน้าที่ดูแลข้อมูลสาขา </i> <br>
+            <input type="radio" id="id_userType" name="userType" value="Administrator" checked> ผู้ดูแลระบบ <br>
+            <input type="radio" id="id_userType" name="userType" value="Personnel" disabled><i class="text-secondary"> บุคลากร </i> <br>
+            <input type="radio" id="id_userType" name="userType" value="Staff" disabled><i class="text-secondary"> เจ้าหน้าที่ดูแลข้อมูลสาขา </i> <br>
+            <input type="radio" id="id_userType" name="userType" value="Manager" disabled><i class="text-secondary"> ผู้บริหาร </i> <br>
         {% else %}
-            <input type="radio" id="id_userType" name="userType" value="personnel" checked>บุคลากร <br>
-            <input type="radio" id="id_userType" name="userType" value="staff" >เจ้าหน้าที่ดูแลข้อมูลสาขา <br>
+            <input type="radio" id="id_userType" name="userType" value="Personnel" checked> บุคลากร <br>
+            <input type="radio" id="id_userType" name="userType" value="Staff" > เจ้าหน้าที่ดูแลข้อมูลสาขา <br>
+            <input type="radio" id="id_userType" name="userType" value="Manager"> ผู้บริหาร </i> <br>
         {% endif %}
 
         <p class="text-center">

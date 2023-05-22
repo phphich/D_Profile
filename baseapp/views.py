@@ -5,7 +5,7 @@ from baseapp.forms import *
 
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
@@ -234,15 +234,11 @@ def personnelNew(request):
             user = User.objects.create_user(id, email, password)
             user.first_name = personnel.firstname_en
             user.last_name = personnel.lastname_en
-            if userType == "admin":
-                user.is_superuser = True
-                user.is_staff = True
-            elif userType == "staff":
-                user.is_superuser = False
-                user.is_staff = True
+            group, created = Group.objects.get_or_create(name=userType)
+            if group is not None:
+                user.groups.add(group)
             else:
-                user.is_superuser = False
-                user.is_staff = False
+                user.groups.add (created)
             user.save()
             return redirect('personnelList', pageNo=1)
         else:
@@ -301,35 +297,20 @@ def personnelUpdate(request, id):
             user.email = personnel.email
             user.first_name = personnel.firstname_en
             user.last_name = personnel.lastname_en
-            if userType == "admin":
-                user.is_superuser = True
-                user.is_staff = True
-            elif userType == "staff":
-                user.is_superuser = False
-                user.is_staff = True
-            else:
-                user.is_superuser = False
-                user.is_staff = False
+            group, created = Group.objects.get_or_create(name=userType)
+            user.groups.clear()
+            user.groups.add(group)
             user.save()
             return redirect('personnelList', pageNo=1)
         else:
             user = User.objects.filter(username=oldemail).first()
-            if user.is_superuser == True and user.is_staff == True:
-                userType = "admin"
-            elif user.is_superuser == False and user.is_staff == True:
-                userType = "staff"
-            else:
-                userType = "personnel"
+            userType = user.groups.first()
             context = {'form': form, 'personnel': personnel, 'userType':userType}
             return render(request, 'base/personnel/personnelUpdate.html', context)
     else:
         user = User.objects.filter(username=oldemail).first()
-        if user.is_superuser == True and user.is_staff == True:
-            userType = "admin"
-        elif user.is_superuser == False and user.is_staff == True:
-            userType = "staff"
-        else:
-            userType = "personnel"
+        userType = user.groups.first()
+        userType = str(userType)
         form = PersonnelForm(instance=personnel)
         form.updateForm()
         context = {'form': form, 'personnel': personnel, 'userType':userType}
