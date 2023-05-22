@@ -115,3 +115,8 @@ class Documents(models.Model):
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     file = models.FileField(upload_to='static/documents/', default=None)
 
+class Permission(models.Model): # เจ้าหน้าที่รับผิดชอบจัดการข้อมูลสาขา
+    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
+    def __str__(self):
+        return self.personnel.firstname_th + ' ' + self.personnel.lastname_th + ' => ' + self.division.name_th

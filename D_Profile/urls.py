@@ -25,6 +25,9 @@ from workapp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', baseapp.views.home, name='home'),
+    path('userAuthen', baseapp.views.userAuthen, name='userAuthen'),
+    path('userLogout', baseapp.views.userLogout, name='userLogout'),
+    path('<email>/changePassword', baseapp.views.changePassword, name='changePassword'),
     path('baseapp/', include('baseapp.urls')),
     path('workapp/', include('workapp.urls')),
 ]

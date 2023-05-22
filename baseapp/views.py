@@ -24,12 +24,53 @@ def home(request):
     else:
         request.session['sess_faculty'] = "Faculty: [N/A]"
         request.session['sess_university'] = "University: [N/A]"
-
     return render(request, 'home.html')
 
+# ตรวจสอบ Login
+def userAuthen(request):
+    if request.method == 'POST':
+        userName = request.POST.get("userName")
+        userPass = request.POST.get("userPass")
+        ## login ด้วย ระบบล็อกอินของ Django
+        user = authenticate(username=userName, password=userPass)
+        if user is not None:
+            login(request, user)
+            personnel = Personnel.objects.get(email=userName)
+            request.session['userEmail'] = personnel.email
+            request.session['userName'] = personnel.firstname_th + " " + personnel.lastname_th
+            if user.is_superuser == True and user.is_staff == True:
+                request.session['userStatus'] = "Administrator"
+            elif user.is_superuser == False and user.is_staff == True:
+                request.session['userStatus'] = "Staff"
+            else:
+                request.session['userStatus'] = "Personnel"
+            request.session['personnelId'] = personnel.id
+            messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ..")
+            return redirect('home')
+        else:
+            messages.error(request, "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง.!!!")
+            data = {'userName': userName}
+            return render(request, 'userAuthen.html', data)
+    else:
+         data = {'userName': ''}
+         return render(request, 'userAuthen.html', data)
+
+#ล็อกเอ๊าท์ผ่านระบบ Authen ของ Django
+@login_required(login_url='userAuthen')
+def userLogout(request):
+    del request.session["userEmail"]
+    del request.session["userName"]
+    del request.session["userStatus"]
+    del request.session["personnelId"]
+    logout(request)
+    return  redirect('home')
+
+@login_required(login_url='userAuthen')
+def changePassword(request, email=None):
+    pass
 
 # Division CRUD.
-# @login_required(login_url='userLogin')
+@login_required(login_url='userAuthen')
 def divisionList(request):
     divisions = Division.objects.all().order_by('name_th')
     context = {'divisions': divisions}
@@ -125,7 +166,6 @@ def curriculumDelete(request, id):
         context = {'form': form, 'curriculum': curriculum}
         return render(request, 'base/curriculum/curriculumDelete.html', context)
 
-
 # Personnel CRUD.
 def personnelListOld(request):
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
@@ -165,6 +205,7 @@ def personnelNew(request):
         form = PersonnelForm(data=request.POST or None, files=request.FILES)
         passwd = request.POST['passwd']
         confpasswd = request.POST['confpasswd']
+        userType  = request.POST['userType']
         if form.is_valid():
             if passwd != confpasswd:
                 messages.add_message(request, messages.WARNING, "กำหนดรหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน!")
@@ -193,16 +234,33 @@ def personnelNew(request):
             user = User.objects.create_user(id, email, password)
             user.first_name = personnel.firstname_en
             user.last_name = personnel.lastname_en
-            user.is_staff = True
+            if userType == "admin":
+                user.is_superuser = True
+                user.is_staff = True
+            elif userType == "staff":
+                user.is_superuser = False
+                user.is_staff = True
+            else:
+                user.is_superuser = False
+                user.is_staff = False
             user.save()
-            # -------
             return redirect('personnelList', pageNo=1)
         else:
-            context = {'form': form}
+            countPersonnel = Personnel.objects.all().count()
+            if countPersonnel ==  0:
+                firstTime = True
+            else:
+                firstTime = False
+            context = {'form': form, 'fistTime':firstTime}
             return render(request, 'base/personnel/personnelNew.html', context)
     else:
         form = PersonnelForm()
-        context = {'form': form}
+        countPersonnel = Personnel.objects.all().count()
+        if countPersonnel == 0:
+            firstTime = True
+        else:
+            firstTime = False
+        context = {'form': form, 'firstTime':firstTime}
         return render(request, 'base/personnel/personnelNew.html', context)
 
 def personnelDetail(request, id):
@@ -210,13 +268,13 @@ def personnelDetail(request, id):
     context = {'personnel': personnel}
     return render(request, 'base/personnel/personnelDetail.html', context)
 
-
 def personnelUpdate(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     oldpicture = personnel.picture.name  # รูปเดิม
     oldemail = personnel.email  # อีเมล์เดิม
     if request.method == 'POST':
         form = PersonnelForm(data=request.POST, instance=personnel, files=request.FILES)
+        userType = request.POST['userType']
         if form.is_valid():
             updateForm = form.save(commit=False)
             id = updateForm.id
@@ -230,8 +288,6 @@ def personnelUpdate(request, id):
                 updateForm.save()
                 personnel = get_object_or_404(Personnel, id=id)
                 newfilename = 'images/personnels/' + str(personnel.id) + ext  # ชื่อไฟล์ที่ระบบกำหนด
-                print("file name2:" + filename)
-                print("new file name: " + newfilename)
                 personnel.picture.name = newfilename  # ต้องอัพเดท เผื่อกรณีที่เปลี่ยนชนิดไฟล์ภาพ
                 personnel.save()
                 if os.path.exists('static/' + oldpicture):  # delete older picture profile
@@ -239,22 +295,45 @@ def personnelUpdate(request, id):
                 os.rename('static/' + filename, 'static/' + personnel.picture.name)
             else:
                 form.save()
-            # กรณีมีการอัพเดทอีเมล์
-            if personnel.email != oldemail:
-                user = User.objects.filter(username=oldemail).first()
-                user.username = personnel.email
-                user.email = personnel.email
-                user.save()
+            # อัพเดท user
+            user = User.objects.filter(username=oldemail).first()
+            user.username = personnel.email
+            user.email = personnel.email
+            user.first_name = personnel.firstname_en
+            user.last_name = personnel.lastname_en
+            if userType == "admin":
+                user.is_superuser = True
+                user.is_staff = True
+            elif userType == "staff":
+                user.is_superuser = False
+                user.is_staff = True
+            else:
+                user.is_superuser = False
+                user.is_staff = False
+            user.save()
             return redirect('personnelList', pageNo=1)
         else:
-            context = {'form': form, 'personnel': personnel}
+            user = User.objects.filter(username=oldemail).first()
+            if user.is_superuser == True and user.is_staff == True:
+                userType = "admin"
+            elif user.is_superuser == False and user.is_staff == True:
+                userType = "staff"
+            else:
+                userType = "personnel"
+            context = {'form': form, 'personnel': personnel, 'userType':userType}
             return render(request, 'base/personnel/personnelUpdate.html', context)
     else:
+        user = User.objects.filter(username=oldemail).first()
+        if user.is_superuser == True and user.is_staff == True:
+            userType = "admin"
+        elif user.is_superuser == False and user.is_staff == True:
+            userType = "staff"
+        else:
+            userType = "personnel"
         form = PersonnelForm(instance=personnel)
         form.updateForm()
-        context = {'form': form, 'personnel': personnel}
+        context = {'form': form, 'personnel': personnel, 'userType':userType}
         return render(request, 'base/personnel/personnelUpdate.html', context)
-
 
 def personnelDelete(request, id):
     personnel = get_object_or_404(Personnel, id=id)
@@ -273,7 +352,6 @@ def personnelDelete(request, id):
         form.deleteForm()
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/personnel/personelDelete.html', context)
-
 
 # Education CRUD.
 def educationList(request, divisionId=None, personnelId=None):
@@ -472,6 +550,7 @@ def currAffiliationDelete(request,id):
     # return render(request, 'base/currAffiliationList.html', context)
     return redirect('currAffiliationList', curriculumId=curriculum.id)
 
-
+def Permission(request):
+    pass
 
 
