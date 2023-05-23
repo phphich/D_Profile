@@ -38,12 +38,7 @@ def userAuthen(request):
             personnel = Personnel.objects.get(email=userName)
             request.session['userEmail'] = personnel.email
             request.session['userName'] = personnel.firstname_th + " " + personnel.lastname_th
-            if user.is_superuser == True and user.is_staff == True:
-                request.session['userStatus'] = "Administrator"
-            elif user.is_superuser == False and user.is_staff == True:
-                request.session['userStatus'] = "Staff"
-            else:
-                request.session['userStatus'] = "Personnel"
+            request.session['userStatus'] = str(user.groups.first())
             request.session['personnelId'] = personnel.id
             messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ..")
             return redirect('home')
