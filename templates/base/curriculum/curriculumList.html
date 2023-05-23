@@ -8,15 +8,19 @@
     </div>
 
     <hr class="text-primary">
-    <table class="table table-light table-striped table-hover table-bordered">
+    <table class="table table-light table-striped table-hover">
         <tr class="text-primary">
             <th class="col-3">ชื่อปริญญา (ภาษาไทย)</th>
             <th class="col-3">ชื่อปริญญา (ภาษาอังกฤษ)</th>
             <th class="col-2  text-center">ระดับการศึกษา</th>
             <th class="col-2  text-center">ระยะเวลาศึกษา (ปี)</th>
-            <th class="col-2"><a href="{% url 'curriculumNew' %}"
-                                     class="btn btn-sm btn-info  text-white" style="width: 100%"><i
-                    class="fa fa-plus"></i> เพิ่มหลักสูตร </a></th>
+            <th class="col-2">
+                {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
+                    <a href="{% url 'curriculumNew' %}" class="btn btn-sm btn-info  text-white" style="width: 100%">
+                        <i class="fa fa-plus"></i> เพิ่มหลักสูตร </a>
+                {% endif %}
+            </th>
+
         </tr>
         {% for curriculum in curriculums %}
             <tr class="text-primary">
@@ -25,10 +29,12 @@
                 <td class="text-center">{{ curriculum.level }}</td>
                 <td class="text-center">{{ curriculum.studyTime }}</td>
                 <td class="text-center">
-                    <a href="{% url 'curriculumUpdate' curriculum.id %}" class="btn btn-secondary"> <i
-                            class="fa fa-tools"> </i> </a>
-                    <a href="{% url 'curriculumDelete' curriculum.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i>
-                    </a>
+                    {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
+                    <a href="{% url 'curriculumUpdate' curriculum.id %}" class="btn btn-secondary">
+                        <i class="fa fa-tools"> </i> </a>
+                    <a href="{% url 'curriculumDelete' curriculum.id %}" class="btn btn-danger">
+                        <i class="fa fa-trash"> </i> </a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

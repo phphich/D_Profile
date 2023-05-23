@@ -7,48 +7,51 @@
             <h2><i class="fa fa-person-dots-from-line"></i> ประวัติการฝึกอบรม/สัมมนา </h2>
         </div>
     </div>
-    <div class="row">
-        <div class="col-5">
-            <form method="post" class="form-control text-success">
-                {% csrf_token %}
-                <label for="divisionId">เลือกสาขาที่สังกัด</label>
-                <select name="divisionId" onchange="this.form.submit();" class="form-control text-success">
-                    {% for div in divisions %}
-                        {% if div == division %}
-                            <option value="{{ div.id }}" selected> {{ div }}</option>
-                        {% else %}
-                            <option value="{{ div.id }}"> {{ div }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-                <input type="hidden" name="personnelId">
-            </form>
-        </div>
-        <div class="col-1 text-center align-middle">
-            {% if division != None %}
-                <br>
-                <h2><i class="fas fa-angle-double-right text-lg-center text-success"></i></h2>
-            {% endif %}
-        </div>
-        <div class="col-6">
-            {% if division != None %}
+
+    {% if request.session.userType != 'Personnel' %}
+        <div class="row">
+            <div class="col-5">
                 <form method="post" class="form-control text-success">
                     {% csrf_token %}
-                    <label for="personnelId">เลือกบุคลากร</label>
-                    <select name="personnelId" onchange="this.form.submit();" class="form-control text-success">
-                        {% for person in division.getPersonnels %}
-                            {% if person == personnel %}
-                                <option value="{{ person.id }}" selected> {{ person }}</option>
+                    <label for="divisionId">เลือกสาขาที่สังกัด</label>
+                    <select name="divisionId" onchange="this.form.submit();" class="form-control text-success">
+                        {% for div in divisions %}
+                            {% if div == division %}
+                                <option value="{{ div.id }}" selected> {{ div }}</option>
                             {% else %}
-                                <option value="{{ person.id }}"> {{ person }}</option>
+                                <option value="{{ div.id }}"> {{ div }}</option>
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <input type="hidden" name="divisionId" value="{{ division.id }}">
+                    <input type="hidden" name="personnelId">
                 </form>
-            {% endif %}
+            </div>
+            <div class="col-1 text-center align-middle">
+                {% if division != None %}
+                    <br>
+                    <h2><i class="fas fa-angle-double-right text-lg-center text-success"></i></h2>
+                {% endif %}
+            </div>
+            <div class="col-6">
+                {% if division != None %}
+                    <form method="post" class="form-control text-success">
+                        {% csrf_token %}
+                        <label for="personnelId">เลือกบุคลากร</label>
+                        <select name="personnelId" onchange="this.form.submit();" class="form-control text-success">
+                            {% for person in division.getPersonnels %}
+                                {% if person == personnel %}
+                                    <option value="{{ person.id }}" selected> {{ person }}</option>
+                                {% else %}
+                                    <option value="{{ person.id }}"> {{ person }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="divisionId" value="{{ division.id }}">
+                    </form>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     {% if personnel != None %}
         <div class="row">
@@ -97,8 +100,13 @@
                 <div class="col-12 text-center ">
                     <div class="btn-group text-center" role="group" aria-label="Item pagination">
                         {% if trainings.has_previous %}
-                            <a href="{% url 'trainingList' personnel.id division.id trainings.previous_page_number %}"
-                               class="btn btn-outline-primary">&laquo;</a>
+                            {% if request.session.userType != 'Personnel' %}
+                                <a href="{% url 'trainingList' personnel.id division.id trainings.previous_page_number %}"
+                                   class="btn btn-outline-primary">&laquo;</a>
+                            {% else %}
+                                    <a href="{% url 'trainingList' None None trainings.previous_page_number %}"
+                                   class="btn btn-outline-primary">&laquo;</a>
+                            {% endif %}
                         {% endif %}
 
                         {% for page_number in trainings.paginator.page_range %}
@@ -107,15 +115,26 @@
                                     <span>{{ page_number  }} <span class="sr-only">(current)</span></span>
                                 </button>
                             {% else %}
-                                <a href="{% url 'trainingList' personnel.id division.id page_number %}" class="btn btn-outline-primary">
-                                    {{ page_number }}
-                                </a>
+                                {% if request.session.userType != 'Personnel' %}
+                                    <a href="{% url 'trainingList' personnel.id division.id page_number %}" class="btn btn-outline-primary">
+                                        {{ page_number }}
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'trainingList' None None page_number %}" class="btn btn-outline-primary">
+                                        {{ page_number }}
+                                    </a>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
 
                         {% if trainings.has_next %}
-                            <a href="{% url 'trainingList' personnel.id division.id trainings.next_page_number %}"
-                               class="btn btn-outline-primary">&raquo;</a>
+                            {% if request.session.userType != 'Personnel' %}
+                                <a href="{% url 'trainingList' personnel.id division.id trainings.next_page_number %}"
+                                   class="btn btn-outline-primary">&raquo;</a>
+                            {% else %}
+                                    <a href="{% url 'trainingList' None None trainings.next_page_number %}"
+                                   class="btn btn-outline-primary">&raquo;</a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>

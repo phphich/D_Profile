@@ -15,30 +15,35 @@ from workapp import common
 iterm_per_page = 5
 #Leave CRUD
 def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
-    # iterm_per_page = 2
     if pageNo == None:
         pageNo = 1
-    division = None
-    personnel = None
-    divisions = Division.objects.all().order_by('name_th')
-    if request.method == 'POST':
-        divisionId = request.POST['divisionId']
-        personnelId = request.POST['personnelId']
-    if divisionId is not None:
-        division = Division.objects.filter(id=divisionId).first()
-        if personnelId != "":
-            personnel = Personnel.objects.filter(id=personnelId).first()
-        else:
-            personnel = division.getPersonnels().first()
+    if request.session['userType'] == "Personnel":
+        personnel = Personnel.objects.filter(id=request.session['userId']).first()
+        leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
+        leaves_page = Paginator(leaves, iterm_per_page)
+        count = leaves.count()
+        context = {'personnel': personnel,'leaves': leaves_page.page(pageNo), 'count': count}
     else:
-        division = Division.objects.all().order_by('name_th').first()
-        personnel = division.getPersonnels().first()
-    leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
-    count = leaves.count()
-    leaves_page = Paginator(leaves, iterm_per_page)
-
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-               'leaves': leaves_page.page(pageNo), 'count':count}
+        division = None
+        personnel = None
+        divisions = Division.objects.all().order_by('name_th')
+        if request.method == 'POST':
+            divisionId = request.POST['divisionId']
+            personnelId = request.POST['personnelId']
+        if divisionId is not None:
+            division = Division.objects.filter(id=divisionId).first()
+            if personnelId != "":
+                personnel = Personnel.objects.filter(id=personnelId).first()
+            else:
+                personnel = division.getPersonnels().first()
+        else:
+            division = Division.objects.all().order_by('name_th').first()
+            personnel = division.getPersonnels().first()
+        leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
+        count = leaves.count()
+        leaves_page = Paginator(leaves, iterm_per_page)
+        context = {'divisions': divisions, 'division': division, 'personnel': personnel,
+                   'leaves': leaves_page.page(pageNo), 'count':count}
     return render(request, 'work/leave/leaveList.html', context)
 
 def leaveDetail(request, id):
@@ -192,7 +197,6 @@ def leaveDeleteFileAll(request, id):
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
     return redirect('leaveDetail', id=leave.id)
 
-
 def leaveDeleteURL(request, id):
     leaveURL = get_object_or_404(LeaveURL, id=id)
     leave = leaveURL.leave
@@ -212,27 +216,34 @@ def leaveDeleteURLAll(request, id):
 def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
-    division = None
-    personnel = None
-    divisions = Division.objects.all().order_by('name_th')
-    if request.method == 'POST':
-        divisionId = request.POST['divisionId']
-        personnelId = request.POST['personnelId']
-    if divisionId is not None:
-        division = Division.objects.filter(id=divisionId).first()
-        if personnelId != "":
-            personnel = Personnel.objects.filter(id=personnelId).first()
-        else:
-            personnel = division.getPersonnels().first()
+    if request.session['userType'] == "Personnel":
+        personnel = Personnel.objects.filter(id=request.session['userId']).first()
+        trainings = Training.objects.filter(personnel=personnel).order_by('-startDate')
+        leaves_page = Paginator(trainings, iterm_per_page)
+        count = trainings.count()
+        context = {'personnel': personnel, 'trainings': leaves_page.page(pageNo), 'count': count}
     else:
-        division = Division.objects.all().order_by('name_th').first()
-        personnel = division.getPersonnels().first()
+        division = None
+        personnel = None
+        divisions = Division.objects.all().order_by('name_th')
+        if request.method == 'POST':
+            divisionId = request.POST['divisionId']
+            personnelId = request.POST['personnelId']
+        if divisionId is not None:
+            division = Division.objects.filter(id=divisionId).first()
+            if personnelId != "":
+                personnel = Personnel.objects.filter(id=personnelId).first()
+            else:
+                personnel = division.getPersonnels().first()
+        else:
+            division = Division.objects.all().order_by('name_th').first()
+            personnel = division.getPersonnels().first()
 
-    trainings = Training.objects.filter(personnel=personnel).order_by('-fiscalYear', '-startDate')
-    count = trainings.count()
-    trainings_page = Paginator(trainings, iterm_per_page)
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-               'trainings':trainings_page.page(pageNo),  'count':count}
+        trainings = Training.objects.filter(personnel=personnel).order_by('-fiscalYear', '-startDate')
+        count = trainings.count()
+        trainings_page = Paginator(trainings, iterm_per_page)
+        context = {'divisions': divisions, 'division': division, 'personnel': personnel,
+                   'trainings':trainings_page.page(pageNo),  'count':count}
     return render(request, 'work/training/trainingList.html', context)
 
 def trainingDetail(request, id):
@@ -408,27 +419,34 @@ def trainingDeleteURLAll(request, id):
 def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
-    division = None
-    personnel = None
-    divisions = Division.objects.all().order_by('name_th')
-    if request.method == 'POST':
-        divisionId = request.POST['divisionId']
-        personnelId = request.POST['personnelId']
-    if divisionId is not None:
-        division = Division.objects.filter(id=divisionId).first()
-        if personnelId != "":
-            personnel = Personnel.objects.filter(id=personnelId).first()
-        else:
-            personnel = division.getPersonnels().first()
+    if request.session['userType'] == "Personnel":
+        personnel = Personnel.objects.filter(id=request.session['userId']).first()
+        performances = Performance.objects.filter(personnel=personnel).order_by('-getDate')
+        leaves_page = Paginator(performances, iterm_per_page)
+        count = performances.count()
+        context = {'personnel': personnel, 'performances': leaves_page.page(pageNo), 'count': count}
     else:
-        division = Division.objects.all().order_by('name_th').first()
-        personnel = division.getPersonnels().first()
+        division = None
+        personnel = None
+        divisions = Division.objects.all().order_by('name_th')
+        if request.method == 'POST':
+            divisionId = request.POST['divisionId']
+            personnelId = request.POST['personnelId']
+        if divisionId is not None:
+            division = Division.objects.filter(id=divisionId).first()
+            if personnelId != "":
+                personnel = Personnel.objects.filter(id=personnelId).first()
+            else:
+                personnel = division.getPersonnels().first()
+        else:
+            division = Division.objects.all().order_by('name_th').first()
+            personnel = division.getPersonnels().first()
 
-    performances = Performance.objects.filter(personnel=personnel).order_by('-fiscalYear', '-getDate')
-    count = performances.count()
-    performances_page = Paginator(performances, iterm_per_page)
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-               'performances': performances_page.page(pageNo), 'count':count}
+        performances = Performance.objects.filter(personnel=personnel).order_by('-fiscalYear', '-getDate')
+        count = performances.count()
+        performances_page = Paginator(performances, iterm_per_page)
+        context = {'divisions': divisions, 'division': division, 'personnel': personnel,
+                   'performances': performances_page.page(pageNo), 'count':count}
     return render(request, 'work/performance/performanceList.html', context)
 
 def performanceDetail(request, id):
@@ -443,7 +461,7 @@ def performanceDetail(request, id):
                 success = True
                 fileerror = ""
                 for f in files:
-                    filepath = fileNameCleansing(f.name)
+                    filepath = common.fileNameCleansing(f.name)
                     point = filepath.rfind('.')
                     ext = filepath[point:]
                     filenames = filepath.split('/')
@@ -484,7 +502,6 @@ def performanceDetail(request, id):
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
     return render(request, 'work/performance/performanceDetail.html', context)
 
-
 def performanceNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     if request.method == 'POST':
@@ -522,7 +539,7 @@ def performanceUpdate(request, id):
             return redirect('performanceDetail', id=performance.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-            context = {'form': form, 'personnel': personnel}
+            context = {'form': form, 'personnel':personnel}
             return render(request, 'work/performance/performanceUpdate.html', context)
     else:
         context = {'form': form, 'personnel': personnel}

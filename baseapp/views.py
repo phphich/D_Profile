@@ -38,8 +38,8 @@ def userAuthen(request):
             personnel = Personnel.objects.get(email=userName)
             request.session['userEmail'] = personnel.email
             request.session['userName'] = personnel.firstname_th + " " + personnel.lastname_th
-            request.session['userStatus'] = str(user.groups.first())
-            request.session['personnelId'] = personnel.id
+            request.session['userType'] = str(user.groups.first())
+            request.session['userId'] = personnel.id
             messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ..")
             return redirect('home')
         else:
@@ -55,8 +55,8 @@ def userAuthen(request):
 def userLogout(request):
     del request.session["userEmail"]
     del request.session["userName"]
-    del request.session["userStatus"]
-    del request.session["personnelId"]
+    del request.session["userType"]
+    del request.session["userId"]
     logout(request)
     return  redirect('home')
 
@@ -331,23 +331,27 @@ def personnelDelete(request, id):
 
 # Education CRUD.
 def educationList(request, divisionId=None, personnelId=None):
-    division = None
-    personnel = None
-    divisions = Division.objects.all().order_by('name_th')
-    if request.method == 'POST':
-        divisionId = request.POST['divisionId']
-        personnelId = request.POST['personnelId']
-    if divisionId is not None:
-        division = Division.objects.filter(id=divisionId).first()
-        if personnelId != "":
-            personnel = Personnel.objects.filter(id=personnelId).first()
-        else:
-            personnel = division.getPersonnels().first()
+    if request.session['userType'] == "Personnel":
+        personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
+        context = {'personnel': personnel}
     else:
-        division = Division.objects.all().order_by('name_th').first()
-        personnel = division.getPersonnels().first()
+        division = None
+        personnel = None
+        divisions = Division.objects.all().order_by('name_th')
+        if request.method == 'POST':
+            divisionId = request.POST['divisionId']
+            personnelId = request.POST['personnelId']
+        if divisionId is not None:
+            division = Division.objects.filter(id=divisionId).first()
+            if personnelId != "":
+                personnel = Personnel.objects.filter(id=personnelId).first()
+            else:
+                personnel = division.getPersonnels().first()
+        else:
+            division = Division.objects.all().order_by('name_th').first()
+            personnel = division.getPersonnels().first()
 
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel}
+        context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/education/educationList.html', context)
 
 
@@ -405,23 +409,28 @@ def educationDelete(request, id):
 
 # Expertise CRUD.
 def expertiseList(request, divisionId=None, personnelId=None):
-    division = None
-    personnel = None
-    divisions = Division.objects.all().order_by('name_th')
-    if request.method == 'POST':
-        divisionId = request.POST['divisionId']
-        personnelId = request.POST['personnelId']
-    if divisionId is not None:
-        division = Division.objects.filter(id=divisionId).first()
-        if personnelId != "":
-            personnel = Personnel.objects.filter(id=personnelId).first()
-        else:
-            personnel = division.getPersonnels().first()
+    if request.session['userType'] == "Personnel":
+        personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
+        context = {'personnel': personnel}
     else:
-        division = Division.objects.all().order_by('name_th').first()
-        personnel =  division.getPersonnels().first()
-    context = {'divisions': divisions, 'division': division, 'personnel': personnel}
+        division = None
+        personnel = None
+        divisions = Division.objects.all().order_by('name_th')
+        if request.method == 'POST':
+            divisionId = request.POST['divisionId']
+            personnelId = request.POST['personnelId']
+        if divisionId is not None:
+            division = Division.objects.filter(id=divisionId).first()
+            if personnelId != "":
+                personnel = Personnel.objects.filter(id=personnelId).first()
+            else:
+                personnel = division.getPersonnels().first()
+        else:
+            division = Division.objects.all().order_by('name_th').first()
+            personnel =  division.getPersonnels().first()
+        context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/expertise/expertiseList.html', context)
+
 
 def expertiseNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)

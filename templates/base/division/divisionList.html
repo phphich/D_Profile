@@ -13,9 +13,13 @@
             <th class="col-4">ชื่อสาขา (ภาษาไทย)</th>
             <th class="col-4">ชื่อสาขา (ภาษาอังกฤษ)</th>
             <th class="col-2 text-center">ชื่อย่อสาขา</th>
-            <th class="col-2"><a href="{% url 'divisionNew' %}"
-                                     class="btn btn-sm btn-info  text-white" style="width: 100%"><i
-                    class="fa fa-plus"></i> เพิ่มสาขา </a></th>
+            <th class="col-2">
+                {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
+                    <a href="{% url 'divisionNew' %}"
+                                         class="btn btn-sm btn-info  text-white" style="width: 100%"><i
+                        class="fa fa-plus"></i> เพิ่มสาขา </a>
+                {% endif %}
+            </th>
         </tr>
         {% for division in divisions %}
             <tr class="text-primary">
@@ -23,12 +27,12 @@
                 <td>{{ division.name_en }}</td>
                 <td  class="text-center">{{ division.name_sh }}</td>
                 <td class="text-center">
-{#                    <a href="{% url 'expertiseDetail' expert.id %}" class="btn btn-light"> <i class="fa fa-search"> </i>#}
-{#                    </a>#}
-                    <a href="{% url 'divisionUpdate' division.id %}" class="btn btn-secondary"> <i
-                            class="fa fa-tools"> </i> </a>
-                    <a href="{% url 'divisionDelete' division.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i>
-                    </a>
+                    {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
+                        <a href="{% url 'divisionUpdate' division.id %}" class="btn btn-secondary">
+                            <i class="fa fa-tools"> </i> </a>
+                        <a href="{% url 'divisionDelete' division.id %}" class="btn btn-danger">
+                            <i class="fa fa-trash"> </i></a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}

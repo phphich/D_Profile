@@ -59,10 +59,17 @@
     </table>
 
     <p class="text-center">
-        <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'trainingList' training.personnel.division.id training.personnel.id %}'">
-            <i class="fa fa-rotate-back"></i> ย้อนกลับ
-        </button>
+        {% if request.session.userType != 'Personnel' %}
+            <button type="button" class="btn btn-secondary"
+                    onclick="location.href='{% url 'trainingList' training.personnel.division.id training.personnel.id %}'">
+                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+        {% else %}
+            <button type="button" class="btn btn-secondary"
+                    onclick="location.href='{% url 'trainingList'  %}'">
+                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+        {% endif %}
         <button type="button" class="btn btn-secondary"
                 onclick="location.href='{% url 'trainingUpdate' training.id %}'">
             <i class="fa fa-tools"></i> แก้ไข

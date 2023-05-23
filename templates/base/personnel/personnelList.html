@@ -13,8 +13,12 @@
                 <th class="col-1 text-center">ประเภท</th>
                 <th class="col-1 text-center">เพศ</th>
                 <th class="col-2">สังกัด</th>
-                <th class="col col-2"><a href="{% url 'personnelNew' %}" class="btn btn-sm btn-info text-white"
-                                         style="width: 100%"><i class="fa fa-plus"></i> เพิ่มบุคลากร </a></th>
+                <th class="col col-2"}>
+                {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
+                    <a href="{% url 'personnelNew' %}" class="btn btn-sm btn-info text-white"
+                                         style="width: 100%"><i class="fa fa-plus"></i> เพิ่มบุคลากร </a>
+                {% endif %}
+                </th>
             </tr>
             {% for personnel in personnels %}
                 <tr class="text-primary">
@@ -30,12 +34,21 @@
                     <td class="text-center">{{ personnel.gender }}</td>
                     <td>{{ personnel.division.name_th }}</td>
                     <td class="text-center">
-                        <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light"> <i
-                                class="fa fa-search"> </i> </a>
-                        <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary"> <i
-                                class="fa fa-tools"> </i> </a>
-                        <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger"> <i
-                                class="fa fa-trash"> </i> </a>
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
+                            <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">
+                                <i class="fa fa-search"> </i> </a>
+                            <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary">
+                                <i class="fa fa-tools"> </i> </a>
+                            <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger">
+                                <i class="fa fa-trash"> </i> </a>
+                            {% else %}
+                                {% if request.session.personnelId == personnel.id %}
+                                    <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">
+                                        <i class="fa fa-search"> </i> </a>
+                                    <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary">
+                                        <i class="fa fa-tools"> </i> </a>
+                                {% endif %}
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
