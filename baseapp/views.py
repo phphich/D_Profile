@@ -40,6 +40,7 @@ def userAuthen(request):
             request.session['userName'] = personnel.firstname_th + " " + personnel.lastname_th
             request.session['userType'] = str(user.groups.first())
             request.session['userId'] = personnel.id
+            request.session['userPicture'] = personnel.picture.name
             messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ..")
             return redirect('home')
         else:
@@ -57,6 +58,7 @@ def userLogout(request):
     del request.session["userName"]
     del request.session["userType"]
     del request.session["userId"]
+    del request.session['userPicture']
     logout(request)
     return  redirect('home')
 
