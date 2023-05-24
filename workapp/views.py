@@ -9,11 +9,14 @@ from baseapp.forms import *
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
 from django.core.files.storage import FileSystemStorage
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 import os
 from workapp import common
 
 iterm_per_page = 5
 #Leave CRUD
+@login_required(login_url='userAuthen')
 def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
@@ -46,6 +49,7 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
                    'leaves': leaves_page.page(pageNo), 'count':count}
     return render(request, 'work/leave/leaveList.html', context)
 
+@login_required(login_url='userAuthen')
 def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
     if request.method == 'POST':
@@ -97,6 +101,7 @@ def leaveDetail(request, id):
     context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave}
     return render(request, 'work/leave/leaveDetail.html', context)
 
+@login_required(login_url='userAuthen')
 def leaveNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     if request.method == 'POST':
@@ -120,6 +125,7 @@ def leaveNew(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveNew.html', context)
 
+@login_required(login_url='userAuthen')
 def leaveUpdate(request, id):
     leave = get_object_or_404(Leave, id=id)
     personnel = leave.personnel
@@ -137,6 +143,7 @@ def leaveUpdate(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveUpdate.html', context)
 
+@login_required(login_url='userAuthen')
 def leaveDelete(request, id):
     leave = get_object_or_404(Leave, id=id)
     form = LeaveForm(data=request.POST or None, instance=leave)
@@ -163,6 +170,7 @@ def leaveDelete(request, id):
         context = {'form': form, 'leave':leave, 'personnel': leave.personnel}
         return render(request, 'work/leave/leaveDelete.html', context)
 
+@login_required(login_url='userAuthen')
 def leaveDeleteFile(request, id):
     leaveFile = get_object_or_404(LeaveFile, id=id)
     leave = leaveFile.leave
@@ -176,6 +184,7 @@ def leaveDeleteFile(request, id):
     leaveFile.delete()
     return redirect('leaveDetail', id=leave.id)
 
+@login_required(login_url='userAuthen')
 def leaveDeleteFileAll(request, id):
     leave = get_object_or_404(Leave, id=id)
     leaveFiles = leave.getLeaveFiles()
@@ -197,6 +206,7 @@ def leaveDeleteFileAll(request, id):
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
     return redirect('leaveDetail', id=leave.id)
 
+@login_required(login_url='userAuthen')
 def leaveDeleteURL(request, id):
     leaveURL = get_object_or_404(LeaveURL, id=id)
     leave = leaveURL.leave
@@ -204,6 +214,7 @@ def leaveDeleteURL(request, id):
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
     return redirect('leaveDetail', id=leave.id)
 
+@login_required(login_url='userAuthen')
 def leaveDeleteURLAll(request, id):
     leave = get_object_or_404(Leave, id=id)
     leaveURLs = leave.getLeaveURLs()
@@ -213,6 +224,7 @@ def leaveDeleteURLAll(request, id):
     return redirect('leaveDetail', id=leave.id)
 
 #Training CRUD
+@login_required(login_url='userAuthen')
 def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
@@ -246,6 +258,7 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
                    'trainings':trainings_page.page(pageNo),  'count':count}
     return render(request, 'work/training/trainingList.html', context)
 
+@login_required(login_url='userAuthen')
 def trainingDetail(request, id):
     training = Training.objects.filter(id=id).first()
     if request.method == 'POST':
@@ -297,6 +310,7 @@ def trainingDetail(request, id):
     context={'fileForm': fileForm, 'urlForm':urlForm, 'training': training}
     return render(request, 'work/training/trainingDetail.html', context)
 
+@login_required(login_url='userAuthen')
 def trainingNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     if request.method == 'POST':
@@ -321,7 +335,8 @@ def trainingNew(request, id):
                                      'days':1})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/training/trainingNew.html', context)
-    
+
+@login_required(login_url='userAuthen')
 def trainingUpdate(request, id):
     training = get_object_or_404(Training, id=id)
     personnel = training.personnel
@@ -339,6 +354,7 @@ def trainingUpdate(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/training/trainingUpdate.html', context)
 
+@login_required(login_url='userAuthen')
 def trainingDelete(request, id):
     training = get_object_or_404(Training, id=id)
     form = TrainignForm(data=request.POST or None, instance=training)
@@ -365,6 +381,7 @@ def trainingDelete(request, id):
         context = {'form': form, 'training':training, 'personnel': training.personnel}
         return render(request, 'work/training/trainingDelete.html', context)
 
+@login_required(login_url='userAuthen')
 def trainingDeleteFile(request, id):
     trainingFile = get_object_or_404(TrainingFile, id=id)
     training = trainingFile.training
@@ -378,6 +395,7 @@ def trainingDeleteFile(request, id):
     trainingFile.delete()
     return redirect('trainingDetail', id=training.id)
 
+@login_required(login_url='userAuthen')
 def trainingDeleteFileAll(request, id):
     training = get_object_or_404(Training, id=id)
     trainingFiles = training.getTrainingFiles()
@@ -399,7 +417,7 @@ def trainingDeleteFileAll(request, id):
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
     return redirect('trainingDetail', id=training.id)
 
-
+@login_required(login_url='userAuthen')
 def trainingDeleteURL(request, id):
     trainingURL = get_object_or_404(TrainingURL, id=id)
     training = trainingURL.training
@@ -407,6 +425,7 @@ def trainingDeleteURL(request, id):
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
     return redirect('trainingDetail', id=training.id)
 
+@login_required(login_url='userAuthen')
 def trainingDeleteURLAll(request, id):
     training = get_object_or_404(Training, id=id)
     trainingURLs = training.getTrainingURLs()
@@ -416,6 +435,7 @@ def trainingDeleteURLAll(request, id):
     return redirect('trainingDetail', id=training.id)
 
 # Performance CRUD
+@login_required(login_url='userAuthen')
 def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
@@ -449,6 +469,7 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
                    'performances': performances_page.page(pageNo), 'count':count}
     return render(request, 'work/performance/performanceList.html', context)
 
+@login_required(login_url='userAuthen')
 def performanceDetail(request, id):
     performance = Performance.objects.filter(id=id).first()
     if request.method == 'POST':
@@ -502,6 +523,7 @@ def performanceDetail(request, id):
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
     return render(request, 'work/performance/performanceDetail.html', context)
 
+@login_required(login_url='userAuthen')
 def performanceNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     if request.method == 'POST':
@@ -520,14 +542,14 @@ def performanceNew(request, id):
         fiscalYear = common.getCurrentFiscalYear()
         eduYear = common.getCurrentEduYear()
         eduSemeter = common.getCurrentEduSemeter()
-        currentData = common.getCurrentDate()
+        currentDate = common.getCurrentDate()
         form = PerformanceForm(
             initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
-                     'getDate':currentData})
+                     'getDate':currentDate})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/performance/performanceNew.html', context)
 
-
+@login_required(login_url='userAuthen')
 def performanceUpdate(request, id):
     performance = get_object_or_404(Performance, id=id)
     personnel = performance.personnel
@@ -545,7 +567,7 @@ def performanceUpdate(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/performance/performanceUpdate.html', context)
 
-
+@login_required(login_url='userAuthen')
 def performanceDelete(request, id):
     performance = get_object_or_404(Performance, id=id)
     form = PerformanceForm(data=request.POST or None, instance=performance)
@@ -572,7 +594,7 @@ def performanceDelete(request, id):
         context = {'form': form, 'performance': performance, 'personnel': performance.personnel}
         return render(request, 'work/performance/performanceDelete.html', context)
 
-
+@login_required(login_url='userAuthen')
 def performanceDeleteFile(request, id):
     performanceFile = get_object_or_404(PerformanceFile, id=id)
     performance = performanceFile.performance
@@ -586,7 +608,7 @@ def performanceDeleteFile(request, id):
     performanceFile.delete()
     return redirect('performanceDetail', id=performance.id)
 
-
+@login_required(login_url='userAuthen')
 def performanceDeleteFileAll(request, id):
     performance = get_object_or_404(Performance, id=id)
     performanceFiles = performance.getPerformanceFiles()
@@ -608,7 +630,7 @@ def performanceDeleteFileAll(request, id):
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
     return redirect('performanceDetail', id=performance.id)
 
-
+@login_required(login_url='userAuthen')
 def performanceDeleteURL(request, id):
     performanceURL = get_object_or_404(PerformanceURL, id=id)
     performance = performanceURL.performance
@@ -616,7 +638,7 @@ def performanceDeleteURL(request, id):
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
     return redirect('performanceDetail', id=performance.id)
 
-
+@login_required(login_url='userAuthen')
 def performanceDeleteURLAll(request, id):
     performance = get_object_or_404(Performance, id=id)
     performanceURLs = performance.getPerformanceURLs()
@@ -624,3 +646,103 @@ def performanceDeleteURLAll(request, id):
         performanceURL.delete()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
     return redirect('performanceDetail', id=performance.id)
+
+@login_required(login_url='userAuthen')
+def performanceDetail(request, id):
+    performance = Performance.objects.filter(id=id).first()
+    if request.method == 'POST':
+        fileForm = PerformanceFileForm(request.POST, request.FILES)
+        urlForm = PerformanceURLForm(request.POST)
+        if request.POST['action'] == 'uploadfile':
+            if fileForm.is_valid():
+                files = request.FILES.getlist("file")
+                newFileForm = fileForm.save(commit=False)
+                success = True
+                fileerror = ""
+                for f in files:
+                    filepath = common.fileNameCleansing(f.name)
+                    point = filepath.rfind('.')
+                    ext = filepath[point:]
+                    filenames = filepath.split('/')
+                    filename = 'documents/performance/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
+                    lf, created = PerformanceFile.objects.get_or_create(file=f, performance=performance, filetype=ext[1:])
+                    lf.save()
+                    performanceFile = PerformanceFile.objects.last()
+                    newfilename = '[' + str(performance.id) + '_' + str(performanceFile.id) + ']-' + filenames[
+                        len(filenames) - 1]  # ชื่อไฟล์ที่ระบบกำหนด
+                    performanceFile.file.name = newfilename
+                    performanceFile.save()
+                    try:
+                        os.rename('static/' + filename, 'static/documents/performance/' + performanceFile.file.name)
+                    except:
+                        fileerror = fileerror + performanceFile.file.name + ", "
+                        performanceFile.delete()
+                        success = False
+                if success == True:
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                else:
+                    messages.add_message(request, messages.WARNING,
+                                         "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
+                return render(request, 'work/performance/performanceDetail.html', context)
+        else:  # upload link
+            if urlForm.is_valid():
+                urlForm.save()
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+                context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
+                return render(request, 'work/performance/performanceDetail.html', context)
+    # else:
+    fileForm = PerformanceFileForm(initial={'performance': performance, 'filetype': 'Unknow'})
+    urlForm = PerformanceURLForm(initial={'performance': performance})
+    context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
+    return render(request, 'work/performance/performanceDetail.html', context)
+
+@login_required(login_url='userAuthen')
+def commandList(request, pageNo=None):
+    if pageNo == None:
+        pageNo = 1
+    if request.session['userType'] == "Personnel":
+        personnel = Personnel.objects.filter(id=request.session['userId'])
+        commands = Command.objects.filter(commandperson__personnel=personnel).order_by('-command__fiscalYear','-command__comDate')
+        commands_page = Paginator(commands, iterm_per_page)
+        count = commands.count()
+        context = {'personnel': personnel,'commands': commands_page.page(pageNo), 'count': count}
+    else:
+        commands = CommandPerson.objects.all().order_by('-command__fiscalYear', '-command__comDate')
+        commands_page = Paginator(commands, iterm_per_page)
+        count = commands.count()
+        context = {'commands': commands_page.page(pageNo), 'count': count}
+    return render(request, 'work/command/commandList.html', context)
+
+@login_required(login_url='userAuthen')
+def commandNew(request):
+    if request.method == 'POST':
+        form = CommandForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            command = Command.objects.last()
+            messages.add_message(request, messages.SUCCESS, "บันทึกคำสั่ง เข้าสู่ระบบเรียบร้อย")
+            return redirect('commandDetail', id=command.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form}
+            return render(request, 'work/command/commandNew.html', context)
+    else:
+        fiscalYear = common.getCurrentFiscalYear()
+        eduYear = common.getCurrentEduYear()
+        eduSemeter = common.getCurrentEduSemeter()
+        currentDate = common.getCurrentDate()
+        recorder = Personnel.objects.filter(id=request.session['userId']).first()
+        form = CommandForm(
+            initial={'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
+                     'comDate':currentDate, 'personnel': recorder,})
+        context = {'form': form}
+        return render(request, 'work/command/commandNew.html', context)
+
+@login_required(login_url='userAuthen')
+def commandDetail(request, id):
+    return HttpResponse("Okay")

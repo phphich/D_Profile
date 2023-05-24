@@ -2,6 +2,12 @@ from django.urls import path
 from workapp import views
 
 urlpatterns = [
+    # คำสั่ง
+    path('commandList', views.commandList, name='commandList'),
+    path('<pageNo>/commandList', views.commandList, name='commandList'),
+    path('commandNew', views.commandNew, name='commandNew'),
+    path('<id>/commandDetail', views.commandDetail, name='commandDetail'),
+
     # การลา
     path('leaveList', views.leaveList, name='leaveList'),
     path('<pageNo>/leaveList', views.leaveList, name='leaveList'),

@@ -73,12 +73,12 @@
                 <th class="col col-2"><a href="{% url 'performanceNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มการฝึกอบรม/สัมมนา </a></th>
             </tr>
 
-            {% fiscalValue "" as nYear %}
+            {% fiscalYearValue "" as nYear %}
             {% for performance in performances  %}
                 <tr class="text-primary">
                     <td class="text-center">
                         {% if nYear != performance.fiscalYear %}
-                            {% fiscalValue performance.fiscalYear as nYear %}
+                            {% fiscalYearValue performance.fiscalYear as nYear %}
                             {{ nYear }}
                         {% endif %}
                     </td>

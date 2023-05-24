@@ -10,13 +10,14 @@ class CommandForm(forms.ModelForm):
             ("บริการทางวิชาการแก่สังคม", "บริการทางวิชาการแก่สังคม"),
             ("ทำนุบำรุงศิลปวัฒนธรรม", "การทำนุบำรุงศิลปวัฒนธรรม"),
             ("สนองโครงการอันเนื่องมาจากพระราชดำริ", "สนองโครงการอันเนื่องมาจากพระราชดำริ"),
+            ("งานอื่น ๆ ที่ได้รับมอบหมาย", "งานอื่น ๆ ที่ได้รับมอบหมาย"),
         )
         SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
         model = Command
-        fields = ( 'eduYear', 'eduSemeter','comId', 'comDate', 'fiscalYear', 'mission', 'topic', 'detail', 'personnel')
+        fields = ( 'eduYear', 'eduSemeter','comId', 'mission', 'topic', 'detail','comDate',  'fiscalYear','personnel')
         widgets = {
             'comId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
-            'comDate': forms.TextInput(attrs={'class': 'form-control'}),
+            'comDate': forms.DateInput(attrs={'class': 'form-control', 'type':'date'}),
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
@@ -30,7 +31,7 @@ class CommandForm(forms.ModelForm):
             'eduYear': 'ปีการศึกษา',
             'eduSemeter': 'ภาคเรียนที่',
             'comId': 'เลขที่คำสั่ง',
-            'comDate': 'วันที่ออกคำสั่ง',
+            'comDate': 'สั่ง ณ วันที่',
             'fiscalYear': 'ปีงบประมาณ',
             'mission': 'พันธะกิจ',
             'topic': 'เรื่อง',

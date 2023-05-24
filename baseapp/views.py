@@ -76,12 +76,12 @@ def changePassword(request, email=None):
     pass
 
 # Division CRUD.
-@login_required(login_url='userAuthen')
 def divisionList(request):
     divisions = Division.objects.all().order_by('name_th')
     context = {'divisions': divisions}
     return render(request, 'base/division/divisionList.html', context)
 
+@login_required(login_url='userAuthen')
 def divisionNew(request):
     if request.method == 'POST':
         form = DivisionForm(data=request.POST)
@@ -96,7 +96,7 @@ def divisionNew(request):
         context = {'form': form}
         return render(request, 'base/division/divisionNew.html', context)
 
-
+@login_required(login_url='userAuthen')
 def divisionUpdate(request, id):
     division = get_object_or_404(Division, id=id)
     form = DivisionForm(data=request.POST or None, instance=division)
@@ -111,7 +111,7 @@ def divisionUpdate(request, id):
         context = {'form': form}
         return render(request, 'base/division/divisionUpdate.html', context)
 
-
+@login_required(login_url='userAuthen')
 def divisionDelete(request, id):
     division = get_object_or_404(Division, id=id)
     form = DivisionForm(data=request.POST or None, instance=division)
@@ -130,7 +130,7 @@ def curriculumList(request):
     context = {'curriculums': curriculums}
     return render(request, 'base/curriculum/curriculumList.html', context)
 
-
+@login_required(login_url='userAuthen')
 def curriculumNew(request):
     if request.method == 'POST':
         form = CurriculumForm(data=request.POST)
@@ -145,7 +145,7 @@ def curriculumNew(request):
         context = {'form': form}
         return render(request, 'base/curriculum/curriculumNew.html', context)
 
-
+@login_required(login_url='userAuthen')
 def curriculumUpdate(request, id):
     curriculum = get_object_or_404(Curriculum, id=id)
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
@@ -160,7 +160,7 @@ def curriculumUpdate(request, id):
         context = {'form': form}
         return render(request, 'base/curriculum/curriculumUpdate.html', context)
 
-
+@login_required(login_url='userAuthen')
 def curriculumDelete(request, id):
     curriculum = get_object_or_404(Curriculum, id=id)
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
@@ -206,6 +206,7 @@ def personnelList(request, pageNo=None):
     context = {'personnels': personnels_page.page(pageNo), 'chart':chart, 'count':count, 'countmale':cm, 'countfemale':cfm}
     return render(request, 'base/personnel/personnelList.html', context)
 
+@login_required(login_url='userAuthen')
 def personnelNew(request):
     if request.method == 'POST':
         form = PersonnelForm(data=request.POST or None, files=request.FILES)
@@ -265,11 +266,13 @@ def personnelNew(request):
         context = {'form': form, 'firstTime':firstTime}
         return render(request, 'base/personnel/personnelNew.html', context)
 
+@login_required(login_url='userAuthen')
 def personnelDetail(request, id):
     personnel = Personnel.objects.filter(id=id).first()
     context = {'personnel': personnel}
     return render(request, 'base/personnel/personnelDetail.html', context)
 
+@login_required(login_url='userAuthen')
 def personnelUpdate(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     oldpicture = personnel.picture.name  # รูปเดิม
@@ -321,7 +324,7 @@ def personnelUpdate(request, id):
         form.updateForm()
         context = {'form': form, 'personnel': personnel, 'userType':userType}
         return render(request, 'base/personnel/personnelUpdate.html', context)
-
+@login_required(login_url='userAuthen')
 def personnelDelete(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     picturefile = personnel.picture.name
@@ -341,6 +344,7 @@ def personnelDelete(request, id):
         return render(request, 'base/personnel/personelDelete.html', context)
 
 # Education CRUD.
+@login_required(login_url='userAuthen')
 def educationList(request, divisionId=None, personnelId=None):
     if request.session['userType'] == "Personnel":
         personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
@@ -365,7 +369,7 @@ def educationList(request, divisionId=None, personnelId=None):
         context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/education/educationList.html', context)
 
-
+@login_required(login_url='userAuthen')
 def educationNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     if request.method == 'POST':
@@ -382,11 +386,13 @@ def educationNew(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/education/educationNew.html', context)
 
+@login_required(login_url='userAuthen')
 def educationDetail(request, id):
     education = Education.objects.filter(id=id).first()
     context = {'education': education}
     return render(request, 'base/education/educationDetail.html', context)
 
+@login_required(login_url='userAuthen')
 def educationUpdate(request, id):
     education = get_object_or_404(Education, id=id)
     personnel = education.personnel
@@ -403,7 +409,7 @@ def educationUpdate(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/education/educationUpdate.html', context)
 
-
+@login_required(login_url='userAuthen')
 def educationDelete(request, id):
     education = get_object_or_404(Education, id=id)
     personnel = education.personnel
@@ -417,8 +423,8 @@ def educationDelete(request, id):
         context = {'form': form, 'personnel': education.personnel}
         return render(request, 'base/education/educationDelete.html', context)
 
-
 # Expertise CRUD.
+@login_required(login_url='userAuthen')
 def expertiseList(request, divisionId=None, personnelId=None):
     if request.session['userType'] == "Personnel":
         personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
@@ -442,7 +448,7 @@ def expertiseList(request, divisionId=None, personnelId=None):
         context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/expertise/expertiseList.html', context)
 
-
+@login_required(login_url='userAuthen')
 def expertiseNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     if request.method == 'POST':
@@ -458,13 +464,13 @@ def expertiseNew(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/expertise/expertiseNew.html', context)
 
-
+@login_required(login_url='userAuthen')
 def expertiseDetail(request, id):
     expertise = Expertise.objects.filter(id=id).first()
     context = {'expertise': expertise}
     return render(request, 'base/expertise/expertiseDetail.html', context)
 
-
+@login_required(login_url='userAuthen')
 def expertiseUpdate(request, id):
     expertise = get_object_or_404(Expertise, id=id)
     personnel = expertise.personnel
@@ -481,7 +487,7 @@ def expertiseUpdate(request, id):
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/expertise/expertiseUpdate.html', context)
 
-
+@login_required(login_url='userAuthen')
 def expertiseDelete(request, id):
     expertise = get_object_or_404(Expertise, id=id)
     personnel = expertise.personnel
@@ -496,6 +502,7 @@ def expertiseDelete(request, id):
         return render(request, 'base/expertise/expertiseDelete.html', context)
 
 # CurrAffiliation CRUD.
+@login_required(login_url='userAuthen')
 def currAffiliationList(request, curriculumId = None):
     curriculum = None
     # for next time, recorder must used user login
@@ -533,6 +540,7 @@ def currAffiliationList(request, curriculumId = None):
     context = {'curriculums': curriculums, 'curriculum': curriculum, 'form': form}
     return render(request, 'base/currAffiliation/currAffiliationList.html', context)
 
+@login_required(login_url='userAuthen')
 def currAffiliationDelete(request,id):
     currAffiliation = get_object_or_404(CurrAffiliation, id=id)
     # for next time, recorder must used user login
@@ -546,6 +554,7 @@ def currAffiliationDelete(request,id):
     # return render(request, 'base/currAffiliationList.html', context)
     return redirect('currAffiliationList', curriculumId=curriculum.id)
 
+@login_required(login_url='userAuthen')
 def Permission(request):
     pass
 

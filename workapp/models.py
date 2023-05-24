@@ -35,6 +35,12 @@ class Command(models.Model):
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
         return self.comId + " " + self.topic + " (" + str(self.comDate)+ ")"
+    def getPersonnel(self):
+        personnels = CommandPerson.objects.filter(command=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
+        return personnels
+    def getCountPersonnel(self):
+        count = CommandPerson.objects.filter(command=self).aggregate(count=Count('id'))
+        return count['count']
 
 class CommandPerson(models.Model):
     status = models.CharField(max_length=30, default="")

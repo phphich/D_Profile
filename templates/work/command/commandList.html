@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-clipboard-list"></i> คำสั่ง </h2>
+        </div>
+    </div>
+
+     <table class="table table-info table-striped table-hover">
+            <tr class="text-primary">
+                <th class="text-center col-1">ปีการศึกษา</th>
+                <th class="col-1">ภาคเรียนที่ </th>
+                <th class="col-1">เลขที่คำสั่ง</th>
+                <th class="col-5">เรื่อง</th>
+                <th class="col-2">จำนวนผู้ที่ได้รับคำสั่ง</th>
+                <th class="col col-2"><a href="{% url 'commandNew' %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มคำสั่ง </a></th>
+            </tr>
+            {% eduYearValue "" as nYear %}
+            {% for command in commands  %}
+                 <tr class="text-primary">
+                    <td class="text-center">
+                        {% if nYear != command.eduYear %}
+                            {% eduYearValue command.eduYear as nYear %}
+                            {{ nYear }}
+                        {% endif %}
+                    </td>
+                    <td>{{ command.eduSemeter }}</td>
+                    <td class="text-center">{{ command.id }}</td>
+                    <td>{{ command.topic }}</td>
+                    <td>{{ command.getCountPersonnel }}</td>
+            {% endfor %}
+     </table>
+    
+     {% if commands.has_other_pages %}
+         <div class="row">
+             <div class="col-12 text-center ">
+                 <div class="btn-group text-center" role="group" aria-label="Item pagination">
+                     {% if commands.has_previous %}
+{#                         <a href="{% url '' commands.previous_page_number %}"#}
+{#                                class="btn btn-outline-primary">&laquo;</a>                     #}
+                     {% endif %}
+
+                     {% for page_number in commands.paginator.page_range %}
+                         {% if commands.number == page_number %}
+                             <button class="btn btn-outline-primary active">
+                                 <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+                             </button>
+                         {% else %}
+                             {% if request.session.userType != "Personnel" %}
+{#                                 <a href="{% url '' page_number %}"#}
+{#                                    class="btn btn-outline-primary">#}
+{#                                     {{ page_number }}#}
+{#                                 </a>#}
+                             {% else %}
+                                 <a href="{% url 'commandList' page_number %}" class="btn btn-outline-primary">
+                                     {{ page_number }}
+                                 </a>
+                             {% endif %}
+                         {% endif %}
+                     {% endfor %}
+
+                     {% if commands.has_next %}
+                         {% if request.session.userType != "Personnel" %}
+                             <a href="{% url ''  commands.next_page_number %}"
+                                class="btn btn-outline-primary">&raquo;</a>
+                         {% else %}
+                             <a href="{% url ''  commands.next_page_number %}"
+                                class="btn btn-outline-primary">&raquo;</a>
+                         {% endif %}
+                     {% endif %}
+                 </div>
+             </div>
+         </div>
+     {% endif %}
+    <p class="text-end text-info">[ข้อมูลคำสั่ง: {{ count }} เรื่อง]</p>
+    <br>
+{% endblock %}

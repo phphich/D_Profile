@@ -3,7 +3,11 @@ from workapp.models import *
 
 register = template.Library()
 @register.simple_tag
-def fiscalValue(val=None):
+def fiscalYearValue(val=None):
+  return val
+
+@register.simple_tag
+def eduYearValue(val=None):
   return val
 
 # @register.filter(name='getPracticeResult')
