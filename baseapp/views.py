@@ -26,10 +26,10 @@ def home(request):
         request.session['sess_university'] = "University: [N/A]"
     countPersonnel = Personnel.objects.all().count()
     if countPersonnel == 0:
-        division = Division.objects.filter(name_sh="N/A").first()
+        division = Division.objects.filter(name_sh="Center").first()
         messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
         if division is None:
-            division = Division(name_th="ไม่ระบุ", name_en="No Assign", name_sh="N/A")
+            division = Division(name_th="สำนักงานคณะ", name_en="Office", name_sh="")
             division.save()
         return  redirect('personnelNew')
     else:

@@ -19,7 +19,10 @@ class Division(models.Model):
     name_en = models.CharField(max_length=50, default="")
     name_sh = models.CharField(max_length=10, default="")
     def __str__(self):
-        return str(self.name_th) + " (" + self.name_sh + ")"
+        if self.name_sh == "":
+            return str(self.name_th)
+        else:
+            return str(self.name_th) + " (" + self.name_sh + ")"
     def getCurriculum(self):
         curriculums = Curriculum.objects.filter(division=self)
         return curriculums
