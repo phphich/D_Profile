@@ -2,15 +2,17 @@
 {% load static %}
 
 {% block content %}
+    <br>
+    <div style="background: url({% static 'images/iconfiles/bg-login.jpg' %}) no-repeat; width: 100%; height: 100%; background-size: 100%;">
     <br><br><br>
-    <div class="row">
+    <div class="row" >
         <div class="col col-4 "> <br> </div>
         <div class="col col-4 bg-primary">
             <br>
             <form method="POST" class="form-control">
                 {% csrf_token %}
                 <table class="table table-info">
-                    <tr class="bg-info"><td align="center" colspan="2"><h2>ตรวจสอบสิทธิ์ผู้ใช้ระบบ</h2></td></tr>
+                    <tr class="bg-info"><td align="center" colspan="2"><h3>ตรวจสอบสิทธิ์ผู้ใช้ระบบ</h3></td></tr>
                     <tr><td width="40%">User Name</td>
                         <td><input type="text" name="userName" value="{{ userName }}" required>
                         </td></tr>
@@ -25,5 +27,5 @@
         </div>
         <div class="col col-4"> <br> </div>
     </div>
-
+</div>
 {% endblock %}

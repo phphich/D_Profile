@@ -24,7 +24,16 @@ def home(request):
     else:
         request.session['sess_faculty'] = "Faculty: [N/A]"
         request.session['sess_university'] = "University: [N/A]"
-    return render(request, 'home.html')
+    countPersonnel = Personnel.objects.all().count()
+    if countPersonnel == 0:
+        division = Division.objects.filter(name_sh="N/A").first()
+        messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
+        if division is None:
+            division = Division(name_th="ไม่ระบุ", name_en="No Assign", name_sh="N/A")
+            division.save()
+        return  redirect('personnelNew')
+    else:
+        return render(request, 'home.html')
 
 # ตรวจสอบ Login
 def userAuthen(request):

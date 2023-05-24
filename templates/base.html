@@ -33,12 +33,12 @@
                         <div class="alert alert-{{ message.tags }} alert-dismissible" role="alert">
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             {% if message.tags == 'success' %}
-                                <b>ดำเนินการสำเร็จ!</b>
+                                <b>ดำเนินการสำเร็จ!</b> "{{ message }}"
+                            {% elif message.tags == 'info' %}
+                                <b>แจ้งให้ทราบ!</b> "{{ message }}"
                             {% else %}
-                                <b>การดำเนินการผิดพลาด!</b> โปรดตรวจสอบและแก้ไขให้ถูกต้อง
+                                <b>การดำเนินการผิดพลาด!</b> "{{ message }}" โปรดตรวจสอบและแก้ไขให้ถูกต้อง
                             {% endif %}
-
-                            <g class="text-danger"> "{{ message }}"</g>
                         </div>
                     {% endfor %}
                 {% endif %}
