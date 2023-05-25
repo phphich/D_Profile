@@ -42,17 +42,23 @@ class Command(models.Model):
             return "ฤดูร้อน"
         else:
             return self.eduSemeter
-    def getPersonnel(self):
+    def getPersonnels(self):
         personnels = CommandPerson.objects.filter(command=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
         return personnels
     def getCountPersonnel(self):
         count = CommandPerson.objects.filter(command=self).aggregate(count=Count('id'))
         return count['count']
+    def getCommandFiles(self):
+        commandFiles = CommandFile.objects.filter(command=self)
+        return commandFiles
+    def getCommandURLs(self):
+        commandURLs = CommandURL.objects.filter(command=self)
+        return commandURLs
 
 class CommandPerson(models.Model):
     status = models.CharField(max_length=30, default="")
     command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
-    personnels = models.ForeignKey(Personnel, related_name='PersonnelCommandPerson', on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelCommandPerson', on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderCommandPerson',on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.command.comId + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \

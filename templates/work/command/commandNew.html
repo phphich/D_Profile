@@ -23,6 +23,12 @@
             <div class="col-12">
                 {{ form.as_p }}
             </div>
+            <p>
+                {% if request.session.userType == "Personnel" %}
+                    <label for="status" class="text-primary">หน้าที่ที่ได้รับมอบหมาย</label>
+                    <input type="text" class="form-control" name="status" required id="status" size="35" maxlength="30">
+                {% endif %}
+            </p>
         </div>
         <hr class="text-primary">
         <div class="row text-primary">

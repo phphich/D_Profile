@@ -3,9 +3,22 @@
 {% load custom_tags %}
 {% block content %}
     <div class="row">
-        <div class="col-12">
+        {% if request.session.userType == "Personnel" %}
+            <div class="col-10">
+                <h2><i class="fa fa-person-hiking"></i> คำสั่ง </h2>
+                <h3>
+                    {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
+                    สังกัด: {{ personnel.division }}
+                </h3>
+            </div>
+            <div class="col-2">
+                <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"  class="rounded-circle">
+            </div>
+        {% else %}
+            <div class="col-12">
             <h2><i class="fas fa-clipboard-list"></i> คำสั่ง </h2>
         </div>
+        {% endif %}
     </div>
 
      <table class="table table-info table-striped table-hover">
@@ -14,7 +27,7 @@
                 <th class="text-center col-1">ภาคเรียนที่ </th>
                 <th class="col-1">เลขที่คำสั่ง</th>
                 <th class="col-5">เรื่อง</th>
-                <th class="text-center col-2">บุคลากรในคำสั่ง (ราย)</th>
+                <th class="text-center col-1">บุคลากร (ราย)</th>
                 <th class="col col-2"><a href="{% url 'commandNew' %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มคำสั่ง </a></th>
             </tr>
             {% eduYearValue "" as nYear %}
@@ -34,7 +47,7 @@
                     <td>{{ command.topic }}</td>
                     <td class="text-center">{{ command.getCountPersonnel }}</td>
                     <td class="text-center">
-                        <a href="" class="btn btn-light"> <i class="fa fa-search"> </i> </a>
+                        <a href="{% url 'commandDetail' command.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>
                         <a href="" class="btn btn-secondary"> <i class="fa fa-tools"> </i> </a>
                         <a href="" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
                     </td>

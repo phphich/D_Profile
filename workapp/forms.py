@@ -1,7 +1,7 @@
 from django import forms
 from .models import *
 
-
+# ฟอร์มคำสั่ง
 class CommandForm(forms.ModelForm):
     class Meta:
         MISSION_CHOICES = (
@@ -14,7 +14,7 @@ class CommandForm(forms.ModelForm):
         )
         SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
         model = Command
-        fields = ( 'eduYear', 'eduSemeter','comId', 'mission', 'topic', 'detail','comDate',  'fiscalYear','personnel')
+        fields = ( 'eduYear', 'eduSemeter','mission', 'comId', 'topic', 'detail','comDate',  'fiscalYear','personnel')
         widgets = {
             'comId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
             'comDate': forms.DateInput(attrs={'class': 'form-control', 'type':'date'}),
@@ -31,9 +31,9 @@ class CommandForm(forms.ModelForm):
             'eduYear': 'ปีการศึกษา',
             'eduSemeter': 'ภาคเรียนที่',
             'comId': 'เลขที่คำสั่ง',
-            'comDate': 'สั่ง ณ วันที่',
+            'comDate': 'วันที่ออกคำสั่่ง',
             'fiscalYear': 'ปีงบประมาณ',
-            'mission': 'พันธะกิจ',
+            'mission': 'พันธกิจ',
             'topic': 'เรื่อง',
             'detail': 'รายละเอียด',
             'personnel': 'ผู้บันทึก'
@@ -50,7 +50,38 @@ class CommandForm(forms.ModelForm):
             self.fields['detail'].widget.attrs['readonly'] = True
             self.fields['personnel'].widget.attrs['readonly'] = True  # ผู้บันทึก
 
+class CommandFileForm(forms.ModelForm):
+    class Meta:
+        model = CommandFile
+        fields = ('file', 'filetype', 'command')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'command': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'command': 'คำสั่ง',
+        }
 
+class CommandURLForm(forms.ModelForm):
+    class Meta:
+        model = CommandURL
+        fields = ('url', 'command')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'command': forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'command': 'คำสั่ง',
+        }
+
+
+# ฟอร์มการลา
 class LeaveForm(forms.ModelForm):
     class Meta:
         TYPE_CHOICES = (
@@ -137,7 +168,7 @@ class LeaveURLForm(forms.ModelForm):
             'leave': 'ใบลา',
         }
 
-
+# ฟอร์มการฝึกอบรม
 class TrainignForm(forms.ModelForm):
     class Meta:
         SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
@@ -229,7 +260,7 @@ class TrainingURLForm(forms.ModelForm):
             'training': 'การฝึกอบรม/สัมมนา',
         }
 
-
+# ฟอร์มการวิจัย
 class ResearchForm(forms.ModelForm):
     class Meta:
         TYPE_CHOICES = (
@@ -287,7 +318,7 @@ class ResearchForm(forms.ModelForm):
         self.fields['publish_method'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
 
-
+# ฟอร์มการบริการวิชาการแก่สังคม
 class SocialServiceForm(forms.ModelForm):
     class Meta:
         SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
@@ -358,7 +389,7 @@ class SocialServiceForm(forms.ModelForm):
         self.fields['num_receiver'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
 
-
+# ฟอร์มการผลงานรางวัล
 class PerformanceForm(forms.ModelForm):
     class Meta:
         SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))

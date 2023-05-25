@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
     <div class="row">
         <div class="col-10">
             <h2><i class="fa fa-person-hiking"></i> รายละเอียดการลา </h2>
@@ -11,7 +10,8 @@
             </h3>
         </div>
         <div class="col-2">
-            <img src="{% static leave.personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"  class="rounded-circle">
+            <img src="{% static leave.personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"
+                 class="rounded-circle">
         </div>
     </div>
 
@@ -73,32 +73,34 @@
                 </button>
             </h5>
             <div id="uploadfiles" class="collapse">
-            <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
-                {% csrf_token %}
-                <div class="row text-danger">
-                    <div class="col-3">
-                        {{ fileForm.as_table }}
+                <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
+                    {% csrf_token %}
+                    <div class="row text-danger">
+                        <div class="col-3">
+                            {{ fileForm.as_table }}
+                        </div>
+                        <div class="col-9" id="fileList">
+                            <p class="text-danger"><i> *** หมายเหตุ:
+                                ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทยหรือใช้สัญลักษณ์พิเศษ </i>
+                            </p>
+                        </div>
                     </div>
-                    <div class="col-9" id="fileList">
-                        <p class="text-danger"><i> *** หมายเหตุ: ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทยหรือใช้สัญลักษณ์พิเศษ </i>
-                        </p>
+                    <div class="row">
+                        <div class="col-5 text-center">
+                            <input type="hidden" name="id" value="{{ leave.id }}">
+                            <input type="hidden" name="action" value="uploadfile">
+                        </div>
+                        <div class="col-2 text-center" id="upload">
+                            <br>
+                            <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload"></i>
+                                อัพโหลดไฟล์เอกสาร
+                            </button>
+                            <br>
+                        </div>
+                        <div class="col-5 text-center"></div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-5 text-center">
-                        <input type="hidden" name="id" value="{{ leave.id }}">
-                        <input type="hidden" name="action" value="uploadfile">
-                    </div>
-                    <div class="col-2 text-center" id="upload">
-                        <br>
-                        <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload"></i> อัพโหลดไฟล์เอกสาร
-                        </button>
-                        <br>
-                    </div>
-                    <div class="col-5 text-center"></div>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
             <p class="text-info">
                 {% if leave.getLeaveFiles|length == 0 %}
                     <div class="row">
@@ -195,31 +197,33 @@
             </form>
         </div>
         <p class="text-primary">
-            <ul class="list-group">
-                {% for link in leave.getLeaveURLs %}
-                    <li class="list-group-item text-primary">
-                        <a href={{ link.url }} class="filelink" target="_blank">
-                            <i class="fas fa-caret-right"></i> {{ link }}
-                        </a>
-                        <a href="{% url 'leaveDeleteURL' link.id %}" onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
-                            <i class="fas fa-minus text-danger"></i>
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
+        <ul class="list-group">
+            {% for link in leave.getLeaveURLs %}
+                <li class="list-group-item text-primary">
+                    <a href={{ link.url }} class="filelink" target="_blank">
+                        <i class="fas fa-caret-right"></i> {{ link }}
+                    </a>
+                    <a href="{% url 'leaveDeleteURL' link.id %}"
+                       onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
+                        <i class="fas fa-minus text-danger"></i>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
 
-            {% if leave.getLeaveURLs|length > 1 %}
-                <div class="row">
-                    <div class="col-3">
-                        <a href="{% url 'leaveDeleteURLAll' leave.id %}"
-                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
-                            <i class="fas fa-trash text-white"></i>
-                            ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
-                        </a>
-                    </div>
-                    <div class="col-9"></div>
+        {% if leave.getLeaveURLs|length > 1 %}
+            <div class="row">
+                <div class="col-3">
+                    <a href="{% url 'leaveDeleteURLAll' leave.id %}"
+                       onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
+                       class="btn btn-danger">
+                        <i class="fas fa-trash text-white"></i>
+                        ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
+                    </a>
                 </div>
-            {% endif %}
+                <div class="col-9"></div>
+            </div>
+        {% endif %}
         </p>
     </div>
     <br>
