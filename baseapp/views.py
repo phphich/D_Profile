@@ -73,7 +73,7 @@ def userLogout(request):
 
 @login_required(login_url='userAuthen')
 def changePassword(request, email=None):
-    pass
+    return HttpResponse("Okay changed.")
 
 # Division CRUD.
 def divisionList(request):
@@ -346,9 +346,11 @@ def personnelDelete(request, id):
 # Education CRUD.
 @login_required(login_url='userAuthen')
 def educationList(request, divisionId=None, personnelId=None):
+    if 'userType' not in request.session:
+        return redirect('userAuthen')
     if request.session['userType'] == "Personnel":
-        personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
-        context = {'personnel': personnel}
+            personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
+            context = {'personnel': personnel}
     else:
         division = None
         personnel = None
@@ -426,6 +428,8 @@ def educationDelete(request, id):
 # Expertise CRUD.
 @login_required(login_url='userAuthen')
 def expertiseList(request, divisionId=None, personnelId=None):
+    if 'userType' not in request.session:
+        return redirect('userAuthen')
     if request.session['userType'] == "Personnel":
         personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
         context = {'personnel': personnel}

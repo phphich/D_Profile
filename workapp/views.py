@@ -18,6 +18,8 @@ iterm_per_page = 5
 #Leave CRUD
 @login_required(login_url='userAuthen')
 def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
+    if 'userType' not in request.session:
+        return redirect('userAuthen')
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
@@ -226,6 +228,8 @@ def leaveDeleteURLAll(request, id):
 #Training CRUD
 @login_required(login_url='userAuthen')
 def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
+    if 'userType' not in request.session:
+        return redirect('userAuthen')
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
@@ -437,6 +441,8 @@ def trainingDeleteURLAll(request, id):
 # Performance CRUD
 @login_required(login_url='userAuthen')
 def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
+    if 'userType' not in request.session:
+        return redirect('userAuthen')
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
@@ -703,6 +709,8 @@ def performanceDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def commandList(request, pageNo=None):
+    if 'userType' not in request.session:
+        return redirect('userAuthen')
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
@@ -712,7 +720,7 @@ def commandList(request, pageNo=None):
         count = commands.count()
         context = {'personnel': personnel,'commands': commands_page.page(pageNo), 'count': count}
     else:
-        commands = CommandPerson.objects.all().order_by('-command__fiscalYear', '-command__comDate')
+        commands = Command.objects.all().order_by('-eduYear', '-eduSemeter', '-comDate')
         commands_page = Paginator(commands, iterm_per_page)
         count = commands.count()
         context = {'commands': commands_page.page(pageNo), 'count': count}
@@ -726,7 +734,8 @@ def commandNew(request):
             form.save()
             command = Command.objects.last()
             messages.add_message(request, messages.SUCCESS, "บันทึกคำสั่ง เข้าสู่ระบบเรียบร้อย")
-            return redirect('commandDetail', id=command.id)
+            # return redirect('commandDetail', id=command.id)
+            return redirect('commandList')
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form}
