@@ -122,7 +122,8 @@ def leaveNew(request, id):
         fiscalYear = common.getCurrentFiscalYear()
         eduYear = common.getCurrentEduYear()
         currentDate = common.getCurrentDate()
-        form = LeaveForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':fiscalYear, 'eduYear':eduYear,
+        recorder = Personnel.objects.filter(id=request.session['userId']).first()
+        form = LeaveForm(initial={'personnel': personnel, 'recorder': recorder, 'fiscalYear':fiscalYear, 'eduYear':eduYear,
                                   'startDate':currentDate, 'endDate':currentDate,'days':1})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveNew.html', context)
@@ -134,7 +135,10 @@ def leaveUpdate(request, id):
     form = LeaveForm(data=request.POST or None, instance=leave)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            updateForm = form.save(commit=False)
+            recorder = Personnel.objects.filter(id = request.session['userId'])
+            updateForm.recorder = recorder
+            updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการลาเรียบร้อย")
             return redirect('leaveDetail', id=leave.id)
         else:
@@ -334,7 +338,8 @@ def trainingNew(request, id):
         eduYear = common.getCurrentEduYear()
         eduSemeter = common.getCurrentEduSemeter()
         currentDate = common.getCurrentDate()
-        form = TrainignForm(initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear':fiscalYear,
+        recorder = Personnel.objects.filter(id=request.session['userId']).first()
+        form = TrainignForm(initial={'personnel': personnel, 'recorder': recorder, 'fiscalYear':fiscalYear,
                                      'eduYear':eduYear, 'eduSemeter':eduSemeter, 'startDate':currentDate, 'endDate':currentDate,
                                      'days':1})
         context = {'form': form, 'personnel': personnel}
@@ -347,7 +352,10 @@ def trainingUpdate(request, id):
     form = TrainignForm(data=request.POST or None, instance=training)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            updateForm = form.save(commit=False)
+            recorder = Personnel.objects.filter(id = request.session['userId'])
+            updateForm.recorder = recorder
+            updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
             return redirect('trainingDetail', id=training.id)
         else:
@@ -549,8 +557,9 @@ def performanceNew(request, id):
         eduYear = common.getCurrentEduYear()
         eduSemeter = common.getCurrentEduSemeter()
         currentDate = common.getCurrentDate()
+        recorder = Personnel.objects.filter(id=request.session['userId']).first()
         form = PerformanceForm(
-            initial={'personnel': personnel, 'recorder': personnel, 'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
+            initial={'personnel': personnel, 'recorder': recorder, 'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
                      'getDate':currentDate})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/performance/performanceNew.html', context)
@@ -562,7 +571,10 @@ def performanceUpdate(request, id):
     form = PerformanceForm(data=request.POST or None, instance=performance)
     if request.method == 'POST':
         if form.is_valid():
-            form.save()
+            updateForm = form.save(commit=False)
+            recorder = Personnel.objects.filter(id = request.session['userId'])
+            updateForm.recorder = recorder
+            updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
             return redirect('performanceDetail', id=performance.id)
         else:

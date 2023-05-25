@@ -297,10 +297,16 @@ class DocumentsForm(forms.ModelForm):
             'personnel': 'ผู้บันทึก',
         }
 
-class ChangePasswordForm(forms.Form):
-    userId = forms.CharField(label='รหัสประจำตัวผู้ใช้', max_length=50,
+class AuthenForm(forms.Form):
+    userName = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name) ', max_length=50,
+                             widget=forms.TextInput(attrs={'class':'form-control'}))
+    userPass = forms.CharField(label='รหัสผ่าน (Password) ', max_length=100,
+                                  widget=forms.PasswordInput(attrs={'class':'form-control'}))
+
+class ChgPasswordForm(forms.Form):
+    email = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name)', max_length=50,
                              widget=forms.TextInput(attrs={'class':'form-control', 'readonly':True}))
-    oldPassword = forms.CharField(label='รหัสผ่านเดิม', max_length=100,
+    currentPassword = forms.CharField(label='รหัสผ่านเดิม', max_length=100,
                                   widget=forms.PasswordInput(attrs={'class':'form-control'}))
     newPassword = forms.CharField(label='รหัสผ่านใหม่', max_length=100,
                                   widget=forms.PasswordInput(attrs={'class':'form-control'}))
@@ -308,7 +314,7 @@ class ChangePasswordForm(forms.Form):
                                       widget=forms.PasswordInput(attrs={'class':'form-control'}))
 
 class ResetPasswordForm(forms.Form):
-    userId = forms.CharField(label='รหัสประจำตัวผู้ใช้', max_length=50,
+    userId = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name)', max_length=50,
                              widget=forms.TextInput(attrs={'class':'form-control', 'readonly':True}))
     newPassword = forms.CharField(label='รหัสผ่านใหม่', max_length=100,
                                   widget=forms.PasswordInput(attrs={'class':'form-control'}))

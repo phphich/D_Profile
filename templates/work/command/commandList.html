@@ -20,13 +20,16 @@
             {% eduYearValue "" as nYear %}
             {% for command in commands  %}
                  <tr class="text-primary">
-                    <td class="text-center">
-                        {% if nYear != command.eduYear %}
-                            {% eduYearValue command.eduYear as nYear %}
-                            {{ nYear }}
-                        {% endif %}
-                    </td>
-                    <td class="text-center">{{ command.eduSemeter }}</td>
+                     {% if nYear != command.getEduYearAndSementer %}
+                         {% eduYearValue command.getEduYearAndSementer as nYear %}
+                         <td class="text-center">
+                            {{ command.eduYear }}
+                        </td>
+                        <td class="text-center">{{ command.eduSemeter }}</td>
+                     {% else %}
+                         <td> </td>
+                         <td> </td>
+                     {% endif %}
                     <td class="text-center">{{ command.comId }}</td>
                     <td>{{ command.topic }}</td>
                     <td class="text-center">{{ command.getCountPersonnel }}</td>
@@ -44,8 +47,13 @@
              <div class="col-12 text-center ">
                  <div class="btn-group text-center" role="group" aria-label="Item pagination">
                      {% if commands.has_previous %}
-{#                         <a href="{% url '' commands.previous_page_number %}"#}
-{#                                class="btn btn-outline-primary">&laquo;</a>                     #}
+                         {% if request.session.userType != "Personnel" %}
+                            <a href="{% url 'commandList' commands.previous_page_number %}"
+                                class="btn btn-outline-primary">&laquo;</a>
+                         {% else %}
+                             <a href="{% url 'commandList' personnel.id commands.previous_page_number %}"
+                                class="btn btn-outline-primary">&raquo;</a>
+                         {% endif %}
                      {% endif %}
 
                      {% for page_number in commands.paginator.page_range %}
@@ -55,12 +63,12 @@
                              </button>
                          {% else %}
                              {% if request.session.userType != "Personnel" %}
-{#                                 <a href="{% url '' page_number %}"#}
-{#                                    class="btn btn-outline-primary">#}
-{#                                     {{ page_number }}#}
-{#                                 </a>#}
+                                 <a href="{% url 'commandList' page_number %}"
+                                    class="btn btn-outline-primary">
+                                     {{ page_number }}
+                                 </a>
                              {% else %}
-                                 <a href="{% url 'commandList' page_number %}" class="btn btn-outline-primary">
+                                 <a href="{% url 'commandList' personnel.id page_number %}" class="btn btn-outline-primary">
                                      {{ page_number }}
                                  </a>
                              {% endif %}
@@ -69,10 +77,10 @@
 
                      {% if commands.has_next %}
                          {% if request.session.userType != "Personnel" %}
-                             <a href="{% url ''  commands.next_page_number %}"
+                             <a href="{% url 'commandList'  commands.next_page_number %}"
                                 class="btn btn-outline-primary">&raquo;</a>
                          {% else %}
-                             <a href="{% url ''  commands.next_page_number %}"
+                             <a href="{% url 'commandList' personnel.id commands.next_page_number %}"
                                 class="btn btn-outline-primary">&raquo;</a>
                          {% endif %}
                      {% endif %}

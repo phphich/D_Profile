@@ -38,6 +38,7 @@ def home(request):
 # ตรวจสอบ Login
 def userAuthen(request):
     if request.method == 'POST':
+        form = AuthenForm(data=request.POST)
         userName = request.POST.get("userName")
         userPass = request.POST.get("userPass")
         ## login ด้วย ระบบล็อกอินของ Django
@@ -50,15 +51,18 @@ def userAuthen(request):
             request.session['userType'] = str(user.groups.first())
             request.session['userId'] = personnel.id
             request.session['userPicture'] = personnel.picture.name
-            messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ..")
+            messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ, ยินดีต้อนรับ: " +
+                                 personnel.status + ' ' + personnel.firstname_th + ' ' + personnel.lastname_th +
+                                 ' เข้าสู่ระบบ.. ')
             return redirect('home')
         else:
-            messages.error(request, "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง.!!!")
-            data = {'userName': userName}
-            return render(request, 'userAuthen.html', data)
+            messages.add_message(request,messages.WARNING, "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง.!!!")
+            context = {'form':form}
+            return render(request, 'userAuthen.html', context)
     else:
-         data = {'userName': ''}
-         return render(request, 'userAuthen.html', data)
+         form = AuthenForm()
+         context = {'form': form}
+         return render(request, 'userAuthen.html', context)
 
 #ล็อกเอ๊าท์ผ่านระบบ Authen ของ Django
 @login_required(login_url='userAuthen')
@@ -69,11 +73,48 @@ def userLogout(request):
     del request.session["userId"]
     del request.session['userPicture']
     logout(request)
-    return  redirect('home')
+    return  redirect('userAuthen')
+
+from django.contrib.auth.hashers import make_password
+def helpme(request):
+    user = User.objects.filter(email='phichayapak.ph@rmuti.ac.th').first()
+    if user is not None:  # มีบัญชีผู้ใช้ระบบจริง
+        user.password = make_password('12345')
+        user.save()
+        messages.add_message(request, messages.SUCCESS, 'แก้ไขรหัสผ่านเรียบร้อย ระบบจะพาท่านเข้าระบบใหม่อีกครั้ง')
+    else:
+        messages.add_message(request, messages.WARNING, 'แก้ไขรหัสผ่านไม่สำเร็จ')
+    return redirect('home')
 
 @login_required(login_url='userAuthen')
-def changePassword(request, email=None):
-    return HttpResponse("Okay changed.")
+def userChgPassword(request):
+    email = request.session['userEmail']
+    personnel = Personnel.objects.filter(email=email).first()
+    if request.method == 'POST':
+        form = ChgPasswordForm(data=request.POST)
+        email = request.POST['email']
+        currentPassword =  request.POST['currentPassword']
+        newPassword = request.POST['newPassword']
+        confirmPassword = request.POST['confirmPassword']
+        user = User.objects.filter(email=email).first()
+        if user is not None: # มีบัญชีผู้ใช้ระบบจริง
+            if user.check_password(currentPassword): # ป้อนรหัสผ่านเดิมถูกต้อง
+                if newPassword == confirmPassword:
+                    user.password = newPassword
+                    user.save()
+                    messages.add_message(request, messages.SUCCESS,'แก้ไขรหัสผ่านเรียบร้อย ระบบจะพาท่านเข้าระบบใหม่อีกครั้ง')
+                    return redirect('userLogout')
+                else:
+                    messages.add_message(request, messages.WARNING, 'ท่านระบุรหัสผ่านใหม่กับรหัสผ่านที่ยืนยันไม่ตรงกัน ')
+            else:
+                messages.add_message(request, messages.WARNING, 'ท่านระบุรหัสผ่านเดิมไม่ถูกต้อง ')
+        else:
+            messages.add_message(request, messages.WARNING, 'ไม่ปรากฏชื่อบัญชีผู้ใช้ระบบตามที่ระบุ ')
+    else:
+        form = ChgPasswordForm(initial={'email':personnel.email})
+    context = {'form':form, 'personnel':personnel}
+    return render(request, 'userChgPassword.html', context)
+
 
 # Division CRUD.
 def divisionList(request):

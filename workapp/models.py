@@ -27,7 +27,7 @@ class Command(models.Model):
     comDate = models.DateField(default=None)
     fiscalYear = models.IntegerField(default=0)
     eduYear = models.IntegerField(default=0)
-    eduSemeter = models.CharField(max_length=10, default="")
+    eduSemeter = models.IntegerField(default=0)
     mission = models.CharField(max_length=50, default="การจัดการเรียนการสอน")
     topic = models.TextField(default=None)
     detail = models.TextField(default=None)
@@ -35,6 +35,13 @@ class Command(models.Model):
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
         return self.comId + " " + self.topic + " (" + str(self.comDate)+ ")"
+    def getEduYearAndSementer(self):
+        return self.eduYear + self.eduSemeter
+    def getSemeter(self):
+        if self.eduSemeter== 3:
+            return "ฤดูร้อน"
+        else:
+            return self.eduSemeter
     def getPersonnel(self):
         personnels = CommandPerson.objects.filter(command=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
         return personnels
@@ -45,7 +52,8 @@ class Command(models.Model):
 class CommandPerson(models.Model):
     status = models.CharField(max_length=30, default="")
     command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    personnels = models.ForeignKey(Personnel, related_name='PersonnelCommandPerson', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandPerson',on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.command.comId + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " +  " (" + self.status + ")"
@@ -70,8 +78,8 @@ class Leave(models.Model):
     eduYear = models.IntegerField(default=0)
     leaveType = models.CharField(max_length=50, default=None)
     reason = models.CharField(max_length=255, default=None)
-    personnel = models.ForeignKey(Personnel, related_name='PersonnelLeave', on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderLeave', on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='CommandPersonnelLeave', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='CommandRecorderLeave', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
         return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th +\
