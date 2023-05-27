@@ -9,71 +9,69 @@
             </h3>
         </div>
         <div class="col-2">
-            <img src="{% static personnel.picture %}" width="100px" height="auto" style="margin-top:10px;" class="rounded-circle">
+{#            <img src="{% static personnel.picture %}" width="100px" height="auto" style="margin-top:10px;" class="rounded-circle">#}
         </div>
     </div>
 
 
     <hr class="text-primary">
-    <table class="table table-info table-striped table-hover">
-        <tr class="text-primary">
-            <th class="col-3">เลขที่ตำแหน่ง</th>
+    <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+        <tr>
+            <th class="col-3 text-primary">เลขที่ตำแหน่ง</th>
             <td class="col-9">{{ personnel.sId }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ชื่อ (ภาษาไทย)</th>
+        <tr>
+            <th  class="text-primary">ชื่อ (ภาษาไทย)</th>
             <td>{{ personnel.firstname_th }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>สกุล (ภาษาไทย)</th>
+        <tr>
+            <th  class="text-primary">สกุล (ภาษาไทย)</th>
             <td>{{ personnel.lastname_en }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ชื่อ (ภาษาอังกฤษ)</th>
+        <tr>
+            <th  class="text-primary">ชื่อ (ภาษาอังกฤษ)</th>
             <td>{{ personnel.firstname_en }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>นามสกุล (ภาษาอังกฤษ)</th>
+        <tr>
+            <th  class="text-primary">นามสกุล (ภาษาอังกฤษ)</th>
             <td>{{ personnel.lastname_en }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ตำแหน่ง</th>
+        <tr>
+            <th  class="text-primary">ตำแหน่ง</th>
             <td>{{ personnel.status }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ประเภทบุคลากร</th>
+        <tr>
+            <th  class="text-primary">ประเภทบุคลากร</th>
             <td>{{ personnel.type }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ที่อยู่</th>
+        <tr>
+            <th  class="text-primary">ที่อยู่</th>
             <td>{{ personnel.address }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>เพศ</th>
+        <tr>
+            <th  class="text-primary">เพศ</th>
             <td>{{ personnel.gender }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>วันเดือนปีเกิด</th>
+        <tr>
+            <th  class="text-primary">วันเดือนปีเกิด</th>
             <td>{{ personnel.birthDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>วันที่เริ่มบรรจุเข้าทำงาน</th>
+        <tr>
+            <th  class="text-primary">วันที่เริ่มบรรจุเข้าทำงาน</th>
             <td>{{ personnel.hiringDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>สังกัดสาขา</th>
+        <tr>
+            <th  class="text-primary">สังกัดสาขา</th>
             <td>{{ personnel.division.name_th }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>อีเมล์</th>
+        <tr>
+            <th  class="text-primary">อีเมล์</th>
             <td>{{ personnel.email }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>รูปประจำตัว</th>
+        <tr>
+            <th  class="text-primary">รูปประจำตัว</th>
             <td><img src="{% static personnel.picture %}" width="200px" height="auto" style="margin-top:10px;" ></td>
         </tr>
-
-
     </table>
     <div class="row">
         <div class="col-5">

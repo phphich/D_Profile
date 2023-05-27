@@ -63,7 +63,7 @@
             </div>
         </div>
         <hr class="text-primary">
-        <table class="table table-info table-striped table-hover">
+        <table class="table table-light table-striped table-hover"  style="border-color: #0b5ed7">
             <tr class="text-primary">
                 <th class="col-5">เรื่อง/ประเด็นที่เชี่ยวชาญ</th>
                 <th class="col-5">ประสบการณ์</th>
@@ -75,8 +75,8 @@
                 <tr class="text-primary">
                     <td>{{ expert.topic }}</td>
                     <td>
-                        {% if expert.experience|length|get_digit:"-1" > 10 %}
-                            {{ expert.experience|slice:"0:10" }}...
+                        {% if expert.experience|length|get_digit:"-1" > 50 %}
+                            {{ expert.experience|slice:"0:50" }}...
                         {% else %}
                             {{ expert.experience }}
                         {% endif %}

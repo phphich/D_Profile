@@ -5,8 +5,16 @@ urlpatterns = [
     # คำสั่ง
     path('commandList', views.commandList, name='commandList'),
     path('<pageNo>/commandList', views.commandList, name='commandList'),
-    path('commandNew', views.commandNew, name='commandNew'),
     path('<id>/commandDetail', views.commandDetail, name='commandDetail'),
+    path('commandNew', views.commandNew, name='commandNew'),
+    path('<id>/commandUpdate', views.commandUpdate, name='commandUpdate'),
+    path('<id>/commandDelete', views.commandDelete, name='commandDelete'),
+    path('<id>/commandDeleteFile', views.commandDeleteFile, name='commandDeleteFile'),
+    path('<id>/commandDeleteFileAll', views.commandDeleteFileAll, name='commandDeleteFileAll'),
+    path('<id>/commandDeleteURL', views.commandDeleteURL, name='commandDeleteURL'),
+    path('<id>/commandDeleteURLAll', views.commandDeleteURLAll, name='commandDeleteURLAll'),
+    path('<id>/commandDeleteCommandPerson', views.commandDeleteCommandPerson, name='commandDeleteCommandPerson'),
+    path('<id>/commandDeleteCommandPersonAll', views.commandDeleteCommandPersonAll, name='commandDeleteCommandPersonAll'),
 
     # การลา
     path('leaveList', views.leaveList, name='leaveList'),

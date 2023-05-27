@@ -64,18 +64,17 @@
             </div>
         </div>
         <hr class="text-primary">
-        <table class="table table-info table-striped table-hover">
+        <table class="table table-light table-striped table-hover text-primary" style="border-color: #0b5ed7">
             <tr class="text-primary">
                 <th class="text-center col-2">ปีงบประมาณ</th>
                 <th class="col-4">ประเภทการลา</th>
                 <th class="col-3">ระหว่างวันที่</th>
                 <th class="col-1">จำนวนวัน </th>
-                <th class="col col-2"><a href="{% url 'leaveNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มข้อมูลการลา </a></th>
+                <th class="col-2"><a href="{% url 'leaveNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มข้อมูลการลา </a></th>
             </tr>
-
             {% fiscalYearValue "" as nYear %}
             {% for leave in leaves  %}
-                <tr class="text-primary">
+                <tr class="text-dark" onclick="location.href='{% url 'leaveDetail' leave.id %}'" style="cursor: pointer">
                     <td class="text-center">
                         {% if nYear != leave.fiscalYear %}
                             {% fiscalYearValue leave.fiscalYear as nYear %}

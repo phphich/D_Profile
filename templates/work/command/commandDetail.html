@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load custom_tags %}
+
 {% block content %}
-        <div class="row">
+    <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
                 <h2><i class="fa fa-person-hiking"></i> รายละเอียดคำสั่ง ({{ command.comId }})</h2>
@@ -22,37 +23,37 @@
     </div>
     <hr class="text-primary">
 
-    <table class="table table-info table-striped table-hover">
-        <tr class="text-primary">
-            <th class="col-3">ปีการศึกษา </th>
+    <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
+        <tr>
+            <th class="col-3 text-primary">ปีการศึกษา </th>
             <td class="col-9">{{ command.eduYear }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ภาคเรียนที่ </th>
+        <tr>
+            <th class="text-primary">ภาคเรียนที่ </th>
             <td>{{ command.getSemeter }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>พันธกิจ</th>
+        <tr>
+            <th class="text-primary">พันธกิจ</th>
             <td>{{ command.mission }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>เลขที่คำสั่ง</th>
+        <tr>
+            <th class="text-primary">เลขที่คำสั่ง</th>
             <td>{{ command.comId }}</td>
         </tr>
-        <tr class="text-primary">
-            <th class="col-3">เรื่อง </th>
-            <td class="col-9">{{ command.topic }}</td>
+        <tr>
+            <th class="text-primary">เรื่อง </th>
+            <td>{{ command.topic }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>รายละเอียด</th>
+        <tr>
+            <th class="text-primary">รายละเอียด</th>
             <td>{{ command.detail }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>วันที่ออกคำสั่ง</th>
+        <tr>
+            <th class="text-primary">วันที่ออกคำสั่ง</th>
             <td>{{ command.comDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ปีงบประมาณ</th>
+        <tr>
+            <th class="text-primary">ปีงบประมาณ</th>
             <td>{{ command.fiscalYear }}</td>
         </tr>
     </table>
@@ -62,11 +63,105 @@
                 onclick="location.href='{% url 'commandList' %}'">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
-        <button type="button" class="btn btn-secondary">
-{#                onclick="location.href='{% url 'commandUpdate' leave.id %}'">#}
-            <i class="fa fa-tools"></i> แก้ไข
-        </button>
+        {% if personnel.id == command.personnel.id %} {#คำสั่งที่บันทึกโดยบุคลากรรายนั้น ๆ #}
+            <button type="button" class="btn btn-secondary"
+                    onclick="location.href='{% url 'commandUpdate' command.id %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
+        {% endif %}
     </p>
+
+    <div class="row">
+        <div class="col-12 text-success">
+            <h5><i class="fa fa-user-friends"></i> บุคลากรที่ได้รับมอบหมายในคำสั่ง:
+                {% if personnel.id == command.personnel.id %} {#คำสั่งที่บันทึกโดยบุคลากรรายนั้น ๆ #}
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listCommandPerson">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                {% endif %}
+            </h5>
+        </div>
+    </div>
+
+
+    <div id="listCommandPerson" class="collapse">
+        <input type="checkbox" name='chkAll' id="chkAll" value="Select" onclick='javascript:chkSelect("personnel","chkAll");'>Select All
+        <form method="post" id='frmCommandPerson' enctype="multipart/form-data" class="form-control text-primary" lang="th">
+            {% csrf_token %}
+            {{ commandPersonForm.as_table }}
+            <p class="text-center">
+                <br>
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-floppy-disk"></i> บันทึกกรายชื่อผู้ได้รับคำสั่ง
+                </button>
+                <input type="hidden" name="id" value="{{ command.id }}">
+                <input type="hidden" name="action" value="uploadPersonnel">
+            </p>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-2>"></div>
+        <div class="col-8>">
+            {% if command.getCommandPerson|length == 0  %}
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="alert-warning col-8 text-center">
+                        <br>....ยังไม่ได้กำหนดรายชื่อบุคลากรที่ได้รับคำสั่งนี้ในระบบ....<br><br></div>
+                    <div class="col-2"></div>
+                </div>
+            {% else %}
+                <table class="table table-striped table-hover table-light">
+                    <tr class="text-primary">
+                        <th class="col-1 text-center">ลำดับที่</th>
+                        <th class="col-4">บุคลากร</th>
+                        <th class="col-5">หน้าที่ที่ได้รับมอบหมาย</th>
+                        <th class="col-2 text-center">
+                            {% if command.getCommandPerson|length > 1 %}
+                                {% if request.session.userType == 'Personnel' and personnel.id == command.personnel.id %} {#คำสั่งที่บันทึกโดยบุคลากรรายนั้น ๆ #}
+                                    <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด (ที่ไม่ใช่ผู้บันทึก) ออกจากคำสั่งนี้!!!' )"
+                                       class="btn btn-danger">
+                                        <i class="fas fa-trash text-white"></i>ลบบุคลากรรายอื่นทั้งหมด
+                                    </a>
+                                {% else %} {# Staff or Admin #}
+                                    <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากคำสั่งนี้!!!' )"
+                                       class="btn btn-danger">
+                                        <i class="fas fa-trash text-white"></i>ลบบุคลากรทั้งหมด
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </th>
+                    </tr>
+
+                    {% for commandPerson in command.getCommandPerson %}
+                        {% if personnel.id == commandPerson.personnel.id %}
+                            <tr style="font-size:x-large;color:black ">
+                        {% else %}
+                            <tr>
+                        {% endif %}
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>{{ commandPerson.personnel }} </td>
+                            <td>{{ commandPerson.status }}</td>
+                            <td class="text-center">
+                                {% if personnel.id == command.personnel.id %} {#คำสั่งที่บันทึกโดยบุคลากรรายนั้น ๆ #}
+                                    {% if personnel.id != commandPerson.personnel.id %} {# รายชื่อที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
+                                        <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
+                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
+                                            <i class="fas fa-minus text-danger"></i>
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+        <div class="col-2>"></div>
+    </div>
+    <br><br>
 
     <div class="row">
         <div class="col-12 text-success">
@@ -105,16 +200,16 @@
                 </form>
             </div>
             <p class="text-info">
-                {% if leave.getLeaveFiles|length == 0 %}
+                {% if command.getCommandFiles|length == 0 %}
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
-                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบไว้ในระบบ....<br><br></div>
+                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบคำสั่งนี้ในระบบ....<br><br></div>
                         <div class="col-2"></div>
                     </div>
                 {% else %}
                     <div class="row">
-                        {% for f in leave.getLeaveFiles %}
+                        {% for f in command.getCommandFiles %}
                             <div class="col-3">
                                 <a href="{% static 'documents/command/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.filetype == "pdf" %}
@@ -151,19 +246,17 @@
                                         {{ f.file.name }}
                                     {% endif %}
                                 </a>
-{#  {% url 'leaveDeleteFile' f.id %}                          #}
-                                <a href=""
+                                <a href="{% url 'commandDeleteFile' f.id %}"
                                    onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
                                     <i class="fas fa-minus text-danger"></i>
                                 </a>
                             </div>
                         {% endfor %}
                     </div>
-                    {% if leave.getLeaveFiles|length > 1 %}
+                    {% if command.getCommandFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
-{#     {% url 'leaveDeleteFileAll' leave.id %}                           #}
-                                <a href=""
+                                <a href="{% url 'commandDeleteFileAll' command.id %}"
                                    onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
                                    class="btn btn-danger">
                                     <i class="fas fa-trash text-white"></i>
@@ -178,6 +271,7 @@
         </div>
     </div>
     <br><br>
+
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
@@ -195,20 +289,19 @@
                     <button type="submit" class="btn btn-success">
                         <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
                     </button>
-                    <input type="hidden" name="id" value="{{ leave.id }}">
+                    <input type="hidden" name="id" value="{{ command.id }}">
                     <input type="hidden" name="action" value="uploadlink">
                 </p>
             </form>
         </div>
         <p class="text-primary">
         <ul class="list-group">
-            {% for link in leave.getLeaveURLs %}
+            {% for link in command.getCommandURLs %}
                 <li class="list-group-item text-primary">
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}
                     </a>
-{# {% url 'leaveDeleteURL' link.id %}                   #}
-                    <a href=""
+                    <a href="{% url 'commandDeleteURL' link.id %}"
                        onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
                         <i class="fas fa-minus text-danger"></i>
                     </a>
@@ -216,11 +309,10 @@
             {% endfor %}
         </ul>
 
-        {% if leave.getLeaveURLs|length > 1 %}
+        {% if command.getCommandURLs|length > 1 %}
             <div class="row">
                 <div class="col-3">
-{#  {% url 'leaveDeleteURLAll' leave.id %}                  #}
-                    <a href=""
+                    <a href="{% url 'commandDeleteURLAll' command.id %}"
                        onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
                        class="btn btn-danger">
                         <i class="fas fa-trash text-white"></i>
@@ -234,29 +326,10 @@
     </div>
     <br><br>
 
-    <div class="row">
-        <div class="col-12 text-success">
-            <h5><i class="fa fa-user-friends"></i> บุคลากรที่ได้รับมอบหมายในคำสั่ง:
-                <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listCommandPerson">
-                    <i class="fa fa-plus text-primary"></i>
-                </button>
-            </h5>
-
-        </div>
-    </div>
-     <div id="listCommandPerson" class="collapse">
-            <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
-                {% csrf_token %}
-                {{ urlForm.as_table }}
-                <p class="text-center">
-                    <br>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-floppy-disk"></i> บันทึกกรายชื่อผู้ได้รับคำสั่ง
-                    </button>
-                    <input type="hidden" name="id" value="{{ command.id }}">
-                    <input type="hidden" name="action" value="uploadPersonnel">
-                </p>
-            </form>
-        </div>
-    <br>
+    <p class="text-sm-end" style="color: #6c757d;">
+        <i>
+            [ข้อมูลได้รับการบันทึก/ปรับปรุงล่าสุดเมื่อ: {{ command.recordDate | date:'d/m/Y, H:m:s' }} โดย: {{ command.getRecorder }} ]
+        </i>
+    </p>
+    <br><br>
 {% endblock %}

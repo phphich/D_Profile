@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-10">
+            <h2><i class="fas fa-award text-primary"></i> ลบข้อมูลการรับตำแหน่ง/ผลงาน/รางวัล </h2>
+            <h4> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
+                สังกัด: {{ personnel.division }} </h4>
+        </div>
+        <div class="col-2">
+            <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"
+                 class="rounded-circle">
+        </div>
+    </div>
+    <hr class="text-primary">
+    <form method="POST" class="form form-control text-primary">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <br>
+        <div class="row">
+            <div class="col-12 text-success">
+                <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>
+                <p class="text-info">
+                    {% if performance.getPerformanceFiles|length == 0 %}
+                        <div class="row">
+                            <div class="col-2"></div>
+                            <div class="alert-warning col-8 text-center"><br>....ไม่มีเอกสารแนบข้อมูลการฝึกอบรม/สัมมนา....<br><br>
+                            </div>
+                            <div class="col-2"></div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            {% for f in performance.getPerformanceFiles %}
+                                <div class="col-3">
+                                    <a href="{% static 'documents/performance/' %}{{ f.file }}" class="filelink"
+                                       target="_blank">
+                                        {% if f.filetype == "pdf" %}
+                                            <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
+                                                 class="img-thumbnail">
+                                        {% else %}
+                                            {% if f.filetype == "doc" or f.filetype == "docx" %}
+                                                <img src="{% static 'images/iconfiles/doc-icon.png' %}" width="80px"
+                                                     class="img-thumbnail">
+                                            {% else %}
+                                                {% if f.filetype == "xls" or f.filetype == "xlsx" %}
+                                                    <img src="{% static 'images/iconfiles/xls-icon.png' %}" width="80px"
+                                                         class="img-thumbnail">
+                                                {% else %}
+                                                    {% if f.filetype == "ppt" or f.filetype == "pptx" %}
+                                                        <img src="{% static 'images/iconfiles/ppt-icon.png' %}"
+                                                             width="80px"
+                                                             class="img-thumbnail">
+                                                    {% else %}
+                                                        {% if f.filetype == "jpg" or f.filetype == "png" or f.filetype == "jpeg" or f.filetype == "gif" %}
+                                                            <img src="{% static 'images/iconfiles/img-icon.png' %}"
+                                                                 width="80px" class="img-thumbnail">
+                                                        {% else %}
+                                                            <img src="{% static 'images/iconfiles/txt-icon.png' %}"
+                                                                 width="80px" class="img-thumbnail">
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                        <br>
+                                        {% if f.file.name|length|get_digit:"-1" > 30 %}
+                                            {{ f.file.name|slice:"0:30" }}...
+                                        {% else %}
+                                            {{ f.file.name }}
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <br>
+
+        <div class="row">
+            <div class="col-12 text-success">
+                <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                </h5>
+            </div>
+            <p class="text-primary">
+            <ul class="list-group">
+                {% for link in performance.getPerformanceURLs %}
+                    <li class="list-group-item text-primary">
+                        <a href={{ link.url }} class="filelink" target="_blank">
+                            <i class="fas fa-caret-right"></i> {{ link }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            </p>
+        </div>
+
+        <p class="text-center">
+            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+            <button type="submit" class="btn btn-danger"
+                    onclick="return confirm('โปรดยืนยันการลบข้อมูลผลงาน/รางวัลนี้' )">
+                <i class="fa-solid fa-trash"></i> ลบข้อมูลการรับตำแหน่ง/ผลงาน/รางวัล
+            </button>
+        </p>
+    </form>
+{% endblock %}

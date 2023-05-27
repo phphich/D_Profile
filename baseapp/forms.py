@@ -49,8 +49,8 @@ class DivisionForm(forms.ModelForm):
             'name_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 15, 'maxlength': 10}),
         }
         labels = {
-            'name_th': 'ชื่อสาขา (ไทย)',
-            'name_en': 'ชื่อสาขา (อังกฤษ)',
+            'name_th': 'ชื่อสาขา/หน่วยงานย่อย (ไทย)',
+            'name_en': 'ชื่อสาขา/หน่วยงานย่อย (อังกฤษ)',
             'name_sh': 'ชื่อย่อ',
         }
     def deleteForm(self):

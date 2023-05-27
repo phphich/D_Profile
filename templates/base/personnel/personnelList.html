@@ -5,7 +5,7 @@
     <h2 class="text-primary"><i class="fa fa-user-group"></i> รายชื่อบุคลากรในสังกัด </h2>
     <hr class="text-primary">
     {% if chart is not None %}
-        <table class="table table-primary table-striped table-hover">
+        <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
             <tr class="bg-white text-primary">
                 <th class="col-1"></th>
                 <th class="col-3">ชื่อ - สกุล</th>
@@ -21,12 +21,17 @@
                 </th>
             </tr>
             {% for personnel in personnels %}
-                <tr class="text-primary">
+                <tr>
                     <td class="text-center">
-                        <a href="{% url 'personnelDetail' personnel.id %}">
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id %}
+                            <a href="{% url 'personnelDetail' personnel.id %}">
+                                <img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                                     width="55px" height="65px">
+                            </a>
+                        {% else %}
                             <img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                  width="55px" height="65px">
-                        </a>
+                        {% endif %}
                     </td>
                     <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
                     <td>{{ personnel.status }}</td>

@@ -65,3 +65,34 @@ chkDays = function () {
         }
     }
 }
+
+/* ฟังก์ชัน เลือก Selectbox บุคลากร */
+chkSelect = function (name, chkAll) {
+    var checkBox = document.getElementById(chkAll);
+    var allname = document.getElementsByName(name)
+    var nameId="";
+    for(i=0; i<allname.length;i++){
+        nameId = "id_"+name+"_" + i.toString();
+        if(checkBox.checked==true) {
+            document.getElementById(nameId).setAttribute('checked', 'checked');
+        }else{
+            document.getElementById(nameId).removeAttribute('checked');
+        }
+    }
+}
+
+// chkSelect = function () {
+//     var checkBox = document.getElementById("chkAll");
+//     var personnels = document.getElementsByName("personnel")
+//     var personnelID="";
+//     for(i=0; i<personnels.length;i++){
+//         personnelID = "id_personnel_" + i.toString();
+//         if(checkBox.checked==true) {
+//             document.getElementById(personnelID).setAttribute('checked', 'checked');
+//         }else{
+//             document.getElementById(personnelID).removeAttribute('checked');
+//         }
+//     }
+// }
+
+

@@ -63,6 +63,8 @@ class Personnel(models.Model):
     hiringDate = models.DateField(default=None)
     picture = models.ImageField(upload_to ='static/images/personnels/', default=None)
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
+    class Meta:
+        ordering = ['firstname_th', 'lastname_th', 'status',]
     def __str__(self):
         return self.status + self.firstname_th +  " " + self.lastname_th
     def getEducations(self):

@@ -16,33 +16,33 @@
     </div>
 
     <hr class="text-primary">
-    <table class="table table-info table-striped table-hover">
-        <tr class="text-primary">
-            <th class="col-3">ปีงบประมาณ</th>
+    <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
+        <tr>
+            <th class="col-3 text-primary">ปีงบประมาณ</th>
             <td class="col-9">{{ leave.fiscalYear }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ประเภทการลา</th>
+        <tr>
+            <th class="text-primary">ประเภทการลา</th>
             <td>{{ leave.leaveType }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ปีการศึกษา</th>
+        <tr>
+            <th class="text-primary">ปีการศึกษา</th>
             <td>{{ leave.eduYear }}</td>
         </tr>
-        <tr class="text-primary">
-            <th class="col-3">วันที่เริ่มต้น</th>
-            <td class="col-9">{{ leave.startDate }}</td>
+        <tr>
+            <th class="text-primary">วันที่เริ่มต้น</th>
+            <td>{{ leave.startDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>วันที่สิ้นสุด</th>
+        <tr>
+            <th class="text-primary">วันที่สิ้นสุด</th>
             <td>{{ leave.endDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>จำนวนวันลา</th>
+        <tr>
+            <th class="text-primary">จำนวนวันลา</th>
             <td>{{ leave.days }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>เหตุผลประกอบการลา</th>
+        <tr>
+            <th class="text-primary">เหตุผลประกอบการลา</th>
             <td>{{ leave.reason }}</td>
         </tr>
     </table>
@@ -106,7 +106,7 @@
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
-                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบไว้ในระบบ....<br><br></div>
+                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบการลานี้ในระบบ....<br><br></div>
                         <div class="col-2"></div>
                     </div>
                 {% else %}
@@ -226,5 +226,11 @@
         {% endif %}
         </p>
     </div>
+    <br><br>
+    <p class="text-sm-end" style="color: #6c757d;">
+        <i>
+            [ข้อมูลได้รับการบันทึก/ปรับปรุงล่าสุดเมื่อ: {{ leave.recordDate | date:'d/m/Y, H:m:s' }} โดย: {{ leave.getRecorder }} ]
+        </i>
+    </p>
     <br>
 {% endblock %}

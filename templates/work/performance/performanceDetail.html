@@ -15,41 +15,41 @@
     </div>
 
     <hr class="text-primary">
-    <table class="table table-info table-striped table-hover">
-        <tr class="text-primary">
-            <th>ปีงบประมาณ</th>
-            <td>{{ performance.fiscalYear  }}</td>
+    <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7;">
+        <tr>
+            <th class="col-3 text-primary">ปีงบประมาณ</th>
+            <td class="col-9">{{ performance.fiscalYear  }}</td>
         </tr>
-        <tr class="text-primary">
-            <th class="col-3">ชื่อผลงาน/รางวัล</th>
-            <td class="col-9">{{ performance.topic }}</td>
+        <tr>
+            <th class="text-primary">ชื่อผลงาน/รางวัล</th>
+            <td>{{ performance.topic }}</td>
         </tr>
-        <tr class="text-primary">
-            <th class="col-3">รายละเอียด</th>
-            <td class="col-9">{{ performance.detail }}</td>
+        <tr>
+            <th class="text-primary">รายละเอียด</th>
+            <td>{{ performance.detail }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>จาก/ผู้มอบ</th>
+        <tr>
+            <th class="text-primary">ได้รับจาก/ผู้มอบ</th>
             <td>{{ performance.source }}</td>
         </tr>
-        <tr class="text-primary">
-            <th class="col-3">วันที่ได้รับ</th>
-            <td class="col-9">{{ performance.getDate }}</td>
+        <tr>
+            <th class="text-primary">วันที่ได้รับ</th>
+            <td>{{ performance.getDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ปีการศึกษา</th>
+        <tr>
+            <th class="text-primary">ปีการศึกษา</th>
             <td>{{ performance.eduYear  }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ภาคเรียนที่</th>
+        <tr>
+            <th class="text-primary">ภาคเรียนที่</th>
             <td>{{ performance.getSemeter }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>งบประมาณที่ใช้</th>
+        <tr>
+            <th class="text-primary">งบประมาณที่ใช้</th>
             <td>{{ performance.budget }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ประเภทงบประมาณ</th>
+        <tr>
+            <th class="text-primary">ประเภทงบประมาณ</th>
             <td>{{ performance.budgetType }}</td>
         </tr>
     </table>
@@ -112,7 +112,7 @@
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
-                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบไว้ในระบบ....<br><br></div>
+                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบการรับตำแหน่ง/ผลงาน/รางวัลนี้ในระบบ....<br><br></div>
                         <div class="col-2"></div>
                     </div>
                 {% else %}
@@ -230,5 +230,11 @@
             {% endif %}
         </p>
     </div>
+    <br><br>
+    <p class="text-sm-end" style="color: #6c757d;">
+        <i>
+            [ข้อมูลได้รับการบันทึก/ปรับปรุงล่าสุดเมื่อ: {{ performance.recordDate | date:'d/m/Y, H:m:s' }} โดย: {{ performance.getRecorder }} ]
+        </i>
+    </p>
     <br>
 {% endblock %}

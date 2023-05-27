@@ -64,7 +64,7 @@
             </div>
         </div>
         <hr class="text-primary">
-        <table class="table table-info table-striped table-hover">
+        <table class="table table-light table-striped table-hover text-primary" style="border-color: #0b5ed7">
             <tr class="text-primary">
                 <th class="text-center col-1">ปีงบประมาณ</th>
                 <th class="col-3">หัวข้อฝึกอบรม/สัมมนา</th>
@@ -75,7 +75,7 @@
             </tr>
             {% fiscalYearValue "" as nYear %}
             {% for training in trainings  %}
-                <tr class="text-primary">
+                <tr class="text-dark" onclick="location.href='{% url 'trainingDetail' training.id %}'" style="cursor: pointer">
                     <td class="text-center">
                         {% if nYear != training.fiscalYear %}
                             {% fiscalYearValue training.fiscalYear as nYear %}

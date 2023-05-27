@@ -26,11 +26,7 @@ def home(request):
         request.session['sess_university'] = "University: [N/A]"
     countPersonnel = Personnel.objects.all().count()
     if countPersonnel == 0:
-        division = Division.objects.filter(name_sh="Center").first()
         messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
-        if division is None:
-            division = Division(name_th="สำนักงานคณะ", name_en="Office", name_sh="")
-            division.save()
         return  redirect('personnelNew')
     else:
         return render(request, 'home.html')
@@ -118,6 +114,8 @@ def userChgPassword(request):
 
 # Division CRUD.
 def divisionList(request):
+    if Personnel.objects.all().count() == 0:
+        return redirect('home')
     divisions = Division.objects.all().order_by('name_th')
     context = {'divisions': divisions}
     return render(request, 'base/division/divisionList.html', context)
@@ -167,6 +165,9 @@ def divisionDelete(request, id):
 
 # Curriculum CRUD.
 def curriculumList(request):
+    if Personnel.objects.all().count() == 0:
+        return redirect('home')
+
     curriculums = Curriculum.objects.all().order_by('name_th')
     context = {'curriculums': curriculums}
     return render(request, 'base/curriculum/curriculumList.html', context)
@@ -220,6 +221,8 @@ def personnelListOld(request):
     return render(request, 'base/personnel/personnelListOld.html', context)
 
 def personnelList(request, pageNo=None):
+    if Personnel.objects.all().count() == 0:
+        return redirect('home')
     if pageNo == None:
         pageNo = 1
     division = Division.objects.all().order_by('name_th')
@@ -247,8 +250,12 @@ def personnelList(request, pageNo=None):
     context = {'personnels': personnels_page.page(pageNo), 'chart':chart, 'count':count, 'countmale':cm, 'countfemale':cfm}
     return render(request, 'base/personnel/personnelList.html', context)
 
-@login_required(login_url='userAuthen')
+# @login_required(login_url='userAuthen')
 def personnelNew(request):
+    divisionCount = Division.objects.filter(name_en="Office").count()
+    if divisionCount == 0:
+        division = Division(name_th="สำนักงานคณะ", name_en="Office", name_sh="")
+        division.save()
     if request.method == 'POST':
         form = PersonnelForm(data=request.POST or None, files=request.FILES)
         passwd = request.POST['passwd']
@@ -282,6 +289,12 @@ def personnelNew(request):
             user = User.objects.create_user(id, email, password)
             user.first_name = personnel.firstname_en
             user.last_name = personnel.lastname_en
+            if userType == 'Administrator':
+                user.is_superuser = True
+                user.is_staff = True
+            else:
+                user.is_superuser = False
+                user.is_staff = True
             group, created = Group.objects.get_or_create(name=userType)
             if group is not None:
                 user.groups.add(group)
@@ -302,6 +315,8 @@ def personnelNew(request):
         countPersonnel = Personnel.objects.all().count()
         if countPersonnel == 0:
             firstTime = True
+            division = Division.objects.first();
+            form.initial={'division':division}
         else:
             firstTime = False
         context = {'form': form, 'firstTime':firstTime}

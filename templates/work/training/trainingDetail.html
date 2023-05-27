@@ -15,45 +15,45 @@
     </div>
 
     <hr class="text-primary">
-    <table class="table table-info table-striped table-hover">
-        <tr class="text-primary">
-            <th>ปีงบประมาณ</th>
-            <td>{{ training.fiscalYear  }}</td>
+    <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
+        <tr>
+            <th class="col-3 text-primary">ปีงบประมาณ</th>
+            <td class="col-9">{{ training.fiscalYear  }}</td>
         </tr>
-        <tr class="text-primary">
-            <th class="col-3">หัวข้อฝึกอบรม/สัมมนา</th>
-            <td class="col-9">{{ training.topic }}</td>
+        <tr>
+            <th class="text-primary">หัวข้อฝึกอบรม/สัมมนา</th>
+            <td >{{ training.topic }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>สถานที่</th>
+        <tr>
+            <th class="text-primary">สถานที่</th>
             <td>{{ training.place }}</td>
         </tr>
-        <tr class="text-primary">
-            <th class="col-3">วันที่เริ่มต้น</th>
-            <td class="col-9">{{ training.startDate }}</td>
+        <tr>
+            <th class="text-primary">วันที่เริ่มต้น</th>
+            <td>{{ training.startDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>วันที่สิ้นสุด</th>
+        <tr>
+            <th class="text-primary">วันที่สิ้นสุด</th>
             <td>{{ training.endDate }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>จำนวนวัน</th>
+        <tr>
+            <th class="text-primary">จำนวนวัน</th>
             <td>{{ training.days }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ปีการศึกษา</th>
+        <tr>
+            <th class="text-primary">ปีการศึกษา</th>
             <td>{{ training.eduYear  }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ภาคเรียนที่</th>
+        <tr>
+            <th class="text-primary">ภาคเรียนที่</th>
             <td>{{ training.getSemeter}}</td>
         </tr>
-        <tr class="text-primary">
-            <th>งบประมาณที่ใช้</th>
+        <tr>
+            <th class="text-primary">งบประมาณที่ใช้</th>
             <td>{{ training.budget }}</td>
         </tr>
-        <tr class="text-primary">
-            <th>ประเภทงบประมาณ</th>
+        <tr>
+            <th class="text-primary">ประเภทงบประมาณ</th>
             <td>{{ training.budgetType }}</td>
         </tr>
     </table>
@@ -115,7 +115,7 @@
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
-                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบไว้ในระบบ....<br><br></div>
+                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบการฝึกอบรม/สัมมนานี้ในระบบ....<br><br></div>
                         <div class="col-2"></div>
                     </div>
                 {% else %}
@@ -233,5 +233,11 @@
             {% endif %}
         </p>
     </div>
+    <br><br>
+    <p class="text-sm-end" style="color: #6c757d;">
+        <i>
+            [ข้อมูลได้รับการบันทึก/ปรับปรุงล่าสุดเมื่อ: {{ training.recordDate | date:'d/m/Y, H:m:s' }} โดย: {{ training.getRecorder }} ]
+        </i>
+    </p>
     <br>
 {% endblock %}

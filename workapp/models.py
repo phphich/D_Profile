@@ -31,10 +31,12 @@ class Command(models.Model):
     mission = models.CharField(max_length=50, default="การจัดการเรียนการสอน")
     topic = models.TextField(default=None)
     detail = models.TextField(default=None)
-    personnel = models.ForeignKey(Personnel, related_name='RecorderCommand', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommand', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
         return self.comId + " " + self.topic + " (" + str(self.comDate)+ ")"
+    def getRecorder(self):
+        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
     def getEduYearAndSementer(self):
         return self.eduYear + self.eduSemeter
     def getSemeter(self):
@@ -42,9 +44,9 @@ class Command(models.Model):
             return "ฤดูร้อน"
         else:
             return self.eduSemeter
-    def getPersonnels(self):
-        personnels = CommandPerson.objects.filter(command=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
-        return personnels
+    # def getCommandPerson(self):
+    #     personnels = CommandPerson.objects.filter(command=self).order_by('status','personnel__firstname_th', 'personnel__lastname_th')
+    #     return personnels
     def getCountPersonnel(self):
         count = CommandPerson.objects.filter(command=self).aggregate(count=Count('id'))
         return count['count']
@@ -67,12 +69,14 @@ class CommandFile(models.Model):
     file = models.FileField(upload_to='static/documents/command', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandFile',on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "(" + str(self.command.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
 
 class CommandURL(models.Model):
     url = models.URLField(max_length=255, default=None)
     command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandURL', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "[" + str(self.command.id) + "_" + str(self.id) + "]_"+ self.url
 
@@ -84,13 +88,15 @@ class Leave(models.Model):
     eduYear = models.IntegerField(default=0)
     leaveType = models.CharField(max_length=50, default=None)
     reason = models.CharField(max_length=255, default=None)
-    personnel = models.ForeignKey(Personnel, related_name='CommandPersonnelLeave', on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='CommandRecorderLeave', on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelLeave', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderLeave', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
         return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th +\
                 "  " + self.leaveType+ " : " + str(self.startDate) + " - " + str(self.endDate) + \
                 "  " + self.leaveType + " (" + str(self.days) + ")"
+    def getRecorder(self):
+        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
     def getLeaveFiles(self):
         leaveFiles = LeaveFile.objects.filter(leave=self)
         return leaveFiles
@@ -102,12 +108,14 @@ class LeaveFile(models.Model):
     file = models.FileField(upload_to='static/documents/leave', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     leave = models.ForeignKey(Leave, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderLeaveFile', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "(" + str(self.leave.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
 
 class LeaveURL(models.Model):
     url = models.URLField(max_length=255, default=None)
     leave = models.ForeignKey(Leave, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderLeaveURL', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "[" + str(self.leave.id) + "_" + str(self.id) + "]_"+ self.url
 
@@ -129,6 +137,8 @@ class Training(models.Model):
         return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " + self.topic + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                " (" + str(self.days) + ")"
+    def getRecorder(self):
+        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
     def getTrainingFiles(self):
         trainingFiles = TrainingFile.objects.filter(training=self)
         return trainingFiles
@@ -145,12 +155,14 @@ class TrainingFile(models.Model):
     file = models.FileField(upload_to='static/documents/training', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     training = models.ForeignKey(Training, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderTrainingFile', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "(" + str(self.training.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
 
 class TrainingURL(models.Model):
     url = models.URLField(max_length=255, default=None)
     training = models.ForeignKey(Training, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderTrainingURL', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "[" + str(self.training.id) + "_" + str(self.id) + "]_"+ self.url
 
@@ -166,17 +178,19 @@ class Research(models.Model):
     keyword = models.TextField(default="")
     percent_success = models.IntegerField(default=0)
     publish_method = models.TextField(default="")
-    personnel = models.ForeignKey(Personnel, related_name='RecorderResearch', on_delete=models.CASCADE, default=None)
-    # recorder = models.ForeignKey(Personnel, related_name='RecorderResearch', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearch', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
         return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " + self.title_th + " - " + str(self.fiscalYear) + " : " + str(self.budget)
+    def getRecorder(self):
+        return self.personnel.status + self.personnel.firstname_th + ' ' + self.personnel.lastname_th
 
 class ResearchPerson(models.Model):
     status = models.CharField(max_length=30, default="")
     research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelResearchPerson', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchPerson', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.research.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " +  " (" + self.status + ")"
@@ -185,12 +199,14 @@ class ResearchFile(models.Model):
     file = models.FileField(upload_to='static/documents/research', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchFile', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "(" + str(self.research.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
 
 class ResearchURL(models.Model):
     url = models.URLField(max_length=255, default=None)
     research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchURL', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "[" + str(self.research.id) + "_" + str(self.id) + "]_"+ self.url
 
@@ -209,17 +225,19 @@ class SocialService(models.Model):
     source = models.CharField(max_length=255, default="")
     receiver = models.CharField(max_length=255, default="")
     num_receiver = models.IntegerField(default = 0)
-    personnel = models.ForeignKey(Personnel, related_name='RecorderSocialService', on_delete=models.CASCADE, default=None)
-    # recorder = models.ForeignKey(Personnel, related_name='RecorderSocialService', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialService', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
-        return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+        return self.recorder.status + self.recorder.firstName_th + " " + self.recorder.lastName_th + \
                "  " + self.topic + " : " + self.place + " : " + str(self.startDate) + "-" + str(self.endDate)
+    def getRecorder(self):
+        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
 
 class SocialServicePerson(models.Model):
     status = models.CharField(max_length=30, default="")
     socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelSocialServicePerson', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServicePerson', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.socialservice.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " +  " (" + self.status + ")"
@@ -228,12 +246,14 @@ class SocialServiceFile(models.Model):
     file = models.FileField(upload_to='static/documents/socialservice', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServiceFile', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "(" + str(self.socialservice.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
 
 class SocialServiceURL(models.Model):
     url = models.URLField(max_length=255, default=None)
     socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServiceURL', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "[" + str(self.socialservice.id) + "_" + str(self.id) + "]_"+ self.url
 
@@ -253,6 +273,8 @@ class Performance(models.Model):
     def __str__(self):
         return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
                "  " + self.topic + " : " + str(self.getDate)
+    def getRecorder(self):
+        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
     def getPerformanceFiles(self):
         performanceFiles = PerformanceFile.objects.filter(performance=self)
         return performanceFiles
@@ -270,11 +292,13 @@ class PerformanceFile(models.Model):
     file = models.FileField(upload_to='static/documents/performance', default=None, null=True, blank=True)
     filetype = models.CharField(max_length=50, default=None)
     performance = models.ForeignKey(Performance, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformanceFile', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "(" + str(self.performance.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
 
 class PerformanceURL(models.Model):
     url = models.URLField(max_length=255, default=None)
     performance = models.ForeignKey(Performance, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformanceURL', on_delete=models.CASCADE, default=None)
     def __str__(self):
         return "[" + str(self.performance.id) + "_" + str(self.id) + "]_"+ self.url

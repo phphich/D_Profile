@@ -64,18 +64,18 @@
             </div>
         </div>
         <hr class="text-primary">
-        <table class="table table-info table-striped table-hover">
+        <table class="table table-light table-striped table-hover text-primary" style="border-color: #0b5ed7">
             <tr class="text-primary">
                 <th class="col-1 text-center">ปีงบประมาณ</th>
                 <th class="col-4">ชื่อผลงาน/รางวัล</th>
-                <th class="col-3">ได้รับจาก</th>
+                <th class="col-3">ได้รับจาก/ผู้มอบ</th>
                 <th class="col-2 text-center">วันที่ได้รับ</th>
                 <th class="col col-2"><a href="{% url 'performanceNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มการฝึกอบรม/สัมมนา </a></th>
             </tr>
 
             {% fiscalYearValue "" as nYear %}
             {% for performance in performances  %}
-                <tr class="text-primary">
+                <tr class="text-dark" onclick="location.href='{% url 'performanceDetail' performance.id %}'" style="cursor: pointer">
                     <td class="text-center">
                         {% if nYear != performance.fiscalYear %}
                             {% fiscalYearValue performance.fiscalYear as nYear %}

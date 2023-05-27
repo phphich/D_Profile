@@ -136,7 +136,7 @@ def leaveUpdate(request, id):
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
-            recorder = Personnel.objects.filter(id = request.session['userId'])
+            recorder = Personnel.objects.filter(id = request.session['userId']).first()
             updateForm.recorder = recorder
             updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการลาเรียบร้อย")
@@ -353,7 +353,7 @@ def trainingUpdate(request, id):
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
-            recorder = Personnel.objects.filter(id = request.session['userId'])
+            recorder = Personnel.objects.filter(id = request.session['userId']).first()
             updateForm.recorder = recorder
             updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
@@ -572,7 +572,7 @@ def performanceUpdate(request, id):
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
-            recorder = Personnel.objects.filter(id = request.session['userId'])
+            recorder = Personnel.objects.filter(id = request.session['userId']).first()
             updateForm.recorder = recorder
             updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
@@ -665,60 +665,7 @@ def performanceDeleteURLAll(request, id):
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
     return redirect('performanceDetail', id=performance.id)
 
-@login_required(login_url='userAuthen')
-def performanceDetail(request, id):
-    performance = Performance.objects.filter(id=id).first()
-    if request.method == 'POST':
-        fileForm = PerformanceFileForm(request.POST, request.FILES)
-        urlForm = PerformanceURLForm(request.POST)
-        if request.POST['action'] == 'uploadfile':
-            if fileForm.is_valid():
-                files = request.FILES.getlist("file")
-                newFileForm = fileForm.save(commit=False)
-                success = True
-                fileerror = ""
-                for f in files:
-                    filepath = common.fileNameCleansing(f.name)
-                    point = filepath.rfind('.')
-                    ext = filepath[point:]
-                    filenames = filepath.split('/')
-                    filename = 'documents/performance/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
-                    lf, created = PerformanceFile.objects.get_or_create(file=f, performance=performance, filetype=ext[1:])
-                    lf.save()
-                    performanceFile = PerformanceFile.objects.last()
-                    newfilename = '[' + str(performance.id) + '_' + str(performanceFile.id) + ']-' + filenames[
-                        len(filenames) - 1]  # ชื่อไฟล์ที่ระบบกำหนด
-                    performanceFile.file.name = newfilename
-                    performanceFile.save()
-                    try:
-                        os.rename('static/' + filename, 'static/documents/performance/' + performanceFile.file.name)
-                    except:
-                        fileerror = fileerror + performanceFile.file.name + ", "
-                        performanceFile.delete()
-                        success = False
-                if success == True:
-                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
-                else:
-                    messages.add_message(request, messages.WARNING,
-                                         "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
-            else:
-                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-                context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
-                return render(request, 'work/performance/performanceDetail.html', context)
-        else:  # upload link
-            if urlForm.is_valid():
-                urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
-            else:
-                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-                context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
-                return render(request, 'work/performance/performanceDetail.html', context)
-    # else:
-    fileForm = PerformanceFileForm(initial={'performance': performance, 'filetype': 'Unknow'})
-    urlForm = PerformanceURLForm(initial={'performance': performance})
-    context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
-    return render(request, 'work/performance/performanceDetail.html', context)
-
+# CRUD. command
 @login_required(login_url='userAuthen')
 def commandList(request, pageNo=None):
     if 'userType' not in request.session:
@@ -743,16 +690,16 @@ def commandList(request, pageNo=None):
 def commandNew(request):
     if request.method == 'POST':
         form = CommandForm(data=request.POST)
-        status = request.POST['status']
         if form.is_valid():
             form.save()
             command = Command.objects.last()
             if(request.session["userType"]=="Personnel"):
+                status = request.POST['status']
                 commandPerson = CommandPerson(command=command, personnel=command.personnel, recorder=command.personnel, status=status)
+                commandPerson.status = status
                 commandPerson.save()
             messages.add_message(request, messages.SUCCESS, "บันทึกคำสั่ง เข้าสู่ระบบเรียบร้อย")
-            # return redirect('commandDetail', id=command.id)
-            return redirect('commandList')
+            return redirect('commandDetail', id=command.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form}
@@ -765,7 +712,7 @@ def commandNew(request):
         recorder = Personnel.objects.filter(id=request.session['userId']).first()
         form = CommandForm(
             initial={'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
-                     'comDate':currentDate, 'personnel': recorder })
+                     'comDate':currentDate, 'recorder': recorder })
         context = {'form': form, 'personnel':recorder}
         return render(request, 'work/command/commandNew.html', context)
 
@@ -774,9 +721,11 @@ def commandDetail(request, id):
     if 'userType' not in request.session:
         return redirect('userAuthen')
     personnel = None
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if (request.session['userType'] == "Personnel"):
         personnel = Personnel.objects.filter(id=request.session['userId']).first()
     command = Command.objects.filter(id=id).first()
+    commandPersons = CommandPerson.objects.filter(command=command)
     if request.method == 'POST':
         fileForm = CommandFileForm(request.POST, request.FILES)
         urlForm = CommandURLForm(request.POST)
@@ -798,6 +747,7 @@ def commandDetail(request, id):
                     newfilename = '[' + str(command.id) + '_' + str(commandFile.id) + ']-' + filenames[
                         len(filenames) - 1]  # ชื่อไฟล์ที่ระบบกำหนด
                     commandFile.file.name = newfilename
+                    commandFile.recorder = recorder
                     commandFile.save()
                     try:
                         os.rename('static/' + filename, 'static/documents/command/' + commandFile.file.name)
@@ -812,18 +762,161 @@ def commandDetail(request, id):
                                          "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-                context = {'fileForm': fileForm, 'urlForm': urlForm, 'command': command}
-                return render(request, 'work/command/commandDetail.html', context)
-        else:  # upload link
+                # context = {'fileForm': fileForm, 'urlForm': urlForm, 'command': command,
+                #            'personnel':personnel, 'commandPersons':commandPersons}
+                # return render(request, 'work/command/commandDetail.html', context)
+        elif request.POST['action']=='uploadLink':  # upload link
             if urlForm.is_valid():
                 urlForm.save()
                 messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-                context = {'fileForm': fileForm, 'urlForm': urlForm, 'command': command}
-                return render(request, 'work/command/commandDetail.html', context)
-
-    fileForm = CommandFileForm(initial={'command': command, 'filetype': 'Unknow'})
-    urlForm = CommandURLForm(initial={'command': command})
-    context = {'fileForm': fileForm, 'urlForm': urlForm, 'command': command, 'personnel':personnel}
+                # context = {'fileForm': fileForm, 'urlForm': urlForm, 'command': command,
+                #            'personnel':personnel, 'commandPersons':commandPersons}
+                # return render(request, 'work/command/commandDetail.html', context)
+        else: # save uploadPersonnel
+            # id = request.POST['command']
+            # command = Command.objects.filter(id=id).first()
+            status =  request.POST['status']
+            status = status.strip()
+            personnelIdList = request.POST.getlist('personnel')
+            msg = "บุคลากรที่มีหน้าที่เดียวกันปรากฏซ้ำในระบบสำหรับคำสั่งนี้อยู่แล้ว :"
+            error = False
+            for pid in personnelIdList:
+                person = Personnel.objects.filter(id=pid).first()
+                print(person)
+                find = CommandPerson.objects.filter(command=command, personnel=person).first()
+                if find is None:
+                    commandPerson = CommandPerson(command=command, personnel=person, status=status,
+                                                  recorder=recorder)
+                    commandPerson.save()
+                else:
+                    error = True
+                    msg = msg + str(person)
+            if error == True:
+                messages.add_message(request, messages.WARNING, msg + " ["+ status + "]")
+    fileForm = CommandFileForm(initial={'command': command, 'filetype': 'Unknow', 'recorder':recorder})
+    urlForm = CommandURLForm(initial={'command': command, 'recorder':recorder})
+    commandPersonForm = CommandPersonForm(initial={'command':command, 'recorder':recorder, })
+    context = {'fileForm': fileForm, 'urlForm': urlForm, 'commandPersonForm':commandPersonForm ,
+               'command': command,'personnel':personnel, 'commandPersons':commandPersons}
     return render(request, 'work/command/commandDetail.html', context)
+
+@login_required(login_url='userAuthen')
+def commandUpdate(request, id):
+    command = get_object_or_404(Command, id=id)
+    personnel = Personnel.objects.filter(id=request.session['userId']).first()
+    recorder = personnel
+    form = CommandForm(data=request.POST or None, instance=command)
+    if request.method == 'POST':
+        if form.is_valid():
+            updateForm = form.save(commit=False)
+            updateForm.recorder = recorder
+            updateForm.save()
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลคำสั่งเรียบร้อย")
+            return redirect('commandDetail', id=command.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': personnel, 'command':command}
+            return render(request, 'work/command/commandUpdate.html', context)
+    else:
+        context = {'form': form, 'personnel': personnel,'command':command}
+        return render(request, 'work/command/commandUpdate.html', context)
+
+@login_required(login_url='userAuthen')
+def commandDelete(request, id):
+    command = get_object_or_404(Command, id=id)
+    form = TrainignForm(data=request.POST or None, instance=command)
+    if request.method == 'POST':
+        #ลบไฟล์
+        fileList = CommandFile.objects.filter(command=command)
+        for f in fileList:
+            fname = f.file.name
+            if os.path.exists('static/documents/command/' + fname):
+                try:
+                    os.remove('static/documents/command/' +fname)  # file exits, delete it
+                except:
+                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                finally:
+                    f.delete()
+        urlList =CommandURL.objects.filter(command=command)
+        for u in urlList:
+            u.delete()
+        command.delete()
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาสำเร็จ")
+        return redirect('commandList', divisionId=command.personnel.division.id, personnelId=command.personnel.id)
+    else:
+        form.deleteForm()
+        context = {'form': form, 'command':command, 'personnel': command.personnel}
+        return render(request, 'work/command/commandDelete.html', context)
+
+@login_required(login_url='userAuthen')
+def commandDeleteFile(request, id):
+    commandFile = get_object_or_404(CommandFile, id=id)
+    command = commandFile.command
+    fname = commandFile.file.name
+    if os.path.exists('static/documents/command/' + fname):
+        try:
+            os.remove('static/documents/command/' + fname)  # file exits, delete it
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+        except:
+            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+    commandFile.delete()
+    return redirect('commandDetail', id=command.id)
+
+@login_required(login_url='userAuthen')
+def commandDeleteFileAll(request, id):
+    command = get_object_or_404(Command, id=id)
+    commandFiles = command.getCommandFiles()
+    success = True
+    fileerror = ""
+    for commandFile in commandFiles:
+        fname = commandFile.file.name
+        if os.path.exists('static/documents/command/' + fname):
+            try:
+                os.remove('static/documents/command/' + fname)  # file exits, delete it
+            except:
+                success = False
+                fileerror = fileerror + fname + ", "
+            finally:
+                commandFile.delete()
+    if success == True:
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+    return redirect('commandDetail', id=command.id)
+
+@login_required(login_url='userAuthen')
+def commandDeleteURL(request, id):
+    commandURL = get_object_or_404(CommandURL, id=id)
+    command = commandURL.command
+    commandURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    return redirect('commandDetail', id=command.id)
+
+@login_required(login_url='userAuthen')
+def commandDeleteURLAll(request, id):
+    command = get_object_or_404(Command, id=id)
+    commandURLs = command.getCommandURLs()
+    for commandURL in commandURLs:
+        commandURL.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    return redirect('commandDetail', id=command.id)
+
+@login_required(login_url='userAuthen')
+def commandDeleteCommandPerson(request, id):
+    commandPerson = get_object_or_404(CommandPerson, id=id)
+    command = commandPerson.command
+    commandPerson.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากคำสั่งสำเร็จ")
+    return redirect('commandDetail', id=command.id)
+
+@login_required(login_url='userAuthen')
+def commandDeleteCommandPersonAll(request, id):
+    command = get_object_or_404(Command, id=id)
+    commandPersons = command.getCommandPerson()
+    for commandPerson in commandPersons:
+        commandPerson.delete()
+    messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดออกจากคำสั่งสำเร็จ")
+    return redirect('commandDetail', id=command.id)
+

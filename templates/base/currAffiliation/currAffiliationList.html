@@ -35,7 +35,7 @@
             </div>
         </div>
         <hr class="text-primary">
-        <table class="table table-info table-striped table-hover">
+        <table class="table table-light table-striped table-hover"  style="border-color: #0b5ed7">
             <tr class="text-primary">
                 <th class="col-1"> </th>
                 <th class="col-5">ชื่อผู้รับผิดชอบ</th>
@@ -48,7 +48,7 @@
                 </th>
             </tr>
             {% for currAff in curriculum.getCurrAffiliation %}
-                <tr class="text-primary">
+                <tr>
                     <td class="text-center">
                         <img src="{% static currAff.personnel.picture %}" class="rounded-circle" width="50px">
                     </td>
