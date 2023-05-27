@@ -45,6 +45,11 @@
             <th class="text-primary">เหตุผลประกอบการลา</th>
             <td>{{ leave.reason }}</td>
         </tr>
+        <tr>
+            <th class="text-secondary"><i>ผู้บันทึก/แก้ไขล่าสุด </i></th>
+            <td class="text-secondary"><i>{{ leave.recorder }}, ({{ leave.recordDate|date:"d/m/Y H:m:s" }})</i></td>
+        </tr>
+
     </table>
 
     <p class="text-center">
@@ -192,7 +197,7 @@
                         <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
                     </button>
                     <input type="hidden" name="id" value="{{ leave.id }}">
-                    <input type="hidden" name="action" value="uploadlink">
+                    <input type="hidden" name="action" value="uploadLink">
                 </p>
             </form>
         </div>
@@ -227,10 +232,5 @@
         </p>
     </div>
     <br><br>
-    <p class="text-sm-end" style="color: #6c757d;">
-        <i>
-            [ข้อมูลได้รับการบันทึก/ปรับปรุงล่าสุดเมื่อ: {{ leave.recordDate | date:'d/m/Y, H:m:s' }} โดย: {{ leave.getRecorder }} ]
-        </i>
-    </p>
-    <br>
+
 {% endblock %}

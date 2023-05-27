@@ -4,7 +4,9 @@
         <i class="fa-solid fa-bars"></i><b> Main:</b></li>
     <a href="{% url 'home' %}" class="list-group-item list-group-item-action list-group-item-light text-primary">
         <i class="fa fa-home"></i> Home </a>
-
+    <a href="{% url 'facultyDetail' %}"
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+        <i class="fa fa-school"></i> คณะ </a>
     <a href="{% url 'divisionList' %}"
        class="list-group-item list-group-item-action list-group-item-light text-info">
         <i class="fa fa-layer-group"></i> สาขา </a>
@@ -42,7 +44,7 @@
     <li class="list-group-item  list-group-item-warning bg-success text-white">
         <i class="fas fa-chalkboard-teacher"></i><b> Working record:</b></li>
     <a href="{% url 'commandList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fas fa-clipboard-list"></i> คำสั่ง </a>
+        <i class="fas fa-clipboard-list"></i> คำสั่ง <i class="fas fa-check"></i></a>
     <a href="" class="list-group-item list-group-item-action list-group-item-light text-success">
         <i class="fas fa-flask"></i> การวิจัย </a>
     <a href="" class="list-group-item list-group-item-action list-group-item-light text-success">
@@ -90,7 +92,8 @@
                 <div class="col-9 text-start">
                     <i class="fa-regular fa-id-card"></i> รหัสผู้ใช้: {{ request.session.userEmail }} <br>
                     <i class="fa-regular fa-user"></i> ชื่อ - สกุล: {{ request.session.userName }} <br>
-                    <i class="fa-solid fa-hand-sparkles"></i> สถานะ: {{ request.session.userType }} <br>
+                    <i class="fa-solid fa-hand-sparkles"></i> สถานะ: {{ request.session.userType }},
+                     <br>
                 </div>
             </div>
             <hr class="text-secondary">

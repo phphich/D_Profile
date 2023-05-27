@@ -12,14 +12,13 @@ class FacultyForm(forms.ModelForm):
             'university': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'telephone': forms.TextInput(attrs={'class': 'form-control', 'size': 25, 'maxlength': 20}),
-            'website': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'website': forms.URLInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
             'vision': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'philosophy': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
         }
         labels = {
             'name_th': 'ชื่อคณะ (ไทย)',
             'name_en': 'ชื่อคณะ (อังกฤษ)',
-            'name_sh': 'ชื่อย่อคณะ',
             'university' : 'ชื่อมหาวิทยาลัย',
             'address': 'ที่อยู่',
             'telephone': 'เบอร์โทรศัพท์',
@@ -68,10 +67,11 @@ class CurriculumForm(forms.ModelForm):
             ("ปริญญาเอก", "ปริญญาเอก"),
         )
         model = Curriculum
-        fields = ('name_th', 'name_en', 'name_th_sh', 'name_en_sh', 'level', 'studyTime', 'division')
+        fields = ('name_th', 'name_en', 'curriculumYear','name_th_sh', 'name_en_sh', 'level', 'studyTime', 'division')
         widgets = {
             'name_th': forms.TextInput(attrs={'class': 'form-control',  'size': 110, 'maxlength': 100}),
             'name_en': forms.TextInput(attrs={'class': 'form-control', 'size': 110, 'maxlength': 100}),
+            'curriculumYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 55}),
             'name_th_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'name_en_sh': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control'}),
@@ -81,6 +81,7 @@ class CurriculumForm(forms.ModelForm):
         labels = {
             'name_th': 'ชื่อปริญญา (ไทย)',
             'name_en': 'ชื่อปริญญา (อังกฤษ)',
+            'curriculumYear': 'ปี พ.ศ.',
             'name_th_sh': 'ชื่อย่อปริญญา (ไทย)',
             'name_en_sh': 'ชื่อย่อปริญญา (อังกฤษ)',
             'level': 'ระดับการศึกษา',
@@ -92,6 +93,7 @@ class CurriculumForm(forms.ModelForm):
     def deleteForm(self):
         self.fields['name_th'].widget.attrs['readonly'] = True
         self.fields['name_en'].widget.attrs['readonly'] = True
+        self.fields['curriculumYear'].widget.attrs['readonly'] = True
         self.fields['name_th_sh'].widget.attrs['readonly'] = True
         self.fields['name_en_sh'].widget.attrs['readonly'] = True
         self.fields['level'].widget.attrs['readonly'] = True
@@ -274,28 +276,6 @@ class CurrAffiliationForm(forms.ModelForm):
         self.fields['curriculum'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
         self.fields['status'].widget.attrs['readonly'] = True
-
-class DocumentsForm(forms.ModelForm):
-    class Meta:
-        model = Documents
-        fields = (
-            'file', 'doctype', 'refId', 'filename', 'filetype', 'personnel')
-        widgets = {
-            'file': forms.FileInput(attrs={'multiple': True}),
-            'doctype': forms.HiddenInput(),
-            'refId': forms.HiddenInput(),
-            'filename': forms.HiddenInput(),
-            'filetype': forms.HiddenInput(),
-            'personnel': forms.HiddenInput(),
-        }
-        labels = {
-            'file': 'ไฟล์เอกสารประกอบ',
-            'doctype': 'ชนิดไฟล์',
-            'refId': 'รหัสอ้างอิง',
-            'filename': 'ชื่อไฟล์',
-            'filetype': 'ชนิดไฟล์',
-            'personnel': 'ผู้บันทึก',
-        }
 
 class AuthenForm(forms.Form):
     userName = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name) ', max_length=50,

@@ -54,6 +54,7 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
 @login_required(login_url='userAuthen')
 def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         fileForm = LeaveFileForm(request.POST, request.FILES)
         urlForm = LeaveURLForm(request.POST)
@@ -69,7 +70,7 @@ def leaveDetail(request, id):
                     ext = filepath[point:]
                     filenames = filepath.split('/')
                     filename = 'documents/leave/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
-                    lf, created = LeaveFile.objects.get_or_create(file=f, leave=leave, filetype=ext[1:])
+                    lf, created = LeaveFile.objects.get_or_create(file=f, leave=leave, recorder=recorder, filetype=ext[1:])
                     lf.save()
                     leaveFile = LeaveFile.objects.last()
                     newfilename = '['+ str(leave.id) + '_' + str(leaveFile.id)+ ']-' + filenames[len(filenames) - 1]   # ชื่อไฟล์ที่ระบบกำหนด
@@ -98,8 +99,8 @@ def leaveDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
                 return render(request, 'work/leave/leaveDetail.html', context)
     # else:
-    fileForm = LeaveFileForm(initial={'leave':leave, 'filetype':'Unknow'})
-    urlForm = LeaveURLForm(initial={'leave':leave})
+    fileForm = LeaveFileForm(initial={'leave':leave, 'filetype':'Unknow', 'recorder':recorder})
+    urlForm = LeaveURLForm(initial={'leave':leave, 'recorder':recorder})
     context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave}
     return render(request, 'work/leave/leaveDetail.html', context)
 
@@ -133,10 +134,10 @@ def leaveUpdate(request, id):
     leave = get_object_or_404(Leave, id=id)
     personnel = leave.personnel
     form = LeaveForm(data=request.POST or None, instance=leave)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
-            recorder = Personnel.objects.filter(id = request.session['userId']).first()
             updateForm.recorder = recorder
             updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการลาเรียบร้อย")
@@ -269,6 +270,7 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
 @login_required(login_url='userAuthen')
 def trainingDetail(request, id):
     training = Training.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         fileForm = TrainingFileForm(request.POST, request.FILES)
         urlForm = TrainingURLForm(request.POST)
@@ -284,7 +286,7 @@ def trainingDetail(request, id):
                     ext = filepath[point:]
                     filenames = filepath.split('/')
                     filename = 'documents/training/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
-                    lf, created = TrainingFile.objects.get_or_create(file=f, training=training, filetype=ext[1:])
+                    lf, created = TrainingFile.objects.get_or_create(file=f, training=training, recorder=recorder, filetype=ext[1:])
                     lf.save()
                     trainingFile = TrainingFile.objects.last()
                     newfilename = '['+ str(training.id) + '_' + str(trainingFile.id)+ ']-' + filenames[len(filenames) - 1]   # ชื่อไฟล์ที่ระบบกำหนด
@@ -313,8 +315,8 @@ def trainingDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'training': training}
                 return render(request, 'work/training/trainingDetail.html', context)
     # else:
-    fileForm = TrainingFileForm(initial={'training':training, 'filetype':'Unknow'})
-    urlForm = TrainingURLForm(initial={'training':training})
+    fileForm = TrainingFileForm(initial={'training':training, 'filetype':'Unknow', 'recorder':recorder})
+    urlForm = TrainingURLForm(initial={'training':training, 'recorder':recorder})
     context={'fileForm': fileForm, 'urlForm':urlForm, 'training': training}
     return render(request, 'work/training/trainingDetail.html', context)
 
@@ -350,10 +352,10 @@ def trainingUpdate(request, id):
     training = get_object_or_404(Training, id=id)
     personnel = training.personnel
     form = TrainignForm(data=request.POST or None, instance=training)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
-            recorder = Personnel.objects.filter(id = request.session['userId']).first()
             updateForm.recorder = recorder
             updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
@@ -486,6 +488,7 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
 @login_required(login_url='userAuthen')
 def performanceDetail(request, id):
     performance = Performance.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         fileForm = PerformanceFileForm(request.POST, request.FILES)
         urlForm = PerformanceURLForm(request.POST)
@@ -501,7 +504,7 @@ def performanceDetail(request, id):
                     ext = filepath[point:]
                     filenames = filepath.split('/')
                     filename = 'documents/performance/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
-                    lf, created = PerformanceFile.objects.get_or_create(file=f, performance=performance, filetype=ext[1:])
+                    lf, created = PerformanceFile.objects.get_or_create(file=f, performance=performance, recorder=recorder, filetype=ext[1:])
                     lf.save()
                     performanceFile = PerformanceFile.objects.last()
                     newfilename = '[' + str(performance.id) + '_' + str(performanceFile.id) + ']-' + filenames[
@@ -532,14 +535,15 @@ def performanceDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
                 return render(request, 'work/performance/performanceDetail.html', context)
     # else:
-    fileForm = PerformanceFileForm(initial={'performance': performance, 'filetype': 'Unknow'})
-    urlForm = PerformanceURLForm(initial={'performance': performance})
+    fileForm = PerformanceFileForm(initial={'performance': performance, 'filetype': 'Unknow','recorder':recorder})
+    urlForm = PerformanceURLForm(initial={'performance': performance, 'recorder':recorder})
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
     return render(request, 'work/performance/performanceDetail.html', context)
 
 @login_required(login_url='userAuthen')
 def performanceNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         form = PerformanceForm(data=request.POST)
         if form.is_valid():
@@ -547,7 +551,6 @@ def performanceNew(request, id):
             performance = Performance.objects.last()
             messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลผลงาน/รางวัล เข้าสู่ระบบเรียบร้อย")
             return redirect('performanceDetail', id=performance.id)
-            # return redirect('home')
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form, 'personnel': personnel}
@@ -557,7 +560,6 @@ def performanceNew(request, id):
         eduYear = common.getCurrentEduYear()
         eduSemeter = common.getCurrentEduSemeter()
         currentDate = common.getCurrentDate()
-        recorder = Personnel.objects.filter(id=request.session['userId']).first()
         form = PerformanceForm(
             initial={'personnel': personnel, 'recorder': recorder, 'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
                      'getDate':currentDate})
@@ -569,10 +571,10 @@ def performanceUpdate(request, id):
     performance = get_object_or_404(Performance, id=id)
     personnel = performance.personnel
     form = PerformanceForm(data=request.POST or None, instance=performance)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
-            recorder = Personnel.objects.filter(id = request.session['userId']).first()
             updateForm.recorder = recorder
             updateForm.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
@@ -688,6 +690,7 @@ def commandList(request, pageNo=None):
 
 @login_required(login_url='userAuthen')
 def commandNew(request):
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         form = CommandForm(data=request.POST)
         if form.is_valid():
@@ -695,7 +698,7 @@ def commandNew(request):
             command = Command.objects.last()
             if(request.session["userType"]=="Personnel"):
                 status = request.POST['status']
-                commandPerson = CommandPerson(command=command, personnel=command.personnel, recorder=command.personnel, status=status)
+                commandPerson = CommandPerson(command=command, personnel=recorder, recorder=recorder, status=status)
                 commandPerson.status = status
                 commandPerson.save()
             messages.add_message(request, messages.SUCCESS, "บันทึกคำสั่ง เข้าสู่ระบบเรียบร้อย")
@@ -709,7 +712,6 @@ def commandNew(request):
         eduYear = common.getCurrentEduYear()
         eduSemeter = common.getCurrentEduSemeter()
         currentDate = common.getCurrentDate()
-        recorder = Personnel.objects.filter(id=request.session['userId']).first()
         form = CommandForm(
             initial={'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
                      'comDate':currentDate, 'recorder': recorder })
@@ -720,11 +722,32 @@ def commandNew(request):
 def commandDetail(request, id):
     if 'userType' not in request.session:
         return redirect('userAuthen')
-    personnel = None
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if (request.session['userType'] == "Personnel"):
         personnel = Personnel.objects.filter(id=request.session['userId']).first()
     command = Command.objects.filter(id=id).first()
+    if request.session['userType'] == 'Administrator':
+        right = 'Write'
+    elif request.session['userType'] == 'Manager':
+        if command.recorder == recorder:
+            right = 'Write'
+        else:
+            right = 'Read'
+    elif request.session['userType'] == 'Personnel':
+        if command.recorder == recorder:
+            right = 'Write'
+        else:
+            right = 'Deny'
+    elif request.session['userType'] == 'Staff':
+        # ดึงรายชื่อสาขาที่ได้รับมอบหมายให้ดูแลข้อมูลให้ มา
+        rightDivision = Permission.getPermisstion(recorder, command.recorder.division);
+        if command.recorder == recorder:
+            right = 'Write'
+        elif rightDivision == True:
+            right = 'Write'
+        else:
+            right = 'Deny'
+
     commandPersons = CommandPerson.objects.filter(command=command)
     if request.method == 'POST':
         fileForm = CommandFileForm(request.POST, request.FILES)
@@ -732,7 +755,6 @@ def commandDetail(request, id):
         if request.POST['action'] == 'uploadfile':
             if fileForm.is_valid():
                 files = request.FILES.getlist("file")
-                newFileForm = fileForm.save(commit=False)
                 success = True
                 fileerror = ""
                 for f in files:
@@ -741,7 +763,7 @@ def commandDetail(request, id):
                     ext = filepath[point:]
                     filenames = filepath.split('/')
                     filename = 'documents/command/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
-                    lf, created = CommandFile.objects.get_or_create(file=f, command=command, filetype=ext[1:])
+                    lf, created = CommandFile.objects.get_or_create(file=f, command=command, recorder=recorder, filetype=ext[1:])
                     lf.save()
                     commandFile = CommandFile.objects.last()
                     newfilename = '[' + str(command.id) + '_' + str(commandFile.id) + ']-' + filenames[
@@ -777,14 +799,13 @@ def commandDetail(request, id):
         else: # save uploadPersonnel
             # id = request.POST['command']
             # command = Command.objects.filter(id=id).first()
-            status =  request.POST['status']
+            status = request.POST['status']
             status = status.strip()
             personnelIdList = request.POST.getlist('personnel')
             msg = "บุคลากรที่มีหน้าที่เดียวกันปรากฏซ้ำในระบบสำหรับคำสั่งนี้อยู่แล้ว :"
             error = False
             for pid in personnelIdList:
                 person = Personnel.objects.filter(id=pid).first()
-                print(person)
                 find = CommandPerson.objects.filter(command=command, personnel=person).first()
                 if find is None:
                     commandPerson = CommandPerson(command=command, personnel=person, status=status,
@@ -799,14 +820,13 @@ def commandDetail(request, id):
     urlForm = CommandURLForm(initial={'command': command, 'recorder':recorder})
     commandPersonForm = CommandPersonForm(initial={'command':command, 'recorder':recorder, })
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'commandPersonForm':commandPersonForm ,
-               'command': command,'personnel':personnel, 'commandPersons':commandPersons}
+               'command': command,'personnel':recorder, 'commandPersons':commandPersons, 'right':right}
     return render(request, 'work/command/commandDetail.html', context)
 
 @login_required(login_url='userAuthen')
 def commandUpdate(request, id):
     command = get_object_or_404(Command, id=id)
-    personnel = Personnel.objects.filter(id=request.session['userId']).first()
-    recorder = personnel
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     form = CommandForm(data=request.POST or None, instance=command)
     if request.method == 'POST':
         if form.is_valid():
@@ -817,10 +837,10 @@ def commandUpdate(request, id):
             return redirect('commandDetail', id=command.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-            context = {'form': form, 'personnel': personnel, 'command':command}
+            context = {'form': form, 'personnel': recorder, 'command':command}
             return render(request, 'work/command/commandUpdate.html', context)
     else:
-        context = {'form': form, 'personnel': personnel,'command':command}
+        context = {'form': form, 'personnel': recorder,'command':command}
         return render(request, 'work/command/commandUpdate.html', context)
 
 @login_required(login_url='userAuthen')
@@ -915,8 +935,10 @@ def commandDeleteCommandPerson(request, id):
 def commandDeleteCommandPersonAll(request, id):
     command = get_object_or_404(Command, id=id)
     commandPersons = command.getCommandPerson()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     for commandPerson in commandPersons:
-        commandPerson.delete()
+        if commandPerson.personnel != recorder:
+            commandPerson.delete()
     messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดออกจากคำสั่งสำเร็จ")
     return redirect('commandDetail', id=command.id)
 

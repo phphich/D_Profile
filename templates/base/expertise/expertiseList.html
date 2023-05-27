@@ -72,16 +72,16 @@
                         class="fa fa-plus"></i> เพิ่มความเชี่ยวชาญ </a></th>
             </tr>
             {% for expert in personnel.getExpertise %}
-                <tr class="text-primary">
-                    <td>{{ expert.topic }}</td>
-                    <td>
+                <tr>
+                    <td class="col-5">{{ expert.topic }}</td>
+                    <td  class="col-5">
                         {% if expert.experience|length|get_digit:"-1" > 50 %}
                             {{ expert.experience|slice:"0:50" }}...
                         {% else %}
                             {{ expert.experience }}
                         {% endif %}
                     </td>
-                    <td class="text-center">
+                    <td class="col-2 text-center">
                         <a href="{% url 'expertiseDetail' expert.id %}" class="btn btn-light"> <i
                                 class="fa fa-search"> </i> </a>
                         <a href="{% url 'expertiseUpdate' expert.id %}" class="btn btn-secondary"> <i

@@ -22,11 +22,11 @@
             </th>
         </tr>
         {% for division in divisions %}
-            <tr class="text-primary">
-                <td>{{ division.name_th }}</td>
-                <td>{{ division.name_en }}</td>
-                <td  class="text-center">{{ division.name_sh }}</td>
-                <td class="text-center">
+            <tr>
+                <td class="col-4">{{ division.name_th }}</td>
+                <td class="col-4">{{ division.name_en }}</td>
+                <td class="col-2 text-center">{{ division.name_sh }}</td>
+                <td class="col-2 text-center">
                     {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
                         <a href="{% url 'divisionUpdate' division.id %}" class="btn btn-secondary">
                             <i class="fa fa-tools"> </i> </a>

@@ -69,7 +69,7 @@ chkDays = function () {
 /* ฟังก์ชัน เลือก Selectbox บุคลากร */
 chkSelect = function (name, chkAll) {
     var checkBox = document.getElementById(chkAll);
-    var allname = document.getElementsByName(name)
+    var allname = document.getElementsByName(name);
     var nameId="";
     for(i=0; i<allname.length;i++){
         nameId = "id_"+name+"_" + i.toString();

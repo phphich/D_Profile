@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.utils import timezone
 from django.db.models import F, Sum, Count
@@ -37,13 +39,14 @@ class Division(models.Model):
 class Curriculum(models.Model):
     name_th= models.CharField(max_length=100, default="")
     name_en = models.CharField(max_length=100, default="")
+    curriculumYear = models.IntegerField(default=0)
     name_th_sh = models.CharField(max_length=50, default="")
     name_en_sh = models.CharField(max_length=50, default="")
     level = models.CharField(max_length=30, default="")
     studyTime = models.IntegerField(default=4)
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
     def __str__(self):
-        return self.name_th
+        return self.name_th + ' (' + str(self.curriculumYear) + ')'
     def getCurrAffiliation(self):
         currAffilaitions = CurrAffiliation.objects.filter(curriculum=self).order_by('status')
         return currAffilaitions
@@ -112,17 +115,16 @@ class CurrAffiliation(models.Model):
     def __str__(self):
         return self.curriculum.name_th + "  (" + self.status + ")"
 
-class Documents(models.Model):
-    doctype=models.CharField(max_length=15, default=None)
-    refId=models.IntegerField(default=0)
-    filename = models.CharField(max_length=100, default=None)
-    filetype = models.CharField(max_length=30, default=None)
-    uploadDate = models.DateTimeField(auto_now_add=True)
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
-    file = models.FileField(upload_to='static/documents/', default=None)
-
 class Permission(models.Model): # เจ้าหน้าที่รับผิดชอบจัดการข้อมูลสาขา
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
     def __str__(self):
         return self.personnel.firstname_th + ' ' + self.personnel.lastname_th + ' => ' + self.division.name_th
+    def getPermission(self, recorder, division):
+        right = Permission.objects.filter(personnel = recorder, division=division)
+        if right is not None:
+            return True
+        else:
+            return False
+
+

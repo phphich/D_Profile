@@ -11,9 +11,10 @@
     <table class="table table-light table-striped table-hover">
         <tr class="text-primary">
             <th class="col-3">ชื่อปริญญา (ภาษาไทย)</th>
-            <th class="col-3">ชื่อปริญญา (ภาษาอังกฤษ)</th>
-            <th class="col-2  text-center">ระดับการศึกษา</th>
-            <th class="col-2  text-center">ระยะเวลาศึกษา (ปี)</th>
+            <th class="col-2">ชื่อปริญญา (ภาษาอังกฤษ)</th>
+            <th class="col-1 text-center">ปี พ.ศ.</th>
+            <th class="col-2 text-center">ระดับการศึกษา</th>
+            <th class="col-2 text-center">ระยะเวลาศึกษา (ปี)</th>
             <th class="col-2">
                 {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
                     <a href="{% url 'curriculumNew' %}" class="btn btn-sm btn-info  text-white" style="width: 100%">
@@ -23,9 +24,10 @@
 
         </tr>
         {% for curriculum in curriculums %}
-            <tr class="text-primary">
+            <tr>
                 <td>{{ curriculum.name_th_sh }}</td>
                 <td>{{ curriculum.name_en_sh }}</td>
+                <td class="text-center">{{ curriculum.curriculumYear }}</td>
                 <td class="text-center">{{ curriculum.level }}</td>
                 <td class="text-center">{{ curriculum.studyTime }}</td>
                 <td class="text-center">

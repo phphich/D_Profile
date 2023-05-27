@@ -44,9 +44,9 @@ class Command(models.Model):
             return "ฤดูร้อน"
         else:
             return self.eduSemeter
-    # def getCommandPerson(self):
-    #     personnels = CommandPerson.objects.filter(command=self).order_by('status','personnel__firstname_th', 'personnel__lastname_th')
-    #     return personnels
+    def getCommandPerson(self):
+        personnels = CommandPerson.objects.filter(command=self).order_by('status','personnel__firstname_th', 'personnel__lastname_th')
+        return personnels
     def getCountPersonnel(self):
         count = CommandPerson.objects.filter(command=self).aggregate(count=Count('id'))
         return count['count']

@@ -1,3 +1,5 @@
+import datetime
+
 from django.db.models import Max
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from baseapp.models import *
@@ -111,6 +113,26 @@ def userChgPassword(request):
     context = {'form':form, 'personnel':personnel}
     return render(request, 'userChgPassword.html', context)
 
+#Factulty Data
+def facultyDetail(request):
+    if Personnel.objects.all().count() == 0:
+        return redirect('home')
+    faculty = Faculty.objects.first()
+    context = {'faculty': faculty}
+    return render(request, 'base/faculty/facultyDetail.html', context)
+
+@login_required(login_url='userAuthen')
+def facultUpdate(request):
+    faculty = Faculty.objects.first()
+    form = FacultyForm(data=request.POST or None, instance=faculty)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลคณะเรียบร้อย')
+            return redirect('facultyDetail')
+    else:
+        context = {'form':form}
+        return render(request, 'base/faculty/facultyUpdate.html', context)
 
 # Division CRUD.
 def divisionList(request):
@@ -183,7 +205,8 @@ def curriculumNew(request):
             context = {'form': form}
             return render(request, 'base/curriculum/curriculumNew.html', context)
     else:
-        form = CurriculumForm()
+        curriculumnYear = datetime.date.year + 543
+        form = CurriculumForm(initial={'curriculumYear':curriculumnYear})
         context = {'form': form}
         return render(request, 'base/curriculum/curriculumNew.html', context)
 
@@ -366,7 +389,7 @@ def personnelUpdate(request, id):
             user.groups.clear()
             user.groups.add(group)
             user.save()
-            return redirect('personnelList', pageNo=1)
+            return redirect('personnelDetail', personnel.id)
         else:
             user = User.objects.filter(username=oldemail).first()
             userType = user.groups.first()

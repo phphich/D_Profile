@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fa fa-school"></i> ข้อมูลคณะ  </h2>
+        </div>
+    </div>
+    <hr class="text-primary">
+    <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
+        <tr>
+            <th class="col-3 text-primary">ชื่อคณะ (ไทย) </th>
+            <td class="col-9">{{ faculty.name_th }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ชื่อคณะ (อังกฤษ)</th>
+            <td>{{ faculty.name_en }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ชื่อมหาวิทยาลัย</th>
+            <td>{{ faculty.university }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ที่อยู่</th>
+            <td>{{ faculty.address }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">เบอร์โทรศัพท์</th>
+            <td>{{ faculty.telephone }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">เว็บไซต์ </th>
+            <td>{{ faculty.website }}
+            <a href="{{ faculty.website }}" target="_blank"><i class="fa fa-link"></i> </a>
+            </td>
+        </tr>
+        <tr>
+            <th class="text-primary">วิสัยทัศน์</th>
+            <td>{{ faculty.vision }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ปรัชญา</th>
+            <td>{{ faculty.philosophy }}</td>
+        </tr>
+    </table>
+
+    <p class="text-center">
+        {% if request.session.userType == 'Administrator'  %}
+            <button type="button" class="btn btn-secondary"
+                onclick="location.href='{% url 'home' %}'">
+            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+            <button type="button" class="btn btn-secondary"
+                    onclick="location.href='{% url 'facultyUpdate' %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
+        {% endif %}
+    </p>
+    <br><br>
+{% endblock %}
