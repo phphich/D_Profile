@@ -56,11 +56,10 @@
             <th class="text-primary">ประเภทงบประมาณ</th>
             <td>{{ training.budgetType }}</td>
         </tr>
-        <tr>
-            <th class="text-secondary"><i>ผู้บันทึก/แก้ไขล่าสุด </i></th>
-            <td class="text-secondary"><i>{{ training.recorder }}, ({{ training.recordDate|date:"d/m/Y H:m:s" }})</i></td>
-        </tr>
     </table>
+    <p class="text-end text-secondary" style="border-color: #6c757d">
+        <i>{{ training.getRecorderAndEditor }} </i>
+    </p>
 
     <p class="text-center">
         {% if request.session.userType != 'Personnel' %}

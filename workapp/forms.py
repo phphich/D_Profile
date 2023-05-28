@@ -1,105 +1,6 @@
 from django import forms
 from .models import *
 
-# ฟอร์มคำสั่ง
-class CommandForm(forms.ModelForm):
-    class Meta:
-        MISSION_CHOICES = (
-            ("การจัดการเรียนการสอน", "การจัดการเรียนการสอน"),
-            ("การวิจัย", "การวิจัย"),
-            ("บริการทางวิชาการแก่สังคม", "บริการทางวิชาการแก่สังคม"),
-            ("ทำนุบำรุงศิลปวัฒนธรรม", "การทำนุบำรุงศิลปวัฒนธรรม"),
-            ("สนองโครงการอันเนื่องมาจากพระราชดำริ", "สนองโครงการอันเนื่องมาจากพระราชดำริ"),
-            ("งานอื่น ๆ ที่ได้รับมอบหมาย", "งานอื่น ๆ ที่ได้รับมอบหมาย"),
-        )
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
-        model = Command
-        fields = ( 'eduYear', 'eduSemeter','mission', 'comId', 'topic', 'detail','comDate',  'fiscalYear','recorder')
-        widgets = {
-            'comId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
-            'comDate': forms.NumberInput(attrs={'class': 'form-control', 'type':'date'}),
-            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
-            'mission': forms.Select(choices=MISSION_CHOICES, attrs={'class': 'form-control'}),
-            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
-            'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'recorder': forms.HiddenInput(),  # ผู้บันทึก
-        }
-
-        labels = {
-            'eduYear': 'ปีการศึกษา',
-            'eduSemeter': 'ภาคเรียนที่',
-            'comId': 'เลขที่คำสั่ง',
-            'comDate': 'วันที่ออกคำสั่่ง',
-            'fiscalYear': 'ปีงบประมาณ',
-            'mission': 'พันธกิจ',
-            'topic': 'เรื่อง',
-            'detail': 'รายละเอียด',
-            'recorder': 'ผู้บันทึก'
-        }
-
-        def deleteForm(self):
-            self.fields['commandId'].widget.attrs['readonly'] = True
-            self.fields['commandDate'].widget.attrs['readonly'] = True
-            self.fields['fiscalYear'].widget.attrs['readonly'] = True
-            self.fields['eduYear'].widget.attrs['readonly'] = True
-            self.fields['eduSemeter'].widget.attrs['readonly'] = True
-            self.fields['mission'].widget.attrs['readonly'] = True
-            self.fields['topic'].widget.attrs['readonly'] = True
-            self.fields['detail'].widget.attrs['readonly'] = True
-            self.fields['recorder'].widget.attrs['readonly'] = True
-
-class CommandFileForm(forms.ModelForm):
-    class Meta:
-        model = CommandFile
-        fields = ('file', 'filetype', 'command','recorder')
-        widgets = {
-            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
-                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
-                                           'onchange': 'javascript:updateList();'}),
-            'filetype': forms.HiddenInput(),
-            'command': forms.HiddenInput(),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'file': 'เลือกไฟล์เอกสารแนบ',
-            'filetype': 'ชนิดไฟล์',
-            'command': 'คำสั่ง',
-            'recorder': 'ผู้บันทึก',
-        }
-
-class CommandURLForm(forms.ModelForm):
-    class Meta:
-        model = CommandURL
-        fields = ('url', 'command', 'recorder')
-        widgets = {
-            'url': forms.URLInput(attrs={'class': 'form-control', }),
-            'command': forms.HiddenInput(),
-            'recorder':forms.HiddenInput(),
-        }
-        labels = {
-            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
-            'command': 'คำสั่ง',
-            'recorder': 'ผู้บันทึก',
-        }
-
-class CommandPersonForm(forms.ModelForm):
-    class Meta:
-        model = CommandPerson
-        fields = ('status','command', 'personnel',  'recorder')
-        widgets = {
-            'command': forms.HiddenInput(),
-            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
-            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'command': 'คำสั่ง',
-            'personnel': 'บุคลากร',
-            'status': 'หน้าที่ที่มอบหมาย',
-            'recorder': 'ผู้บันทึก',
-        }
 
 # ฟอร์มการลา
 class LeaveForm(forms.ModelForm):
@@ -118,7 +19,7 @@ class LeaveForm(forms.ModelForm):
         model = Leave
         fields = (
             'fiscalYear', 'leaveType', 'eduYear', 'startDate', 'endDate', 'days', 'reason', 'personnel',
-            'recorder')
+            'recorder', 'editor')
         widgets = {
             'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date',
                                                   'onchange': 'javascript:chkDateDiff();'}),
@@ -132,6 +33,7 @@ class LeaveForm(forms.ModelForm):
             'reason': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'personnel': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
+            'editor': forms.HiddenInput(),
         }
         labels = {
             'fiscalYear': 'ปีงบประมาณ',
@@ -142,7 +44,8 @@ class LeaveForm(forms.ModelForm):
             'days': 'จำนวนวันที่ลา',
             'reason': 'เหตุผลประกอบการลา',
             'personnel': 'บุคลากร',
-            'recorder': 'ผู้บันทึก'
+            'recorder': 'ผู้บันทึก',
+            'editor': 'ผู้แก้ไข'
         }
 
     def deleteForm(self):
@@ -155,6 +58,7 @@ class LeaveForm(forms.ModelForm):
         self.fields['reason'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
         self.fields['recorder'].widget.attrs['readonly'] = True
+        self.fields['editor'].widget.attrs['readonly'] = True
 
 
 class LeaveFileForm(forms.ModelForm):
@@ -204,7 +108,7 @@ class TrainignForm(forms.ModelForm):
         )
         model = Training
         fields = ('fiscalYear','topic', 'place',  'startDate', 'endDate', 'days', 'eduYear', 'eduSemeter', 'budget',
-            'budgetType', 'personnel', 'recorder')
+            'budgetType', 'personnel', 'recorder', 'editor')
         widgets = {
             'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
             'place': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
@@ -222,6 +126,7 @@ class TrainignForm(forms.ModelForm):
                                                                     'onchange': 'javascript:chkBudgetType();'}),
             'personnel': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
+            'editor': forms.HiddenInput(),
         }
         labels = {
             'startDate': 'วันที่เริ่มต้น',
@@ -236,6 +141,7 @@ class TrainignForm(forms.ModelForm):
             'budgetType': 'ประเภทงบประมาณ',
             'personnel': 'บุคลากร',
             'recorder': 'ผู้บันทึก',
+            'editor': 'ผู้แก้ไข',
         }
 
     def deleteForm(self):
@@ -251,6 +157,7 @@ class TrainignForm(forms.ModelForm):
         self.fields['budgetType'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
         self.fields['recorder'].widget.attrs['readonly'] = True
+        self.fields['editor'].widget.attrs['readonly'] = True
 
 
 class TrainingFileForm(forms.ModelForm):
@@ -288,6 +195,100 @@ class TrainingURLForm(forms.ModelForm):
             'recorder': 'ผู้บันทึก',
         }
 
+# ฟอร์มการผลงานรางวัล
+class PerformanceForm(forms.ModelForm):
+    class Meta:
+        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
+        TYPE_CHOICES = (
+            ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
+            ('งบประมาณรายได้', 'งบประมาณรายได้'),
+            ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
+            ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
+        )
+        model = Performance
+        fields = ('fiscalYear','topic', 'detail', 'source','getDate',  'eduYear', 'eduSemeter',  'budget', 'budgetType',
+                  'personnel', 'recorder', 'editor')
+        widgets = {
+            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
+            'getDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
+            'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
+            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
+            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
+                                                                    'onchange': 'javascript:chkBudgetType();'}),
+            'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'personnel': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
+            'editor': forms.HiddenInput(),
+        }
+        labels = {
+            'getDate': 'วันที่ได้รางวัล/ผลงาน',
+            'fiscalYear': 'ปีงบประมาณ',
+            'eduYear': 'ปีการศึกษา',
+            'eduSemeter': 'ภาคเรียนที่',
+            'topic': 'ชื่อผลงาน/รางวัล',
+            'detail': 'รายละเอียด',
+            'budget': 'งบประมาณ',
+            'budgetType': 'ประเภทงบประมาณ',
+            'source': 'ได้รับจาก/ผู้มอบ',
+            'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก',
+            'editor': 'ผู้แก้ไข',
+        }
+
+    def deleteForm(self):
+        self.fields['getDate'].widget.attrs['readonly'] = True
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['eduYear'].widget.attrs['readonly'] = True
+        self.fields['eduSemeter'].widget.attrs['readonly'] = True
+        self.fields['topic'].widget.attrs['readonly'] = True
+        self.fields['detail'].widget.attrs['readonly'] = True
+        self.fields['budget'].widget.attrs['readonly'] = True
+        self.fields['budgetType'].widget.attrs['readonly'] = True
+        self.fields['source'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
+        self.fields['recorder'].widget.attrs['readonly'] = True
+        self.fields['editor'].widget.attrs['readonly'] = True
+
+class PerformanceFileForm(forms.ModelForm):
+    class Meta:
+        model = PerformanceFile
+        fields = ('file', 'filetype', 'performance','recorder')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'performance': forms.HiddenInput(),
+            'recorder':forms.HiddenInput(),
+
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'performance': 'การฝึกอบรม/สัมมนา',
+            'recorder': 'ผู้บันทึก',
+        }
+
+
+class PerformanceURLForm(forms.ModelForm):
+    class Meta:
+        model = PerformanceURL
+        fields = ('url', 'performance','recorder')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'performance': forms.HiddenInput(),
+            'recorder':forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'performance': 'การฝึกอบรม/สัมมนา',
+            'recorder':'ผู้บันทึก',
+        }
+
+# +++++++++++++++
 # ฟอร์มการวิจัย
 class ResearchForm(forms.ModelForm):
     class Meta:
@@ -330,7 +331,7 @@ class ResearchForm(forms.ModelForm):
             'publish_method': 'วิธีการเผยแพร่ผลงาน',
             'recorder': 'ผู้บันทึก'
         }
-
+        
     def deleteForm(self):
         self.fields['fiscalYear'].widget.attrs['readonly'] = True
         self.fields['topic_th'].widget.attrs['readonly'] = True
@@ -344,8 +345,60 @@ class ResearchForm(forms.ModelForm):
         self.fields['percent_success'].widget.attrs['readonly'] = True
         self.fields['publish_method'].widget.attrs['readonly'] = True
         self.fields['recorder'].widget.attrs['readonly'] = True
-# ++++++++++++++++++++++++++++
 
+class ResearchFileForm(forms.ModelForm):
+    class Meta:
+        model = ResearchFile
+        fields = ('file', 'filetype', 'research','recorder')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'research': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'research': 'งานวิจัย',
+            'recorder': 'ผู้บันทึก',
+        }
+
+class ResearchURLForm(forms.ModelForm):
+    class Meta:
+        model = ResearchURL
+        fields = ('url', 'research', 'recorder')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'research': forms.HiddenInput(),
+            'recorder':forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'research': 'งานวิจัย',
+            'recorder': 'ผู้บันทึก',
+        }
+
+class ResearchPersonForm(forms.ModelForm):
+    class Meta:
+        model = ResearchPerson
+        fields = ('status','percent', 'research', 'personnel',  'recorder')
+        widgets = {
+            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
+            'percent': forms.NumberInput(attrs={'class': 'form-control', 'size': 35}),
+            'research': forms.HiddenInput(),
+            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'research': 'งานวิจัย',
+            'personnel': 'บุคลากร',
+            'status': 'หน้าที่ที่มอบหมาย',
+            'percent': 'สัดส่วนการดำเนินการวิจัย (%)',
+            'recorder': 'ผู้บันทึก',
+        }
+# +++++++++++++++
 # ฟอร์มการบริการวิชาการแก่สังคม
 class SocialServiceForm(forms.ModelForm):
     class Meta:
@@ -415,96 +468,162 @@ class SocialServiceForm(forms.ModelForm):
         self.fields['receiver'].widget.attrs['readonly'] = True
         self.fields['num_receiver'].widget.attrs['readonly'] = True
         self.fields['recorder'].widget.attrs['readonly'] = True
-# +++++++++++++++
 
-
-# ฟอร์มการผลงานรางวัล
-class PerformanceForm(forms.ModelForm):
+class SocialServiceFileForm(forms.ModelForm):
     class Meta:
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
-        TYPE_CHOICES = (
-            ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
-            ('งบประมาณรายได้', 'งบประมาณรายได้'),
-            ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
-            ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
-        )
-        model = Performance
-        fields = ('fiscalYear','topic', 'detail', 'source','getDate',  'eduYear', 'eduSemeter',  'budget', 'budgetType',
-                  'personnel', 'recorder')
-        widgets = {
-            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'getDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
-            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
-                                                                    'onchange': 'javascript:chkBudgetType();'}),
-            'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'personnel': forms.HiddenInput(),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'getDate': 'วันที่ได้รางวัล/ผลงาน',
-            'fiscalYear': 'ปีงบประมาณ',
-            'eduYear': 'ปีการศึกษา',
-            'eduSemeter': 'ภาคเรียนที่',
-            'topic': 'ชื่อผลงาน/รางวัล',
-            'detail': 'รายละเอียด',
-            'budget': 'งบประมาณ',
-            'budgetType': 'ประเภทงบประมาณ',
-            'source': 'ได้รับจาก/ผู้มอบ',
-            'personnel': 'บุคลากร',
-            'recorder': 'ผู้บันทึก',
-        }
-
-    def deleteForm(self):
-        self.fields['getDate'].widget.attrs['readonly'] = True
-        self.fields['fiscalYear'].widget.attrs['readonly'] = True
-        self.fields['eduYear'].widget.attrs['readonly'] = True
-        self.fields['eduSemeter'].widget.attrs['readonly'] = True
-        self.fields['topic'].widget.attrs['readonly'] = True
-        self.fields['detail'].widget.attrs['readonly'] = True
-        self.fields['budget'].widget.attrs['readonly'] = True
-        self.fields['budgetType'].widget.attrs['readonly'] = True
-        self.fields['source'].widget.attrs['readonly'] = True
-        self.fields['personnel'].widget.attrs['readonly'] = True
-        self.fields['recorder'].widget.attrs['readonly'] = True
-
-class PerformanceFileForm(forms.ModelForm):
-    class Meta:
-        model = PerformanceFile
-        fields = ('file', 'filetype', 'performance','recorder')
+        model = SocialServiceFile
+        fields = ('file', 'filetype', 'socialservice','recorder')
         widgets = {
             'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
                                            'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
                                            'onchange': 'javascript:updateList();'}),
             'filetype': forms.HiddenInput(),
-            'performance': forms.HiddenInput(),
-            'recorder':forms.HiddenInput(),
-
+            'socialservice': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
         }
         labels = {
             'file': 'เลือกไฟล์เอกสารแนบ',
             'filetype': 'ชนิดไฟล์',
-            'performance': 'การฝึกอบรม/สัมมนา',
+            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
             'recorder': 'ผู้บันทึก',
         }
 
-
-class PerformanceURLForm(forms.ModelForm):
+class SocialServiceURLForm(forms.ModelForm):
     class Meta:
-        model = PerformanceURL
-        fields = ('url', 'performance','recorder')
+        model = SocialServiceURL
+        fields = ('url', 'socialservice', 'recorder')
         widgets = {
             'url': forms.URLInput(attrs={'class': 'form-control', }),
-            'performance': forms.HiddenInput(),
+            'socialservice': forms.HiddenInput(),
             'recorder':forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
-            'performance': 'การฝึกอบรม/สัมมนา',
-            'recorder':'ผู้บันทึก',
+            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
+            'recorder': 'ผู้บันทึก',
         }
+
+class SocialServicePersonForm(forms.ModelForm):
+    class Meta:
+        model = SocialServicePerson
+        fields = ('status', 'socialservice', 'personnel',  'recorder')
+        widgets = {
+            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
+            'socialservice': forms.HiddenInput(),
+            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
+            'personnel': 'บุคลากร',
+            'status': 'หน้าที่ในโครงการ',
+            'percent': 'สัดส่วนการดำเนินการวิจัย (%)',
+            'recorder': 'ผู้บันทึก',
+        }
+
+# +++++++++++++++
+# ฟอร์มคำสั่ง
+class CommandForm(forms.ModelForm):
+    class Meta:
+        MISSION_CHOICES = (
+            ("การจัดการเรียนการสอน", "การจัดการเรียนการสอน"),
+            ("การวิจัย", "การวิจัย"),
+            ("บริการทางวิชาการแก่สังคม", "บริการทางวิชาการแก่สังคม"),
+            ("ทำนุบำรุงศิลปวัฒนธรรม", "การทำนุบำรุงศิลปวัฒนธรรม"),
+            ("สนองโครงการอันเนื่องมาจากพระราชดำริ", "สนองโครงการอันเนื่องมาจากพระราชดำริ"),
+            ("งานอื่น ๆ ที่ได้รับมอบหมาย", "งานอื่น ๆ ที่ได้รับมอบหมาย"),
+        )
+        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
+        model = Command
+        fields = ( 'eduYear', 'eduSemeter','mission', 'comId', 'topic', 'detail','comDate',  'fiscalYear','recorder','editor')
+        widgets = {
+            'comId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
+            'comDate': forms.NumberInput(attrs={'class': 'form-control', 'type':'date'}),
+            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
+            'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
+            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
+            'mission': forms.Select(choices=MISSION_CHOICES, attrs={'class': 'form-control'}),
+            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
+            'detail': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
+            'recorder': forms.HiddenInput(),
+            'editor': forms.HiddenInput(),
+        }
+
+        labels = {
+            'eduYear': 'ปีการศึกษา',
+            'eduSemeter': 'ภาคเรียนที่',
+            'comId': 'เลขที่คำสั่ง',
+            'comDate': 'วันที่ออกคำสั่่ง',
+            'fiscalYear': 'ปีงบประมาณ',
+            'mission': 'พันธกิจ',
+            'topic': 'เรื่อง',
+            'detail': 'รายละเอียด',
+            'recorder': 'ผู้บันทึก',
+            'editor' : 'ผู้แก้ไข',
+        }
+
+        def deleteForm(self):
+            self.fields['commandId'].widget.attrs['readonly'] = True
+            self.fields['commandDate'].widget.attrs['readonly'] = True
+            self.fields['fiscalYear'].widget.attrs['readonly'] = True
+            self.fields['eduYear'].widget.attrs['readonly'] = True
+            self.fields['eduSemeter'].widget.attrs['readonly'] = True
+            self.fields['mission'].widget.attrs['readonly'] = True
+            self.fields['topic'].widget.attrs['readonly'] = True
+            self.fields['detail'].widget.attrs['readonly'] = True
+            self.fields['recorder'].widget.attrs['readonly'] = True
+            self.fields['editor'].widget.attrs['readonly'] = True
+
+class CommandFileForm(forms.ModelForm):
+    class Meta:
+        model = CommandFile
+        fields = ('file', 'filetype', 'command','recorder')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'command': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'command': 'คำสั่ง',
+            'recorder': 'ผู้บันทึก',
+        }
+
+class CommandURLForm(forms.ModelForm):
+    class Meta:
+        model = CommandURL
+        fields = ('url', 'command', 'recorder')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'command': forms.HiddenInput(),
+            'recorder':forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'command': 'คำสั่ง',
+            'recorder': 'ผู้บันทึก',
+        }
+
+class CommandPersonForm(forms.ModelForm):
+    class Meta:
+        model = CommandPerson
+        fields = ('status','command', 'personnel',  'recorder')
+        widgets = {
+            'command': forms.HiddenInput(),
+            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
+            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'command': 'คำสั่ง',
+            'personnel': 'บุคลากร',
+            'status': 'หน้าที่ที่มอบหมาย',
+            'recorder': 'ผู้บันทึก',
+        }
+
+
 

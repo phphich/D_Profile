@@ -1,5 +1,4 @@
 import fileinput
-
 from django.db import models
 from baseapp.models import *
 
@@ -21,94 +20,6 @@ from baseapp.models import *
 # def getPerformance(self):
 #     performances = Performance.objects.filter(personnel=self).order_by('id')
 #     return performances
-
-class Command(models.Model):
-    comId = models.CharField(max_length=30, default="")
-    comDate = models.DateField(default=None)
-    fiscalYear = models.IntegerField(default=0)
-    eduYear = models.IntegerField(default=0)
-    eduSemeter = models.IntegerField(default=0)
-    mission = models.CharField(max_length=50, default="การจัดการเรียนการสอน")
-    topic = models.TextField(default=None)
-    detail = models.TextField(default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderCommand', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add = True)
-    editor = models.ForeignKey(Personnel, related_name='EditorCommand', on_delete=models.CASCADE, default=None)
-    editDate = models.DateTimeField(auto_now_add = True)
-    def __str__(self):
-        return self.comId + " " + self.topic + " (" + str(self.comDate)+ ")"
-    def getEduYearAndSementer(self):
-        return self.eduYear + self.eduSemeter
-    def getSemeter(self):
-        if self.eduSemeter== 3:
-            return "ฤดูร้อน"
-        else:
-            return self.eduSemeter
-    def getCommandPerson(self):
-        personnels = CommandPerson.objects.filter(command=self).order_by('status','personnel__firstname_th', 'personnel__lastname_th')
-        return personnels
-    def getCountPersonnel(self):
-        count = CommandPerson.objects.filter(command=self).aggregate(count=Count('id'))
-        return count['count']
-    def getCommandFiles(self):
-        commandFiles = CommandFile.objects.filter(command=self)
-        return commandFiles
-    def getCommandURLs(self):
-        commandURLs = CommandURL.objects.filter(command=self)
-        return commandURLs
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        editor  = Personnel.objects.filter(id=self.editor.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
-        if recorder == editor and recordDate == editDate:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-        elif recorder == editor and recordDate != editDate:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
-                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
-        else:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
-                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
-
-
-class CommandPerson(models.Model):
-    status = models.CharField(max_length=30, default="")
-    command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
-    personnel = models.ForeignKey(Personnel, related_name='PersonnelCommandPerson', on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandPerson',on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.command.comId + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
-               "  " +  " (" + self.status + ")"
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-
-class CommandFile(models.Model):
-    file = models.FileField(upload_to='static/documents/command', default=None, null=True, blank=True)
-    filetype = models.CharField(max_length=50, default=None)
-    command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandFile',on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "(" + str(self.command.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-
-class CommandURL(models.Model):
-    url = models.URLField(max_length=255, default=None)
-    command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandURL', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "[" + str(self.command.id) + "_" + str(self.id) + "]_"+ self.url
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
 
 class Leave(models.Model):
     startDate = models.DateField(default=None)
@@ -133,6 +44,13 @@ class Leave(models.Model):
     def getLeaveURLs(self):
         leaveURLs = LeaveURL.objects.filter(leave=self)
         return leaveURLs
+    @staticmethod
+    def getCountPersonLeave(personnel): #นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการลา
+        countLeave = Leave.objects.filter(Q(personnel=personnel) or Q(recorder=personnel) or Q(editor=personnel)).count()
+        countLeaveFile = LeaveFile.objects.filter(recorder=personnel).count()
+        countLeaveURL = LeaveURL.objects.filter(recorder=personnel).count()        
+        countAll = countLeave + countLeaveFile + countLeaveURL
+        return countAll
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         editor  = Personnel.objects.filter(id=self.editor.id).first()
@@ -203,6 +121,13 @@ class Training(models.Model):
             return "ฤดูร้อน"
         else:
             return self.eduSemeter
+    @staticmethod
+    def getCountPersonTraining(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการลา
+        countTraining = Training.objects.filter(Q(personnel=personnel) or Q(recorder=personnel) or Q(editor=personnel)).count()
+        countTrainingFile = TrainingFile.objects.filter(recorder=personnel).count()
+        countTrainingURL = TrainingURL.objects.filter(recorder=personnel).count()
+        countAll = countTraining + countTrainingFile + countTrainingURL
+        return countAll    
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         editor  = Personnel.objects.filter(id=self.editor.id).first()
@@ -242,6 +167,84 @@ class TrainingURL(models.Model):
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
 
+class Performance(models.Model):
+    getDate = models.DateField(default=None)
+    fiscalYear = models.IntegerField(default=0)
+    eduYear = models.IntegerField(default=0)
+    eduSemeter = models.IntegerField(default=0)
+    topic = models.CharField(max_length=255, default=None)
+    detail = models.TextField(default=None)
+    budget = models.FloatField(default=0.00)
+    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
+    source = models.CharField(max_length=255, default="")
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelPerformance', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformance', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add = True)
+    editor = models.ForeignKey(Personnel, related_name='EditorPerformance', on_delete=models.CASCADE, default=None)
+    editDate = models.DateTimeField(auto_now_add = True)
+    def __str__(self):
+        return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+               "  " + self.topic + " : " + str(self.getDate)
+    def getRecorder(self):
+        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
+    def getPerformanceFiles(self):
+        performanceFiles = PerformanceFile.objects.filter(performance=self)
+        return performanceFiles
+    def getPerformanceURLs(self):
+        performanceURLs = PerformanceURL.objects.filter(performance=self)
+        return performanceURLs
+    def getSemeter(self):
+        if self.eduSemeter== 3:
+            return "ฤดูร้อน"
+        else:
+            return self.eduSemeter
+
+    @staticmethod
+    def getCountPersonPerformance(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการลา
+        countPerformance = Performance.objects.filter(Q(personnel=personnel) or Q(recorder=personnel) or Q(editor=personnel)).count()
+        countPerformanceFile = PerformanceFile.objects.filter(recorder=personnel).count()
+        countPerformanceURL = PerformanceURL.objects.filter(recorder=personnel).count()
+        countAll = countPerformance + countPerformanceFile + countPerformanceURL
+        return countAll    
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        editor  = Personnel.objects.filter(id=self.editor.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
+        if recorder == editor and recordDate == editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+        elif recorder == editor and recordDate != editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
+                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
+        else:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
+
+class PerformanceFile(models.Model):
+    file = models.FileField(upload_to='static/documents/performance', default=None, null=True, blank=True)
+    filetype = models.CharField(max_length=50, default=None)
+    performance = models.ForeignKey(Performance, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformanceFile', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "(" + str(self.performance.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+
+class PerformanceURL(models.Model):
+    url = models.URLField(max_length=255, default=None)
+    performance = models.ForeignKey(Performance, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformanceURL', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "[" + str(self.performance.id) + "_" + str(self.id) + "]_"+ self.url
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+
 class Research(models.Model):
     fiscalYear = models.IntegerField(default=0)
     title_th = models.TextField(default="")
@@ -263,6 +266,14 @@ class Research(models.Model):
                "  " + self.title_th + " - " + str(self.fiscalYear) + " : " + str(self.budget)
     def getRecorder(self):
         return self.personnel.status + self.personnel.firstname_th + ' ' + self.personnel.lastname_th
+    @staticmethod
+    def getCountPersonResearch(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการวิจัย
+        countResearch = Research.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
+        countResearchPerson = ResearchPerson.objects.filter(Q(personnel=personnel) or Q(recorder=personnel)).count()
+        countResearchFile = ResearchFile.objects.filter(recorder=personnel).count()
+        countResearchURL = ResearchURL.objects.filter(recorder=personnel).count()
+        countAll = countResearch + countResearchPerson + countResearchFile + countResearchURL
+        return countAll   
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         editor  = Personnel.objects.filter(id=self.editor.id).first()
@@ -279,6 +290,7 @@ class Research(models.Model):
 
 class ResearchPerson(models.Model):
     status = models.CharField(max_length=30, default="")
+    percent= models.IntegerField(default=100)
     research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
     personnel = models.ForeignKey(Personnel, related_name='PersonnelResearchPerson', on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderResearchPerson', on_delete=models.CASCADE, default=None)
@@ -340,6 +352,14 @@ class SocialService(models.Model):
                "  " + self.topic + " : " + self.place + " : " + str(self.startDate) + "-" + str(self.endDate)
     def getRecorder(self):
         return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
+    @staticmethod
+    def getCountPersonSocialService(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการบริการทางวิชาการ
+        countSocialService = SocialService.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
+        countSocialServicePerson = SocialServicePerson.objects.filter(Q(personnel=personnel) or Q(recorder=personnel)).count()
+        countSocialServiceFile = SocialServiceFile.objects.filter(recorder=personnel).count()
+        countSocialServiceURL = SocialServiceURL.objects.filter(recorder=personnel).count()
+        countAll = countSocialService + countSocialServicePerson + countSocialServiceFile + countSocialServiceURL
+        return countAll 
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         editor  = Personnel.objects.filter(id=self.editor.id).first()
@@ -393,37 +413,48 @@ class SocialServiceURL(models.Model):
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
 
-class Performance(models.Model):
-    getDate = models.DateField(default=None)
+class Command(models.Model):
+    comId = models.CharField(max_length=30, default="")
+    comDate = models.DateField(default=None)
     fiscalYear = models.IntegerField(default=0)
     eduYear = models.IntegerField(default=0)
     eduSemeter = models.IntegerField(default=0)
-    topic = models.CharField(max_length=255, default=None)
+    mission = models.CharField(max_length=50, default="การจัดการเรียนการสอน")
+    topic = models.TextField(default=None)
     detail = models.TextField(default=None)
-    budget = models.FloatField(default=0.00)
-    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
-    source = models.CharField(max_length=255, default="")
-    personnel = models.ForeignKey(Personnel, related_name='PersonnelPerformance', on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformance', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommand', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
-    recorder = models.ForeignKey(Personnel, related_name='EditorPerformance', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add = True)
+    editor = models.ForeignKey(Personnel, related_name='EditorCommand', on_delete=models.CASCADE, default=None)
+    editDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
-        return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
-               "  " + self.topic + " : " + str(self.getDate)
-    def getRecorder(self):
-        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
-    def getPerformanceFiles(self):
-        performanceFiles = PerformanceFile.objects.filter(performance=self)
-        return performanceFiles
-    def getPerformanceURLs(self):
-        performanceURLs = PerformanceURL.objects.filter(performance=self)
-        return performanceURLs
+        return self.comId + " " + self.topic + " (" + str(self.comDate)+ ")"
+    def getEduYearAndSementer(self):
+        return self.eduYear + self.eduSemeter
     def getSemeter(self):
         if self.eduSemeter== 3:
             return "ฤดูร้อน"
         else:
             return self.eduSemeter
+    def getCommandPerson(self):
+        personnels = CommandPerson.objects.filter(command=self).order_by('status','personnel__firstname_th', 'personnel__lastname_th')
+        return personnels  
+    def getCountPersonnel(self):
+        count = CommandPerson.objects.filter(command=self).aggregate(count=Count('id'))
+        return count['count']
+    def getCommandFiles(self):
+        commandFiles = CommandFile.objects.filter(command=self)
+        return commandFiles
+    def getCommandURLs(self):
+        commandURLs = CommandURL.objects.filter(command=self)
+        return commandURLs
+    @staticmethod
+    def getCountPersonCommand(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการลา
+        countCommand = Command.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
+        countCommandPerson = CommandPerson.objects.filter(Q(personnel=personnel) or Q(recorder=personnel)).count()
+        countCommandFile = CommandFile.objects.filter(recorder=personnel).count()
+        countCommandURL = CommandURL.objects.filter(recorder=personnel).count()
+        countAll = countCommand + countCommandPerson + countCommandFile + countCommandURL
+        return countAll 
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         editor  = Personnel.objects.filter(id=self.editor.id).first()
@@ -438,27 +469,42 @@ class Performance(models.Model):
             return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
                    '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
 
-class PerformanceFile(models.Model):
-    file = models.FileField(upload_to='static/documents/performance', default=None, null=True, blank=True)
-    filetype = models.CharField(max_length=50, default=None)
-    performance = models.ForeignKey(Performance, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformanceFile', on_delete=models.CASCADE, default=None)
+class CommandPerson(models.Model):
+    status = models.CharField(max_length=30, default="")
+    command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelCommandPerson', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandPerson',on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "(" + str(self.performance.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
+        return self.command.comId + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+               "  " +  " (" + self.status + ")"
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
 
-class PerformanceURL(models.Model):
-    url = models.URLField(max_length=255, default=None)
-    performance = models.ForeignKey(Performance, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderPerformanceURL', on_delete=models.CASCADE, default=None)
+class CommandFile(models.Model):
+    file = models.FileField(upload_to='static/documents/command', default=None, null=True, blank=True)
+    filetype = models.CharField(max_length=50, default=None)
+    command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandFile',on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "[" + str(self.performance.id) + "_" + str(self.id) + "]_"+ self.url
+        return "(" + str(self.command.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+
+class CommandURL(models.Model):
+    url = models.URLField(max_length=255, default=None)
+    command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderCommandURL', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "[" + str(self.command.id) + "_" + str(self.id) + "]_"+ self.url
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+

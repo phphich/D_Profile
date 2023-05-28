@@ -1,9 +1,9 @@
 from datetime import datetime
-
 from django.db.models import Max
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from baseapp.models import *
 from baseapp.forms import *
+from workapp.models import *
 
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
@@ -17,7 +17,7 @@ import pandas as pd
 import plotly.express as px
 
 iterm_per_page = 10
-
+# Item.objects.filter(Q(field_a=123) | Q(field_b__in=(3, 4, 5, ))
 def home(request):
     faculty = Faculty.objects.first()
     if faculty is not None:
@@ -54,7 +54,7 @@ def userAuthen(request):
                                  ' เข้าสู่ระบบ.. ')
             return redirect('home')
         else:
-            messages.add_message(request,messages.WARNING, "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง.!!!")
+            messages.add_message(request,messages.ERROR, "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง.!!!")
             context = {'form':form}
             return render(request, 'userAuthen.html', context)
     else:
@@ -74,14 +74,14 @@ def userLogout(request):
     return  redirect('userAuthen')
 
 from django.contrib.auth.hashers import make_password
-def helpme(request):
+def helpme(request): # เมธอดพิเศษ
     user = User.objects.filter(email='phichayapak.ph@rmuti.ac.th').first()
     if user is not None:  # มีบัญชีผู้ใช้ระบบจริง
         user.password = make_password('12345')
         user.save()
         messages.add_message(request, messages.SUCCESS, 'แก้ไขรหัสผ่านเรียบร้อย ระบบจะพาท่านเข้าระบบใหม่อีกครั้ง')
     else:
-        messages.add_message(request, messages.WARNING, 'แก้ไขรหัสผ่านไม่สำเร็จ')
+        messages.add_message(request, messages.ERROR, 'แก้ไขรหัสผ่านไม่สำเร็จ')
     return redirect('home')
 
 @login_required(login_url='userAuthen')
@@ -103,11 +103,11 @@ def userChgPassword(request):
                     messages.add_message(request, messages.SUCCESS,'แก้ไขรหัสผ่านเรียบร้อย ระบบจะพาท่านเข้าระบบใหม่อีกครั้ง')
                     return redirect('userLogout')
                 else:
-                    messages.add_message(request, messages.WARNING, 'ท่านระบุรหัสผ่านใหม่กับรหัสผ่านที่ยืนยันไม่ตรงกัน ')
+                    messages.add_message(request, messages.ERROR, 'ท่านระบุรหัสผ่านใหม่กับรหัสผ่านที่ยืนยันไม่ตรงกัน ')
             else:
-                messages.add_message(request, messages.WARNING, 'ท่านระบุรหัสผ่านเดิมไม่ถูกต้อง ')
+                messages.add_message(request, messages.ERROR, 'ท่านระบุรหัสผ่านเดิมไม่ถูกต้อง ')
         else:
-            messages.add_message(request, messages.WARNING, 'ไม่ปรากฏชื่อบัญชีผู้ใช้ระบบตามที่ระบุ ')
+            messages.add_message(request, messages.ERROR, 'ไม่ปรากฏชื่อบัญชีผู้ใช้ระบบตามที่ระบุ ')
     else:
         form = ChgPasswordForm(initial={'email':personnel.email})
     context = {'form':form, 'personnel':personnel}
@@ -136,7 +136,7 @@ def facultUpdate(request):
 
 # Division CRUD.
 def divisionList(request):
-    dt = datetime.now()
+    dt = datetime.datetime.now()
     print(dt)
     if Personnel.objects.all().count() == 0:
         return redirect('home')
@@ -150,6 +150,7 @@ def divisionNew(request):
         form = DivisionForm(data=request.POST)
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลสาขา/หน่วยงานย่อยใหม่เรียบร้อย')
             return redirect('divisionList')
         else:
             context = {'form': form}
@@ -166,6 +167,7 @@ def divisionUpdate(request, id):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลสาขา/หน่วยงานย่อยเรียบร้อย')
             return redirect('divisionList')
         else:
             context = {'form': form}
@@ -180,18 +182,21 @@ def divisionDelete(request, id):
     form = DivisionForm(data=request.POST or None, instance=division)
     if request.method == 'POST':
         division.delete()
+        messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลสาขา/หน่วยงานย่อยที่เลือกเรียบร้อย')
         return redirect('divisionList')
     else:
-        form.deleteForm()
-        context = {'form': form, 'division': division}
-        return render(request, 'base/division/divisionDelete.html', context)
-
+        if division.getCountPersonnel() > 0 or division.getCountCurriculum() > 0: #มีบุคลากร หรือหลักสูตรอยู่
+            messages.add_message(request, messages.ERROR, 'ไม่สามารถลบข้อมูลสาขา/หน่วยงานย่อยที่เลือกได้ เนื่องจากมีบุคลากรหรือหลักสูตรในสาขา/หน่วยงานย่อยนี้')
+            return redirect('divisionList')
+        else:
+            form.deleteForm()
+            context = {'form': form, 'division': division}
+            return render(request, 'base/division/divisionDelete.html', context)
 
 # Curriculum CRUD.
 def curriculumList(request):
     if Personnel.objects.all().count() == 0:
         return redirect('home')
-
     curriculums = Curriculum.objects.all().order_by('name_th')
     context = {'curriculums': curriculums}
     return render(request, 'base/curriculum/curriculumList.html', context)
@@ -202,6 +207,7 @@ def curriculumNew(request):
         form = CurriculumForm(data=request.POST)
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS, 'เพิ่มข้อมูลหลักสูตรใหม่เรียบร้อย')
             return redirect('curriculumList')
         else:
             context = {'form': form}
@@ -219,6 +225,7 @@ def curriculumUpdate(request, id):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลหลักสูตรเรียบร้อย')
             return redirect('curriculumList')
         else:
             context = {'form': form}
@@ -232,8 +239,13 @@ def curriculumDelete(request, id):
     curriculum = get_object_or_404(Curriculum, id=id)
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
     if request.method == 'POST':
-        curriculum.delete()
-        return redirect('curriculumList')
+        if curriculum.getCountCurrAffiliation() > 0: #มีผู้รับผิดชอบหลักสูตรอยู่
+            messages.add_message(request, messages.ERROR,'ไม่สามารถลบข้อมูลหลักสูตรที่เลือกได้ เนื่องจากได้กำหนดผู้รับผิดชอบหลักสูตรนี้ไว้แล้ว')
+            return redirect('curriculumList')
+        else:
+            curriculum.delete()
+            messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลหลักสูตรที่เลือกเรียบร้อย')
+            return redirect('curriculumList')
     else:
         form.deleteForm()
         context = {'form': form, 'curriculum': curriculum}
@@ -266,7 +278,6 @@ def personnelList(request, pageNo=None):
         chart = fig.to_html()
     else:
         chart=None
-
     personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
     personnels_page = Paginator(personnels, iterm_per_page)
     count = Personnel.objects.all().count()
@@ -335,6 +346,7 @@ def personnelNew(request):
             else:
                 user.groups.add (created)
             user.save()
+            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลบุคลากรรายใหม่เรียบร้อย')
             return redirect('personnelList', pageNo=1)
         else:
             countPersonnel = Personnel.objects.all().count()
@@ -353,7 +365,7 @@ def personnelNew(request):
             form.initial={'division':division, 'recorderId':'0000', 'editorId':'0000'}
         else:
             firstTime = False
-            form.initial = {'recordId': recorder.id, 'editorId': recorder.id}
+            form.initial = {'recorderId': recorder.id, 'editorId': recorder.id}
         context = {'form': form, 'firstTime':firstTime}
         return render(request, 'base/personnel/personnelNew.html', context)
 
@@ -393,8 +405,9 @@ def personnelUpdate(request, id):
             else:
                 updateForm.save()
                 personnel.editorId = recorder.id
-                personnel.editDate = datetime.now()
+                personnel.editDate = datetime.datetime.now()
                 personnel.save()
+                messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลบุคลากรเรียบร้อย')
             # อัพเดท user
             user = User.objects.filter(username=oldemail).first()
             user.username = personnel.email
@@ -419,20 +432,44 @@ def personnelUpdate(request, id):
         form.updateForm()
         context = {'form': form, 'personnel': personnel, 'userType':userType}
         return render(request, 'base/personnel/personnelUpdate.html', context)
+
 @login_required(login_url='userAuthen')
 def personnelDelete(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     picturefile = personnel.picture.name
     form = PersonnelForm(data=request.POST or None, instance=personnel)
     if request.method == 'POST':
-        user = User.objects.filter(username=personnel.email).first()
-        user.delete()
-        personnel.delete()
-        # delete picture file
-        if os.path.exists('static/' + picturefile):
-            os.remove('static/' + picturefile)  # file exits, delete it
-
-        return redirect('personnelList', pageNo=1)
+        error=False
+        if personnel.getCountBasicTransaction()>0:
+            error = True
+        if Leave.getCountPersonLeave(personnel) > 0 or \
+                Training.getCountPersonTraining(personnel)>0 or \
+                Performance.getCountPersonPerformance(personnel)>0 or \
+                Research.getCountPersonResearch(personnel) > 0 or \
+                SocialService.getCountPersonSocialService(personnel) > 0 or \
+                Command.getCountPersonCommand(personnel) > 0:
+            error = True
+        if error == True:
+            messages.add_message(request, messages.ERROR,'ไม่สามารถลบข้อมูลบุคลากรที่เลือกได้ เนื่องจากได้ข้อมูลบุคลากรรายนี้ได้ถูกนำไปใช้ร่วมกันข้อมูลในส่วนอื่น ๆ แล้ว')
+            return redirect('personnelList', pageNo=1)
+        else:
+            user = User.objects.filter(username=personnel.email).first()
+            user.delete()
+            pid = personnel.id
+            useRecorder = Personnel.objects.filter(recorderId=pid)
+            for use in useRecorder:
+                use.recorderId = use.id
+                use.save()
+            useEditor = Personnel.objects.filter(editorId=pid)
+            for use in useEditor:
+                use.editorId = use.id
+                use.save()
+            personnel.delete()
+            # delete picture file
+            if os.path.exists('static/' + picturefile):
+                os.remove('static/' + picturefile)  # file exits, delete it
+            messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลบุคลากรที่เลือกเรียบร้อย')
+            return redirect('personnelList', pageNo=1)
     else:
         form.deleteForm()
         context = {'form': form, 'personnel': personnel}
@@ -474,9 +511,10 @@ def educationNew(request, id):
         form = EducationForm(data=request.POST)
         if form.is_valid():
             form.save()
-            divisions = Division.objects.all().order_by('name_th')
+            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลการศึกษาเรียบร้อย')
             return redirect('educationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
+            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/education/educationNew.html', context)
     else:
@@ -501,10 +539,12 @@ def educationUpdate(request, id):
             # divisions = Division.objects.all().order_by('name_th')
             form.save()
             education.editor = recorder
-            education.editDate = datetime.now()
+            education.editDate = datetime.datetime.now()
             education.save()
+            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลการศึกษาเรียบร้อย')
             return redirect('educationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
+            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/education/educationUpdate.html', context)
     else:
@@ -519,6 +559,7 @@ def educationDelete(request, id):
     if request.method == 'POST':
         divisions = Division.objects.all().order_by('name_th')
         education.delete()
+        messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลการศึกษาที่เลือกเรียบร้อย')
         return redirect('educationList', divisionId=personnel.division.id, personnelId=personnel.id)
     else:
         form.deleteForm()
@@ -560,8 +601,10 @@ def expertiseNew(request, id):
         form = ExpertiseForm(data=request.POST)
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลความเชี่ยวชาญเรียบร้อย')
             return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
+            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/expertise/expertiseNew.html', context)
     else:
@@ -583,13 +626,14 @@ def expertiseUpdate(request, id):
     form = ExpertiseForm(data=request.POST or None, instance=expertise)
     if request.method == 'POST':
         if form.is_valid():
-            # divisions = Division.objects.all().order_by('name_th')
             form.save()
             expertise.editor = recorder
-            expertise.editDate = datetime.now()
+            expertise.editDate = datetime.datetime.now()
             expertise.save()
+            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลความเชี่ยวชาญเรียบร้อย')
             return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
+            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/expertise/expertiseUpdate.html', context)
     else:
@@ -604,6 +648,7 @@ def expertiseDelete(request, id):
     if request.method == 'POST':
         divisions = Division.objects.all().order_by('name_th')
         expertise.delete()
+        messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลความเชี่ยวชาญที่เลือกเรียบร้อย')
         return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
     else:
         form.deleteForm()
@@ -626,16 +671,15 @@ def currAffiliationList(request, curriculumId = None):
                 currAffs  = curriculum.getCurrAffiliation()
                 duplicate = False
                 for currAff in currAffs:
-                    if currAff.personnel == person:
-                        messages.add_message(request, messages.WARNING, 'บุคลากรที่เลือกมีรายชื่อในการบริหารหลักสูตรอยู่แล้ว')
+                    if currAff.personnel == person :
+                        messages.add_message(request, messages.ERROR, 'บุคลากรที่เลือกมีรายชื่อในการบริหารหลักสูตรอยู่แล้ว')
                         duplicate = True
                         break
                 if duplicate == False:
                     newForm.save()
-                    messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลผู้บริหารหลักสูตรสำเร็จ')
+                    messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลผู้บริหารหลักสูตรเรียบร้อย')
             else:
                 messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
-
     curriculums = Curriculum.objects.all().order_by('name_th')
     if request.method == 'POST':
         curriculumId = request.POST['curriculumId']
@@ -643,7 +687,6 @@ def currAffiliationList(request, curriculumId = None):
         curriculum = Curriculum.objects.filter(id=curriculumId).first()
     else:
         curriculum = curriculums.first()
-
     form = CurrAffiliationForm(initial={'curriculum': curriculum, 'recorder': recorder})
     context = {'curriculums': curriculums, 'curriculum': curriculum, 'form': form}
     return render(request, 'base/currAffiliation/currAffiliationList.html', context)
@@ -651,15 +694,12 @@ def currAffiliationList(request, curriculumId = None):
 @login_required(login_url='userAuthen')
 def currAffiliationDelete(request,id):
     currAffiliation = get_object_or_404(CurrAffiliation, id=id)
-    # for next time, recorder must used user login
-    recorder = Personnel.objects.all().first()
-
     curriculum = currAffiliation.curriculum
     curriculums = Curriculum.objects.all().order_by('name_th')
-    form = CurrAffiliationForm(initial={'curriculum': curriculum, 'recorder': recorder})
+    form = CurrAffiliationForm(instance=currAffiliation)
     context = {'curriculums': curriculums, 'curriculum': curriculum, 'form': form}
     currAffiliation.delete()
-    # return render(request, 'base/currAffiliationList.html', context)
+    messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้บริหารหลักสูตรที่เลือกเรียบร้อย')
     return redirect('currAffiliationList', curriculumId=curriculum.id)
 
 @login_required(login_url='userAuthen')

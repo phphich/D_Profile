@@ -83,7 +83,7 @@ def leaveDetail(request, id):
                         leaveFile.delete()
                         success=False
                 if success==True:
-                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารเรียบร้อย")
                 else:
                     messages.add_message(request, messages.WARNING, "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
             else:
@@ -93,7 +93,7 @@ def leaveDetail(request, id):
         else: # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
@@ -107,14 +107,15 @@ def leaveDetail(request, id):
 @login_required(login_url='userAuthen')
 def leaveNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    print(request.session['userId'])
     if request.method == 'POST':
         form = LeaveForm(data=request.POST)
         if form.is_valid():
             form.save()
             leave = Leave.objects.last()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการลาเข้าสู่ระบบเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการลาเรียบร้อย")
             return redirect('leaveDetail', id=leave.id)
-            # return redirect('leaveList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form, 'personnel': personnel}
@@ -123,8 +124,7 @@ def leaveNew(request, id):
         fiscalYear = common.getCurrentFiscalYear()
         eduYear = common.getCurrentEduYear()
         currentDate = common.getCurrentDate()
-        recorder = Personnel.objects.filter(id=request.session['userId']).first()
-        form = LeaveForm(initial={'personnel': personnel, 'recorder': recorder, 'fiscalYear':fiscalYear, 'eduYear':eduYear,
+        form = LeaveForm(initial={'personnel': personnel, 'recorder': recorder,'editor':recorder, 'fiscalYear':fiscalYear, 'eduYear':eduYear,
                                   'startDate':currentDate, 'endDate':currentDate,'days':1})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveNew.html', context)
@@ -140,6 +140,9 @@ def leaveUpdate(request, id):
             updateForm = form.save(commit=False)
             updateForm.recorder = recorder
             updateForm.save()
+            leave.editor = recorder
+            leave.editDate = datetime.datetime.now()
+            leave.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการลาเรียบร้อย")
             return redirect('leaveDetail', id=leave.id)
         else:
@@ -163,14 +166,14 @@ def leaveDelete(request, id):
                 try:
                     os.remove('static/documents/leave/' +fname)  # file exits, delete it
                 except:
-                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                    messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
                 finally:
                     f.delete()
         urlList = LeaveURL.objects.filter(leave=leave)
         for u in urlList:
             u.delete()
         leave.delete()
-        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการลาสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการลาที่เลือกเรียบร้อย")
         return redirect('leaveList', divisionId=leave.personnel.division.id, personnelId=leave.personnel.id)
     else:
         form.deleteForm()
@@ -185,9 +188,9 @@ def leaveDeleteFile(request, id):
     if os.path.exists('static/documents/leave/' + fname):
         try:
             os.remove('static/documents/leave/' + fname)  # file exits, delete it
-            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารเรียบร้อย")
         except:
-            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+            messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
     leaveFile.delete()
     return redirect('leaveDetail', id=leave.id)
 
@@ -208,7 +211,7 @@ def leaveDeleteFileAll(request, id):
             finally:
                 leaveFile.delete()
     if success==True:
-        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดเรียบร้อย")
     else:
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
     return redirect('leaveDetail', id=leave.id)
@@ -218,7 +221,7 @@ def leaveDeleteURL(request, id):
     leaveURL = get_object_or_404(LeaveURL, id=id)
     leave = leaveURL.leave
     leaveURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
     return redirect('leaveDetail', id=leave.id)
 
 @login_required(login_url='userAuthen')
@@ -227,7 +230,7 @@ def leaveDeleteURLAll(request, id):
     leaveURLs = leave.getLeaveURLs()
     for leaveURL in leaveURLs:
         leaveURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
     return redirect('leaveDetail', id=leave.id)
 
 #Training CRUD
@@ -299,7 +302,7 @@ def trainingDetail(request, id):
                         trainingFile.delete()
                         success=False
                 if success==True:
-                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารเรียบร้อย")
                 else:
                     messages.add_message(request, messages.WARNING, "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
             else:
@@ -309,7 +312,7 @@ def trainingDetail(request, id):
         else: # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'training': training}
@@ -323,14 +326,14 @@ def trainingDetail(request, id):
 @login_required(login_url='userAuthen')
 def trainingNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         form = TrainignForm(data=request.POST)
         if form.is_valid():
             form.save()
             training = Training.objects.last()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการฝึกอบรม/สัมมนาเข้าสู่ระบบเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการฝึกอบรม/สัมมนาเรียบร้อย")
             return redirect('trainingDetail', id=training.id)
-            # return redirect('home')
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
             context = {'form': form, 'personnel': personnel}
@@ -340,8 +343,7 @@ def trainingNew(request, id):
         eduYear = common.getCurrentEduYear()
         eduSemeter = common.getCurrentEduSemeter()
         currentDate = common.getCurrentDate()
-        recorder = Personnel.objects.filter(id=request.session['userId']).first()
-        form = TrainignForm(initial={'personnel': personnel, 'recorder': recorder, 'fiscalYear':fiscalYear,
+        form = TrainignForm(initial={'personnel': personnel, 'recorder': recorder, 'editor':recorder, 'fiscalYear':fiscalYear,
                                      'eduYear':eduYear, 'eduSemeter':eduSemeter, 'startDate':currentDate, 'endDate':currentDate,
                                      'days':1})
         context = {'form': form, 'personnel': personnel}
@@ -358,6 +360,9 @@ def trainingUpdate(request, id):
             updateForm = form.save(commit=False)
             updateForm.recorder = recorder
             updateForm.save()
+            training.editor = recorder
+            training.editDate = datetime.datetime.now()
+            training.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
             return redirect('trainingDetail', id=training.id)
         else:
@@ -381,14 +386,14 @@ def trainingDelete(request, id):
                 try:
                     os.remove('static/documents/training/' +fname)  # file exits, delete it
                 except:
-                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                    messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
                 finally:
                     f.delete()
         urlList =TrainingURL.objects.filter(training=training)
         for u in urlList:
             u.delete()
         training.delete()
-        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาที่เลือกเรียบร้อย")
         return redirect('trainingList', divisionId=training.personnel.division.id, personnelId=training.personnel.id)
     else:
         form.deleteForm()
@@ -403,9 +408,9 @@ def trainingDeleteFile(request, id):
     if os.path.exists('static/documents/training/' + fname):
         try:
             os.remove('static/documents/training/' + fname)  # file exits, delete it
-            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารเรียบร้อย")
         except:
-            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+            messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
     trainingFile.delete()
     return redirect('trainingDetail', id=training.id)
 
@@ -426,7 +431,7 @@ def trainingDeleteFileAll(request, id):
             finally:
                 trainingFile.delete()
     if success==True:
-        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดเรียบร้อย")
     else:
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror+"]")
     return redirect('trainingDetail', id=training.id)
@@ -436,7 +441,7 @@ def trainingDeleteURL(request, id):
     trainingURL = get_object_or_404(TrainingURL, id=id)
     training = trainingURL.training
     trainingURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารที่เลือกเรียบร้อย")
     return redirect('trainingDetail', id=training.id)
 
 @login_required(login_url='userAuthen')
@@ -445,7 +450,7 @@ def trainingDeleteURLAll(request, id):
     trainingURLs = training.getTrainingURLs()
     for trainingURL in trainingURLs:
         trainingURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
     return redirect('trainingDetail', id=training.id)
 
 # Performance CRUD
@@ -518,7 +523,7 @@ def performanceDetail(request, id):
                         performanceFile.delete()
                         success = False
                 if success == True:
-                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารเรียบร้อย")
                 else:
                     messages.add_message(request, messages.WARNING,
                                          "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
@@ -529,7 +534,7 @@ def performanceDetail(request, id):
         else:  # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
@@ -549,7 +554,7 @@ def performanceNew(request, id):
         if form.is_valid():
             form.save()
             performance = Performance.objects.last()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลผลงาน/รางวัล เข้าสู่ระบบเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลผลงาน/รางวัลเรียบร้อย")
             return redirect('performanceDetail', id=performance.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
@@ -561,7 +566,7 @@ def performanceNew(request, id):
         eduSemeter = common.getCurrentEduSemeter()
         currentDate = common.getCurrentDate()
         form = PerformanceForm(
-            initial={'personnel': personnel, 'recorder': recorder, 'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
+            initial={'personnel': personnel, 'recorder': recorder, 'editor':recorder,'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
                      'getDate':currentDate})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/performance/performanceNew.html', context)
@@ -577,6 +582,9 @@ def performanceUpdate(request, id):
             updateForm = form.save(commit=False)
             updateForm.recorder = recorder
             updateForm.save()
+            performance.editor = recorder
+            performance.editDate = datetime.datetime.now()
+            performance.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลฝึกอบรม/สัมมนาเรียบร้อย")
             return redirect('performanceDetail', id=performance.id)
         else:
@@ -600,14 +608,14 @@ def performanceDelete(request, id):
                 try:
                     os.remove('static/documents/performance/' + fname)  # file exits, delete it
                 except:
-                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                    messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
                 finally:
                     f.delete()
         urlList = PerformanceURL.objects.filter(performance=performance)
         for u in urlList:
             u.delete()
         performance.delete()
-        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาที่เลือกเรียบร้อย")
         return redirect('performanceList', divisionId=performance.personnel.division.id, personnelId=performance.personnel.id)
     else:
         form.deleteForm()
@@ -622,9 +630,9 @@ def performanceDeleteFile(request, id):
     if os.path.exists('static/documents/performance/' + fname):
         try:
             os.remove('static/documents/performance/' + fname)  # file exits, delete it
-            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารที่เลือกเรียบร้อย")
         except:
-            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+            messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารที่เลือกได้")
     performanceFile.delete()
     return redirect('performanceDetail', id=performance.id)
 
@@ -645,7 +653,7 @@ def performanceDeleteFileAll(request, id):
             finally:
                 performanceFile.delete()
     if success == True:
-        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดเรียบร้อย")
     else:
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
     return redirect('performanceDetail', id=performance.id)
@@ -655,7 +663,7 @@ def performanceDeleteURL(request, id):
     performanceURL = get_object_or_404(PerformanceURL, id=id)
     performance = performanceURL.performance
     performanceURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
     return redirect('performanceDetail', id=performance.id)
 
 @login_required(login_url='userAuthen')
@@ -664,7 +672,7 @@ def performanceDeleteURLAll(request, id):
     performanceURLs = performance.getPerformanceURLs()
     for performanceURL in performanceURLs:
         performanceURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
     return redirect('performanceDetail', id=performance.id)
 
 # CRUD. command
@@ -701,7 +709,7 @@ def commandNew(request):
                 commandPerson = CommandPerson(command=command, personnel=recorder, recorder=recorder, status=status)
                 commandPerson.status = status
                 commandPerson.save()
-            messages.add_message(request, messages.SUCCESS, "บันทึกคำสั่ง เข้าสู่ระบบเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลคำสั่งเรียบร้อย")
             return redirect('commandDetail', id=command.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
@@ -714,7 +722,7 @@ def commandNew(request):
         currentDate = common.getCurrentDate()
         form = CommandForm(
             initial={'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
-                     'comDate':currentDate, 'recorder': recorder })
+                     'comDate':currentDate, 'recorder': recorder, 'editor':recorder })
         context = {'form': form, 'personnel':recorder}
         return render(request, 'work/command/commandNew.html', context)
 
@@ -778,24 +786,18 @@ def commandDetail(request, id):
                         commandFile.delete()
                         success = False
                 if success == True:
-                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารสำเร็จ")
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารเรียบร้อย")
                 else:
                     messages.add_message(request, messages.WARNING,
                                          "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
             else:
-                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-                # context = {'fileForm': fileForm, 'urlForm': urlForm, 'command': command,
-                #            'personnel':personnel, 'commandPersons':commandPersons}
-                # return render(request, 'work/command/commandDetail.html', context)
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")                
         elif request.POST['action']=='uploadLink':  # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารสำเร็จ")
+                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-                # context = {'fileForm': fileForm, 'urlForm': urlForm, 'command': command,
-                #            'personnel':personnel, 'commandPersons':commandPersons}
-                # return render(request, 'work/command/commandDetail.html', context)
         else: # save uploadPersonnel
             # id = request.POST['command']
             # command = Command.objects.filter(id=id).first()
@@ -833,6 +835,9 @@ def commandUpdate(request, id):
             updateForm = form.save(commit=False)
             updateForm.recorder = recorder
             updateForm.save()
+            command.editor = recorder
+            command.editDate = datetime.datetime.now()
+            command.save()
             messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลคำสั่งเรียบร้อย")
             return redirect('commandDetail', id=command.id)
         else:
@@ -856,14 +861,14 @@ def commandDelete(request, id):
                 try:
                     os.remove('static/documents/command/' +fname)  # file exits, delete it
                 except:
-                    messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+                    messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
                 finally:
                     f.delete()
         urlList =CommandURL.objects.filter(command=command)
         for u in urlList:
             u.delete()
         command.delete()
-        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาที่เลือกเรียบร้อย")
         return redirect('commandList', divisionId=command.personnel.division.id, personnelId=command.personnel.id)
     else:
         form.deleteForm()
@@ -878,9 +883,9 @@ def commandDeleteFile(request, id):
     if os.path.exists('static/documents/command/' + fname):
         try:
             os.remove('static/documents/command/' + fname)  # file exits, delete it
-            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารสำเร็จ")
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารที่เลือกเรียบร้อย")
         except:
-            messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารได้")
+            messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
     commandFile.delete()
     return redirect('commandDetail', id=command.id)
 
@@ -901,7 +906,7 @@ def commandDeleteFileAll(request, id):
             finally:
                 commandFile.delete()
     if success == True:
-        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดสำเร็จ")
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดเรียบร้อย")
     else:
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
     return redirect('commandDetail', id=command.id)
@@ -911,7 +916,7 @@ def commandDeleteURL(request, id):
     commandURL = get_object_or_404(CommandURL, id=id)
     command = commandURL.command
     commandURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารที่เลือกเรียบร้อย")
     return redirect('commandDetail', id=command.id)
 
 @login_required(login_url='userAuthen')
@@ -920,7 +925,7 @@ def commandDeleteURLAll(request, id):
     commandURLs = command.getCommandURLs()
     for commandURL in commandURLs:
         commandURL.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
     return redirect('commandDetail', id=command.id)
 
 @login_required(login_url='userAuthen')
@@ -928,7 +933,7 @@ def commandDeleteCommandPerson(request, id):
     commandPerson = get_object_or_404(CommandPerson, id=id)
     command = commandPerson.command
     commandPerson.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากคำสั่งสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากคำสั่งเรียบร้อย")
     return redirect('commandDetail', id=command.id)
 
 @login_required(login_url='userAuthen')
@@ -939,6 +944,6 @@ def commandDeleteCommandPersonAll(request, id):
     for commandPerson in commandPersons:
         if commandPerson.personnel != recorder:
             commandPerson.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดออกจากคำสั่งสำเร็จ")
+    messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดออกจากคำสั่งเรียบร้อย")
     return redirect('commandDetail', id=command.id)
 

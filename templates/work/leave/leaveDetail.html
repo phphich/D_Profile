@@ -45,12 +45,10 @@
             <th class="text-primary">เหตุผลประกอบการลา</th>
             <td>{{ leave.reason }}</td>
         </tr>
-        <tr>
-            <th class="text-secondary"><i>ผู้บันทึก/แก้ไขล่าสุด </i></th>
-            <td class="text-secondary"><i>{{ leave.recorder }}, ({{ leave.recordDate|date:"d/m/Y H:m:s" }})</i></td>
-        </tr>
-
     </table>
+    <p class="text-end text-secondary" style="border-color: #6c757d">
+        <i>{{ leave.getRecorderAndEditor }} </i>
+    </p>
 
     <p class="text-center">
         {% if request.session.userType != 'Personnel' %}

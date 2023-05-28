@@ -92,7 +92,7 @@
                 <div class="col-9 text-start">
                     <i class="fa-regular fa-id-card"></i> รหัสผู้ใช้: {{ request.session.userEmail }} <br>
                     <i class="fa-regular fa-user"></i> ชื่อ - สกุล: {{ request.session.userName }} <br>
-                    <i class="fa-solid fa-hand-sparkles"></i> สถานะ: {{ request.session.userType }},
+                    <i class="fa-solid fa-hand-sparkles"></i> สถานะ: {{ request.session.userType }}, {{ request.session.userId }}
                      <br>
                 </div>
             </div>

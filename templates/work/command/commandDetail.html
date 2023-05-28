@@ -56,12 +56,10 @@
             <th class="text-primary">ปีงบประมาณ</th>
             <td>{{ command.fiscalYear }}</td>
         </tr>
-        <tr>
-            <th class="text-secondary"><i>ผู้บันทึก/แก้ไขล่าสุด </i></th>
-            <td class="text-secondary"><i>{{ command.recorder }}, ({{ command.recordDate|date:"d/m/Y H:m:s" }})</i></td>
-        </tr>
     </table>
-
+    <p class="text-end text-secondary" style="border-color: #6c757d">
+        <i>{{ command.getRecorderAndEditor }} </i>
+    </p>
     <p class="text-center">
         <button type="button" class="btn btn-secondary"
                 onclick="location.href='{% url 'commandList' %}'">
@@ -126,7 +124,7 @@
                                     <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด (ที่ไม่ใช่ผู้บันทึกคำสั่ง) ออกจากคำสั่งนี้!!!' )"
                                        class="btn btn-danger">
-                                        <i class="fas fa-trash text-white"></i>ลบบุคลากรรายอื่นทั้งหมด
+                                        <i class="fas fa-trash text-white"></i>ลบบุคลากรรายทั้งหมด
                                     </a>
                                 {% endif %}
                             {% endif %}

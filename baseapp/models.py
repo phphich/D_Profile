@@ -1,7 +1,7 @@
-# import datetime
+import datetime
 from django.db import models
 from django.utils import timezone
-from django.db.models import F, Sum, Count
+from django.db.models import F, Sum, Q, Count
 
 class Faculty(models.Model):
     name_th = models.CharField(max_length=100, default="")
@@ -34,6 +34,9 @@ class Division(models.Model):
     def getCountPersonnel(self):
         count = Personnel.objects.filter(division=self).aggregate(count=Count('id'))
         return count['count']
+    def getCountCurriculum(self):
+        count = Curriculum.objects.filter(division=self).aggregate(count=Count('id'))
+        return count['count']
 
 class Curriculum(models.Model):
     name_th= models.CharField(max_length=100, default="")
@@ -49,6 +52,9 @@ class Curriculum(models.Model):
     def getCurrAffiliation(self):
         currAffilaitions = CurrAffiliation.objects.filter(curriculum=self).order_by('status')
         return currAffilaitions
+    def getCountCurrAffiliation(self):
+        count = CurrAffiliation.objects.filter(curriculum=self).aggregate(count=Count('id'))
+        return count['count']
 
 class Personnel(models.Model):
     email = models.CharField(max_length=30, unique=True, default="")
@@ -80,8 +86,14 @@ class Personnel(models.Model):
         expertises = Expertise.objects.filter(personnel=self).order_by('id')
         return expertises
     def getCurrAffiliation(self):
-        curraffiliations = CurrAffiliation.objects.filter(personnel=self).order_by('id')
+        curraffiliations = CurrAffiliation.objects.filter(personnel=self).order_by('id').all()
         return curraffiliations
+    def getCountBasicTransaction(self):
+        countEdu = Education.objects.filter(Q(personnel=self) or Q(recorder=self) or Q(editor=self)).count()
+        countExp = Expertise.objects.filter(Q(personnel=self) or Q(recorder=self) or Q(editor=self)).count()
+        countCurrAff = CurrAffiliation.objects.filter(Q(personnel=self) or Q(recorder=self) or Q(editor=self)).count()
+        countAll = countEdu + countExp + countCurrAff
+        return countAll
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorderId).first()
         editor  = Personnel.objects.filter(id=self.editorId).first()
