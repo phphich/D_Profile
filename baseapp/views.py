@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import dateutil.tz.tz
 from django.db.models import Max
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from baseapp.models import *
@@ -137,6 +136,8 @@ def facultUpdate(request):
 
 # Division CRUD.
 def divisionList(request):
+    dt = datetime.now()
+    print(dt)
     if Personnel.objects.all().count() == 0:
         return redirect('home')
     divisions = Division.objects.all().order_by('name_th')
@@ -392,7 +393,7 @@ def personnelUpdate(request, id):
             else:
                 updateForm.save()
                 personnel.editorId = recorder.id
-                personnel.editDate = timezone.now()
+                personnel.editDate = datetime.now()
                 personnel.save()
             # อัพเดท user
             user = User.objects.filter(username=oldemail).first()
@@ -500,7 +501,7 @@ def educationUpdate(request, id):
             # divisions = Division.objects.all().order_by('name_th')
             form.save()
             education.editor = recorder
-            education.editDate = timezone.now()
+            education.editDate = datetime.now()
             education.save()
             return redirect('educationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
@@ -585,7 +586,7 @@ def expertiseUpdate(request, id):
             # divisions = Division.objects.all().order_by('name_th')
             form.save()
             expertise.editor = recorder
-            expertise.editDate = timezone.now()
+            expertise.editDate = datetime.now()
             expertise.save()
             return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
