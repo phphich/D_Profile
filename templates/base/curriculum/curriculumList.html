@@ -31,7 +31,7 @@
                 <td class="text-center">{{ curriculum.level }}</td>
                 <td class="text-center">{{ curriculum.studyTime }}</td>
                 <td class="text-center">
-                    {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
+                    {% if request.session.userType == 'Administrator' %}
                     <a href="{% url 'curriculumUpdate' curriculum.id %}" class="btn btn-secondary">
                         <i class="fa fa-tools"> </i> </a>
                     <a href="{% url 'curriculumDelete' curriculum.id %}" class="btn btn-danger">

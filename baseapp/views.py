@@ -1,5 +1,6 @@
-import datetime
+from datetime import datetime
 
+import dateutil.tz.tz
 from django.db.models import Max
 from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from baseapp.models import *
@@ -275,7 +276,12 @@ def personnelList(request, pageNo=None):
 
 # @login_required(login_url='userAuthen')
 def personnelNew(request):
-    divisionCount = Division.objects.filter(name_en="Office").count()
+    divisionCount = Division.objects.all().count()
+    personnelCount = Personnel.objects.all().count()
+    if personnelCount > 0:
+        recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    else:
+        recorder = None
     if divisionCount == 0:
         division = Division(name_th="สำนักงานคณะ", name_en="Office", name_sh="")
         division.save()
@@ -302,6 +308,10 @@ def personnelNew(request):
             newfilename = 'images/personnels/' + str(personnel.id) + ext
             personnel.picture.name = newfilename
             personnel.save()
+            if personnelCount == 0: # กรณีบันทึกเป็นรายแรก  (Admin)
+                personnel.recorderId = personnel.id
+                personnel.editorId = personnel.id
+                personnel.save()
             if os.path.exists('static/' + personnel.picture.name):
                 os.remove('static/' + personnel.picture.name)  # file exits, delete it
             os.rename('static/' + filename, 'static/' + personnel.picture.name)
@@ -339,9 +349,10 @@ def personnelNew(request):
         if countPersonnel == 0:
             firstTime = True
             division = Division.objects.first();
-            form.initial={'division':division}
+            form.initial={'division':division, 'recorderId':'0000', 'editorId':'0000'}
         else:
             firstTime = False
+            form.initial = {'recordId': recorder.id, 'editorId': recorder.id}
         context = {'form': form, 'firstTime':firstTime}
         return render(request, 'base/personnel/personnelNew.html', context)
 
@@ -354,6 +365,7 @@ def personnelDetail(request, id):
 @login_required(login_url='userAuthen')
 def personnelUpdate(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     oldpicture = personnel.picture.name  # รูปเดิม
     oldemail = personnel.email  # อีเมล์เดิม
     if request.method == 'POST':
@@ -378,7 +390,10 @@ def personnelUpdate(request, id):
                     os.remove('static/' + oldpicture)
                 os.rename('static/' + filename, 'static/' + personnel.picture.name)
             else:
-                form.save()
+                updateForm.save()
+                personnel.editorId = recorder.id
+                personnel.editDate = timezone.now()
+                personnel.save()
             # อัพเดท user
             user = User.objects.filter(username=oldemail).first()
             user.username = personnel.email
@@ -453,6 +468,7 @@ def educationList(request, divisionId=None, personnelId=None):
 @login_required(login_url='userAuthen')
 def educationNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         form = EducationForm(data=request.POST)
         if form.is_valid():
@@ -463,7 +479,7 @@ def educationNew(request, id):
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/education/educationNew.html', context)
     else:
-        form = EducationForm(initial={'personnel': personnel, 'recorder': personnel})
+        form = EducationForm(initial={'personnel': personnel, 'recorder': recorder, 'editor':recorder})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/education/educationNew.html', context)
 
@@ -477,11 +493,15 @@ def educationDetail(request, id):
 def educationUpdate(request, id):
     education = get_object_or_404(Education, id=id)
     personnel = education.personnel
-    form = EducationForm(data=request.POST or None, instance=education, initial={'recorder': education.personnel})
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    form = EducationForm(data=request.POST or None, instance=education)
     if request.method == 'POST':
         if form.is_valid():
-            divisions = Division.objects.all().order_by('name_th')
+            # divisions = Division.objects.all().order_by('name_th')
             form.save()
+            education.editor = recorder
+            education.editDate = timezone.now()
+            education.save()
             return redirect('educationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             context = {'form': form, 'personnel': personnel}
@@ -534,6 +554,7 @@ def expertiseList(request, divisionId=None, personnelId=None):
 @login_required(login_url='userAuthen')
 def expertiseNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         form = ExpertiseForm(data=request.POST)
         if form.is_valid():
@@ -543,7 +564,7 @@ def expertiseNew(request, id):
             context = {'form': form, 'personnel': personnel}
             return render(request, 'base/expertise/expertiseNew.html', context)
     else:
-        form = ExpertiseForm(initial={'personnel': personnel, 'recorder': personnel})
+        form = ExpertiseForm(initial={'personnel': personnel, 'recorder': recorder, 'editor':recorder})
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/expertise/expertiseNew.html', context)
 
@@ -557,11 +578,15 @@ def expertiseDetail(request, id):
 def expertiseUpdate(request, id):
     expertise = get_object_or_404(Expertise, id=id)
     personnel = expertise.personnel
-    form = ExpertiseForm(data=request.POST or None, instance=expertise, initial={'recorder': expertise.personnel})
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    form = ExpertiseForm(data=request.POST or None, instance=expertise)
     if request.method == 'POST':
         if form.is_valid():
-            divisions = Division.objects.all().order_by('name_th')
+            # divisions = Division.objects.all().order_by('name_th')
             form.save()
+            expertise.editor = recorder
+            expertise.editDate = timezone.now()
+            expertise.save()
             return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             context = {'form': form, 'personnel': personnel}
@@ -588,11 +613,10 @@ def expertiseDelete(request, id):
 @login_required(login_url='userAuthen')
 def currAffiliationList(request, curriculumId = None):
     curriculum = None
-    # for next time, recorder must used user login
-    recorder = Personnel.objects.all().first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if 'action' in request.POST:
-            form = CurrAffiliationForm(data=request.POST)
+            form = CurrAffiliationForm(data=request.POST, initial={'recorder':recorder, 'editor':recorder})
             print("form", form)
             if form.is_valid():
                 newForm = form.save(commit=False)

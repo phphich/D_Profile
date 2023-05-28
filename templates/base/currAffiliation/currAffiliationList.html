@@ -41,10 +41,12 @@
                 <th class="col-5">ชื่อผู้รับผิดชอบ</th>
                 <th class="col-4 text-center">หน้าที่</th>
                 <th class="col-2">
-                    <button data-bs-toggle="collapse" data-bs-target="#newCurrAff"
-                            class="btn btn-sm btn-info  text-white" style="width: 100%">
-                        <i class="fa fa-plus"></i> เพิ่มผู้บริหารหลักสูตร
-                    </button>
+                    {% if request.session.userType == 'Administrator' %}
+                        <button data-bs-toggle="collapse" data-bs-target="#newCurrAff"
+                                class="btn btn-sm btn-info  text-white" style="width: 100%">
+                            <i class="fa fa-plus"></i> เพิ่มผู้บริหารหลักสูตร
+                        </button>
+                    {% endif %}
                 </th>
             </tr>
             {% for currAff in curriculum.getCurrAffiliation %}
@@ -57,9 +59,11 @@
                     </td>
                     <td class="text-center">{{ currAff.status }}</td>
                     <td class="text-center">
-                        <a href="{% url 'currAffiliationDelete' currAff.id %}" class="btn btn-danger"
-                           onclick="return confirm('โปรดยืนยันการลบผู้บริหารหลักสูตรที่เลือกนี้' )">
-                            <i class="fa fa-trash"> </i></a>
+                        {% if request.session.userType == 'Administrator' %}
+                            <a href="{% url 'currAffiliationDelete' currAff.id %}" class="btn btn-danger"
+                               onclick="return confirm('โปรดยืนยันการลบผู้บริหารหลักสูตรที่เลือกนี้' )">
+                                <i class="fa fa-trash"> </i></a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

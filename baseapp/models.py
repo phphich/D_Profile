@@ -1,5 +1,4 @@
-import datetime
-
+# import datetime
 from django.db import models
 from django.utils import timezone
 from django.db.models import F, Sum, Count
@@ -66,6 +65,10 @@ class Personnel(models.Model):
     hiringDate = models.DateField(default=None)
     picture = models.ImageField(upload_to ='static/images/personnels/', default=None)
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
+    recorderId = models.IntegerField(default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    editorId = models.IntegerField(default=None)
+    editDate = models.DateTimeField(auto_now_add=True)
     class Meta:
         ordering = ['firstname_th', 'lastname_th', 'status',]
     def __str__(self):
@@ -79,6 +82,19 @@ class Personnel(models.Model):
     def getCurrAffiliation(self):
         curraffiliations = CurrAffiliation.objects.filter(personnel=self).order_by('id')
         return curraffiliations
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorderId).first()
+        editor  = Personnel.objects.filter(id=self.editorId).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
+        if recorder == editor and recordDate == editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+        elif recorder == editor and recordDate != editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
+                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
+        else:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
 
 class Education(models.Model):
     level = models.CharField(max_length=30, default="")
@@ -91,9 +107,24 @@ class Education(models.Model):
     personnel = models.ForeignKey(Personnel, related_name='PersonnelEducation', on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderEducation', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
+    editor = models.ForeignKey(Personnel, related_name='EditorEducation', on_delete=models.CASCADE, default=None)
+    editDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th +\
                " " + self.degree_th + " " + str(self.yearGraduate)
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        editor  = Personnel.objects.filter(id=self.editor.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
+        if recorder == editor and recordDate == editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+        elif recorder == editor and recordDate != editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
+                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
+        else:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
 
 class Expertise(models.Model):
     topic = models.CharField(max_length=100, default=None)
@@ -102,9 +133,24 @@ class Expertise(models.Model):
     personnel = models.ForeignKey(Personnel, related_name='PersonnelExpertise', on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderExpertise', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
+    editor = models.ForeignKey(Personnel, related_name='EditorExpertise', on_delete=models.CASCADE, default=None)
+    editDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th + \
                " - " + self.topic
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        editor  = Personnel.objects.filter(id=self.editor.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
+        if recorder == editor and recordDate == editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+        elif recorder == editor and recordDate != editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
+                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
+        else:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
 
 class CurrAffiliation(models.Model):
     status = models.CharField(max_length=30, default="อาจารย์ประจำหลักสูตร")
@@ -114,6 +160,10 @@ class CurrAffiliation(models.Model):
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.curriculum.name_th + "  (" + self.status + ")"
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
 
 class Permission(models.Model): # เจ้าหน้าที่รับผิดชอบจัดการข้อมูลสาขา
     personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
@@ -126,5 +176,3 @@ class Permission(models.Model): # เจ้าหน้าที่รับผ�
             return True
         else:
             return False
-
-
