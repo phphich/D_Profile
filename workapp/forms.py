@@ -609,6 +609,15 @@ class CommandURLForm(forms.ModelForm):
         }
 
 class CommandPersonForm(forms.ModelForm):
+    # def __init__(self, personnelsId, *args, **kwargs):
+    def __init__(self, command, *args, **kwargs):
+        super(CommandPersonForm, self).__init__(*args, **kwargs)
+        personnelsId = []
+        compersonnels = CommandPerson.objects.filter(command=command).order_by('personnel__firstname_th',
+                                                                            'personnel__lastname_th')
+        for comper in compersonnels:
+            personnelsId.append(comper.personnel.id)
+        self.fields['personnel'].queryset = Personnel.objects.filter().exclude(id__in=personnelsId)
     class Meta:
         model = CommandPerson
         fields = ('status','command', 'personnel',  'recorder')

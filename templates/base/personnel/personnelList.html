@@ -14,14 +14,18 @@
                 <th class="col-1 text-center">เพศ</th>
                 <th class="col-2">สังกัด</th>
                 <th class="col col-2"}>
-                {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
-                    <a href="{% url 'personnelNew' %}" class="btn btn-sm btn-info text-white"
+                {% if request.session.userType in 'Administrator, Staff' %}
+                    <a href="{% url 'personnelNew' %}" class="btn btn-sm btn-primary text-white"
                                          style="width: 100%"><i class="fa fa-plus"></i> เพิ่มบุคลากร </a>
                 {% endif %}
                 </th>
             </tr>
             {% for personnel in personnels %}
-                <tr>
+                {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id  or request.session.userType == 'Manager' %}
+                    <tr class="text-dark" onclick="location.href='{% url 'personnelDetail' personnel.id %}'" style="cursor:pointer">
+                {% else %}
+                    <tr class="text-dark" >
+                {% endif %}
                     <td class="text-center">
                         {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id %}
                             <a href="{% url 'personnelDetail' personnel.id %}">
@@ -39,20 +43,13 @@
                     <td class="text-center">{{ personnel.gender }}</td>
                     <td>{{ personnel.division.name_th }}</td>
                     <td class="text-center">
-                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
-                            <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">
-                                <i class="fa fa-search"> </i> </a>
-                            <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary">
+                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+{#                            <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">#}
+{#                                <i class="fa fa-search"> </i> </a>#}
+                            <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-warning">
                                 <i class="fa fa-tools"> </i> </a>
                             <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger">
                                 <i class="fa fa-trash"> </i> </a>
-                        {% else %}
-                            {% if request.session.userId == personnel.id %}
-                                <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">
-                                    <i class="fa fa-search"> </i> </a>
-                                <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-secondary">
-                                    <i class="fa fa-tools"> </i> </a>
-                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>

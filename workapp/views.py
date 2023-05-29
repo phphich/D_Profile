@@ -747,16 +747,9 @@ def commandDetail(request, id):
         else:
             right = 'Deny'
     elif request.session['userType'] == 'Staff':
-        # ดึงรายชื่อสาขาที่ได้รับมอบหมายให้ดูแลข้อมูลให้ มา
-        rightDivision = Permission.getPermisstion(recorder, command.recorder.division);
-        if command.recorder == recorder:
-            right = 'Write'
-        elif rightDivision == True:
-            right = 'Write'
-        else:
-            right = 'Deny'
+        right = 'Write'
+    # ดึงรายชื่อสาขาที่ได้รับมอบหมายให้ดูแลข้อมูลให้ มา
 
-    commandPersons = CommandPerson.objects.filter(command=command)
     if request.method == 'POST':
         fileForm = CommandFileForm(request.POST, request.FILES)
         urlForm = CommandURLForm(request.POST)
@@ -820,9 +813,9 @@ def commandDetail(request, id):
                 messages.add_message(request, messages.WARNING, msg + " ["+ status + "]")
     fileForm = CommandFileForm(initial={'command': command, 'filetype': 'Unknow', 'recorder':recorder})
     urlForm = CommandURLForm(initial={'command': command, 'recorder':recorder})
-    commandPersonForm = CommandPersonForm(initial={'command':command, 'recorder':recorder, })
+    commandPersonForm = CommandPersonForm(command=command, initial={'command':command, 'recorder':recorder, })
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'commandPersonForm':commandPersonForm ,
-               'command': command,'personnel':recorder, 'commandPersons':commandPersons, 'right':right}
+               'command': command,'personnel':recorder, 'right':right}
     return render(request, 'work/command/commandDetail.html', context)
 
 @login_required(login_url='userAuthen')

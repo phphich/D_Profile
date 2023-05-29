@@ -23,6 +23,12 @@
                     <th class="col-3 text-primary">เลขที่ตำแหน่ง</th>
                     <td class="col-9">{{ personnel.sId }}</td>
                 </tr>
+                {% if personnel.type == 'สายสนับสนุน' %}
+                    <tr>
+                        <th class="text-primary">คำนำหน้าชื่อ</th>
+                        <td>{{ personnel.title }}</td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <th class="text-primary">ชื่อ (ภาษาไทย)</th>
                     <td>{{ personnel.firstname_th }}</td>
@@ -39,10 +45,12 @@
                     <th class="text-primary">นามสกุล (ภาษาอังกฤษ)</th>
                     <td>{{ personnel.lastname_en }}</td>
                 </tr>
-                <tr>
-                    <th class="text-primary">ตำแหน่ง</th>
-                    <td>{{ personnel.status }}</td>
-                </tr>
+                {% if personnel.type != 'สายสนับสนุน' %}
+                    <tr>
+                        <th class="text-primary">ตำแหน่ง</th>
+                        <td>{{ personnel.status }}</td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <th class="text-primary">ประเภทบุคลากร</th>
                     <td>{{ personnel.type }}</td>
@@ -71,10 +79,6 @@
                     <th class="text-primary">อีเมล์</th>
                     <td>{{ personnel.email }}</td>
                 </tr>
-                {#        <tr>#}
-                {#            <th  class="text-primary">รูปประจำตัว</th>#}
-                {#            <td><img src="{% static personnel.picture %}" width="200px" height="auto" style="margin-top:10px;" ></td>#}
-                {#        </tr>#}
             </table>
             <p class="text-end text-secondary" style="border-color: #6c757d">
                 <i>{{ personnel.getRecorderAndEditor }} </i>
@@ -92,15 +96,17 @@
                 <button type="button" class="btn btn-secondary" onclick="location.href='{% url 'personnelList' %}'">
                     <i class="fa fa-rotate-back"></i> ย้อนกลับ
                 </button>
-                <button type="button" class="btn btn-secondary"
-                        onclick="location.href='{% url 'personnelUpdate' personnel.id %}'">
-                    <i class="fa fa-tools"></i> แก้ไข
-                </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+                        <button type="button" class="btn btn-warning"
+                            onclick="location.href='{% url 'personnelUpdate' personnel.id %}'">
+                        <i class="fa fa-tools"></i> แก้ไข
+                    </button>
+                {% endif %}
             </p>
         </div>
         <div class="col-5">
             <p class="text-center">
-                <button type="button" class="btn btn-info"
+                <button type="button" class="btn btn-primary"
                         onclick="location.href='{% url 'educationList' personnel.division.id personnel.id %}'">
                     <i class="fa fa-graduation-cap"></i> การศึกษา
                 </button>

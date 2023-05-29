@@ -65,8 +65,8 @@
                 onclick="location.href='{% url 'commandList' %}'">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
-        {% if right == 'Write'  %}
-            <button type="button" class="btn btn-secondary"
+        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
+            <button type="button" class="btn btn-warning"
                     onclick="location.href='{% url 'commandUpdate' command.id %}'">
                 <i class="fa fa-tools"></i> แก้ไข
             </button>
@@ -76,7 +76,7 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-user-friends"></i> บุคลากรที่ได้รับมอบหมายในคำสั่ง:
-                {% if right == 'Write' %}
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
                     <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listCommandPerson">
                         <i class="fa fa-plus text-primary"></i>
                     </button>
@@ -85,7 +85,7 @@
         </div>
     </div>
 
-
+    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
     <div id="listCommandPerson" class="collapse">
         <input type="checkbox" name='chkAll' id="chkAll" value="Select" onclick='javascript:chkSelect("personnel","chkAll");'>Select All
         <form method="post" id='frmCommandPerson' enctype="multipart/form-data" class="form-control text-primary" lang="th">
@@ -101,6 +101,7 @@
             </p>
         </form>
     </div>
+    {% endif %}
 
     <div class="row">
         <div class="col-2>"></div>
@@ -120,7 +121,7 @@
                         <th class="col-5">หน้าที่ที่ได้รับมอบหมาย</th>
                         <th class="col-2 text-center">
                             {% if command.getCommandPerson|length > 1 %}
-                                {% if right == 'Write' %} {#คำสั่งที่บันทึกโดยบุคลากรรายนั้น ๆ #}
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
                                     <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด (ที่ไม่ใช่ผู้บันทึกคำสั่ง) ออกจากคำสั่งนี้!!!' )"
                                        class="btn btn-danger">
@@ -142,12 +143,13 @@
                             <td>{{ commandPerson.status }}</td>
                             <td class="text-center">
                                 {% if right == 'Write' %}
-                                    {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' %}
+                                    {% if request.session.userType in 'Administrator, Staff' %}
                                         <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
                                            onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
                                             <i class="fas fa-minus text-danger"></i>
                                         </a>
-                                    {% elif personnel.id != commandPerson.personnel.id   %} {# รายชื่อที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
+                                    {% elif request.session.userId == command.recorder.id and commandPerson.personnel.id != requestion.session.userId %}
+                                        {# รายชื่อที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
                                         <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
                                            onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
                                             <i class="fas fa-minus text-danger"></i>
@@ -167,9 +169,11 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
-                <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
-                    <i class="fa fa-plus text-primary"></i>
-                </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                {% endif %}
             </h5>
             <div id="uploadfiles" class="collapse">
                 <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
@@ -247,12 +251,7 @@
                                         {{ f.file.name }}
                                     {% endif %}
                                 </a>
-                                {% if right == 'Write' %}
-                                    <a href="{% url 'commandDeleteFile' f.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
-                                        <i class="fas fa-minus text-danger"></i>
-                                    </a>
-                                {% elif personnel.id == f.recorder.id %} {#  เป็นผู้มีรายชื่อในคำสั่งและบันทึกไฟล์นี้ไว้ #}
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
                                     <a href="{% url 'commandDeleteFile' f.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
                                         <i class="fas fa-minus text-danger"></i>
@@ -264,12 +263,14 @@
                     {% if command.getCommandFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
-                                <a href="{% url 'commandDeleteFileAll' command.id %}"
-                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
-                                   class="btn btn-danger">
-                                    <i class="fas fa-trash text-white"></i>
-                                    ลบไฟล์เอกสารแนบทั้งหมด!
-                                </a>
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
+                                    <a href="{% url 'commandDeleteFileAll' command.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
+                                       class="btn btn-danger">
+                                        <i class="fas fa-trash text-white"></i>
+                                        ลบไฟล์เอกสารแนบทั้งหมด!
+                                    </a>
+                                {% endif %}
                             </div>
                             <div class="col-9"></div>
                         </div>
@@ -283,9 +284,11 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
-                <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
-                    <i class="fa fa-plus text-primary"></i>
-                </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                {% endif %}
             </h5>
         </div>
         <div id="uploadlinks" class="collapse">
@@ -309,12 +312,7 @@
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}
                     </a>
-                    {% if right == 'Write' %}
-                        <a href="{% url 'commandDeleteURL' link.id %}"
-                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
-                            <i class="fas fa-minus text-danger"></i>
-                        </a>
-                    {% elif personnel.id == link.recorder.id %} {#  เป็นผู้มีรายชื่อในคำสั่งและบันทึกลิงก์นี้ไว้ #}
+                   {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
                         <a href="{% url 'commandDeleteURL' link.id %}"
                            onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
                             <i class="fas fa-minus text-danger"></i>
@@ -327,12 +325,14 @@
         {% if command.getCommandURLs|length > 1 %}
             <div class="row">
                 <div class="col-3">
-                    <a href="{% url 'commandDeleteURLAll' command.id %}"
-                       onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
-                       class="btn btn-danger">
-                        <i class="fas fa-trash text-white"></i>
-                        ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด
-                    </a>
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
+                        <a href="{% url 'commandDeleteURLAll' command.id %}"
+                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
+                           class="btn btn-danger">
+                            <i class="fas fa-trash text-white"></i>
+                            ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด
+                        </a>
+                    {% endif %}
                 </div>
                 <div class="col-9"></div>
             </div>

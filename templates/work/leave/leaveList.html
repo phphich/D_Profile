@@ -70,7 +70,12 @@
                 <th class="col-4">ประเภทการลา</th>
                 <th class="col-3">ระหว่างวันที่</th>
                 <th class="col-1">จำนวนวัน </th>
-                <th class="col-2"><a href="{% url 'leaveNew' personnel.id %}" class="btn btn-sm btn-info  text-white" style="width: 100%"><i class="fa fa-plus"></i> เพิ่มข้อมูลการลา </a></th>
+                <th class="col-2">
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+                        <a href="{% url 'leaveNew' personnel.id %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
+                            <i class="fa fa-plus"></i> เพิ่มข้อมูลการลา </a>
+                    {% endif %}
+                </th>
             </tr>
             {% fiscalYearValue "" as nYear %}
             {% for leave in leaves  %}
@@ -85,9 +90,11 @@
                     <td>{{ leave.startDate }} - {{ leave.endDate }}</td>
                     <td class="text-center">{{ leave.days }}</td>
                     <td class="text-center">
-                        <a href="{% url 'leaveDetail' leave.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>
-                        <a href="{% url 'leaveUpdate' leave.id %}" class="btn btn-secondary"> <i class="fa fa-tools"> </i> </a>
-                        <a href="{% url 'leaveDelete' leave.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+    {#                        <a href="{% url 'leaveDetail' leave.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>#}
+                            <a href="{% url 'leaveUpdate' leave.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
+                            <a href="{% url 'leaveDelete' leave.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

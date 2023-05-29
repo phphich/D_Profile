@@ -67,27 +67,34 @@
             <tr class="text-primary">
                 <th class="col-5">เรื่อง/ประเด็นที่เชี่ยวชาญ</th>
                 <th class="col-5">ประสบการณ์</th>
-                <th class="col col-2"><a href="{% url 'expertiseNew' personnel.id %}"
-                                         class="btn btn-sm btn-info  text-white" style="width: 100%"><i
-                        class="fa fa-plus"></i> เพิ่มความเชี่ยวชาญ </a></th>
+                <th class="col col-2">
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+                        <a href="{% url 'expertiseNew' personnel.id %}"
+                                             class="btn btn-sm btn-primary  text-white" style="width: 100%"><i
+                            class="fa fa-plus"></i> เพิ่มความเชี่ยวชาญ </a>
+                    {% endif %}
+                </th>
             </tr>
             {% for expert in personnel.getExpertise %}
-                <tr>
-                    <td class="col-5">{{ expert.topic }}</td>
+                <tr class="text-dark" onclick="location.href='{% url 'expertiseDetail' expert.id %}'" style="cursor: pointer">
+                    <td class="col-5">{{ expert.topic |truncatechars:50  }}</td>
                     <td  class="col-5">
-                        {% if expert.experience|length|get_digit:"-1" > 50 %}
-                            {{ expert.experience|slice:"0:50" }}...
-                        {% else %}
-                            {{ expert.experience }}
-                        {% endif %}
+                        {{ expert.experience|truncatechars:50 }}...
+{#                        {% if expert.experience|length|get_digit:"-1" > 5 %}#}
+{#                            {{ expert.experience|slice:"0:50" }}... <br>#}
+{#                        {% else %}#}
+{#                            {{ expert.experience }}#}
+{#                        {% endif %}#}
                     </td>
                     <td class="col-2 text-center">
-                        <a href="{% url 'expertiseDetail' expert.id %}" class="btn btn-light"> <i
-                                class="fa fa-search"> </i> </a>
-                        <a href="{% url 'expertiseUpdate' expert.id %}" class="btn btn-secondary"> <i
-                                class="fa fa-tools"> </i> </a>
-                        <a href="{% url 'expertiseDelete' expert.id %}" class="btn btn-danger"> <i
-                                class="fa fa-trash"> </i> </a>
+                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+    {#                        <a href="{% url 'expertiseDetail' expert.id %}" class="btn btn-light"> <i#}
+    {#                                class="fa fa-search"> </i> </a>#}
+                            <a href="{% url 'expertiseUpdate' expert.id %}" class="btn btn-warning"> <i
+                                    class="fa fa-tools"> </i> </a>
+                            <a href="{% url 'expertiseDelete' expert.id %}" class="btn btn-danger"> <i
+                                    class="fa fa-trash"> </i> </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

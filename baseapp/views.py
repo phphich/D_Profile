@@ -136,8 +136,6 @@ def facultUpdate(request):
 
 # Division CRUD.
 def divisionList(request):
-    dt = datetime.datetime.now()
-    print(dt)
     if Personnel.objects.all().count() == 0:
         return redirect('home')
     divisions = Division.objects.all().order_by('name_th')
@@ -213,7 +211,7 @@ def curriculumNew(request):
             context = {'form': form}
             return render(request, 'base/curriculum/curriculumNew.html', context)
     else:
-        curriculumnYear = datetime.date.year + 543
+        curriculumnYear = datetime.datetime.year + 543
         form = CurriculumForm(initial={'curriculumYear':curriculumnYear})
         context = {'form': form}
         return render(request, 'base/curriculum/curriculumNew.html', context)
@@ -371,6 +369,7 @@ def personnelNew(request):
 
 @login_required(login_url='userAuthen')
 def personnelDetail(request, id):
+
     personnel = Personnel.objects.filter(id=id).first()
     context = {'personnel': personnel}
     return render(request, 'base/personnel/personnelDetail.html', context)
@@ -662,8 +661,7 @@ def currAffiliationList(request, curriculumId = None):
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if 'action' in request.POST:
-            form = CurrAffiliationForm(data=request.POST, initial={'recorder':recorder, 'editor':recorder})
-            print("form", form)
+            form = CurrAffiliationForm(data=request.POST, initial={'recorder':recorder})
             if form.is_valid():
                 newForm = form.save(commit=False)
                 person = Personnel.objects.filter(id=newForm.personnel.id).first()
@@ -672,7 +670,7 @@ def currAffiliationList(request, curriculumId = None):
                 duplicate = False
                 for currAff in currAffs:
                     if currAff.personnel == person :
-                        messages.add_message(request, messages.ERROR, 'บุคลากรที่เลือกมีรายชื่อในการบริหารหลักสูตรอยู่แล้ว')
+                        messages.add_message(request, messages.ERROR, 'บุคลากรที่เลือกมีรายชื่อในการบริหารหลักสูตรนี้อยู่แล้ว')
                         duplicate = True
                         break
                 if duplicate == False:
@@ -687,7 +685,7 @@ def currAffiliationList(request, curriculumId = None):
         curriculum = Curriculum.objects.filter(id=curriculumId).first()
     else:
         curriculum = curriculums.first()
-    form = CurrAffiliationForm(initial={'curriculum': curriculum, 'recorder': recorder})
+    form = CurrAffiliationForm(type='สายวิชาการ', initial={'curriculum': curriculum, 'recorder': recorder})
     context = {'curriculums': curriculums, 'curriculum': curriculum, 'form': form}
     return render(request, 'base/currAffiliation/currAffiliationList.html', context)
 
@@ -695,12 +693,53 @@ def currAffiliationList(request, curriculumId = None):
 def currAffiliationDelete(request,id):
     currAffiliation = get_object_or_404(CurrAffiliation, id=id)
     curriculum = currAffiliation.curriculum
-    curriculums = Curriculum.objects.all().order_by('name_th')
-    form = CurrAffiliationForm(instance=currAffiliation)
-    context = {'curriculums': curriculums, 'curriculum': curriculum, 'form': form}
     currAffiliation.delete()
     messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้บริหารหลักสูตรที่เลือกเรียบร้อย')
     return redirect('currAffiliationList', curriculumId=curriculum.id)
+
+# Responsible CRUD.
+@login_required(login_url='userAuthen')
+def responsibleList(request, divisionId = None):
+    division = None
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    if request.method == 'POST':
+        if 'action' in request.POST:
+            form = ResponsibleForm(data=request.POST, initial={'recorder':recorder})
+            if form.is_valid():
+                newForm = form.save(commit=False)
+                person = Personnel.objects.filter(id=newForm.personnel.id).first()
+                division = Division.objects.filter(id=newForm.division.id).first()
+                responsibles = division.getResponsible()
+                duplicate = False
+                for responer in responsibles:
+                    if responer.personnel == person:
+                        messages.add_message(request, messages.ERROR,
+                                             'บุคลากรที่เลือกมีรายชื่อรับผิดชอบข้อมูลสาขา/หน่วยงานนี้อยู่แล้ว')
+                        duplicate = True
+                        break
+                if duplicate == False:
+                    newForm.save()
+                    messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยเรียบร้อย')
+            else:
+                messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
+    divisions = Division.objects.all().order_by('name_th')
+    if request.method == 'POST':
+        divisionId = request.POST['divisionId']
+    if divisionId is not None:
+        division = Division.objects.filter(id=divisionId).first()
+    else:
+        division = divisions.first()
+    form = ResponsibleForm(type='สายสนับสนุน', initial={'division': division, 'recorder': recorder})
+    context = {'divisions': divisions, 'division':division, 'form': form}
+    return render(request, 'base/responsible/responsibleList.html', context)
+
+@login_required(login_url='userAuthen')
+def responsibleDelete(request,id):
+    responsible = get_object_or_404(Responsible, id=id)
+    division = responsible.division
+    responsible.delete()
+    messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยที่เลือกเรียบร้อย')
+    return redirect('responsibleList', divisionId= division.id)
 
 @login_required(login_url='userAuthen')
 def Permission(request):

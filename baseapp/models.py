@@ -24,13 +24,15 @@ class Division(models.Model):
             return str(self.name_th)
         else:
             return str(self.name_th) + " (" + self.name_sh + ")"
-
     def getCurriculum(self):
         curriculums = Curriculum.objects.filter(division=self)
         return curriculums
     def getPersonnels(self):
         personnels = Personnel.objects.filter(division=self).order_by('firstname_th', 'lastname_th')
         return personnels
+    def getResponsible(self):
+        responsibles = Responsible.objects.filter(division=self)
+        return responsibles
     def getCountPersonnel(self):
         count = Personnel.objects.filter(division=self).aggregate(count=Count('id'))
         return count['count']
@@ -58,6 +60,7 @@ class Curriculum(models.Model):
 
 class Personnel(models.Model):
     email = models.CharField(max_length=30, unique=True, default="")
+    title = models.CharField(max_length=20, default="")
     sId = models.CharField(max_length=15, default="")
     firstname_th = models.CharField(max_length=50, default="")
     lastname_th = models.CharField(max_length=50, default="")
@@ -78,7 +81,10 @@ class Personnel(models.Model):
     class Meta:
         ordering = ['firstname_th', 'lastname_th', 'status',]
     def __str__(self):
-        return self.status + self.firstname_th +  " " + self.lastname_th
+        if self.type == 'สายสนับสนุน':
+            return self.title + self.firstname_th +  " " + self.lastname_th
+        else:
+            return self.status + self.firstname_th + " " + self.lastname_th
     def getEducations(self):
         educations = Education.objects.filter(personnel=self).order_by('-yearGraduate')
         return educations
@@ -171,20 +177,26 @@ class CurrAffiliation(models.Model):
     recorder = models.ForeignKey(Personnel, related_name='RecorderCurrAffiliation', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.curriculum.name_th + "  (" + self.status + ")"
+        return self.curriculum.name_th + ' ' + self.personnel  + ' (' + self.status + ')'
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
 
-class Permission(models.Model): # เจ้าหน้าที่รับผิดชอบจัดการข้อมูลสาขา
-    personnel = models.ForeignKey(Personnel, on_delete=models.CASCADE, default=None)
+class Responsible(models.Model): # เจ้าหน้าที่รับผิดชอบจัดการข้อมูลสาขา
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelResponsible', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResponsible', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.personnel.firstname_th + ' ' + self.personnel.lastname_th + ' => ' + self.division.name_th
-    def getPermission(self, recorder, division):
-        right = Permission.objects.filter(personnel = recorder, division=division)
+        return self.division.name_th + ' - ' + self.personnel
+    def getRight(self, recorder, division):
+        right = Responsible.objects.filter(personnel=recorder, division=division)
         if right is not None:
             return True
         else:
             return False
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'

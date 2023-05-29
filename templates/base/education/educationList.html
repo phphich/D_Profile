@@ -69,23 +69,30 @@
                 <th class="col-3">ชื่อวุฒิการศึกษาแบบ</th>
                 <th class="col-3">ชื่อสถาบันการศึกษา</th>
                 <th class="text-center col-2">ปีที่สำเร็จการศึกษา</th>
-                <th class="col col-2"><a href="{% url 'educationNew' personnel.id %}"
-                                         class="btn btn-sm btn-info  text-white" style="width: 100%"><i
-                        class="fa fa-plus"></i> เพิ่มวุฒิการศึกษา </a></th>
+                <th class="col col-2">
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+                        <a href="{% url 'educationNew' personnel.id %}"
+                                             class="btn btn-sm btn-primary  text-white" style="width: 100%"><i
+                            class="fa fa-plus"></i> เพิ่มวุฒิการศึกษา </a>
+                    {% endif %}
+                </th>
+
             </tr>
             {% for educate in personnel.getEducations %}
-                <tr>
+                <tr class="text-dark" onclick="location.href='{% url 'educationDetail' educate.id %}'" style="cursor: pointer">
                     <td class="text-center">{{ educate.level }}</td>
                     <td>{{ educate.degree_th }}</td>
                     <td>{{ educate.institute }}</td>
                     <td class="text-center">{{ educate.yearGraduate }}</td>
                     <td class="text-center">
-                        <a href="{% url 'educationDetail' educate.id %}" class="btn btn-light"> <i
-                                class="fa fa-search"> </i> </a>
-                        <a href="{% url 'educationUpdate' educate.id %}" class="btn btn-secondary"> <i
-                                class="fa fa-tools"> </i> </a>
-                        <a href="{% url 'educationDelete' educate.id %}" class="btn btn-danger"> <i
-                                class="fa fa-trash"> </i> </a>
+                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+    {#                        <a href="{% url 'educationDetail' educate.id %}" class="btn btn-light"> <i#}
+    {#                                class="fa fa-search"> </i> </a>#}
+                            <a href="{% url 'educationUpdate' educate.id %}" class="btn btn-warning"> <i
+                                    class="fa fa-tools"> </i> </a>
+                            <a href="{% url 'educationDelete' educate.id %}" class="btn btn-danger"> <i
+                                    class="fa fa-trash"> </i> </a>
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}

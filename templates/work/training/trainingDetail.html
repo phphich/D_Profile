@@ -73,18 +73,22 @@
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
         {% endif %}
-        <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'trainingUpdate' training.id %}'">
-            <i class="fa fa-tools"></i> แก้ไข
-        </button>
+        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+            <button type="button" class="btn btn-warning"
+                    onclick="location.href='{% url 'trainingUpdate' training.id %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
+        {% endif %}
     </p>
 
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
-                <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
-                    <i class="fa fa-plus text-primary"></i>
-                </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                {% endif %}
             </h5>
             <div id="uploadfiles" class="collapse">
             <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
@@ -160,22 +164,26 @@
                                         {{ f.file.name }}
                                     {% endif %}
                                 </a>
-                                <a href="{% url 'trainingDeleteFile' f.id %}"
-                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
-                                    <i class="fas fa-minus text-danger"></i>
-                                </a>
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+                                    <a href="{% url 'trainingDeleteFile' f.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
+                                        <i class="fas fa-minus text-danger"></i>
+                                    </a>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
                     {% if training.getTrainingFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
-                                <a href="{% url 'trainingDeleteFileAll' training.id %}"
-                                   onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
-                                   class="btn btn-danger">
-                                    <i class="fas fa-trash text-white"></i>
-                                    ลบไฟล์เอกสารแนบทั้งหมด!
-                                </a>
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+                                    <a href="{% url 'trainingDeleteFileAll' training.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
+                                       class="btn btn-danger">
+                                        <i class="fas fa-trash text-white"></i>
+                                        ลบไฟล์เอกสารแนบทั้งหมด!
+                                    </a>
+                                {% endif %}
                             </div>
                             <div class="col-9"></div>
                         </div>
@@ -189,9 +197,11 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
-                <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
-                    <i class="fa fa-plus text-primary"></i>
-                </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                {% endif %}
             </h5>
         </div>
         <div id="uploadlinks" class="collapse">
@@ -215,9 +225,11 @@
                         <a href={{ link.url }} class="filelink" target="_blank">
                             <i class="fas fa-caret-right"></i> {{ link }}
                         </a>
-                        <a href="{% url 'trainingDeleteURL' link.id %}" onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
-                            <i class="fas fa-minus text-danger"></i>
-                        </a>
+                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+                            <a href="{% url 'trainingDeleteURL' link.id %}" onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
+                                <i class="fas fa-minus text-danger"></i>
+                            </a>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -225,11 +237,13 @@
             {% if training.getTrainingURLs|length > 1 %}
                 <div class="row">
                     <div class="col-3">
-                        <a href="{% url 'trainingDeleteURLAll' training.id %}"
-                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
-                            <i class="fas fa-trash text-white"></i>
-                            ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
-                        </a>
+                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+                            <a href="{% url 'trainingDeleteURLAll' training.id %}"
+                               onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )" class="btn btn-danger">
+                                <i class="fas fa-trash text-white"></i>
+                                ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
+                            </a>
+                        {% endif %}
                     </div>
                     <div class="col-9"></div>
                 </div>

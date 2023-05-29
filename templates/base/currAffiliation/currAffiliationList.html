@@ -43,30 +43,36 @@
                 <th class="col-2">
                     {% if request.session.userType == 'Administrator' %}
                         <button data-bs-toggle="collapse" data-bs-target="#newCurrAff"
-                                class="btn btn-sm btn-info  text-white" style="width: 100%">
-                            <i class="fa fa-plus"></i> เพิ่มผู้บริหารหลักสูตร
+                                class="btn btn-sm btn-primary text-white" style="width: 100%">
+                            <i class="fa fa-plus"></i> เพิ่มผู้รับผิดชอบหลักสูตร
                         </button>
                     {% endif %}
                 </th>
             </tr>
-            {% for currAff in curriculum.getCurrAffiliation %}
+            {% if curriculum.getCurrAffiliation.count == 0 %}
                 <tr>
-                    <td class="text-center">
-                        <img src="{% static currAff.personnel.picture %}" class="rounded-circle" width="50px">
-                    </td>
-                    <td>
-                        {{ currAff.personnel.status }}{{ currAff.personnel.firstname_th }} {{ currAff.personnel.lastname_th }}
-                    </td>
-                    <td class="text-center">{{ currAff.status }}</td>
-                    <td class="text-center">
-                        {% if request.session.userType == 'Administrator' %}
-                            <a href="{% url 'currAffiliationDelete' currAff.id %}" class="btn btn-danger"
-                               onclick="return confirm('โปรดยืนยันการลบผู้บริหารหลักสูตรที่เลือกนี้' )">
-                                <i class="fa fa-trash"> </i></a>
-                        {% endif %}
-                    </td>
+                    <td colspan="4" class="text-center text-danger"> - ยังไม่ได้กำหนดรายชื่อผู้รับผิดชอบหลักสูตรนี้ไว้ในระบบ - </td>
                 </tr>
-            {% endfor %}
+            {% else %}
+                {% for currAff in curriculum.getCurrAffiliation %}
+                    <tr>
+                        <td class="text-center">
+                            <img src="{% static currAff.personnel.picture %}" class="rounded-circle" width="50px">
+                        </td>
+                        <td>
+                            {{ currAff.personnel.status }}{{ currAff.personnel.firstname_th }} {{ currAff.personnel.lastname_th }}
+                        </td>
+                        <td class="text-center">{{ currAff.status }}</td>
+                        <td class="text-center">
+                            {% if request.session.userType == 'Administrator' %}
+                                <a href="{% url 'currAffiliationDelete' currAff.id %}" class="btn btn-danger"
+                                   onclick="return confirm('โปรดยืนยันการลบผู้รับผิดชอบหลักสูตรที่เลือกนี้' )">
+                                    <i class="fa fa-trash"> </i></a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
         </table>
 
         <div id="newCurrAff" class="collapse">

@@ -105,15 +105,17 @@ class PersonnelForm(forms.ModelForm):
             ("ชาย", "ชาย"),
             ("หญิง", "หญิง"),
         )
+        TITLE_CHOICES = (
+            ("นาย", "นาย"),
+            ("นาง", "นาง"),
+            ("นางสาว", "นางสาว"),
+        )
         STATUS_CHOICES = (
+            ("ไม่มี", "ไม่มี"),
             ("อาจารย์", "อาจารย์"),
             ("ผู้ช่วยศาสตราจารย์", "ผู้ช่วยศาสตราจารย์"),
             ("รองศาสตราจารย์", "รองศาสตราจารย์"),
             ("ศาสตราจารย์", "ศาสตราจารย์"),
-            ("นาย", "นาย"),
-            ("นาง", "นาง"),
-            ("นางสาว", "นางสาว"),
-
         )
         TYPE_CHOICES = (
             ('สายวิชาการ', 'สายวิชาการ'),
@@ -121,11 +123,12 @@ class PersonnelForm(forms.ModelForm):
         )
 
         model = Personnel
-        fields = ('sId', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
+        fields = ('sId', 'title', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
                   'birthDate', 'hiringDate', 'division', 'picture', 'email', 'recorderId', 'editorId')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
             'sId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
+            'title': forms.Select(choices=TITLE_CHOICES, attrs={'class': 'form-control'}),
             'firstname_th': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'lastname_th': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'firstname_en': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
@@ -145,11 +148,12 @@ class PersonnelForm(forms.ModelForm):
         labels = {
             'email': 'อีเมล์',
             'sId': 'เลขที่ตำแหน่ง',
+            'title': 'คำนำหน้าชื่อ',
             'firstname_th': 'ชื่อ (ไทย)',
             'lastname_th': 'สกุล (ไทย)',
             'firstname_en': 'ชื่อ (อังกฤษ)',
             'lastname_en': 'สกุล (อังกฤษ)',
-            'status': 'ตำแหน่ง',
+            'status': 'ตำแหน่งทางวิชาการ',
             'type': 'ประเภท',
             'gender': 'เพศ',
             'address': 'ที่อยู่',
@@ -255,6 +259,9 @@ class ExpertiseForm(forms.ModelForm):
         self.fields['personnel'].widget.attrs['readonly'] = True
 
 class CurrAffiliationForm(forms.ModelForm):
+    def __init__(self, type,  *args, **kwargs):
+        super(CurrAffiliationForm, self).__init__(*args, **kwargs)
+        self.fields['personnel'].queryset = Personnel.objects.filter(type=type)
     class Meta:
         STATUS_CHOICES = (
             ("ผู้รับผิดชอบหลักสูตร", "ผู้รับผิดชอบหลักสูตร"),
@@ -281,6 +288,33 @@ class CurrAffiliationForm(forms.ModelForm):
         self.fields['curriculum'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
         self.fields['status'].widget.attrs['readonly'] = True
+
+class ResponsibleForm(forms.ModelForm):
+    def __init__(self,type, *args, **kwargs):
+        super(ResponsibleForm, self).__init__(*args, **kwargs)
+        self.fields['personnel'].queryset = Personnel.objects.filter(type=type)
+    class Meta:
+        STATUS_CHOICES = (
+            ("ผู้รับผิดชอบหลักสูตร", "ผู้รับผิดชอบหลักสูตร"),
+            ("กรรมการประจำหลักสูตร", "กรรมการประจำหลักสูตร"),
+            ("อาจารย์ประจำหลักสูตร", "อาจารย์ประจำหลักสูตร"),
+        )
+        model = Responsible
+        fields = (
+            'division', 'personnel','recorder')
+        widgets = {
+            'division': forms.HiddenInput(attrs={'class': 'form-control text-primary', 'readonly':'readonly'}),
+            'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'division': 'สาขา/หน่วยงานย่อย',
+            'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก',
+        }
+    def deleteForm(self):
+        self.fields['division'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
 
 class AuthenForm(forms.Form):
     userName = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name) ', max_length=50,

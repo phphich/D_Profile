@@ -52,10 +52,12 @@
         <button type="button" class="btn btn-secondary" onclick="history.back()">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
-        <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'educationUpdate' education.id  %}'">
-            <i class="fa fa-tools"></i> แก้ไข
-        </button>
+        {% if request.session.userType in 'Administrator, Staff, Personnnel' %}
+            <button type="button" class="btn btn-warning"
+                    onclick="location.href='{% url 'educationUpdate' education.id  %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
+        {% endif %}
     </p>
 
 {% endblock %}

@@ -17,7 +17,7 @@
             <th class="col-2 text-center">ระยะเวลาศึกษา (ปี)</th>
             <th class="col-2">
                 {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff'  %}
-                    <a href="{% url 'curriculumNew' %}" class="btn btn-sm btn-info  text-white" style="width: 100%">
+                    <a href="{% url 'curriculumNew' %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
                         <i class="fa fa-plus"></i> เพิ่มหลักสูตร </a>
                 {% endif %}
             </th>
@@ -32,7 +32,7 @@
                 <td class="text-center">{{ curriculum.studyTime }}</td>
                 <td class="text-center">
                     {% if request.session.userType == 'Administrator' %}
-                    <a href="{% url 'curriculumUpdate' curriculum.id %}" class="btn btn-secondary">
+                    <a href="{% url 'curriculumUpdate' curriculum.id %}" class="btn btn-warning">
                         <i class="fa fa-tools"> </i> </a>
                     <a href="{% url 'curriculumDelete' curriculum.id %}" class="btn btn-danger">
                         <i class="fa fa-trash"> </i> </a>
