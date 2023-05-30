@@ -78,12 +78,12 @@
                     {% endif %}
                 </th>
             </tr>
-            {% fiscalYearValue "" as nYear %}
+            {% groupValue "" as nYear %}
             {% for training in trainings  %}
                 <tr class="text-dark" onclick="location.href='{% url 'trainingDetail' training.id %}'" style="cursor: pointer">
                     <td class="text-center">
                         {% if nYear != training.fiscalYear %}
-                            {% fiscalYearValue training.fiscalYear as nYear %}
+                            {% groupValue training.fiscalYear as nYear %}
                             {{ nYear }}
                         {% endif %}
                     </td>
@@ -93,9 +93,13 @@
                     <td class="text-center">{{ training.days }}</td>
                     <td class="text-center">
                         {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-    {#                        <a href="{% url 'trainingDetail' training.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>#}
-                            <a href="{% url 'trainingUpdate' training.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
-                            <a href="{% url 'trainingDelete' training.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                            {% if request.session.userId == personnel.id and training.recordDate|getTimeUpdate == False %}
+                                <button class="btn btn-secondary" disabled>  <i class="fas fa-file-archive"></i> </button>
+                            {% else %}
+        {#                        <a href="{% url 'trainingDetail' training.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>#}
+                                <a href="{% url 'trainingUpdate' training.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
+                                <a href="{% url 'trainingDelete' training.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>

@@ -1,14 +1,15 @@
 from django import template
 from workapp.models import *
+from workapp import common
 
 register = template.Library()
 @register.simple_tag
-def fiscalYearValue(val=None):
+def groupValue(val=None):
   return val
 
-@register.simple_tag
-def eduYearValue(val=None):
-  return val
+@register.filter(name='getTimeUpdate')
+def getTimeUpdate(docDate):
+    return common.chkUpdateTime(docDate)
 
 @register.filter(name='is_in_list')
 def is_in_list(value, given_list):

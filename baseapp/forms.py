@@ -290,9 +290,9 @@ class CurrAffiliationForm(forms.ModelForm):
         self.fields['status'].widget.attrs['readonly'] = True
 
 class ResponsibleForm(forms.ModelForm):
-    def __init__(self,type, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(ResponsibleForm, self).__init__(*args, **kwargs)
-        self.fields['personnel'].queryset = Personnel.objects.filter(type=type)
+        self.fields['personnel'].queryset = Personnel.objects.filter(type='สายสนับสนุน')
     class Meta:
         STATUS_CHOICES = (
             ("ผู้รับผิดชอบหลักสูตร", "ผู้รับผิดชอบหลักสูตร"),
@@ -303,7 +303,7 @@ class ResponsibleForm(forms.ModelForm):
         fields = (
             'division', 'personnel','recorder')
         widgets = {
-            'division': forms.HiddenInput(attrs={'class': 'form-control text-primary', 'readonly':'readonly'}),
+            'division': forms.Select(attrs={'class': 'form-control text-primary'}),
             'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
             'recorder': forms.HiddenInput(),
         }

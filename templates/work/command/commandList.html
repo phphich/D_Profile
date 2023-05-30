@@ -5,7 +5,7 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fa fa-person-hiking"></i> คำสั่ง </h2>
+                <h2><i class="fa fa-person-hiking"></i> ประวัติการรับคำสั่ง </h2>
                 <h3>
                     {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
                     สังกัด: {{ personnel.division }}
@@ -35,13 +35,13 @@
                     {% endif %}
                 </th>
             </tr>
-            {% eduYearValue "" as nYear %}
+            {% groupValue "" as nYear %}
             {% for command in commands  %}
                  <tr class="text-dark" onclick="location.href='{% url 'commandDetail' command.id %}'" style="cursor: pointer">
                      {% if nYear != command.getEduYearAndSementer %}
-                         {% eduYearValue command.getEduYearAndSementer as nYear %}
                          <td class="text-center">
-                            {{ command.eduYear }}
+                            {% groupValue command.getEduYearAndSementer as nYear %}
+                            {{ nYear }}
                         </td>
                         <td class="text-center">{{ command.eduSemeter }}</td>
                      {% else %}
@@ -60,6 +60,7 @@
                     </td>
                  </tr>
             {% endfor %}
+
      </table>
     
      {% if commands.has_other_pages %}

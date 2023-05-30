@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
     <div class="row">
         <div class="col-10">
@@ -70,11 +71,17 @@
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
         {% endif %}
-        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
-            <button type="button" class="btn btn-warning"
-                    onclick="location.href='{% url 'performanceUpdate' performance.id %}'">
-                <i class="fa fa-tools"></i> แก้ไข
-            </button>
+        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == performance.personnel.id %}
+            {% if request.session.userId == performance.personnel.id and performance.recordDate|getTimeUpdate == False %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    <i class="fa fa-tools"></i> (หมดอายุแก้ไข)
+                </button>
+            {% else %}
+                <button type="button" class="btn btn-warning"
+                        onclick="location.href='{% url 'performanceUpdate' performance.id %}'">
+                    <i class="fa fa-tools"></i> แก้ไข
+                </button>
+            {% endif %}
         {% endif %}
     </p>
 
@@ -193,7 +200,7 @@
 
     <div class="row">
         <div class="col-12 text-success">
-            <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
+            <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
                 {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
                     <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
                         <i class="fa fa-plus text-primary"></i>

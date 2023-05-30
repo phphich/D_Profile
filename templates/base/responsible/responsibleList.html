@@ -1,87 +1,103 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
     <div class="row">
         <div class="col-12">
             <h2><i class="fas fa-chalkboard-teacher"></i>ผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อย </h2>
         </div>
     </div>
-    <div class="row">
-        <div class="col-5">
-            <form method="post" class="form-control text-success">
-                {% csrf_token %}
-                <label for="divisionId">เลือกสาขา/หน่วยงานย่อย </label>
-                <select name="divisionId" onchange="this.form.submit();" class="form-control text-success">
-                    {% for div in divisions %}
-                        {% if div == division %}
-                            <option value="{{ div.id }}" selected> {{ div }}</option>
+    <hr class="text-primary">
+
+    <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+        <tr class="text-primary">
+            <th class="col-3">สาขา/หน่วยงานย่อย</th>
+            <th class="col-1"></th>
+            <th class="col-6">ชื่อผู้รับผิดชอบข้อมูล</th>
+            <th class="col-2">
+                {% if request.session.userType == 'Administrator' %}
+                    <button data-bs-toggle="collapse" data-bs-target="#newResonsible"
+                            class="btn btn-sm btn-primary text-white" style="width: 100%">
+                        <i class="fa fa-plus"></i> เพิ่มผู้รับผิดชอบข้อมูล
+                    </button>
+                {% endif %}
+            </th>
+        </tr>
+        {% if division.getResponsible.count == 0 %}
+            <tr>
+                <td colspan="4" class="text-center text-danger"> -
+                    ยังไม่ได้กำหนดรายชื่อผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยนี้ไว้ในระบบ -
+                </td>
+            </tr>
+        {% else %}
+            {% groupValue "" as divisionName %}
+            {% for responer in responsibles %}
+                <tr>
+                    <td>
+                        {% if divisionName != responer.division.name_th %}
+                            {% groupValue responer.division as divisionName %}
+                            {{ divisionName }}
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <img src="{% static responer.personnel.picture %}" class="rounded-circle" width="50px">
+                    </td>
+                    <td>
+                        {{ responer.personnel }}
+                    </td>
+                    <td class="text-center">
+                        {% if request.session.userType == 'Administrator' %}
+                            <a href="{% url 'responsibleDelete' responer.id %}" class="btn btn-danger"
+                               onclick="return confirm('โปรดยืนยันการลบผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยที่เลือกนี้' )">
+                                <i class="fa fa-trash"> </i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+    {% if responsibles.has_other_pages %}
+        <div class="row">
+            <div class="col-12 text-center ">
+                <div class="btn-group text-center" role="group" aria-label="Item pagination">
+                    {% if responsibles.has_previous %}
+                        <a href="{% url 'responsibleList'  responsibles.previous_page_number %}"
+                           class="btn btn-outline-primary">&laquo;</a>
+                    {% endif %}
+
+                    {% for page_number in responsibles.paginator.page_range %}
+                        {% if responsibles.number == page_number %}
+                            <button class="btn btn-outline-primary active">
+                                <span>{{ page_number }} <span class="sr-only">(current)</span></span>
+                            </button>
                         {% else %}
-                            <option value="{{ div.id }}"> {{ div }}</option>
+                            <a href="{% url 'responsibleList' page_number %}"
+                               class="btn btn-outline-primary">
+                                {{ page_number }}
+                            </a>
                         {% endif %}
                     {% endfor %}
-                </select>
-{#                <input type="hidden" name="act" value="select">#}
-            </form>
-        </div>
-        <div class="col-1 text-center align-middle"> </div>
-        <div class="col-6"></div>
-    </div>
 
-    {% if division != None %}
-        <div class="row">
-            <div class="col-12"><br>
-                <h4 class="align-bottom"> {{ division.name_th }} ({{ division.name_sh }}) </h4>
+                    {% if responsibles.has_next %}
+                        <a href="{% url 'responsibleList' responsibles.next_page_number %}"
+                           class="btn btn-outline-primary">&raquo;</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
-        <hr class="text-primary">
-        <table class="table table-light table-striped table-hover"  style="border-color: #0b5ed7">
-            <tr class="text-primary">
-                <th class="col-1"> </th>
-                <th class="col-9">ชื่อผู้รับผิดชอบข้อมูล</th>
-                <th class="col-2">
-                    {% if request.session.userType == 'Administrator' %}
-                        <button data-bs-toggle="collapse" data-bs-target="#newResonsible"
-                                class="btn btn-sm btn-primary text-white" style="width: 100%">
-                            <i class="fa fa-plus"></i> เพิ่มผู้รับผิดชอบข้อมูล
-                        </button>
-                    {% endif %}
-                </th>
-            </tr>
-            {% if division.getResponsible.count == 0 %}
-                <tr>
-                    <td colspan="4" class="text-center text-danger"> - ยังไม่ได้กำหนดรายชื่อผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยนี้ไว้ในระบบ - </td>
-                </tr>
-            {% else %}
-                {% for responer in division.getResponsible %}
-                    <tr>
-                        <td class="text-center">
-                            <img src="{% static responer.personnel.picture %}" class="rounded-circle" width="50px">
-                        </td>
-                        <td>
-                            {{ responer.personnel }}
-                        </td>
-                        <td class="text-center">
-                            {% if request.session.userType == 'Administrator' %}
-                                <a href="{% url 'responsibleDelete' responer.id %}" class="btn btn-danger"
-                                   onclick="return confirm('โปรดยืนยันการลบผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยที่เลือกนี้' )">
-                                    <i class="fa fa-trash"> </i></a>
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% endif %}
-        </table>
-
-        <div id="newResonsible" class="collapse">
-            <form method="post" class="form-control text-primary">
-                {% csrf_token %}
-                {{ form.as_table }}
-                <input type="hidden" name="divisionId" value="{{ division.id }}">
-                <input type="hidden" name="action" value="new">
-                <button type="submit" class="btn btn-success">
-                    <i class="fa-solid fa-floppy-disk"></i> บันทึก
-                </button>
-            </form>
-        </div>
     {% endif %}
+
+    <div id="newResonsible" class="collapse">
+        <form method="post" class="form-control text-primary">
+            {% csrf_token %}
+            {{ form.as_table }}
+            <input type="hidden" name="divisionId" value="{{ division.id }}">
+            <input type="hidden" name="action" value="new">
+            <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-floppy-disk"></i> บันทึก
+            </button>
+        </form>
+    </div>
+    <p class="text-end text-info">[ข้อมูลการกำหหนดผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อย: {{ count }} รายการ]</p>
+    <br>
 {% endblock %}

@@ -177,7 +177,7 @@ class CurrAffiliation(models.Model):
     recorder = models.ForeignKey(Personnel, related_name='RecorderCurrAffiliation', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.curriculum.name_th + ' ' + self.personnel  + ' (' + self.status + ')'
+        return self.curriculum.name_th + ' ' + str(self.personnel)  + ' (' + self.status + ')'
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
@@ -189,7 +189,7 @@ class Responsible(models.Model): # เจ้าหน้าที่รับผ
     recorder = models.ForeignKey(Personnel, related_name='RecorderResponsible', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.division.name_th + ' - ' + self.personnel
+        return self.division.name_th + ' - ' + str(self.personnel)
     def getRight(self, recorder, division):
         right = Responsible.objects.filter(personnel=recorder, division=division)
         if right is not None:

@@ -36,7 +36,7 @@
         <button type="button" class="btn btn-secondary" onclick="history.back()">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
-        {% if request.session.userType in 'Administrator, Staff, Personnnel' %}
+        {% if request.session.userType in 'Administrator, Staff, Personnel' %}
             <button type="button" class="btn btn-warning"
                     onclick="location.href='{% url 'expertiseUpdate' expertise.id  %}'">
                 <i class="fa fa-tools"></i> แก้ไข

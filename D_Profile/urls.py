@@ -29,6 +29,7 @@ urlpatterns = [
     path('userLogout', baseapp.views.userLogout, name='userLogout'),
     path('userChgPassword', baseapp.views.userChgPassword, name='userChgPassword'),
     path('helpme', baseapp.views.helpme, name='helpme'),
+    path('permissionerror', baseapp.views.permissionerror, name='permissionerror'),
     path('baseapp/', include('baseapp.urls')),
     path('workapp/', include('workapp.urls')),
 ]

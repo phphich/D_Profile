@@ -99,9 +99,10 @@ def leaveDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
                 return render(request, 'work/leave/leaveDetail.html', context)
     # else:
+    timeUpdate = leave.getTimeUpdate()
     fileForm = LeaveFileForm(initial={'leave':leave, 'filetype':'Unknow', 'recorder':recorder})
     urlForm = LeaveURLForm(initial={'leave':leave, 'recorder':recorder})
-    context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave}
+    context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave, 'timeUpdate':timeUpdate}
     return render(request, 'work/leave/leaveDetail.html', context)
 
 @login_required(login_url='userAuthen')
@@ -318,9 +319,10 @@ def trainingDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'training': training}
                 return render(request, 'work/training/trainingDetail.html', context)
     # else:
+    timeUpdate = training.getTimeUpdate()
     fileForm = TrainingFileForm(initial={'training':training, 'filetype':'Unknow', 'recorder':recorder})
     urlForm = TrainingURLForm(initial={'training':training, 'recorder':recorder})
-    context={'fileForm': fileForm, 'urlForm':urlForm, 'training': training}
+    context={'fileForm': fileForm, 'urlForm':urlForm, 'training': training, 'timeUpdate':timeUpdate}
     return render(request, 'work/training/trainingDetail.html', context)
 
 @login_required(login_url='userAuthen')
@@ -540,9 +542,10 @@ def performanceDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
                 return render(request, 'work/performance/performanceDetail.html', context)
     # else:
+    timeUpdate = performance.getTimeUpdate()
     fileForm = PerformanceFileForm(initial={'performance': performance, 'filetype': 'Unknow','recorder':recorder})
     urlForm = PerformanceURLForm(initial={'performance': performance, 'recorder':recorder})
-    context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
+    context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance, 'timeUpdate':timeUpdate}
     return render(request, 'work/performance/performanceDetail.html', context)
 
 @login_required(login_url='userAuthen')

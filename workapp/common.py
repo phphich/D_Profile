@@ -59,6 +59,25 @@ def getCurrentDate():
     currentDay = y + "-" + m + "-" + d
     return currentDay
 
+def chkUpdateTime(documentDate): #ฟังก์ชันตรวจสอบวันสุดท้ายของการแก้ไขเอกสาร เทียบกับวันปัจจุบัน ว่าสามารถแก้ไขได้อยู่หรือไม่
+    m= documentDate.month
+    y = documentDate.year
+    if m <= 8:
+        lastUpdate = datetime.datetime(y, 8, 31, 23, 59, 59) # สิ้นเดือนสิงหาคมของปีปัจจุบัน
+    else:
+        lastUpdate = datetime.datetime(y+1, 8, 31, 23, 59, 59) # สิ้นเดือนสิงหาคมของปีถัดไป
+    today = datetime.datetime.now()
+    print('document: ' + str(documentDate))
+    print('lastUpdate: ' + str(lastUpdate))
+    print('today: ' + str(today))
+    if today < lastUpdate:
+        print(True)
+        return True
+    else:
+        print(False)
+        return False
+
+
 
 
 

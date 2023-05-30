@@ -42,7 +42,7 @@ urlpatterns = [
     path('<id>/currAffiliationDelete', views.currAffiliationDelete, name='currAffiliationDelete'),
 
     path('responsibleList', views.responsibleList, name='responsibleList'),
-    path('<divisionId>/responsibleList', views.responsibleList, name='responsibleList'),
+    path('<pageNo>/responsibleList', views.responsibleList, name='responsibleList'),
     path('<id>/responsibleDelete', views.responsibleDelete, name='responsibleDelete'),
 
 ]

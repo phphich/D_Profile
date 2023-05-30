@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
     <div class="row">
         <div class="col-10">
@@ -62,21 +63,30 @@
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
         {% endif %}
-        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-            <button type="button" class="btn btn-warning"
-                    onclick="location.href='{% url 'leaveUpdate' leave.id %}'">
-                <i class="fa fa-tools"></i> แก้ไข
-            </button>
+        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+            {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    <i class="fa fa-tools"></i> (หมดอายุแก้ไข)
+                </button>
+            {% else %}
+                <button type="button" class="btn btn-warning"
+                        onclick="location.href='{% url 'leaveUpdate' leave.id %}'">
+                    <i class="fa fa-tools"></i> แก้ไข
+                </button>
+            {% endif %}
         {% endif %}
     </p>
 
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
+                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
+                            <i class="fa fa-plus text-primary"></i>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </h5>
             <div id="uploadfiles" class="collapse">
@@ -155,11 +165,14 @@
                                         {{ f.file.name }}
                                     {% endif %}
                                 </a>
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-                                    <a href="{% url 'leaveDeleteFile' f.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
-                                        <i class="fas fa-minus text-danger"></i>
-                                    </a>
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                                    {% else %}
+                                        <a href="{% url 'leaveDeleteFile' f.id %}"
+                                           onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
+                                            <i class="fas fa-minus text-danger"></i>
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         {% endfor %}
@@ -167,13 +180,16 @@
                     {% if leave.getLeaveFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-                                    <a href="{% url 'leaveDeleteFileAll' leave.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
-                                       class="btn btn-danger">
-                                        <i class="fas fa-trash text-white"></i>
-                                        ลบไฟล์เอกสารแนบทั้งหมด!
-                                    </a>
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
+                                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                                    {% else %}
+                                        <a href="{% url 'leaveDeleteFileAll' leave.id %}"
+                                           onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
+                                           class="btn btn-danger">
+                                            <i class="fas fa-trash text-white"></i>
+                                            ลบไฟล์เอกสารแนบทั้งหมด!
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                             <div class="col-9"></div>
@@ -187,11 +203,14 @@
 
     <div class="row">
         <div class="col-12 text-success">
-            <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
+            <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
+                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                            <i class="fa fa-plus text-primary"></i>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </h5>
         </div>
@@ -216,11 +235,14 @@
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}
                     </a>
-                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-                        <a href="{% url 'leaveDeleteURL' link.id %}"
-                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
-                            <i class="fas fa-minus text-danger"></i>
-                        </a>
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                        {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                        {% else %}
+                            <a href="{% url 'leaveDeleteURL' link.id %}"
+                               onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
+                                <i class="fas fa-minus text-danger"></i>
+                            </a>
+                        {% endif %}
                     {% endif %}
                 </li>
             {% endfor %}
@@ -229,13 +251,15 @@
         {% if leave.getLeaveURLs|length > 1 %}
             <div class="row">
                 <div class="col-3">
-                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-                        <a href="{% url 'leaveDeleteURLAll' leave.id %}"
-                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
-                           class="btn btn-danger">
-                            <i class="fas fa-trash text-white"></i>
-                            ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
-                        </a>
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
+                        {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                        {% else %}
+                            <a href="{% url 'leaveDeleteURLAll' leave.id %}"   onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
+                               class="btn btn-danger">
+                                <i class="fas fa-trash text-white"></i>
+                                ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
+                            </a>
+                        {% endif %}
                     {% endif %}
                 </div>
                 <div class="col-9"></div>

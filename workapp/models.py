@@ -1,6 +1,7 @@
 import fileinput
 from django.db import models
 from baseapp.models import *
+from workapp import common
 
 # def getCommand(self):
 #     commands = Command.objects.filter(personnel=self).order_by('id')
@@ -44,6 +45,8 @@ class Leave(models.Model):
     def getLeaveURLs(self):
         leaveURLs = LeaveURL.objects.filter(leave=self)
         return leaveURLs
+    def getTimeUpdate(self):
+        return common.chkUpdateTime(self.recordDate)
     @staticmethod
     def getCountPersonLeave(personnel): #นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการลา
         countLeave = Leave.objects.filter(Q(personnel=personnel) or Q(recorder=personnel) or Q(editor=personnel)).count()
@@ -121,6 +124,8 @@ class Training(models.Model):
             return "ฤดูร้อน"
         else:
             return self.eduSemeter
+    def getTimeUpdate(self):
+        return common.chkUpdateTime(self.recordDate)
     @staticmethod
     def getCountPersonTraining(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการลา
         countTraining = Training.objects.filter(Q(personnel=personnel) or Q(recorder=personnel) or Q(editor=personnel)).count()
@@ -198,7 +203,8 @@ class Performance(models.Model):
             return "ฤดูร้อน"
         else:
             return self.eduSemeter
-
+    def getTimeUpdate(self):
+        return common.chkUpdateTime(self.recordDate)
     @staticmethod
     def getCountPersonPerformance(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการลา
         countPerformance = Performance.objects.filter(Q(personnel=personnel) or Q(recorder=personnel) or Q(editor=personnel)).count()

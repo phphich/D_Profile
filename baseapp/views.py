@@ -83,6 +83,8 @@ def helpme(request): # เมธอดพิเศษ
     else:
         messages.add_message(request, messages.ERROR, 'แก้ไขรหัสผ่านไม่สำเร็จ')
     return redirect('home')
+def permissionerror(request):
+    return  render(request, 'permissionerror.html')
 
 @login_required(login_url='userAuthen')
 def userChgPassword(request):
@@ -250,11 +252,6 @@ def curriculumDelete(request, id):
         return render(request, 'base/curriculum/curriculumDelete.html', context)
 
 # Personnel CRUD.
-def personnelListOld(request):
-    personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
-    context = {'personnels': personnels}
-    return render(request, 'base/personnel/personnelListOld.html', context)
-
 def personnelList(request, pageNo=None):
     if Personnel.objects.all().count() == 0:
         return redirect('home')
@@ -289,7 +286,10 @@ def personnelNew(request):
     divisionCount = Division.objects.all().count()
     personnelCount = Personnel.objects.all().count()
     if personnelCount > 0:
-        recorder = Personnel.objects.filter(id=request.session['userId']).first()
+        if 'userId' not in request.session:
+            return redirect('home')
+        else:
+            recorder = Personnel.objects.filter(id=request.session['userId']).first()
     else:
         recorder = None
     if divisionCount == 0:
@@ -699,22 +699,23 @@ def currAffiliationDelete(request,id):
 
 # Responsible CRUD.
 @login_required(login_url='userAuthen')
-def responsibleList(request, divisionId = None):
-    division = None
+def responsibleList(request, pageNo=None):
+    if pageNo == None:
+        pageNo = 1
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if 'action' in request.POST:
-            form = ResponsibleForm(data=request.POST, initial={'recorder':recorder})
+            form = ResponsibleForm(data=request.POST)
             if form.is_valid():
                 newForm = form.save(commit=False)
                 person = Personnel.objects.filter(id=newForm.personnel.id).first()
                 division = Division.objects.filter(id=newForm.division.id).first()
-                responsibles = division.getResponsible()
+                responsibles = division.getResponsible() #รายชื่อผู้รับผิดชอบทั้งหมดของสาขานั้นในระบบ
                 duplicate = False
                 for responer in responsibles:
                     if responer.personnel == person:
                         messages.add_message(request, messages.ERROR,
-                                             'บุคลากรที่เลือกมีรายชื่อรับผิดชอบข้อมูลสาขา/หน่วยงานนี้อยู่แล้ว')
+                                             'บุคลากรที่เลือกเป็นผู้มีรายชื่อรับผิดชอบข้อมูลสาขา/หน่วยงานย่อยนี้อยู่แล้ว')
                         duplicate = True
                         break
                 if duplicate == False:
@@ -722,27 +723,20 @@ def responsibleList(request, divisionId = None):
                     messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยเรียบร้อย')
             else:
                 messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
-    divisions = Division.objects.all().order_by('name_th')
-    if request.method == 'POST':
-        divisionId = request.POST['divisionId']
-    if divisionId is not None:
-        division = Division.objects.filter(id=divisionId).first()
-    else:
-        division = divisions.first()
-    form = ResponsibleForm(type='สายสนับสนุน', initial={'division': division, 'recorder': recorder})
-    context = {'divisions': divisions, 'division':division, 'form': form}
+
+    responsibles = Responsible.objects.all().order_by('division__name_th', 'personnel__firstname_th','personnel__lastname_th')
+    responsibles_page = Paginator(responsibles, iterm_per_page)
+    count = responsibles_page.count
+    names = responsibles_page.page(pageNo)
+    for name in names:
+        print(name)
+    form = ResponsibleForm(initial={'recorder': recorder})
+    context = {'responsibles':responsibles_page.page(pageNo), 'count':count, 'form': form}
     return render(request, 'base/responsible/responsibleList.html', context)
 
 @login_required(login_url='userAuthen')
 def responsibleDelete(request,id):
     responsible = get_object_or_404(Responsible, id=id)
-    division = responsible.division
     responsible.delete()
     messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยที่เลือกเรียบร้อย')
-    return redirect('responsibleList', divisionId= division.id)
-
-@login_required(login_url='userAuthen')
-def Permission(request):
-    pass
-
-
+    return redirect('responsibleList')
