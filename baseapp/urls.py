@@ -3,7 +3,7 @@ from baseapp import views
 
 urlpatterns = [
     path('facultyDetail', views.facultyDetail, name='facultyDetail'),
-    path('facultyUpdate', views.facultUpdate, name='facultyUpdate'),
+    path('facultyUpdate', views.facultyUpdate, name='facultyUpdate'),
 
     path('divisionList', views.divisionList, name='divisionList'),
     path('divisionNew', views.divisionNew, name='divisionNew'),

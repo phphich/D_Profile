@@ -1,4 +1,7 @@
 import datetime
+from workapp.models import *
+from django.contrib.auth.models import User, Group
+
 
 # ฟังก์ชันสำหรับตัดอักขระจากชื่อไฟล์ที่ระบบไม่รองรับ
 def fileNameCleansing(filename):
@@ -67,15 +70,71 @@ def chkUpdateTime(documentDate): #ฟังก์ชันตรวจสอบ�
     else:
         lastUpdate = datetime.datetime(y+1, 8, 31, 23, 59, 59) # สิ้นเดือนสิงหาคมของปีถัดไป
     today = datetime.datetime.now()
-    print('document: ' + str(documentDate))
-    print('lastUpdate: ' + str(lastUpdate))
-    print('today: ' + str(today))
     if today < lastUpdate:
         print(True)
         return True
     else:
         print(False)
         return False
+
+def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
+    methodDenyStaff = ['facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
+                        'curriculumNew','curriculumUpdate','curriculumDelete',
+                    ]
+    methodDenyManager =['facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
+                        'curriculumNew','curriculumUpdate','curriculumDelete',
+                        'personnelNew', 'personnelDelete',
+                    ]
+    methodDenyPersonnel =['facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
+                        'curriculumNew','curriculumUpdate','curriculumDelete',
+                        'personnelNew', 'personnelDelete',
+                    ]
+    print('method: ' + methodName)
+    print('type: ' + uType)
+    if uType == 'Administrator':
+       return True
+    elif uType == 'Staff' and methodName in methodDenyStaff:
+        return False
+    elif uType == 'Manager' and methodName in methodDenyManager:
+        return False
+    elif uType == 'Personnel' and methodName in methodDenyPersonnel:
+        return False
+    elif uType == 'Personnel':
+        # if str(methodName).find('Update') != -1:
+        if docType == 'Personnel':
+            userDocIds = Personnel.objects.filter(id=uId).only('id')
+            if docId in userDocIds:
+                return True
+            else:
+                return False
+        elif docType == 'Leave':
+            userDocIds = Leave.objects.filter(personnel_id=uId).only('id')
+            if docId in userDocIds:
+                return True
+            else:
+                return False
+        elif docType == 'Training':
+            userDocIds = Training.objects.filter(personnel_id=uId).only('id')
+            if docId in userDocIds:
+                return True
+            else:
+                return False
+        elif docType == 'Performance':
+            userDocIds = Performance.objects.filter(personnel_id=uId).only('id')
+            if docId in userDocIds:
+                return True
+            else:
+                return False
+        else:
+            return False
+    elif uType == 'Manager':
+        return True
+
+
+
+
+
+
 
 
 

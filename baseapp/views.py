@@ -18,7 +18,30 @@ import plotly.express as px
 
 iterm_per_page = 10
 # Item.objects.filter(Q(field_a=123) | Q(field_b__in=(3, 4, 5, ))
+
+def getSession(request, dtype=None, did=None):
+    global uId
+    global uType
+    global docType
+    global docId
+    global msgErrorPermission
+    msgErrorPermission='ท่านกำลังพยายามเข้าถึงข้อมูลหรือระบบย่อย ในส่วนที่ไม่ได้รับอนุญาตให้เข้าใช้งานได้!'
+    docType = dtype
+    docId = did
+    if 'userId' in request.session:
+        uId = request.session['userId']
+    if 'userType' in request.session:
+        uType = request.session['userType']
+    print("uid in getsession"+ str(uId))
+    print("utype in getsession" + str(uType))
+
 def home(request):
+    getSession(request, dtype='Personnel', did=23)
+    print("uid in home " + str(uId))
+    print("utype in home " + str(uType))
+    print("dtype in home " + str(docType))
+    print("did in home " + str(docId))
+
     faculty = Faculty.objects.first()
     if faculty is not None:
         request.session['sess_faculty'] = faculty.name_th
@@ -124,7 +147,11 @@ def facultyDetail(request):
     return render(request, 'base/faculty/facultyDetail.html', context)
 
 @login_required(login_url='userAuthen')
-def facultUpdate(request):
+def facultyUpdate(request):
+    getSession(request)
+    if common.chkPermission(facultyUpdate.__name__, uType=uType)==False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect('home')
     faculty = Faculty.objects.first()
     form = FacultyForm(data=request.POST or None, instance=faculty)
     if request.method == 'POST':
@@ -146,6 +173,10 @@ def divisionList(request):
 
 @login_required(login_url='userAuthen')
 def divisionNew(request):
+    uType=request.session['userType']
+    if common.chkPermission(divisionNew.__name__,uType=uType)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     if request.method == 'POST':
         form = DivisionForm(data=request.POST)
         if form.is_valid():
@@ -162,6 +193,10 @@ def divisionNew(request):
 
 @login_required(login_url='userAuthen')
 def divisionUpdate(request, id):
+    getSession(request)
+    if common.chkPermission(divisionUpdate.__name__, uType=uType)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     division = get_object_or_404(Division, id=id)
     form = DivisionForm(data=request.POST or None, instance=division)
     if request.method == 'POST':
@@ -178,6 +213,10 @@ def divisionUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def divisionDelete(request, id):
+    getSession(request)
+    if common.chkPermission(divisionDelete.__name__, uType=uType)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     division = get_object_or_404(Division, id=id)
     form = DivisionForm(data=request.POST or None, instance=division)
     if request.method == 'POST':
@@ -203,6 +242,10 @@ def curriculumList(request):
 
 @login_required(login_url='userAuthen')
 def curriculumNew(request):
+    getSession(request)
+    if common.chkPermission(curriculumNew.__name__, uType=uType) ==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     if request.method == 'POST':
         form = CurriculumForm(data=request.POST)
         if form.is_valid():
@@ -220,6 +263,10 @@ def curriculumNew(request):
 
 @login_required(login_url='userAuthen')
 def curriculumUpdate(request, id):
+    getSession(request)
+    if common.chkPermission(curriculumUpdate.__name__, uType=uType)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     curriculum = get_object_or_404(Curriculum, id=id)
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
     if request.method == 'POST':
@@ -236,6 +283,10 @@ def curriculumUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def curriculumDelete(request, id):
+    getSession(request)
+    if common.chkPermission(curriculumDelete.__name__, uType=uType)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     curriculum = get_object_or_404(Curriculum, id=id)
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
     if request.method == 'POST':
@@ -283,6 +334,10 @@ def personnelList(request, pageNo=None):
 
 # @login_required(login_url='userAuthen')
 def personnelNew(request):
+    getSession(request)
+    if common.chkPermission(personnelNew.__name__, uType=uType)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     divisionCount = Division.objects.all().count()
     personnelCount = Personnel.objects.all().count()
     if personnelCount > 0:
@@ -369,14 +424,21 @@ def personnelNew(request):
 
 @login_required(login_url='userAuthen')
 def personnelDetail(request, id):
-
     personnel = Personnel.objects.filter(id=id).first()
+    getSession(request, dtype='Personnel', did=personnel.id)
+    if common.chkPermission(personnelDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     context = {'personnel': personnel}
     return render(request, 'base/personnel/personnelDetail.html', context)
 
 @login_required(login_url='userAuthen')
 def personnelUpdate(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    getSession(request,dtype='Personnel', did=personnel.id)
+    if common.chkPermission(personnelUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     oldpicture = personnel.picture.name  # รูปเดิม
     oldemail = personnel.email  # อีเมล์เดิม
@@ -435,6 +497,10 @@ def personnelUpdate(request, id):
 @login_required(login_url='userAuthen')
 def personnelDelete(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    getSession(request, dtype='Personnel', did=personnel.id)
+    if common.chkPermission(personnelDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect('home')
     picturefile = personnel.picture.name
     form = PersonnelForm(data=request.POST or None, instance=personnel)
     if request.method == 'POST':
@@ -473,7 +539,7 @@ def personnelDelete(request, id):
         form.deleteForm()
         context = {'form': form, 'personnel': personnel}
         return render(request, 'base/personnel/personelDelete.html', context)
-
+# *******************************
 # Education CRUD.
 @login_required(login_url='userAuthen')
 def educationList(request, divisionId=None, personnelId=None):
