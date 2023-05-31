@@ -32,16 +32,10 @@ def getSession(request, dtype=None, did=None):
         uId = request.session['userId']
     if 'userType' in request.session:
         uType = request.session['userType']
-    print("uid in getsession"+ str(uId))
-    print("utype in getsession" + str(uType))
+    # print("uid in getsession"+ str(uId))
+    # print("utype in getsession" + str(uType))
 
 def home(request):
-    getSession(request, dtype='Personnel', did=23)
-    print("uid in home " + str(uId))
-    print("utype in home " + str(uType))
-    print("dtype in home " + str(docType))
-    print("did in home " + str(docId))
-
     faculty = Faculty.objects.first()
     if faculty is not None:
         request.session['sess_faculty'] = faculty.name_th
@@ -54,6 +48,11 @@ def home(request):
         messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
         return  redirect('personnelNew')
     else:
+        # getSession(request, dtype='Personnel', did=23)
+        # print("uid in home " + str(uId))
+        # print("utype in home " + str(uType))
+        # print("dtype in home " + str(docType))
+        # print("did in home " + str(docId))
         return render(request, 'home.html')
 
 # ตรวจสอบ Login
@@ -335,6 +334,7 @@ def personnelList(request, pageNo=None):
 # @login_required(login_url='userAuthen')
 def personnelNew(request):
     getSession(request)
+    getSession(request, dtype='Personnel')
     if common.chkPermission(personnelNew.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect('home')
@@ -590,12 +590,20 @@ def educationNew(request, id):
 @login_required(login_url='userAuthen')
 def educationDetail(request, id):
     education = Education.objects.filter(id=id).first()
+    getSession(request, dtype='Education', did=education.id)
+    if common.chkPermission(educationDetail.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect('home')
     context = {'education': education}
     return render(request, 'base/education/educationDetail.html', context)
 
 @login_required(login_url='userAuthen')
 def educationUpdate(request, id):
     education = get_object_or_404(Education, id=id)
+    getSession(request, dtype='Education', did=education.id)
+    if common.chkPermission(educationUpdate.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect('home')
     personnel = education.personnel
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     form = EducationForm(data=request.POST or None, instance=education)
@@ -619,6 +627,10 @@ def educationUpdate(request, id):
 @login_required(login_url='userAuthen')
 def educationDelete(request, id):
     education = get_object_or_404(Education, id=id)
+    getSession(request, dtype='Education', did=education.id)
+    if common.chkPermission(educationDelete.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect('home')
     personnel = education.personnel
     form = EducationForm(instance=education)
     if request.method == 'POST':
