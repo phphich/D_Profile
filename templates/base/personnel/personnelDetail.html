@@ -16,7 +16,6 @@
 
     <hr class="text-primary">
     <div class="row">
-
         <div class="col-10">
             <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
                 <tr>
@@ -84,6 +83,7 @@
                 <i>{{ personnel.getRecorderAndEditor }} </i>
             </p>
         </div>
+
         <div class="col-2 text-center">
             <img class="img-thumbnail" src="{% static personnel.picture %}" width="200px" height="auto"
                  style="margin-top:10px;">
@@ -96,7 +96,7 @@
                 <button type="button" class="btn btn-secondary" onclick="location.href='{% url 'personnelList' %}'">
                     <i class="fa fa-rotate-back"></i> ย้อนกลับ
                 </button>
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
                         <button type="button" class="btn btn-warning"
                             onclick="location.href='{% url 'personnelUpdate' personnel.id %}'">
                         <i class="fa fa-tools"></i> แก้ไข
@@ -116,7 +116,15 @@
                 </button>
             </p>
         </div>
+        <div class="col-2">
+            <p class="text-center">
+                {% if request.session.userType in 'Administrator, Staff' %}
+                    <button type="button " class="btn btn-danger btn-sm"
+                            onclick="location.href='{% url 'userResetPassword' personnel.id %}'">
+                        <i class="fa fa-key"></i> รีเซตรหัสผ่าน
+                    </button>
+                {% endif %}
+            </p>
+        </div>
     </div>
-
-
 {% endblock %}

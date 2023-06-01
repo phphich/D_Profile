@@ -18,8 +18,6 @@ iterm_per_page = 5
 #Leave CRUD
 @login_required(login_url='userAuthen')
 def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
-    if 'userType' not in request.session:
-        return redirect('userAuthen')
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
@@ -109,7 +107,6 @@ def leaveDetail(request, id):
 def leaveNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
-    print(request.session['userId'])
     if request.method == 'POST':
         form = LeaveForm(data=request.POST)
         if form.is_valid():

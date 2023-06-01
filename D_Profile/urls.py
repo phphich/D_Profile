@@ -28,6 +28,7 @@ urlpatterns = [
     path('userAuthen', baseapp.views.userAuthen, name='userAuthen'),
     path('userLogout', baseapp.views.userLogout, name='userLogout'),
     path('userChgPassword', baseapp.views.userChgPassword, name='userChgPassword'),
+    path('<id>/userResetPassword', baseapp.views.userResetPassword, name='userResetPassword'),
     path('helpme', baseapp.views.helpme, name='helpme'),
     path('permissionerror', baseapp.views.permissionerror, name='permissionerror'),
     path('baseapp/', include('baseapp.urls')),

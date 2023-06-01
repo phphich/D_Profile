@@ -19,6 +19,7 @@ import plotly.express as px
 iterm_per_page = 10
 # Item.objects.filter(Q(field_a=123) | Q(field_b__in=(3, 4, 5, ))
 
+
 def getSession(request, dtype=None, did=None):
     global uId
     global uType
@@ -44,6 +45,7 @@ def home(request):
         request.session['sess_faculty'] = "Faculty: [N/A]"
         request.session['sess_university'] = "University: [N/A]"
     countPersonnel = Personnel.objects.all().count()
+    request.session['last_url']= request.path_info
     if countPersonnel == 0:
         messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
         return  redirect('personnelNew')
@@ -110,6 +112,10 @@ def permissionerror(request):
 
 @login_required(login_url='userAuthen')
 def userChgPassword(request):
+    getSession(request)
+    if common.chkPermission(facultyUpdate.__name__, uType=uType) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect('home')
     email = request.session['userEmail']
     personnel = Personnel.objects.filter(email=email).first()
     if request.method == 'POST':
@@ -122,7 +128,7 @@ def userChgPassword(request):
         if user is not None: # มีบัญชีผู้ใช้ระบบจริง
             if user.check_password(currentPassword): # ป้อนรหัสผ่านเดิมถูกต้อง
                 if newPassword == confirmPassword:
-                    user.password = newPassword
+                    user.password = make_password(newPassword)
                     user.save()
                     messages.add_message(request, messages.SUCCESS,'แก้ไขรหัสผ่านเรียบร้อย ระบบจะพาท่านเข้าระบบใหม่อีกครั้ง')
                     return redirect('userLogout')
@@ -137,10 +143,40 @@ def userChgPassword(request):
     context = {'form':form, 'personnel':personnel}
     return render(request, 'userChgPassword.html', context)
 
+@login_required(login_url='userAuthen')
+def userResetPassword(request, id):
+    personnel = Personnel.objects.filter(id=id).first()
+    getSession(request, dtype='Personnel', did=personnel.id)
+    if common.chkPermission(userResetPassword.__name__, uType=uType, uId=uId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect('home')
+    if request.method == 'POST':
+        form = ChgPasswordForm(data=request.POST)
+        email = request.POST['email']
+        newPassword = request.POST['newPassword']
+        confirmPassword = request.POST['confirmPassword']
+        user = User.objects.filter(email=email).first()
+        if user is not None: # มีบัญชีผู้ใช้ระบบจริง
+            if newPassword == confirmPassword:
+                user.password = make_password(newPassword)
+                user.save()
+                messages.add_message(request, messages.SUCCESS,
+                                     'แก้ไขรหัสผ่านเรียบร้อย ระบบจะพาท่านเข้าระบบใหม่อีกครั้ง')
+                return redirect('personnelDetail', id=personnel.id)
+            else:
+                messages.add_message(request, messages.ERROR, 'ท่านระบุรหัสผ่านใหม่กับรหัสผ่านที่ยืนยันไม่ตรงกัน ')
+        else:
+            messages.add_message(request, messages.ERROR, 'ไม่ปรากฏชื่อบัญชีผู้ใช้ระบบตามที่ระบุ ')
+    else:
+        form = ResetPasswordForm(initial={'email':personnel.email})
+    context = {'form':form, 'personnel':personnel}
+    return render(request, 'base/personnel/userResetPassword.html', context)
+
 #Factulty Data
 def facultyDetail(request):
     if Personnel.objects.all().count() == 0:
         return redirect('home')
+    request.session['last_url']= request.path_info
     faculty = Faculty.objects.first()
     context = {'faculty': faculty}
     return render(request, 'base/faculty/facultyDetail.html', context)
@@ -150,7 +186,8 @@ def facultyUpdate(request):
     getSession(request)
     if common.chkPermission(facultyUpdate.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     faculty = Faculty.objects.first()
     form = FacultyForm(data=request.POST or None, instance=faculty)
     if request.method == 'POST':
@@ -166,16 +203,18 @@ def facultyUpdate(request):
 def divisionList(request):
     if Personnel.objects.all().count() == 0:
         return redirect('home')
+    request.session['last_url'] = request.path_info
     divisions = Division.objects.all().order_by('name_th')
     context = {'divisions': divisions}
     return render(request, 'base/division/divisionList.html', context)
 
 @login_required(login_url='userAuthen')
 def divisionNew(request):
-    uType=request.session['userType']
+    getSession(request)
     if common.chkPermission(divisionNew.__name__,uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     if request.method == 'POST':
         form = DivisionForm(data=request.POST)
         if form.is_valid():
@@ -195,7 +234,8 @@ def divisionUpdate(request, id):
     getSession(request)
     if common.chkPermission(divisionUpdate.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     division = get_object_or_404(Division, id=id)
     form = DivisionForm(data=request.POST or None, instance=division)
     if request.method == 'POST':
@@ -215,7 +255,8 @@ def divisionDelete(request, id):
     getSession(request)
     if common.chkPermission(divisionDelete.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     division = get_object_or_404(Division, id=id)
     form = DivisionForm(data=request.POST or None, instance=division)
     if request.method == 'POST':
@@ -235,6 +276,7 @@ def divisionDelete(request, id):
 def curriculumList(request):
     if Personnel.objects.all().count() == 0:
         return redirect('home')
+    request.session['last_url'] = request.path_info
     curriculums = Curriculum.objects.all().order_by('name_th')
     context = {'curriculums': curriculums}
     return render(request, 'base/curriculum/curriculumList.html', context)
@@ -244,7 +286,8 @@ def curriculumNew(request):
     getSession(request)
     if common.chkPermission(curriculumNew.__name__, uType=uType) ==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     if request.method == 'POST':
         form = CurriculumForm(data=request.POST)
         if form.is_valid():
@@ -265,7 +308,8 @@ def curriculumUpdate(request, id):
     getSession(request)
     if common.chkPermission(curriculumUpdate.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     curriculum = get_object_or_404(Curriculum, id=id)
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
     if request.method == 'POST':
@@ -285,7 +329,8 @@ def curriculumDelete(request, id):
     getSession(request)
     if common.chkPermission(curriculumDelete.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     curriculum = get_object_or_404(Curriculum, id=id)
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
     if request.method == 'POST':
@@ -305,6 +350,7 @@ def curriculumDelete(request, id):
 def personnelList(request, pageNo=None):
     if Personnel.objects.all().count() == 0:
         return redirect('home')
+    request.session['last_url'] = request.path_info
     if pageNo == None:
         pageNo = 1
     division = Division.objects.all().order_by('name_th')
@@ -337,7 +383,8 @@ def personnelNew(request):
     getSession(request, dtype='Personnel')
     if common.chkPermission(personnelNew.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     divisionCount = Division.objects.all().count()
     personnelCount = Personnel.objects.all().count()
     if personnelCount > 0:
@@ -428,7 +475,8 @@ def personnelDetail(request, id):
     getSession(request, dtype='Personnel', did=personnel.id)
     if common.chkPermission(personnelDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     context = {'personnel': personnel}
     return render(request, 'base/personnel/personnelDetail.html', context)
 
@@ -438,7 +486,8 @@ def personnelUpdate(request, id):
     getSession(request,dtype='Personnel', did=personnel.id)
     if common.chkPermission(personnelUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     oldpicture = personnel.picture.name  # รูปเดิม
     oldemail = personnel.email  # อีเมล์เดิม
@@ -449,6 +498,8 @@ def personnelUpdate(request, id):
             updateForm = form.save(commit=False)
             id = updateForm.id
             if updateForm.picture.name != oldpicture:  # หากเลือกรูปใหม่
+                if os.path.exists('static/' + oldpicture):  # delete older picture profile
+                    os.remove('static/' + oldpicture)
                 filepath = updateForm.picture.name
                 filepath = filepath.replace(' ', '_')
                 point = filepath.rfind('.')
@@ -460,8 +511,6 @@ def personnelUpdate(request, id):
                 newfilename = 'images/personnels/' + str(personnel.id) + ext  # ชื่อไฟล์ที่ระบบกำหนด
                 personnel.picture.name = newfilename  # ต้องอัพเดท เผื่อกรณีที่เปลี่ยนชนิดไฟล์ภาพ
                 personnel.save()
-                if os.path.exists('static/' + oldpicture):  # delete older picture profile
-                    os.remove('static/' + oldpicture)
                 os.rename('static/' + filename, 'static/' + personnel.picture.name)
             else:
                 updateForm.save()
@@ -500,7 +549,8 @@ def personnelDelete(request, id):
     getSession(request, dtype='Personnel', did=personnel.id)
     if common.chkPermission(personnelDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     picturefile = personnel.picture.name
     form = PersonnelForm(data=request.POST or None, instance=personnel)
     if request.method == 'POST':

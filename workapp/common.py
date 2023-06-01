@@ -79,13 +79,13 @@ def chkUpdateTime(documentDate): #ฟังก์ชันตรวจสอบ�
 
 def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
     methodDenyStaff = ['facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
-                        'curriculumNew','curriculumUpdate','curriculumDelete',
+                        'curriculumNew','curriculumUpdate','curriculumDelete', 'personnelDelete'
                     ] # method ที่ไม่อนุญาตสำหรับ Staff
-    methodDenyManager =['facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
+    methodDenyManager =['userResetPassword', 'facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
                         'curriculumNew','curriculumUpdate','curriculumDelete',
                         'personnelNew', 'personnelDelete',
                     ] # method ที่ไม่อนุญาตสำหรับ Manager
-    methodDenyPersonnel =['facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
+    methodDenyPersonnel =['userResetPassword', 'facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
                         'curriculumNew','curriculumUpdate','curriculumDelete',
                         'personnelNew', 'personnelDelete',
                     ] # method ที่ไม่อนุญาตสำหรับ Personnel
@@ -157,8 +157,7 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
         personResponsible = Personnel.objects.filter(division__in = divReponsible) #บุคลากรทั้งหมดที่มีสิทธิ์เข้าถึงได้
         print("personResponsible")
         print(personResponsible)
-        if str(methodName).find('List') != -1 or str(methodName).find(
-                'Detail') != -1:
+        if str(methodName).find('List') != -1 or str(methodName).find('Detail') != -1:
             if docType == 'Personnel':
                 userDocIds=Personnel.objects.filter(id__in=personResponsible)  # เอกสารข้อมูลบุคลากรทุกคน ที่ได้รับสิทธิื์ให้เข้าถึงได้
                 print("hyeeeee")
@@ -176,6 +175,10 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
             else:
                 userDocIds = None
             uDocId = []
+            print(docId)
+            print(uId)
+            if docId == uId:
+                return True
             for x in userDocIds:
                 uDocId.append(x.id)
             if docId not in uDocId:

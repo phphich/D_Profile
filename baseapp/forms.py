@@ -166,7 +166,9 @@ class PersonnelForm(forms.ModelForm):
         }
 
     def updateForm(self):
-        self.fields['email'].widget.attrs['readonly'] = False
+        # self.fields['email'].widget.attrs['readonly'] = True
+        # self.fields['email'].label = 'ที่อยู่อีเมล์ [ไม่อนุญาตให้แก้ไขได้]'
+        pass
 
     def deleteForm(self):
         self.fields['email'].widget.attrs['readonly'] = True
@@ -333,9 +335,10 @@ class ChgPasswordForm(forms.Form):
                                       widget=forms.PasswordInput(attrs={'class':'form-control'}))
 
 class ResetPasswordForm(forms.Form):
-    userId = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name)', max_length=50,
+    email = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name)', max_length=50,
                              widget=forms.TextInput(attrs={'class':'form-control', 'readonly':True}))
     newPassword = forms.CharField(label='รหัสผ่านใหม่', max_length=100,
                                   widget=forms.PasswordInput(attrs={'class':'form-control'}))
     confirmPassword = forms.CharField(label='ยืนยันรหัสผ่านใหม่',  max_length=100,
                                       widget=forms.PasswordInput(attrs={'class':'form-control'}))
+

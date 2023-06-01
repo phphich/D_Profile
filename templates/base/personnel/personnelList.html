@@ -48,6 +48,8 @@
 {#                                <i class="fa fa-search"> </i> </a>#}
                             <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-warning">
                                 <i class="fa fa-tools"> </i> </a>
+                        {% endif %}
+                        {% if request.session.userType in 'Administrator' %}
                             <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger">
                                 <i class="fa fa-trash"> </i> </a>
                         {% endif %}
