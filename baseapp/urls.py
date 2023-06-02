@@ -45,4 +45,12 @@ urlpatterns = [
     path('<pageNo>/responsibleList', views.responsibleList, name='responsibleList'),
     path('<id>/responsibleDelete', views.responsibleDelete, name='responsibleDelete'),
 
+    path('headerList', views.headerList, name='headerList'),
+    path('<pageNo>/headerList', views.headerList, name='headerList'),
+    path('<id>/headerDelete', views.headerDelete, name='headerDelete'),
+
+    path('managerList', views.managerList, name='managerList'),
+    path('<id>/managerDelete', views.managerDelete, name='managerDelete'),
+
+
 ]

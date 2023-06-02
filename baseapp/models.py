@@ -30,7 +30,10 @@ class Division(models.Model):
     def getPersonnels(self):
         personnels = Personnel.objects.filter(division=self).order_by('firstname_th', 'lastname_th')
         return personnels
-    def getResponsible(self):
+    def getHeader(self): #ข้อมูลหัวหน้าสาขานั้น
+        header = Header.objects.filter(division=self)
+        return header
+    def getResponsible(self): #ข้อมูลผู้รับผิดชอบข้อมูลสาขานั้น
         responsibles = Responsible.objects.filter(division=self)
         return responsibles
     def getCountPersonnel(self):
@@ -100,6 +103,18 @@ class Personnel(models.Model):
         countCurrAff = CurrAffiliation.objects.filter(Q(personnel=self) or Q(recorder=self) or Q(editor=self)).count()
         countAll = countEdu + countExp + countCurrAff
         return countAll
+    def getManager(self): #ข้อมูลการเป็นผู้บริหารของบุคลากรรายนั้น
+        manager = Manager.objects.filter(personnel=self)
+        return manager
+    def getHeader(self): #ข้อมูลการเป็นหัวหน้าของบุคลากรรายนั้น
+        header = Header.objects.filter(personnel=self)
+        return header
+    def getDivisionResponsible(self): #ข้อมูลสาขาที่ต้องรับผิดชอบของบุคลากรรายนั้น
+        responsibles = Responsible.objects.filter(personnel=self)
+        divResponsible = []
+        for x in responsibles:  # สาขาทั้งหมดที่มีสิทธิ์เข้าถึงได้
+            divResponsible.append(x.division)
+        return divResponsible
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorderId).first()
         editor  = Personnel.objects.filter(id=self.editorId).first()
@@ -190,6 +205,14 @@ class Responsible(models.Model): # เจ้าหน้าที่รับผ
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return self.division.name_th + ' - ' + str(self.personnel)
+    @staticmethod
+    def getPersonnelResponsibles(id):
+        responsibles = Responsible.objects.filter(personnel_id=id)
+        divReponsible = []
+        for x in responsibles:  # สาขาทั้งหมดที่มีสิทธิ์เข้าถึงได้
+            divReponsible.append(x.division)
+        personnelResponsibles = Personnel.objects.filter(division__in=divReponsible)
+        return personnelResponsibles
     def getRight(self, recorder, division):
         right = Responsible.objects.filter(personnel=recorder, division=division)
         if right is not None:
@@ -200,3 +223,28 @@ class Responsible(models.Model): # เจ้าหน้าที่รับผ
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+
+class Header(models.Model): # หัวหน้าสาขา
+    division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelHeader', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderHeader', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.division.name_th + ' header is: ' + str(self.personnel)
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+
+class Manager(models.Model): # ผู้บริหาร
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelManager', on_delete=models.CASCADE, default=None)
+    status = models.CharField(max_length=50, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderManager', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return str(self.personnel) + " - " + self.status
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+

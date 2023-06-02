@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-user-tie"></i> ผู้บริหารหน่วยงาน </h2>
+        </div>
+    </div>
+    <hr class="text-primary">
+
+    <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+        <tr class="text-primary">
+            <th class="col-1"></th>
+            <th class="col-4">ชื่อผู้บริหาร</th>
+            <th class="col-4">ตำแหน่ง</th>
+            <th class="col-2">
+                {% if request.session.userType == 'Administrator' %}
+                    <button data-bs-toggle="collapse" data-bs-target="#newResonsible"
+                            class="btn btn-sm btn-primary text-white" style="width: 100%">
+                        <i class="fa fa-plus"></i> เพิ่มผู้บริหาร
+                    </button>
+                {% endif %}
+            </th>
+        </tr>
+        {% if count == 0 %}
+            <tr>
+                <td colspan="4" class="text-center text-danger"> -
+                    ยังไม่ได้กำหนดรายชื่อผู้บริหารหน่วยงานไว้ในระบบ -
+                </td>
+            </tr>
+        {% else %}
+            {% for manager in managers %}
+                <tr>
+                    <td class="text-center">
+                        <img src="{% static manager.personnel.picture %}" class="rounded-circle" width="50px">
+                    </td>
+                    <td>
+                        {{ manager.personnel }}
+                    </td>
+                    <td>
+                        {{ manager.status }}
+                    </td>
+                    <td class="text-center">
+                        {% if request.session.userType == 'Administrator' %}
+                            <a href="{% url 'managerDelete' manager.id  %}" class="btn btn-danger"
+                               onclick="return confirm('โปรดยืนยันการลบรายชื่อผู้บริหารที่เลือกนี้' )">
+                                <i class="fa fa-trash"> </i></a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% endif %}
+    </table>
+
+    <div id="newResonsible" class="collapse">
+        <form method="post" class="form-control text-primary">
+            {% csrf_token %}
+            {{ form.as_table }}
+            <button type="submit" class="btn btn-success">
+
+                <i class="fa-solid fa-floppy-disk"></i> บันทึก
+            </button>
+        </form>
+    </div>
+    <p class="text-end text-info">[ข้อมูลรายชื่อผู้บริหารหน่วยงาน: {{ count }} รายการ]</p>
+    <br>
+{% endblock %}

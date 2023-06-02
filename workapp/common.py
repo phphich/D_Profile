@@ -152,16 +152,10 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
         divReponsible = []
         for x in responsibles: #สาขาทั้งหมดที่มีสิทธิ์เข้าถึงได้
             divReponsible.append(x.division)
-        print('divResponsible')
-        print(divReponsible)
         personResponsible = Personnel.objects.filter(division__in = divReponsible) #บุคลากรทั้งหมดที่มีสิทธิ์เข้าถึงได้
-        print("personResponsible")
-        print(personResponsible)
         if str(methodName).find('List') != -1 or str(methodName).find('Detail') != -1:
             if docType == 'Personnel':
                 userDocIds=Personnel.objects.filter(id__in=personResponsible)  # เอกสารข้อมูลบุคลากรทุกคน ที่ได้รับสิทธิื์ให้เข้าถึงได้
-                print("hyeeeee")
-                print(userDocIds)
             elif docType == 'Education':
                 userDocIds = Education.objects.filter(personnel_id__in=personResponsible)  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Experience':

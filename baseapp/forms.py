@@ -88,7 +88,6 @@ class CurriculumForm(forms.ModelForm):
             'division': 'หน่วยงานที่รับผิดชอบ',
         }
 
-
     def deleteForm(self):
         self.fields['name_th'].widget.attrs['readonly'] = True
         self.fields['name_en'].widget.attrs['readonly'] = True
@@ -100,6 +99,16 @@ class CurriculumForm(forms.ModelForm):
         self.fields['division'].widget.attrs['readonly'] = True
 
 class PersonnelForm(forms.ModelForm):
+    def __init__(self, staffId=None,  *args, **kwargs):
+        super(PersonnelForm, self).__init__(*args, **kwargs)
+        if staffId != None:
+            staff = Personnel.objects.filter(id=staffId).first()
+            divResponsible = staff.getDivisionResponsible()
+            divIds=[]
+            for x in divResponsible:
+                divIds.append(x.id)
+            self.fields['division'].queryset = Division.objects.filter(id__in=divIds)
+            # self.fields['personnel'].queryset = Personnel.objects.filter(type=type)
     class Meta:
         GENDER_CHOICES = (
             ("ชาย", "ชาย"),
@@ -303,20 +312,91 @@ class ResponsibleForm(forms.ModelForm):
         )
         model = Responsible
         fields = (
-            'division', 'personnel','recorder')
+            'personnel', 'division', 'recorder')
         widgets = {
-            'division': forms.Select(attrs={'class': 'form-control text-primary'}),
             'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'division': forms.Select(attrs={'class': 'form-control text-primary'}),
             'recorder': forms.HiddenInput(),
         }
         labels = {
-            'division': 'สาขา/หน่วยงานย่อย',
-            'personnel': 'บุคลากร',
+            'division': 'รับผิดชอบดูแลข้อมูลของสาขา/หน่วยงานย่อย',
+            'personnel': 'เลือกผู้รับผิดชอบ',
             'recorder': 'ผู้บันทึก',
         }
     def deleteForm(self):
         self.fields['division'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
+
+class ResponsibleForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ResponsibleForm, self).__init__(*args, **kwargs)
+        self.fields['personnel'].queryset = Personnel.objects.filter(type='สายสนับสนุน')
+    class Meta:
+        model = Responsible
+        fields = (
+            'personnel', 'division', 'recorder')
+        widgets = {
+            'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'division': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'personnel': 'เลือกผู้รับผิดชอบ',
+            'division': 'รับผิดชอบดูแลข้อมูลของสาขา/หน่วยงานย่อย',
+            'recorder': 'ผู้บันทึก',
+        }
+    def deleteForm(self):
+        self.fields['personnel'].widget.attrs['readonly'] = True
+        self.fields['division'].widget.attrs['readonly'] = True
+
+class HeaderForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(HeaderForm, self).__init__(*args, **kwargs)
+        self.fields['personnel'].queryset = Personnel.objects.exclude(id__in=Header.objects.values('personnel_id'))
+        self.fields['division'].queryset = Division.objects.exclude(id__in=Header.objects.values('division_id'))
+
+    #     เฉพาะรายช่อบุคลากรที่ยังไม่ปรากฎในรายชื่อหัวหน้าสาขาอื่น
+
+    class Meta:
+        model = Header
+        fields = (
+            'personnel', 'division', 'recorder')
+        widgets = {
+            'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'division': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'personnel': 'บุคลากร',
+            'division': 'เป็นหัวหน้าสาขา/หน่วยงานย่อย',
+            'recorder': 'ผู้บันทึก',
+        }
+    def deleteForm(self):
+        self.fields['division'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
+
+class ManagerForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ManagerForm, self).__init__(*args, **kwargs)
+        self.fields['personnel'].queryset = Personnel.objects.exclude(type='สายสนับสนุน').exclude(id__in=Manager.objects.values('personnel_id'))
+    #     เฉพาะรายช่อบุคลากรที่ไม่ใช่สายสนับสนุนและยังไม่ปรากฎในรายชื่อผู้บริหาร
+    class Meta:
+        model = Manager
+        fields = (
+            'personnel', 'status', 'recorder')
+        widgets = {
+            'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
+            'status':  forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'personnel': 'บุคลากร',
+            'status': 'ตำแหน่งบริหาร',
+            'recorder': 'ผู้บันทึก',
+        }
+    def deleteForm(self):
+        self.fields['personnel'].widget.attrs['readonly'] = True
+        self.fields['division'].widget.attrs['readonly'] = True
 
 class AuthenForm(forms.Form):
     userName = forms.CharField(label='ชื่อบัญชีผู้ใช้ระบบ (User Name) ', max_length=50,

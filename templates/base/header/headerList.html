@@ -4,7 +4,7 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <h2><i class="fas fa-chalkboard-teacher"></i> ผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อย </h2>
+            <h2><i class="fas fa-user-astronaut"></i> หัวหน้าสาขา/หน่วยงานย่อย </h2>
         </div>
     </div>
     <hr class="text-primary">
@@ -12,13 +12,13 @@
     <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
         <tr class="text-primary">
             <th class="col-1"></th>
-            <th class="col-4">ชื่อผู้รับผิดชอบข้อมูล</th>
-            <th class="col-5">รับผิดชอบดูแลข้อมูลของสาขา/หน่วยงานย่อย</th>
+            <th class="col-4">ชื่อหัวหน้าสาขา/หน่วยงานย่อย</th>
+            <th class="col-5">สาขา/หน่วยงานย่อย</th>
             <th class="col-2">
                 {% if request.session.userType == 'Administrator' %}
-                    <button data-bs-toggle="collapse" data-bs-target="#newResonsible"
+                    <button data-bs-toggle="collapse" data-bs-target="#newHeader"
                             class="btn btn-sm btn-primary text-white" style="width: 100%">
-                        <i class="fa fa-plus"></i> เพิ่มผู้รับผิดชอบข้อมูล
+                        <i class="fa fa-plus"></i> เพิ่มหัวหน้า
                     </button>
                 {% endif %}
             </th>
@@ -26,29 +26,25 @@
         {% if count == 0 %}
             <tr>
                 <td colspan="4" class="text-center text-danger"> -
-                    ยังไม่ได้กำหนดรายชื่อผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยไว้ในระบบ -
+                    ยังไม่ได้กำหนดรายชื่อหัวหน้าสาขา/หน่วยงานย่อยไว้ในระบบ -
                 </td>
             </tr>
         {% else %}
-            {% groupValue "" as divisionName %}
-            {% for responer in responsibles %}
+            {% for header in headers %}
                 <tr>
                     <td class="text-center">
-                        <img src="{% static responer.personnel.picture %}" class="rounded-circle" width="50px">
+                        <img src="{% static header.personnel.picture %}" class="rounded-circle" width="50px">
                     </td>
                     <td>
-                        {{ responer.personnel }}
+                        {{ header.personnel }}
                     </td>
-                     <td>
-                        {% if divisionName != responer.division.name_th %}
-                            {% groupValue responer.division as divisionName %}
-                            {{ divisionName }}
-                        {% endif %}
+                    <td>
+                        {{ header.division }}
                     </td>
                     <td class="text-center">
                         {% if request.session.userType == 'Administrator' %}
-                            <a href="{% url 'responsibleDelete' responer.id %}" class="btn btn-danger"
-                               onclick="return confirm('โปรดยืนยันการลบผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยที่เลือกนี้' )">
+                            <a href="{% url 'headerDelete' header.id %}" class="btn btn-danger"
+                               onclick="return confirm('โปรดยืนยันการลบรายชื่อหัวหน้าสาขา/หน่วยงานย่อยที่เลือกนี้' )">
                                 <i class="fa fa-trash"> </i></a>
                         {% endif %}
                     </td>
@@ -87,17 +83,15 @@
         </div>
     {% endif %}
 
-    <div id="newResonsible" class="collapse">
+    <div id="newHeader" class="collapse">
         <form method="post" class="form-control text-primary">
             {% csrf_token %}
             {{ form.as_table }}
-            <input type="hidden" name="divisionId" value="{{ division.id }}">
-            <input type="hidden" name="action" value="new">
             <button type="submit" class="btn btn-success">
                 <i class="fa-solid fa-floppy-disk"></i> บันทึก
             </button>
         </form>
     </div>
-    <p class="text-end text-info">[ข้อมูลการกำหหนดผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อย: {{ count }} รายการ]</p>
+    <p class="text-end text-info">[ข้อมูลรายชื่อหัวหน้าสาขา/หน่วยงานย่อย: {{ count }} รายการ]</p>
     <br>
 {% endblock %}

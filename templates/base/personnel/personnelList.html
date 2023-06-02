@@ -3,8 +3,11 @@
 
 {% block content %}
     <h2 class="text-primary"><i class="fa fa-user-group"></i> ข้อมูลบุคลากร </h2>
+    {% if request.session.userType == 'Staff' %}
+        <h5 class="text-primary">(เฉพาะบุคลากรในสาขาที่ผู้ใช้ระบบต้องรับผิดชอบดูแลข้อมูล) </h5>
+    {% endif %}
     <hr class="text-primary">
-    {% if chart is not None %}
+    {% if count != 0 %}
         <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
             <tr class="bg-white text-primary">
                 <th class="col-1"></th>
@@ -89,6 +92,7 @@
         {% endif %}
         <p class="text-end text-info">[ข้อมูลบุคลากร: {{ count }} ราย]</p>
         <br>
+        {% if chart is not None %}
         <div class="row text-center align-content-center">
             <div class="col-md-1"></div>
             <div class="col-md-4 text-center" style="alignment: center; vertical-align: middle">
@@ -125,6 +129,7 @@
             </div>
             <div class="col-md-1"></div>
         </div>
+        {% endif %}
 
     {% else %}
         <div class="row">
@@ -132,7 +137,7 @@
             <div class="col-6 text-center text-danger">
                 <div class="alert-warning text-center text-danger">
                     <br>
-                    <h3>ยังไม่ปรากฎข้อมูลสาขาในระบบ!!</h3>
+                    <h3>ไม่ปรากฎข้อมูลบุคลากรที่ท่านสามารถเข้าถึงได้ในระบบ!!</h3>
                     <br>
                     <button type="button" class="btn btn-primary" onclick="location.href='{% url 'home' %}'">
                         <i class="fa fa-home"></i> หน้าหลัก
