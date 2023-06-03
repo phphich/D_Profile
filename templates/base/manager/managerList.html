@@ -16,7 +16,7 @@
             <th class="col-4">ตำแหน่ง</th>
             <th class="col-2">
                 {% if request.session.userType == 'Administrator' %}
-                    <button data-bs-toggle="collapse" data-bs-target="#newResonsible"
+                    <button data-bs-toggle="collapse" data-bs-target="#newHeader"
                             class="btn btn-sm btn-primary text-white" style="width: 100%">
                         <i class="fa fa-plus"></i> เพิ่มผู้บริหาร
                     </button>
@@ -53,7 +53,7 @@
         {% endif %}
     </table>
 
-    <div id="newResonsible" class="collapse">
+    <div id="newHeader" class="collapse">
         <form method="post" class="form-control text-primary">
             {% csrf_token %}
             {{ form.as_table }}

@@ -31,11 +31,14 @@ class Division(models.Model):
         personnels = Personnel.objects.filter(division=self).order_by('firstname_th', 'lastname_th')
         return personnels
     def getHeader(self): #ข้อมูลหัวหน้าสาขานั้น
-        header = Header.objects.filter(division=self)
-        return header
+        header = Header.objects.filter(division=self).first()
+        return header.personnel
     def getResponsible(self): #ข้อมูลผู้รับผิดชอบข้อมูลสาขานั้น
         responsibles = Responsible.objects.filter(division=self)
-        return responsibles
+        personnels = []
+        for responsible in responsibles:
+            personnels.append(responsible.personnel)
+        return personnels
     def getCountPersonnel(self):
         count = Personnel.objects.filter(division=self).aggregate(count=Count('id'))
         return count['count']
@@ -104,17 +107,27 @@ class Personnel(models.Model):
         countAll = countEdu + countExp + countCurrAff
         return countAll
     def getManager(self): #ข้อมูลการเป็นผู้บริหารของบุคลากรรายนั้น
-        manager = Manager.objects.filter(personnel=self)
-        return manager
+        manager = Manager.objects.filter(personnel=self).first()
+        return manager.status
     def getHeader(self): #ข้อมูลการเป็นหัวหน้าของบุคลากรรายนั้น
-        header = Header.objects.filter(personnel=self)
-        return header
+        header = Header.objects.filter(personnel=self).first()
+        return header.division
     def getDivisionResponsible(self): #ข้อมูลสาขาที่ต้องรับผิดชอบของบุคลากรรายนั้น
         responsibles = Responsible.objects.filter(personnel=self)
-        divResponsible = []
-        for x in responsibles:  # สาขาทั้งหมดที่มีสิทธิ์เข้าถึงได้
-            divResponsible.append(x.division)
-        return divResponsible
+        divisions = []
+        for responsible in responsibles:
+            divisions.append(responsible.division)
+        return divisions
+    def getPersonnelResponsible(self): #ข้อมูลสาขาที่ต้องรับผิดชอบของบุคลากรรายนั้น
+        responsibles = Responsible.objects.filter(personnel=self)
+        personnels = []
+        for responsible in responsibles:
+            division = responsible.division
+            respersonnels = division.getPersonnels()
+            for personnel in respersonnels:
+                personnels.append(personnel)
+        return personnels
+
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorderId).first()
         editor  = Personnel.objects.filter(id=self.editorId).first()

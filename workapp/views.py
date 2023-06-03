@@ -40,8 +40,9 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
             else:
                 personnel = division.getPersonnels().first()
         else:
-            division = Division.objects.all().order_by('name_th').first()
-            personnel = division.getPersonnels().first()
+            division = Division.objects.all().order_by('name_th').first() #ถ้ายังไม่เคยเลือกสาขา ให้ระบบเลือกสาขาแรก
+            personnel = division.getPersonnels().first() #ถ้ายังไม่เคยเลือกบุคลากร ให้ระบบเลือกบุคลากรคนแรกในสาขา
+
         leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
         count = leaves.count()
         leaves_page = Paginator(leaves, iterm_per_page)

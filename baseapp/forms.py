@@ -103,10 +103,13 @@ class PersonnelForm(forms.ModelForm):
         super(PersonnelForm, self).__init__(*args, **kwargs)
         if staffId != None:
             staff = Personnel.objects.filter(id=staffId).first()
-            divResponsible = staff.getDivisionResponsible()
-            divIds=[]
-            for x in divResponsible:
-                divIds.append(x.id)
+            divisions = staff.getDivisionResponsible()
+            divIds = []
+            if len(divisions) == 0:
+                divIds = [staff.division]
+            else:
+                for x in divisions:
+                    divIds.append(x.id)
             self.fields['division'].queryset = Division.objects.filter(id__in=divIds)
             # self.fields['personnel'].queryset = Personnel.objects.filter(type=type)
     class Meta:
@@ -303,6 +306,7 @@ class CurrAffiliationForm(forms.ModelForm):
 class ResponsibleForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ResponsibleForm, self).__init__(*args, **kwargs)
+        self.fields['division'].queryset = Division.objects.all().order_by('name_th')
         self.fields['personnel'].queryset = Personnel.objects.filter(type='สายสนับสนุน')
     class Meta:
         STATUS_CHOICES = (
@@ -317,6 +321,7 @@ class ResponsibleForm(forms.ModelForm):
             'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
             'division': forms.Select(attrs={'class': 'form-control text-primary'}),
             'recorder': forms.HiddenInput(),
+
         }
         labels = {
             'division': 'รับผิดชอบดูแลข้อมูลของสาขา/หน่วยงานย่อย',
@@ -327,27 +332,27 @@ class ResponsibleForm(forms.ModelForm):
         self.fields['division'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
 
-class ResponsibleForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(ResponsibleForm, self).__init__(*args, **kwargs)
-        self.fields['personnel'].queryset = Personnel.objects.filter(type='สายสนับสนุน')
-    class Meta:
-        model = Responsible
-        fields = (
-            'personnel', 'division', 'recorder')
-        widgets = {
-            'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
-            'division': forms.Select(attrs={'class': 'form-control text-primary'}),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'personnel': 'เลือกผู้รับผิดชอบ',
-            'division': 'รับผิดชอบดูแลข้อมูลของสาขา/หน่วยงานย่อย',
-            'recorder': 'ผู้บันทึก',
-        }
-    def deleteForm(self):
-        self.fields['personnel'].widget.attrs['readonly'] = True
-        self.fields['division'].widget.attrs['readonly'] = True
+# class ResponsibleForm(forms.ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super(ResponsibleForm, self).__init__(*args, **kwargs)
+#         self.fields['personnel'].queryset = Personnel.objects.filter(type='สายสนับสนุน')
+#     class Meta:
+#         model = Responsible
+#         fields = (
+#             'personnel', 'division', 'recorder')
+#         widgets = {
+#             'personnel': forms.Select(attrs={'class': 'form-control text-primary'}),
+#             'division': forms.Select(attrs={'class': 'form-control text-primary'}),
+#             'recorder': forms.HiddenInput(),
+#         }
+#         labels = {
+#             'personnel': 'เลือกผู้รับผิดชอบ',
+#             'division': 'รับผิดชอบดูแลข้อมูลของสาขา/หน่วยงานย่อย',
+#             'recorder': 'ผู้บันทึก',
+#         }
+#     def deleteForm(self):
+#         self.fields['personnel'].widget.attrs['readonly'] = True
+#         self.fields['division'].widget.attrs['readonly'] = True
 
 class HeaderForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

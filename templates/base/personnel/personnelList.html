@@ -9,6 +9,32 @@
     <hr class="text-primary">
     {% if count != 0 %}
         <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+            {% if request.session.userType != 'Staff' %}
+                <form class="form-control" method="post">
+                    {% csrf_token %}
+                    <tr class="text-success">
+                        <div class="col-3">
+                                <label for="id_divId" class="text-success">เลือกสาขา/หน่วยงานย่อย:</label>
+                                <select name="divId" class="form-control text-success" id="id_divId"
+                                        onchange="form.submit();">
+                                    {% if divId == "0" %}
+                                        <option value="0" selected> (ทั้งหมด) </option>
+                                    {% else %}
+                                        <option value="0"> (ทั้งหมด) </option>
+                                    {% endif %}
+                                    {% for div in divisions %}
+                                        {% if div == division %}
+                                            <option value="{{ div.id }}" selected> {{ div }} </option>
+                                        {% else %}
+                                            <option value="{{ div.id }}" >  {{ div }} </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                        </div>
+                        <div class="col-8"></div>
+                    </tr>
+                </form>
+            {% endif %}
             <tr class="bg-white text-primary">
                 <th class="col-1"></th>
                 <th class="col-3">ชื่อ - สกุล</th>

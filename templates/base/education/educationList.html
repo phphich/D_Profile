@@ -21,7 +21,7 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <input type="hidden" name="personnelId">
+{#                    <input type="hidden" name="personnelId">#}
                 </form>
             </div>
             <div class="col-1 text-center align-middle">
@@ -86,8 +86,6 @@
                     <td class="text-center">{{ educate.yearGraduate }}</td>
                     <td class="text-center">
                         {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-    {#                        <a href="{% url 'educationDetail' educate.id %}" class="btn btn-light"> <i#}
-    {#                                class="fa fa-search"> </i> </a>#}
                             <a href="{% url 'educationUpdate' educate.id %}" class="btn btn-warning"> <i
                                     class="fa fa-tools"> </i> </a>
                             <a href="{% url 'educationDelete' educate.id %}" class="btn btn-danger"> <i

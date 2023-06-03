@@ -18,7 +18,7 @@ import plotly.express as px
 
 iterm_per_page = 10
 # Item.objects.filter(Q(field_a=123) | Q(field_b__in=(3, 4, 5, ))
-
+msgErrorId = 'เป้าหมายที่ท่านระบุ ไม่ปรากฎในระบบหรือท่านไม่มีสิทธิ์ในการเข้าถึง!'
 
 def getSession(request, dtype=None, did=None):
     global uId
@@ -27,6 +27,7 @@ def getSession(request, dtype=None, did=None):
     global docId
     global msgErrorPermission
     msgErrorPermission='ท่านกำลังพยายามเข้าถึงข้อมูลหรือระบบย่อย ในส่วนที่ไม่ได้รับอนุญาตให้เข้าใช้งานได้!'
+
     docType = dtype
     docId = did
     if 'userId' in request.session:
@@ -107,6 +108,24 @@ def helpme(request): # เมธอดพิเศษ
     else:
         messages.add_message(request, messages.ERROR, 'แก้ไขรหัสผ่านไม่สำเร็จ')
     return redirect('home')
+
+def helpReset(request):
+    users = User.objects.all()
+    pgroup = Group.objects.filter(name='Personnel').first()
+    sgroup = Group.objects.filter(name='Staff').first()
+    hgroup = Group.objects.filter(name='Header').first()
+    mgroup = Group.objects.filter(name='Manager').first()
+    for user in users:
+        if user.is_superuser != True: # groups.filter(name='Administrator').exists():
+            user.groups.remove(sgroup)
+            user.groups.remove(hgroup)
+            user.groups.remove(mgroup)
+            user.save()
+            user.groups.add(pgroup)
+    messages.add_message(request, messages.SUCCESS, 'รีเซตระบบเรียบร้อย...')
+    return redirect('home')
+
+
 def permissionerror(request):
     return  render(request, 'permissionerror.html')
 
@@ -298,7 +317,7 @@ def curriculumNew(request):
             context = {'form': form}
             return render(request, 'base/curriculum/curriculumNew.html', context)
     else:
-        curriculumnYear = datetime.datetime.year + 543
+        curriculumnYear = datetime.datetime.now().year + 543
         form = CurriculumForm(initial={'curriculumYear':curriculumnYear})
         context = {'form': form}
         return render(request, 'base/curriculum/curriculumNew.html', context)
@@ -347,57 +366,76 @@ def curriculumDelete(request, id):
         return render(request, 'base/curriculum/curriculumDelete.html', context)
 
 # Personnel CRUD.
-def personnelList(request, pageNo=None):
+def personnelList(request, pageNo=None, divId=None):
     if Personnel.objects.all().count() == 0:
         return redirect('home')
+    # if 'userType' not in request.session:
+    #     return redirect('userAuthen')
     request.session['last_url'] = request.path_info
     if pageNo == None:
         pageNo = 1
-    if request.session['userType'] != 'Staff':
-        division = Division.objects.all().order_by('name_th')
+    divId = request.POST.get('divId')
+    if divId == None or int(divId)==0:
+        division=None
+    else:
+        division = Division.objects.filter(id=divId).first()
+        pageNo = 1
+
+    # if request.session['userType'] != 'Staff':
+    if 'userType' not in request.session or request.session['userType'] != 'Staff':
+        divisions = Division.objects.all().order_by('name_th')
         listDivName = []
         listDivCountPersonnel=[]
-        if division.count() != 0:
-            for div in division:
+        if division is None:
+            personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
+            for div in divisions:
                 listDivName.append(div.name_th)
                 listDivCountPersonnel.append(div.getCountPersonnel())
-                dataFrame = pd.DataFrame({'สาขา':listDivName, 'จำนวน':listDivCountPersonnel}, columns=['สาขา','จำนวน'])
-
-            fig = px.bar(dataFrame, x='สาขา', y='จำนวน', title='จำนวนบุคลากรแยกตามสาขา')
-            fig.update_layout(autosize=False, width=600, height=400,
-                              margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
-                              paper_bgcolor = "aliceblue")
-            chart = fig.to_html()
         else:
-            chart=None
-        personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
+            personnels = division.getPersonnels()
+            listDivName.append(division.name_th)
+            listDivCountPersonnel.append(division.getCountPersonnel())
+        dataFrame = pd.DataFrame({'สาขา': listDivName, 'จำนวน': listDivCountPersonnel}, columns=['สาขา', 'จำนวน'])
+        fig = px.bar(dataFrame, x='สาขา', y='จำนวน', title='จำนวนบุคลากรแยกตามสาขา')
+        fig.update_layout(autosize=False, width=600, height=400,
+                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
+                          paper_bgcolor="aliceblue")
+        chart = fig.to_html()
         personnels_page = Paginator(personnels, iterm_per_page)
-        count = Personnel.objects.all().count()
-        cm = Personnel.objects.filter(gender='ชาย').count()
-        cfm = Personnel.objects.filter(gender='หญิง').count()
-        context = {'personnels': personnels_page.page(pageNo), 'chart':chart, 'count':count, 'countmale':cm, 'countfemale':cfm}
+        count = personnels.count()
+        cm = personnels.filter(gender='ชาย').count()
+        cfm = personnels.filter(gender='หญิง').count()
+        context = {'divisions':divisions, 'division':division, 'personnels': personnels_page.page(pageNo), 'chart':chart, 'count':count, 'countmale':cm, 'countfemale':cfm}
     else:
-        personResponsible = Responsible.getPersonnelResponsibles(request.session['userId'])
-        personnels_page = Paginator(personResponsible, iterm_per_page)
-        count = personResponsible.count()
+        personnel = Personnel.objects.filter(id=request.session['userId']).first()
+        divisions = personnel.getDivisionResponsible()
+        # divisions=[]
+        # for resDivision in resDivisions:
+        #     divisions.append(resDivision.division)
+        print('respon')
+        print(divisions)
+        personnels = Personnel.objects.filter(division__in=divisions)
+        # personnels = Responsible.getPersonnelResponsibles(request.session['userId']).order_by('division__personnel__firstname_th','division__personnel__lastname_th') #เฉพาะรายชื่อบุคลากรที่รับผิดชอบข้อมูลให้
+        personnels_page = Paginator(personnels, iterm_per_page)
+        count = personnels.count()
         context = {'personnels': personnels_page.page(pageNo), 'count': count}
     return render(request, 'base/personnel/personnelList.html', context)
 
 # @login_required(login_url='userAuthen')
 def personnelNew(request):
-    getSession(request)
-    getSession(request, dtype='Personnel')
-    if common.chkPermission(personnelNew.__name__, uType=uType)==False:
-        messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect(request.session['last_url'])
+    if 'userType' in request.session:
+        recorder = Personnel.objects.filter(id=request.session['userId']).first()
+        if request.session['userType'] == 'Staff':
+            getSession(request, dtype='Personnel', did=recorder.id)
+            if common.chkPermission(personnelNew.__name__, uType=uType, uId=uId)==False:
+                messages.add_message(request, messages.ERROR,msgErrorPermission)
+                return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     divisionCount = Division.objects.all().count()
     personnelCount = Personnel.objects.all().count()
     if personnelCount > 0:
         if 'userId' not in request.session:
-            return redirect('home')
-        else:
-            recorder = Personnel.objects.filter(id=request.session['userId']).first()
+            return redirect('userAuthen')
     else:
         recorder = None
     if divisionCount == 0:
@@ -446,17 +484,20 @@ def personnelNew(request):
             user = User.objects.create_user(id, email, password)
             user.first_name = personnel.firstname_en
             user.last_name = personnel.lastname_en
-            if userType == 'Administrator':
+            if personnelCount == 0: # กรณีบันทึกเป็นรายแรก  (Admin)
                 user.is_superuser = True
                 user.is_staff = True
+                group = Group.objects.create(name='Administrator')
+                # group.save()
+                user.groups.add(group)
             else:
                 user.is_superuser = False
                 user.is_staff = True
-            group, created = Group.objects.get_or_create(name=userType)
-            if group is not None:
-                user.groups.add(group)
-            else:
-                user.groups.add (created)
+                group, created = Group.objects.get_or_create(name='Personnel')
+                if created is not None:
+                    user.groups.add(created)
+                else:
+                    user.groups.add(group)
             user.save()
             messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลบุคลากรรายใหม่เรียบร้อย')
             return redirect('personnelList', pageNo=1)
@@ -472,8 +513,6 @@ def personnelNew(request):
         if request.session['userType'] == 'Administrator':
             form = PersonnelForm()
         else:
-            print("userID")
-            print(request.session['userId'])
             form = PersonnelForm(staffId=request.session['userId'])
         countPersonnel = Personnel.objects.all().count()
         if countPersonnel == 0:
@@ -489,6 +528,9 @@ def personnelNew(request):
 @login_required(login_url='userAuthen')
 def personnelDetail(request, id):
     personnel = Personnel.objects.filter(id=id).first()
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request, dtype='Personnel', did=personnel.id)
     if common.chkPermission(personnelDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
@@ -500,6 +542,8 @@ def personnelDetail(request, id):
 @login_required(login_url='userAuthen')
 def personnelUpdate(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
     getSession(request,dtype='Personnel', did=personnel.id)
     if common.chkPermission(personnelUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
@@ -513,7 +557,6 @@ def personnelUpdate(request, id):
             form = PersonnelForm(data=request.POST, instance=personnel, files=request.FILES)
         else:
             form = PersonnelForm(staffId=request.session['userId'], data=request.POST, instance=personnel, files=request.FILES)
-        userType = request.POST['userType']
         if form.is_valid():
             updateForm = form.save(commit=False)
             id = updateForm.id
@@ -539,15 +582,15 @@ def personnelUpdate(request, id):
                 personnel.save()
                 messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลบุคลากรเรียบร้อย')
             # อัพเดท user
-            user = User.objects.filter(username=oldemail).first()
-            user.username = personnel.email
-            user.email = personnel.email
-            user.first_name = personnel.firstname_en
-            user.last_name = personnel.lastname_en
-            group, created = Group.objects.get_or_create(name=userType)
-            user.groups.clear()
-            user.groups.add(group)
-            user.save()
+            # user = User.objects.filter(username=oldemail).first()
+            # user.username = personnel.email
+            # user.email = personnel.email
+            # user.first_name = personnel.firstname_en
+            # user.last_name = personnel.lastname_en
+            # group, created = Group.objects.get_or_create(name=userType)
+            # user.groups.clear()
+            # user.groups.add(group)
+            # user.save()
             return redirect('personnelDetail', personnel.id)
         else:
             user = User.objects.filter(username=oldemail).first()
@@ -556,8 +599,8 @@ def personnelUpdate(request, id):
             return render(request, 'base/personnel/personnelUpdate.html', context)
     else:
         user = User.objects.filter(username=oldemail).first()
-        userType = user.groups.first()
-        userType = str(userType)
+        user_group = user.groups.first()
+        userType = str(user_group)
         if request.session['userType'] == 'Administrator':
             form = PersonnelForm(instance=personnel)
         else:
@@ -569,6 +612,9 @@ def personnelUpdate(request, id):
 @login_required(login_url='userAuthen')
 def personnelDelete(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request, dtype='Personnel', did=personnel.id)
     if common.chkPermission(personnelDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
@@ -589,23 +635,27 @@ def personnelDelete(request, id):
             error = True
         if error == True:
             messages.add_message(request, messages.ERROR,'ไม่สามารถลบข้อมูลบุคลากรที่เลือกได้ เนื่องจากได้ข้อมูลบุคลากรรายนี้ได้ถูกนำไปใช้ร่วมกันข้อมูลในส่วนอื่น ๆ แล้ว')
-            return redirect('personnelList', pageNo=1)
+            return redirect(request.session['last_url'])
+            # return redirect('personnelList', pageNo=1)
         else:
             user = User.objects.filter(username=personnel.email).first()
             user.delete()
             pid = personnel.id
-            useRecorder = Personnel.objects.filter(recorderId=pid)
+            admin = User.groups.filter(user_set__groups='Administrator').first()
+            useRecorder = Personnel.objects.filter(recorderId=pid) #ดึงรายชื่อบุคลากรที่เคยถูกบันทึกข้อมูลด้วยบุคลากรรายที่จะลบ
             for use in useRecorder:
-                use.recorderId = use.id
+                use.recorderId = use.id #เปลี่ยนข้อมูลคนบันทึกเป็นเจ้าของข้อมูล
                 use.save()
             useEditor = Personnel.objects.filter(editorId=pid)
             for use in useEditor:
                 use.editorId = use.id
                 use.save()
             personnel.delete()
-            # delete picture file
-            if os.path.exists('static/' + picturefile):
-                os.remove('static/' + picturefile)  # file exits, delete it
+            try:
+                if os.path.exists('static/' + picturefile):
+                    os.remove('static/' + picturefile)  # file exits, delete it
+            except:
+                messages.add_message(request, messages.SUCCESS, 'พบปัญหาการลบไฟล์รูปภาพของบุคลากร')
             messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลบุคลากรที่เลือกเรียบร้อย')
             return redirect('personnelList', pageNo=1)
     else:
@@ -616,27 +666,38 @@ def personnelDelete(request, id):
 # Education CRUD.
 @login_required(login_url='userAuthen')
 def educationList(request, divisionId=None, personnelId=None):
-    if 'userType' not in request.session:
-        return redirect('userAuthen')
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.session['userType'] == "Personnel":
-            personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
-            context = {'personnel': personnel}
+        context = {'personnel': recorder}
     else:
         division = None
         personnel = None
-        divisions = Division.objects.all().order_by('name_th')
+        if request.session['userType'] == 'Staff':
+            divisions = recorder.getDivisionResponsible()
+            division = divisions[0]
+        elif request.session['userType'] == 'Header':
+            divisions = [recorder.division]
+            division = recorder.division
+        else: #Manager, Administrator
+            divisions = Division.objects.all().order_by('name_th')
+            division = divisions.first()
+
         if request.method == 'POST':
-            divisionId = request.POST['divisionId']
-            personnelId = request.POST['personnelId']
-        if divisionId is not None:
-            division = Division.objects.filter(id=divisionId).first()
-            if personnelId != "":
+            if 'personnelId' in request.POST:
+                personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
+                division = personnel.division
+            else:
+                divisionId = request.POST['divisionId']
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = division.getPersonnels().first()
+        else: #เข้ามาครั้งแรก
+            if divisionId is not None: # กรณี redirect มาจากการ New
+                division = Division.objects.get(id=divisionId)
+                personnel = Personnel.objects.get(id=personnelId)
             else:
                 personnel = division.getPersonnels().first()
-        else:
-            division = Division.objects.all().order_by('name_th').first()
-            personnel = division.getPersonnels().first()
 
         context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/education/educationList.html', context)
@@ -644,6 +705,14 @@ def educationList(request, divisionId=None, personnelId=None):
 @login_required(login_url='userAuthen')
 def educationNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Education', did=personnel.id)
+    if common.chkPermission(educationNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         form = EducationForm(data=request.POST)
@@ -663,26 +732,33 @@ def educationNew(request, id):
 @login_required(login_url='userAuthen')
 def educationDetail(request, id):
     education = Education.objects.filter(id=id).first()
+    if education is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request, dtype='Education', did=education.id)
     if common.chkPermission(educationDetail.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
         messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     context = {'education': education}
     return render(request, 'base/education/educationDetail.html', context)
 
 @login_required(login_url='userAuthen')
 def educationUpdate(request, id):
     education = get_object_or_404(Education, id=id)
+    if education is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request, dtype='Education', did=education.id)
     if common.chkPermission(educationUpdate.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
         messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     personnel = education.personnel
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     form = EducationForm(data=request.POST or None, instance=education)
     if request.method == 'POST':
         if form.is_valid():
-            # divisions = Division.objects.all().order_by('name_th')
             form.save()
             education.editor = recorder
             education.editDate = datetime.datetime.now()
@@ -700,10 +776,13 @@ def educationUpdate(request, id):
 @login_required(login_url='userAuthen')
 def educationDelete(request, id):
     education = get_object_or_404(Education, id=id)
+    if education is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request, dtype='Education', did=education.id)
     if common.chkPermission(educationDelete.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
         messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect('home')
+        return redirect(request.session['last_url'])
     personnel = education.personnel
     form = EducationForm(instance=education)
     if request.method == 'POST':
@@ -719,33 +798,52 @@ def educationDelete(request, id):
 # Expertise CRUD.
 @login_required(login_url='userAuthen')
 def expertiseList(request, divisionId=None, personnelId=None):
-    if 'userType' not in request.session:
-        return redirect('userAuthen')
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.session['userType'] == "Personnel":
-        personnel = Personnel.objects.filter(id=request.session['userId'] ).first()
-        context = {'personnel': personnel}
+        context = {'personnel': recorder}
     else:
         division = None
         personnel = None
-        divisions = Division.objects.all().order_by('name_th')
+        if request.session['userType'] == 'Staff':
+            divisions = recorder.getDivisionResponsible()
+            division = divisions[0]
+        elif request.session['userType'] == 'Header':
+            divisions = [recorder.division]
+            division = recorder.division
+        else: #Manager, Administrator
+            divisions = Division.objects.all().order_by('name_th')
+            division = divisions.first()
+
         if request.method == 'POST':
-            divisionId = request.POST['divisionId']
-            personnelId = request.POST['personnelId']
-        if divisionId is not None:
-            division = Division.objects.filter(id=divisionId).first()
-            if personnelId != "":
+            if 'personnelId' in request.POST:
+                personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
+                division = personnel.division
+            else:
+                divisionId = request.POST['divisionId']
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = division.getPersonnels().first()
+        else: #เข้ามาครั้งแรก
+            if divisionId is not None: # กรณี redirect มาจากการ New
+                division = Division.objects.get(id=divisionId)
+                personnel = Personnel.objects.get(id=personnelId)
             else:
                 personnel = division.getPersonnels().first()
-        else:
-            division = Division.objects.all().order_by('name_th').first()
-            personnel =  division.getPersonnels().first()
         context = {'divisions': divisions, 'division': division, 'personnel': personnel}
     return render(request, 'base/expertise/expertiseList.html', context)
 
 @login_required(login_url='userAuthen')
 def expertiseNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Expertise', did=personnel.id)
+    if common.chkPermission(expertiseNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         form = ExpertiseForm(data=request.POST)
@@ -764,15 +862,31 @@ def expertiseNew(request, id):
 
 @login_required(login_url='userAuthen')
 def expertiseDetail(request, id):
-    expertise = Expertise.objects.filter(id=id).first()
+    expertise= Expertise.objects.filter(id=id).first()
+    if expertise is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Expertise', did=expertise.id)
+    if common.chkPermission(expertiseDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     context = {'expertise': expertise}
     return render(request, 'base/expertise/expertiseDetail.html', context)
 
 @login_required(login_url='userAuthen')
 def expertiseUpdate(request, id):
     expertise = get_object_or_404(Expertise, id=id)
-    personnel = expertise.personnel
+    if expertise is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Expertise', did=expertise.id)
+    if common.chkPermission(expertiseUpdate.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    personnel = expertise.personnel
     form = ExpertiseForm(data=request.POST or None, instance=expertise)
     if request.method == 'POST':
         if form.is_valid():
@@ -784,10 +898,10 @@ def expertiseUpdate(request, id):
             return redirect('expertiseList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
-            context = {'form': form, 'personnel': personnel}
+            context = {'form': form, 'personnel': expertise}
             return render(request, 'base/expertise/expertiseUpdate.html', context)
     else:
-        context = {'form': form, 'personnel': personnel}
+        context = {'form': form, 'personnel': expertise}
         return render(request, 'base/expertise/expertiseUpdate.html', context)
 
 @login_required(login_url='userAuthen')
@@ -858,24 +972,42 @@ def responsibleList(request, pageNo=None):
         form = ResponsibleForm(data=request.POST)
         if form.is_valid():
             newForm = form.save(commit=False)
-            person = Personnel.objects.filter(id=newForm.personnel.id).first()
+            personnel = Personnel.objects.filter(id=newForm.personnel.id).first()
             division = Division.objects.filter(id=newForm.division.id).first()
-            responsibles = division.getResponsible()  # รายชื่อผู้รับผิดชอบทั้งหมดของสาขานั้นในระบบ
+            # responsibles = division.getResponsible()  # รายชื่อผู้รับผิดชอบทั้งหมดของสาขานั้นในระบบ
+            responsibles = personnel.getDivisionResponsible()
             duplicate = False
             for responer in responsibles:
-                if responer.personnel == person:
-                    messages.add_message(request, messages.ERROR,
-                                         'บุคลากรที่เลือกเป็นผู้มีรายชื่อรับผิดชอบข้อมูลสาขา/หน่วยงานย่อยนี้อยู่แล้ว')
+                if responer.division == division:
                     duplicate = True
                     break
-            if duplicate == False:
+            if duplicate == True:
+                messages.add_message(request, messages.ERROR,
+                                    'บุคลากรที่เลือกเป็นผู้มีรายชื่อรับผิดชอบข้อมูลสาขา/หน่วยงานย่อยนี้อยู่แล้ว')
+            elif personnel.getHeader().count() !=0 :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
+                messages.add_message(request, messages.ERROR,
+                                     'บุคลากรที่เลือกเป็นหัวหน้าสาขา/หน่วยงานย่อย')
+            elif personnel.getManager().count() != 0:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
+                messages.add_message(request, messages.ERROR,
+                                     'บุคลากรที่เลือกเป็นผู้บริหารหน่วยงาน')
+            else:
+            # if duplicate == False:
                 newForm.save()
+                email = personnel.email
+                user = User.objects.filter(email=email).first()
+                user.is_superuser = False
+                user.is_staff = True
+                pgroup = Group.objects.get(name='Personnel')
+                user.groups.remove(pgroup)
+                hgroup = Group.objects.get(name='Staff')
+                user.groups.add(hgroup)
+                user.save()
                 messages.add_message(request, messages.SUCCESS,
                                      'บันทึกข้อมูลผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยเรียบร้อย')
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
 
-    responsibles = Responsible.objects.all().order_by('division__name_th', 'personnel__firstname_th','personnel__lastname_th')
+    responsibles = Responsible.objects.all().order_by('personnel__firstname_th','personnel__lastname_th', 'division__name_th',)
     responsibles_page = Paginator(responsibles, iterm_per_page)
     count = responsibles.count
     form = ResponsibleForm(initial={'recorder': recorder})
@@ -885,7 +1017,16 @@ def responsibleList(request, pageNo=None):
 @login_required(login_url='userAuthen')
 def responsibleDelete(request,id):
     responsible = get_object_or_404(Responsible, id=id)
+    user=User.objects.get(email=responsible.personnel.email)
     responsible.delete()
+    personnel = Personnel.objects.filter(email=user.email).first()
+    print('count')
+    print(personnel.getDivisionResponsible().count())
+    if personnel.getDivisionResponsible().count() == 0:
+        rgroup = Group.objects.get(name='Staff')
+        user.groups.remove(rgroup)
+        pgroup = Group.objects.get(name='Personnel')  # ให้ group กลับคืนเป็นบุคลากร
+        user.groups.add(pgroup)
     messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อยที่เลือกเรียบร้อย')
     return redirect('responsibleList')
 
@@ -901,10 +1042,12 @@ def headerList(request, pageNo=None):
             newForm = form.save(commit=False)
             division = Division.objects.filter(id=newForm.division.id).first()
             personnel = Personnel.objects.filter(id=newForm.personnel.id).first()
-
             if division.getHeader().count() != 0:  # สาขานั้นมีหัวหน้าแล้ว
                 messages.add_message(request, messages.ERROR,
                                      'สาขา/หน่วยงานย่อยที่เลือกมีการกำหนดผู้เป็นหัวหน้าไปแล้ว')
+            elif personnel.getDivisionResponsible().count() !=0 :  # บุคลากรคนนั้นเป็นนผู้รับผิดชอบข้อมูล
+                messages.add_message(request, messages.ERROR,
+                                     'บุคลากรที่เลือกเป็นเจ้าหน้าที่ผู้รับผิดชอบข้อมูลหัวหน้าสาขา/หน่วยงานย่อย')
             elif personnel.getHeader().count() !=0 :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นหัวหน้าสาขา/หน่วยงานย่อยอยู่แล้ว')
@@ -913,6 +1056,15 @@ def headerList(request, pageNo=None):
                                      'บุคลากรที่เลือกเป็นผู้บริหารหน่วยงาน')
             else:
                 newForm.save()
+                email = personnel.email
+                user = User.objects.filter(email=email).first()
+                user.is_superuser = False
+                user.is_staff = True
+                pgroup = Group.objects.get(name='Personnel')
+                user.groups.remove(pgroup)
+                hgroup = Group.objects.get(name='Header')
+                user.groups.add(hgroup)
+                user.save()
                 messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลหัวหน้าสาขา/หน่วยงานย่อยเรียบร้อย')
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
@@ -926,7 +1078,12 @@ def headerList(request, pageNo=None):
 @login_required(login_url='userAuthen')
 def headerDelete(request,id):
     header = get_object_or_404(Header, id=id)
+    user = User.objects.get(email=header.personnel.email)
     header.delete()
+    hgroup = Group.objects.get(name='Header')
+    user.groups.remove(hgroup)
+    pgroup = Group.objects.get(name='Personnel') # ให้ group กลับคืนเป็นบุคลากร
+    user.groups.add(pgroup)
     messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลหัวหน้าสาขา/หน่วยงานย่อยที่เลือกเรียบร้อย')
     return redirect('headerList')
 
@@ -939,16 +1096,26 @@ def managerList(request, pageNo=None):
         if form.is_valid():
             newForm = form.save(commit=False)
             personnel = Personnel.objects.filter(id=newForm.personnel.id).first()
-            header = Header.objects.filter(personnel_id=personnel.id).first()
-            manager= Manager.objects.filter(personnel_id=personnel.id).first()
-            if header is not None:  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
+            if personnel.getDivisionResponsible().count() !=0 :  # บุคลากรคนนั้นเป็นนผู้รับผิดชอบข้อมูล
                 messages.add_message(request, messages.ERROR,
-                                     'บุคลากรที่เลือกเป็นหัวหน้าสาขา/หน่วยงานย่อยอยู่แล้ว')
-            elif manager is not None:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
+                                     'บุคลากรที่เลือกเป็นเจ้าหน้าที่ผู้รับผิดชอบข้อมูลหัวหน้าสาขา/หน่วยงานย่อย')
+            elif personnel.getHeader().count() !=0 :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
+                messages.add_message(request, messages.ERROR,
+                                     'บุคลากรที่เลือกเป็นหัวหน้าสาขา/หน่วยงานย่อย')
+            elif personnel.getManager().count() != 0:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นผู้บริหารหน่วยงานอยู่แล้ว')
             else:
                 newForm.save()
+                email = personnel.email
+                user = User.objects.filter(email=email).first()
+                user.is_superuser = False
+                user.is_staff = True
+                pgroup = Group.objects.get(name='Personnel')
+                user.groups.remove(pgroup)
+                mgroup = Group.objects.get(name='Manager')
+                user.groups.add(mgroup)
+                user.save()
                 messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลหัวหน้าสาขา/หน่วยงานย่อยเรียบร้อย')
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
@@ -961,6 +1128,11 @@ def managerList(request, pageNo=None):
 @login_required(login_url='userAuthen')
 def managerDelete(request,id):
     manager = get_object_or_404(Manager, id=id)
+    user = User.objects.filter(email=manager.personnel.email).first()
     manager.delete()
+    mgroup = Group.objects.get(name='Manager')
+    user.groups.remove(mgroup)
+    pgroup = Group.objects.get(name='Personnel')  # ให้ group กลับคืนเป็นบุคลากร
+    user.groups.add(pgroup)
     messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้บริหารที่เลือกเรียบร้อย')
     return redirect('managerList')

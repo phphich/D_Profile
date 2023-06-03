@@ -96,7 +96,19 @@
                 <div class="col-9 text-start">
                     <i class="fa-regular fa-id-card"></i> รหัสผู้ใช้: {{ request.session.userEmail }} <br>
                     <i class="fa-regular fa-user"></i> ชื่อ - สกุล: {{ request.session.userName }} <br>
-                    <i class="fa-solid fa-hand-sparkles"></i> สถานะ: {{ request.session.userType }}, {{ request.session.userId }}
+                    <i class="fa-solid fa-hand-sparkles"></i> สถานะ:
+                    {% if request.session.userType == 'Administrator' %}
+                        ผู้ดูแลระบบ
+                    {% elif request.session.userType  == 'Manager' %}
+                        ผู้บริหารหน่วยงาน
+                    {% elif request.session.userType  == 'Header' %}
+                        หัวหน้าสาขา/หน่วยงานย่อย
+                    {% elif request.session.userType  == 'Staff' %}
+                        เจ้าหน้าที่รับผิดชอบข้อมูลฯ
+                    {% else %}
+                        บุคลากร
+                    {% endif %}
+                    , {{ request.session.userId }}
                      <br>
                 </div>
             </div>
