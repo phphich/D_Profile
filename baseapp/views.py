@@ -69,7 +69,7 @@ def userAuthen(request):
         user = authenticate(username=userName, password=userPass)
         if user is not None:
             login(request, user)
-            personnel = Personnel.objects.get(email=userName)
+            personnel = Personnel.objects.filter(email=userName).first()
             request.session['userEmail'] = personnel.email
             request.session['userName'] = personnel.firstname_th + " " + personnel.lastname_th
             request.session['userType'] = str(user.groups.first())
@@ -251,12 +251,16 @@ def divisionNew(request):
 
 @login_required(login_url='userAuthen')
 def divisionUpdate(request, id):
+    division = Division.objects.filter(id=id).first()
+    if division is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request)
     if common.chkPermission(divisionUpdate.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
-    division = get_object_or_404(Division, id=id)
+
     form = DivisionForm(data=request.POST or None, instance=division)
     if request.method == 'POST':
         if form.is_valid():
@@ -272,12 +276,15 @@ def divisionUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def divisionDelete(request, id):
+    division = Division.objects.filter(id=id).first()
+    if division is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request)
     if common.chkPermission(divisionDelete.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
-    division = get_object_or_404(Division, id=id)
     form = DivisionForm(data=request.POST or None, instance=division)
     if request.method == 'POST':
         division.delete()
@@ -325,12 +332,16 @@ def curriculumNew(request):
 
 @login_required(login_url='userAuthen')
 def curriculumUpdate(request, id):
+    curriculum = Curriculum.objects.filter(id=id).first()
+    if curriculum is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request)
     if common.chkPermission(curriculumUpdate.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
-    curriculum = get_object_or_404(Curriculum, id=id)
+
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
     if request.method == 'POST':
         if form.is_valid():
@@ -346,12 +357,16 @@ def curriculumUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def curriculumDelete(request, id):
+    curriculum = Curriculum.objects.filter(id=id).first()
+    if curriculum is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
     getSession(request)
     if common.chkPermission(curriculumDelete.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
-    curriculum = get_object_or_404(Curriculum, id=id)
+
     form = CurriculumForm(data=request.POST or None, instance=curriculum)
     if request.method == 'POST':
         if curriculum.getCountCurrAffiliation() > 0: #มีผู้รับผิดชอบหลักสูตรอยู่
@@ -408,18 +423,17 @@ def personnelList(request, pageNo=None, divId=None):
         cfm = personnels.filter(gender='หญิง').count()
         context = {'divisions':divisions, 'division':division, 'personnels': personnels_page.page(pageNo), 'chart':chart, 'count':count, 'countmale':cm, 'countfemale':cfm}
     else:
-        personnel = Personnel.objects.filter(id=request.session['userId']).first()
-        divisions = personnel.getDivisionResponsible()
-        # divisions=[]
-        # for resDivision in resDivisions:
-        #     divisions.append(resDivision.division)
-        print('respon')
-        print(divisions)
+        recorder = Personnel.objects.filter(id=request.session['userId']).first()
+        divisions = recorder.getDivisionResponsible()
+        outside = recorder.getOutsideResponsible()
+        if outside == True:
+            staffOnly = True
+            divisions.append(recorder.division)
         personnels = Personnel.objects.filter(division__in=divisions)
         # personnels = Responsible.getPersonnelResponsibles(request.session['userId']).order_by('division__personnel__firstname_th','division__personnel__lastname_th') #เฉพาะรายชื่อบุคลากรที่รับผิดชอบข้อมูลให้
         personnels_page = Paginator(personnels, iterm_per_page)
         count = personnels.count()
-        context = {'personnels': personnels_page.page(pageNo), 'count': count}
+        context = {'personnels': personnels_page.page(pageNo), 'count': count, 'staffOnly':staffOnly, 'recorder':recorder }
     return render(request, 'base/personnel/personnelList.html', context)
 
 # @login_required(login_url='userAuthen')
@@ -464,7 +478,7 @@ def personnelNew(request):
             filenames = filepath.split('/')
             filename = 'images/personnels/' + filenames[len(filenames) - 1]
             newForm.save()
-            personnel = get_object_or_404(Personnel, email=email)
+            personnel = Personnel.objects.filter(email=email).first()
             newfilename = 'images/personnels/' + str(personnel.id) + ext
             personnel.picture.name = newfilename
             personnel.save()
@@ -514,7 +528,7 @@ def personnelNew(request):
         if request.session['userType'] == 'Administrator':
             form = PersonnelForm()
         else:
-            form = PersonnelForm(staffId=request.session['userId'])
+            form = PersonnelForm(userType=request.session['userType'],userId=request.session['userId'])
         countPersonnel = Personnel.objects.all().count()
         if countPersonnel == 0:
             firstTime = True
@@ -542,7 +556,7 @@ def personnelDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def personnelUpdate(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
+    personnel = Personnel.objects.filter(id=id).first()
     if personnel is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
     getSession(request,dtype='Personnel', did=personnel.id)
@@ -571,7 +585,7 @@ def personnelUpdate(request, id):
                 filenames = filepath.split('/')
                 filename = 'images/personnels/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหลด
                 updateForm.save()
-                personnel = get_object_or_404(Personnel, id=id)
+                personnel = Personnel.objects.filter(id=id).first()
                 newfilename = 'images/personnels/' + str(personnel.id) + ext  # ชื่อไฟล์ที่ระบบกำหนด
                 personnel.picture.name = newfilename  # ต้องอัพเดท เผื่อกรณีที่เปลี่ยนชนิดไฟล์ภาพ
                 personnel.save()
@@ -582,16 +596,6 @@ def personnelUpdate(request, id):
                 personnel.editDate = datetime.datetime.now()
                 personnel.save()
                 messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลบุคลากรเรียบร้อย')
-            # อัพเดท user
-            # user = User.objects.filter(username=oldemail).first()
-            # user.username = personnel.email
-            # user.email = personnel.email
-            # user.first_name = personnel.firstname_en
-            # user.last_name = personnel.lastname_en
-            # group, created = Group.objects.get_or_create(name=userType)
-            # user.groups.clear()
-            # user.groups.add(group)
-            # user.save()
             return redirect('personnelDetail', personnel.id)
         else:
             user = User.objects.filter(username=oldemail).first()
@@ -604,8 +608,6 @@ def personnelUpdate(request, id):
         userType = str(user_group)
         if request.session['userType'] == 'Administrator':
             form = PersonnelForm(instance=personnel)
-        # elif request.session['userType'] == 'Staff':
-        #     form = PersonnelForm(userType=request.session['userType'], staffId=request.session['userId'], instance=personnel)
         else:
             form = PersonnelForm(userType=request.session['userType'], userId=request.session['userId'], instance=personnel)
         form.updateForm()
@@ -614,7 +616,7 @@ def personnelUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def personnelDelete(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
+    personnel = Personnel.objects.filter(id=id).first()
     if personnel is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -676,8 +678,12 @@ def educationList(request, divisionId=None, personnelId=None):
     else:
         division = None
         personnel = None
+        outside=False
         if request.session['userType'] == 'Staff':
+            outside = recorder.getOutsideResponsible()
             divisions = recorder.getDivisionResponsible()
+            if outside == True: #กรณีที่ผู้รับชอบข้อมูลไม่ได้อยู่ในสาขา/หน่วยงานย่อยที่รับผิดชอบ
+                divisions.append(recorder.division)
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
@@ -686,28 +692,34 @@ def educationList(request, divisionId=None, personnelId=None):
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
 
+        onlyStaff = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
+                if divisionId == recorder.division.id and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
-                personnel = division.getPersonnels().first()
+                if str(divisionId) == str(recorder.division.id) and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
+                    personnel = recorder
+                else:
+                    personnel = division.getPersonnels().first()
         else: #เข้ามาครั้งแรก
             if divisionId is not None: # กรณี redirect มาจากการ New
                 division = Division.objects.get(id=divisionId)
                 personnel = Personnel.objects.get(id=personnelId)
             else:
                 personnel = division.getPersonnels().first()
-
-        context = {'divisions': divisions, 'division': division, 'personnel': personnel}
+        context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'onlyStaff':onlyStaff, 'recorder':recorder}
     return render(request, 'base/education/educationList.html', context)
 
 @login_required(login_url='userAuthen')
 def educationNew(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
+    personnel = Personnel.objects.filter(id=id).first()
     if personnel is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -748,7 +760,7 @@ def educationDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def educationUpdate(request, id):
-    education = get_object_or_404(Education, id=id)
+    education = Education.objects.filter(id=id).first()
     if education is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -778,7 +790,7 @@ def educationUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def educationDelete(request, id):
-    education = get_object_or_404(Education, id=id)
+    education =  Education.objects.filter(id=id).first()
     if education is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -808,8 +820,12 @@ def expertiseList(request, divisionId=None, personnelId=None):
     else:
         division = None
         personnel = None
+        outside = False
         if request.session['userType'] == 'Staff':
+            outside = recorder.getOutsideResponsible()
             divisions = recorder.getDivisionResponsible()
+            if outside == True: #กรณีที่ผู้รับชอบข้อมูลไม่ได้อยู่ในสาขา/หน่วยงานย่อยที่รับผิดชอบ
+                divisions.append(recorder.division)
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
@@ -818,27 +834,34 @@ def expertiseList(request, divisionId=None, personnelId=None):
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
 
+        onlyStaff = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
+                if divisionId == recorder.division.id and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
-                personnel = division.getPersonnels().first()
+                if str(divisionId) == str(recorder.division.id) and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
+                    personnel = recorder
+                else:
+                    personnel = division.getPersonnels().first()
         else: #เข้ามาครั้งแรก
             if divisionId is not None: # กรณี redirect มาจากการ New
                 division = Division.objects.get(id=divisionId)
                 personnel = Personnel.objects.get(id=personnelId)
             else:
                 personnel = division.getPersonnels().first()
-        context = {'divisions': divisions, 'division': division, 'personnel': personnel}
+        context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'onlyStaff':onlyStaff, 'recorder':recorder}
     return render(request, 'base/expertise/expertiseList.html', context)
 
 @login_required(login_url='userAuthen')
 def expertiseNew(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
+    personnel = Personnel.objects.filter(id=id).first()
     if personnel is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -879,7 +902,7 @@ def expertiseDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def expertiseUpdate(request, id):
-    expertise = get_object_or_404(Expertise, id=id)
+    expertise = Expertise.objects.filter(id=id).first()
     if expertise is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -909,7 +932,7 @@ def expertiseUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def expertiseDelete(request, id):
-    expertise = get_object_or_404(Expertise, id=id)
+    expertise = Expertise.objects.filter(id=id).first()
     personnel = expertise.personnel
     form = ExpertiseForm(instance=expertise)
     if request.method == 'POST':
@@ -959,7 +982,7 @@ def currAffiliationList(request, curriculumId = None):
 
 @login_required(login_url='userAuthen')
 def currAffiliationDelete(request,id):
-    currAffiliation = get_object_or_404(CurrAffiliation, id=id)
+    currAffiliation = CurrAffiliation.objects.filter(id=id).first()
     curriculum = currAffiliation.curriculum
     currAffiliation.delete()
     messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้บริหารหลักสูตรที่เลือกเรียบร้อย')
@@ -1019,8 +1042,8 @@ def responsibleList(request, pageNo=None):
 
 @login_required(login_url='userAuthen')
 def responsibleDelete(request,id):
-    responsible = get_object_or_404(Responsible, id=id)
-    user=User.objects.get(email=responsible.personnel.email)
+    responsible = Responsible.objects.filter(id=id).first()
+    user=User.objects.filter(email=responsible.personnel.email).first()
     responsible.delete()
     personnel = Personnel.objects.filter(email=user.email).first()
     print('count')
@@ -1045,16 +1068,16 @@ def headerList(request, pageNo=None):
             newForm = form.save(commit=False)
             division = Division.objects.filter(id=newForm.division.id).first()
             personnel = Personnel.objects.filter(id=newForm.personnel.id).first()
-            if division.getHeader().count() != 0:  # สาขานั้นมีหัวหน้าแล้ว
-                messages.add_message(request, messages.ERROR,
-                                     'สาขา/หน่วยงานย่อยที่เลือกมีการกำหนดผู้เป็นหัวหน้าไปแล้ว')
-            elif personnel.getDivisionResponsible().count() !=0 :  # บุคลากรคนนั้นเป็นนผู้รับผิดชอบข้อมูล
+            if len(personnel.getDivisionResponsible()) !=0 :  # บุคลากรคนนั้นเป็นนผู้รับผิดชอบข้อมูล
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นเจ้าหน้าที่ผู้รับผิดชอบข้อมูลหัวหน้าสาขา/หน่วยงานย่อย')
-            elif personnel.getHeader().count() !=0 :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
+            elif division.getHeader() is not None:  # สาขานั้นมีหัวหน้าแล้ว
+                messages.add_message(request, messages.ERROR,
+                                     'สาขา/หน่วยงานย่อยที่เลือกมีการกำหนดผู้เป็นหัวหน้าไปแล้ว')
+            elif personnel.getHeader() is not None :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นหัวหน้าสาขา/หน่วยงานย่อยอยู่แล้ว')
-            elif personnel.getManager().count() != 0:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
+            elif personnel.getManager() is not None:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นผู้บริหารหน่วยงาน')
             else:
@@ -1080,8 +1103,8 @@ def headerList(request, pageNo=None):
 
 @login_required(login_url='userAuthen')
 def headerDelete(request,id):
-    header = get_object_or_404(Header, id=id)
-    user = User.objects.get(email=header.personnel.email)
+    header = Header.objects.filter(id=id).first()
+    user = User.objects.filter(email=header.personnel.email).first()
     header.delete()
     hgroup = Group.objects.get(name='Header')
     user.groups.remove(hgroup)
@@ -1099,13 +1122,13 @@ def managerList(request, pageNo=None):
         if form.is_valid():
             newForm = form.save(commit=False)
             personnel = Personnel.objects.filter(id=newForm.personnel.id).first()
-            if personnel.getDivisionResponsible().count() !=0 :  # บุคลากรคนนั้นเป็นนผู้รับผิดชอบข้อมูล
+            if len(personnel.getDivisionResponsible()) !=0 :  # บุคลากรคนนั้นเป็นนผู้รับผิดชอบข้อมูล
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นเจ้าหน้าที่ผู้รับผิดชอบข้อมูลหัวหน้าสาขา/หน่วยงานย่อย')
-            elif personnel.getHeader().count() !=0 :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
+            elif personnel.getHeader() is not None :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นหัวหน้าสาขา/หน่วยงานย่อย')
-            elif personnel.getManager().count() != 0:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
+            elif personnel.getManager() is not None:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นผู้บริหารหน่วยงานอยู่แล้ว')
             else:
@@ -1119,7 +1142,7 @@ def managerList(request, pageNo=None):
                 mgroup = Group.objects.get(name='Manager')
                 user.groups.add(mgroup)
                 user.save()
-                messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลหัวหน้าสาขา/หน่วยงานย่อยเรียบร้อย')
+                messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลผู้บริหารหน่วยงานเรียบร้อย')
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
     managers = Manager.objects.all().order_by('personnel__firstname_th','personnel__lastname_th')
@@ -1130,7 +1153,7 @@ def managerList(request, pageNo=None):
 
 @login_required(login_url='userAuthen')
 def managerDelete(request,id):
-    manager = get_object_or_404(Manager, id=id)
+    manager = Manager.objects.filter(id=id).first()
     user = User.objects.filter(email=manager.personnel.email).first()
     manager.delete()
     mgroup = Group.objects.get(name='Manager')

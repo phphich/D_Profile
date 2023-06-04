@@ -37,13 +37,21 @@
                         {% csrf_token %}
                         <label for="personnelId">เลือกบุคลากร</label>
                         <select name="personnelId" onchange="this.form.submit();" class="form-control text-success">
-                            {% for person in division.getPersonnels %}
-                                {% if person == personnel %}
-                                    <option value="{{ person.id }}" selected> {{ person }}</option>
-                                {% else %}
-                                    <option value="{{ person.id }}"> {{ person }}</option>
-                                {% endif %}
-                            {% endfor %}
+                            {% if onlyStaff == True %}
+                                <option value="{{ recorder.id }}" selected> {{ recorder }} (*คุณ) </option>
+                            {% else %}
+                                {% for person in division.getPersonnels %}
+                                    {% if person == personnel %}
+                                        <option value="{{ person.id }}" selected> {{ person }}
+                                    {% else %}
+                                        <option value="{{ person.id }}"> {{ person }}
+                                    {% endif %}
+                                    {% if person == recorder %}
+                                         (*คุณ)
+                                    {% endif %}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
                         </select>
                         <input type="hidden" name="divisionId" value="{{ division.id }}">
                     </form>
@@ -55,8 +63,7 @@
     {% if personnel != None %}
         <div class="row">
             <div class="col-10"><br>
-                <h4 class="align-bottom"> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
-                    สังกัด: {{ personnel.division }} </h4>
+                <h4 class="align-bottom"> {{ personnel }},  สังกัด: {{ personnel.division }} </h4>
             </div>
             <div class="col-2">
                 <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:5px;" class="rounded-circle">

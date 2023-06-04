@@ -49,8 +49,12 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
     else:
         division = None
         personnel = None
+        outside = False
         if request.session['userType'] == 'Staff':
+            outside = recorder.getOutsideResponsible()
             divisions = recorder.getDivisionResponsible()
+            if outside == True:  # กรณีที่ผู้รับชอบข้อมูลไม่ได้อยู่ในสาขา/หน่วยงานย่อยที่รับผิดชอบ
+                divisions.append(recorder.division)
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
@@ -58,19 +62,27 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
         else: #Manager, Administrator
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
+
+        onlyStaff = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
+                if divisionId == recorder.division.id and outside == True:  # ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
-                personnel = division.getPersonnels().first()
+                if str(divisionId) == str(recorder.division.id) and outside == True:  # ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
+                    personnel = recorder
+                else:
+                    personnel = division.getPersonnels().first()
         else: #เข้ามาครั้งแรก
             if divisionId is not None: # กรณี redirect มาจากการ New
-                division = Division.objects.get(id=divisionId)
-                personnel = Personnel.objects.get(id=personnelId)
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = Personnel.objects.filter(id=personnelId).first()
             else:
                 personnel = division.getPersonnels().first()
 
@@ -78,7 +90,7 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
         count = leaves.count()
         leaves_page = Paginator(leaves, iterm_per_page)
         context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-                   'leaves': leaves_page.page(pageNo), 'count':count}
+                   'leaves': leaves_page.page(pageNo), 'count':count,'onlyStaff':onlyStaff, 'recorder':recorder}
     return render(request, 'work/leave/leaveList.html', context)
 
 @login_required(login_url='userAuthen')
@@ -146,7 +158,7 @@ def leaveDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def leaveNew(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
+    personnel = Personnel.objects.filter(id=id).first()
     if personnel is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -179,7 +191,7 @@ def leaveNew(request, id):
 
 @login_required(login_url='userAuthen')
 def leaveUpdate(request, id):
-    leave = get_object_or_404(Leave, id=id)
+    leave = Leave.objects.filter(id=id).first()
     if leave is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -211,7 +223,7 @@ def leaveUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def leaveDelete(request, id):
-    leave = get_object_or_404(Leave, id=id)
+    leave = Leave.objects.filter(id=id).first()
     if leave is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -246,7 +258,7 @@ def leaveDelete(request, id):
 
 @login_required(login_url='userAuthen')
 def leaveDeleteFile(request, id):
-    leaveFile = get_object_or_404(LeaveFile, id=id)
+    leaveFile = LeaveFile.objects.filter(id=id).first()
     leave = leaveFile.leave
     fname = leaveFile.file.name
     if os.path.exists('static/documents/leave/' + fname):
@@ -260,7 +272,7 @@ def leaveDeleteFile(request, id):
 
 @login_required(login_url='userAuthen')
 def leaveDeleteFileAll(request, id):
-    leave = get_object_or_404(Leave, id=id)
+    leave = Leave.objects.filter(id=id).first()
     leaveFiles = leave.getLeaveFiles()
     success = True
     fileerror = ""
@@ -282,7 +294,7 @@ def leaveDeleteFileAll(request, id):
 
 @login_required(login_url='userAuthen')
 def leaveDeleteURL(request, id):
-    leaveURL = get_object_or_404(LeaveURL, id=id)
+    leaveURL = LeaveURL.objects.filter(id=id).first()
     leave = leaveURL.leave
     leaveURL.delete()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
@@ -290,7 +302,7 @@ def leaveDeleteURL(request, id):
 
 @login_required(login_url='userAuthen')
 def leaveDeleteURLAll(request, id):
-    leave = get_object_or_404(Leave, id=id)
+    leave = Leave.objects.filter(id=id).first()
     leaveURLs = leave.getLeaveURLs()
     for leaveURL in leaveURLs:
         leaveURL.delete()
@@ -312,8 +324,12 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
     else:
         division = None
         personnel = None
+        outside = False
         if request.session['userType'] == 'Staff':
+            outside = recorder.getOutsideResponsible()
             divisions = recorder.getDivisionResponsible()
+            if outside == True:  # กรณีที่ผู้รับชอบข้อมูลไม่ได้อยู่ในสาขา/หน่วยงานย่อยที่รับผิดชอบ
+                divisions.append(recorder.division)
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
@@ -321,19 +337,27 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
         else: #Manager, Administrator
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
+
+        onlyStaff = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
+                if divisionId == recorder.division.id and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
-                personnel = division.getPersonnels().first()
+                if str(divisionId) == str(recorder.division.id) and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
+                    personnel = recorder
+                else:
+                    personnel = division.getPersonnels().first()
         else: #เข้ามาครั้งแรก
             if divisionId is not None: # กรณี redirect มาจากการ New
-                division = Division.objects.get(id=divisionId)
-                personnel = Personnel.objects.get(id=personnelId)
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = Personnel.objects.filter(id=personnelId).first()
             else:
                 personnel = division.getPersonnels().first()
 
@@ -341,7 +365,7 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
         count = trainings.count()
         trainings_page = Paginator(trainings, iterm_per_page)
         context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-                   'trainings':trainings_page.page(pageNo),  'count':count}
+                   'trainings':trainings_page.page(pageNo),  'count':count, 'onlyStaff':onlyStaff, 'recorder':recorder}
     return render(request, 'work/training/trainingList.html', context)
 
 @login_required(login_url='userAuthen')
@@ -409,7 +433,7 @@ def trainingDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def trainingNew(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
+    personnel = Personnel.objects.filter(id=id).first()
     if personnel is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -444,7 +468,7 @@ def trainingNew(request, id):
 
 @login_required(login_url='userAuthen')
 def trainingUpdate(request, id):
-    training = get_object_or_404(Training, id=id)
+    training = Training.objects.filter(id=id).first()
     if training is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -476,7 +500,7 @@ def trainingUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def trainingDelete(request, id):
-    training = get_object_or_404(Training, id=id)
+    training = Training.objects.filter(id=id).first()
     if training is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -512,7 +536,7 @@ def trainingDelete(request, id):
 
 @login_required(login_url='userAuthen')
 def trainingDeleteFile(request, id):
-    trainingFile = get_object_or_404(TrainingFile, id=id)
+    trainingFile = TrainingFile.objects.filter(id=id).first()
     training = trainingFile.training
     fname = trainingFile.file.name
     if os.path.exists('static/documents/training/' + fname):
@@ -526,7 +550,7 @@ def trainingDeleteFile(request, id):
 
 @login_required(login_url='userAuthen')
 def trainingDeleteFileAll(request, id):
-    training = get_object_or_404(Training, id=id)
+    training = Training.objects.filter(id=id).first()
     trainingFiles = training.getTrainingFiles()
     success = True
     fileerror = ""
@@ -548,7 +572,7 @@ def trainingDeleteFileAll(request, id):
 
 @login_required(login_url='userAuthen')
 def trainingDeleteURL(request, id):
-    trainingURL = get_object_or_404(TrainingURL, id=id)
+    trainingURL = TrainingURL.objects.filter(id=id).first()
     training = trainingURL.training
     trainingURL.delete()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารที่เลือกเรียบร้อย")
@@ -556,7 +580,7 @@ def trainingDeleteURL(request, id):
 
 @login_required(login_url='userAuthen')
 def trainingDeleteURLAll(request, id):
-    training = get_object_or_404(Training, id=id)
+    training = Training.objects.filter(id=id).first()
     trainingURLs = training.getTrainingURLs()
     for trainingURL in trainingURLs:
         trainingURL.delete()
@@ -578,8 +602,12 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
     else:
         division = None
         personnel = None
+        outside = False
         if request.session['userType'] == 'Staff':
+            outside = recorder.getOutsideResponsible()
             divisions = recorder.getDivisionResponsible()
+            if outside == True:  # กรณีที่ผู้รับชอบข้อมูลไม่ได้อยู่ในสาขา/หน่วยงานย่อยที่รับผิดชอบ
+                divisions.append(recorder.division)
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
@@ -587,19 +615,27 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
         else: #Manager, Administrator
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
+
+        onlyStaff = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
+                if divisionId == recorder.division.id and outside == True:  # ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
-                personnel = division.getPersonnels().first()
+                if str(divisionId) == str(recorder.division.id) and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
+                    onlyStaff = True
+                    personnel = recorder
+                else:
+                    personnel = division.getPersonnels().first()
         else: #เข้ามาครั้งแรก
             if divisionId is not None: # กรณี redirect มาจากการ New
-                division = Division.objects.get(id=divisionId)
-                personnel = Personnel.objects.get(id=personnelId)
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = Personnel.objects.filter(id=personnelId).first()
             else:
                 personnel = division.getPersonnels().first()
 
@@ -607,7 +643,7 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
         count = performances.count()
         performances_page = Paginator(performances, iterm_per_page)
         context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-                   'performances': performances_page.page(pageNo), 'count':count}
+                   'performances': performances_page.page(pageNo), 'count':count, 'onlyStaff':onlyStaff, 'recorder':recorder}
     return render(request, 'work/performance/performanceList.html', context)
 
 @login_required(login_url='userAuthen')
@@ -677,7 +713,7 @@ def performanceDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def performanceNew(request, id):
-    personnel = get_object_or_404(Personnel, id=id)
+    personnel = Personnel.objects.filter(id=id).first()
     if personnel is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -712,7 +748,7 @@ def performanceNew(request, id):
 
 @login_required(login_url='userAuthen')
 def performanceUpdate(request, id):
-    performance = get_object_or_404(Performance, id=id)
+    performance = Performance.objects.filter(id=id).first()
     if performance is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -745,7 +781,7 @@ def performanceUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def performanceDelete(request, id):
-    performance = get_object_or_404(Performance, id=id)
+    performance = Performance.objects.filter(id=id).first()
     if performance is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
@@ -781,7 +817,7 @@ def performanceDelete(request, id):
 
 @login_required(login_url='userAuthen')
 def performanceDeleteFile(request, id):
-    performanceFile = get_object_or_404(PerformanceFile, id=id)
+    performanceFile = PerformanceFile.objects.filter(id=id).first()
     performance = performanceFile.performance
     fname = performanceFile.file.name
     if os.path.exists('static/documents/performance/' + fname):
@@ -795,7 +831,7 @@ def performanceDeleteFile(request, id):
 
 @login_required(login_url='userAuthen')
 def performanceDeleteFileAll(request, id):
-    performance = get_object_or_404(Performance, id=id)
+    performance = Performance.objects.filter(id=id).first()
     performanceFiles = performance.getPerformanceFiles()
     success = True
     fileerror = ""
@@ -817,7 +853,7 @@ def performanceDeleteFileAll(request, id):
 
 @login_required(login_url='userAuthen')
 def performanceDeleteURL(request, id):
-    performanceURL = get_object_or_404(PerformanceURL, id=id)
+    performanceURL = PerformanceURL.objects.filter(id=id).first()
     performance = performanceURL.performance
     performanceURL.delete()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
@@ -825,7 +861,7 @@ def performanceDeleteURL(request, id):
 
 @login_required(login_url='userAuthen')
 def performanceDeleteURLAll(request, id):
-    performance = get_object_or_404(Performance, id=id)
+    performance = Performance.objects.filter(id=id).first()
     performanceURLs = performance.getPerformanceURLs()
     for performanceURL in performanceURLs:
         performanceURL.delete()
@@ -835,17 +871,14 @@ def performanceDeleteURLAll(request, id):
 # CRUD. command
 @login_required(login_url='userAuthen')
 def commandList(request, pageNo=None):
-    if 'userType' not in request.session:
-        return redirect('userAuthen')
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        personnel = Personnel.objects.filter(id=request.session['userId']).first()
-        # commands = CommandPerson.objects.filter(personnel = personnel)
-        commands = Command.objects.filter(commandperson__personnel=personnel).order_by('-eduYear', '-eduSemeter', '-comDate')
+        commands = Command.objects.filter(commandperson__personnel=recorder).order_by('-eduYear', '-eduSemeter', '-comDate')
         commands_page = Paginator(commands, iterm_per_page)
         count = len(commands)
-        context = {'personnel': personnel,'commands': commands_page.page(pageNo), 'count': count}
+        context = {'personnel': recorder,'commands': commands_page.page(pageNo), 'count': count}
     else:
         commands = Command.objects.all().order_by('-eduYear', '-eduSemeter', '-comDate')
         commands_page = Paginator(commands, iterm_per_page)
@@ -885,12 +918,13 @@ def commandNew(request):
 
 @login_required(login_url='userAuthen')
 def commandDetail(request, id):
+    command = Command.objects.filter(id=id).first()
+
     if 'userType' not in request.session:
         return redirect('userAuthen')
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if (request.session['userType'] == "Personnel"):
         personnel = Personnel.objects.filter(id=request.session['userId']).first()
-    command = Command.objects.filter(id=id).first()
     if request.session['userType'] == 'Administrator':
         right = 'Write'
     elif request.session['userType'] == 'Manager':
@@ -977,7 +1011,7 @@ def commandDetail(request, id):
 
 @login_required(login_url='userAuthen')
 def commandUpdate(request, id):
-    command = get_object_or_404(Command, id=id)
+    command = Command.objects.filter(id=id).first()
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     form = CommandForm(data=request.POST or None, instance=command)
     if request.method == 'POST':
@@ -1000,7 +1034,8 @@ def commandUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def commandDelete(request, id):
-    command = get_object_or_404(Command, id=id)
+    command = Command.objects.filter(id=id).first()
+
     form = TrainignForm(data=request.POST or None, instance=command)
     if request.method == 'POST':
         #ลบไฟล์
@@ -1027,7 +1062,7 @@ def commandDelete(request, id):
 
 @login_required(login_url='userAuthen')
 def commandDeleteFile(request, id):
-    commandFile = get_object_or_404(CommandFile, id=id)
+    commandFile = CommandFile.objects.filter(id=id).first()
     command = commandFile.command
     fname = commandFile.file.name
     if os.path.exists('static/documents/command/' + fname):
@@ -1041,7 +1076,7 @@ def commandDeleteFile(request, id):
 
 @login_required(login_url='userAuthen')
 def commandDeleteFileAll(request, id):
-    command = get_object_or_404(Command, id=id)
+    command = Command.objects.filter(id=id).first()
     commandFiles = command.getCommandFiles()
     success = True
     fileerror = ""
@@ -1063,7 +1098,7 @@ def commandDeleteFileAll(request, id):
 
 @login_required(login_url='userAuthen')
 def commandDeleteURL(request, id):
-    commandURL = get_object_or_404(CommandURL, id=id)
+    commandURL = CommandURL.objects.filter(id=id).first()
     command = commandURL.command
     commandURL.delete()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารที่เลือกเรียบร้อย")
@@ -1071,7 +1106,7 @@ def commandDeleteURL(request, id):
 
 @login_required(login_url='userAuthen')
 def commandDeleteURLAll(request, id):
-    command = get_object_or_404(Command, id=id)
+    command = Command.objects.filter(id=id).first()
     commandURLs = command.getCommandURLs()
     for commandURL in commandURLs:
         commandURL.delete()
@@ -1080,7 +1115,7 @@ def commandDeleteURLAll(request, id):
 
 @login_required(login_url='userAuthen')
 def commandDeleteCommandPerson(request, id):
-    commandPerson = get_object_or_404(CommandPerson, id=id)
+    commandPerson = CommandPerson.objects.filter(id=id).first()
     command = commandPerson.command
     commandPerson.delete()
     messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากคำสั่งเรียบร้อย")
@@ -1088,7 +1123,7 @@ def commandDeleteCommandPerson(request, id):
 
 @login_required(login_url='userAuthen')
 def commandDeleteCommandPersonAll(request, id):
-    command = get_object_or_404(Command, id=id)
+    command = Command.objects.filter(id=id).first()
     commandPersons = command.getCommandPerson()
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     for commandPerson in commandPersons:

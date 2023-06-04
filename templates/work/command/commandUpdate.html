@@ -6,10 +6,7 @@
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
                 <h2><i class="fa fa-person-hiking"></i> แก้ไขข้อมูลคำสั่ง ({{ command.comId }})</h2>
-                <h3>
-                    {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
-                    สังกัด: {{ personnel.division }}
-                </h3>
+                <h4> {{ personnel }},   สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
                 <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"  class="rounded-circle">

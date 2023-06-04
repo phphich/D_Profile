@@ -32,7 +32,7 @@ class Division(models.Model):
         return personnels
     def getHeader(self): #ข้อมูลหัวหน้าสาขานั้น
         header = Header.objects.filter(division=self).first()
-        return header.personnel
+        return header
     def getResponsible(self): #ข้อมูลผู้รับผิดชอบข้อมูลสาขานั้น
         responsibles = Responsible.objects.filter(division=self)
         personnels = []
@@ -108,10 +108,10 @@ class Personnel(models.Model):
         return countAll
     def getManager(self): #ข้อมูลการเป็นผู้บริหารของบุคลากรรายนั้น
         manager = Manager.objects.filter(personnel=self).first()
-        return manager.status
+        return manager
     def getHeader(self): #ข้อมูลการเป็นหัวหน้าของบุคลากรรายนั้น
         header = Header.objects.filter(personnel=self).first()
-        return header.division
+        return header
     def getDivisionResponsible(self): #ข้อมูลสาขาที่ต้องรับผิดชอบของบุคลากรรายนั้น
         responsibles = Responsible.objects.filter(personnel=self)
         divisions = []
@@ -127,6 +127,14 @@ class Personnel(models.Model):
             for personnel in respersonnels:
                 personnels.append(personnel)
         return personnels
+    def getOutsideResponsible(self):
+        outside = True
+        responsibles = Responsible.objects.filter(personnel=self)
+        for div in responsibles:
+            if div == self.division:
+                outside = False
+                break
+        return outside
 
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorderId).first()

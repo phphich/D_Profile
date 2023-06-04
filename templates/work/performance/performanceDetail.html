@@ -5,10 +5,7 @@
     <div class="row">
         <div class="col-10">
             <h2><i class="fas fa-award text-primary"></i> รายละเอียดการรับตำแหน่ง/ผลงาน/รางวัล</h2>
-            <h3>
-                {{ performance.personnel.status }}{{ performance.personnel.firstname_th }} {{ performance.personnel.lastname_th }},
-                สังกัด: {{ performance.personnel.division }}
-            </h3>
+            <h4> {{ performance.personnel }},   สังกัด: {{ performance.personnel.division }}  </h4>
         </div>
         <div class="col-2">
             <img src="{% static performance.personnel.picture %}" width="75px" height="auto" style="margin-top:10px;" class="rounded-circle">
@@ -27,7 +24,7 @@
         </tr>
         <tr>
             <th class="text-primary">รายละเอียด</th>
-            <td>{{ performance.detail }}</td>
+            <td>{{ performance.detail | linebreaks }}</td>
         </tr>
         <tr>
             <th class="text-primary">ได้รับจาก/ผู้มอบ</th>

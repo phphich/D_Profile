@@ -50,40 +50,48 @@
                 </th>
             </tr>
             {% for personnel in personnels %}
-                {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id  or request.session.userType == 'Manager' %}
-                    <tr class="text-dark" onclick="location.href='{% url 'personnelDetail' personnel.id %}'" style="cursor:pointer">
+                {% if personnel.division == recorder.division and staffOnly == True and personnel != recorder %}
+
                 {% else %}
-                    <tr class="text-dark" >
-                {% endif %}
-                    <td class="text-center">
-                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id %}
-                            <a href="{% url 'personnelDetail' personnel.id %}">
+                    {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id  or request.session.userType == 'Manager' %}
+                         {% if personnel == recorder %}
+                            <tr class="text-danger" onclick="location.href='{% url 'personnelDetail' personnel.id %}'" style="cursor:pointer">
+                         {% else %}
+                            <tr class="text-dark" onclick="location.href='{% url 'personnelDetail' personnel.id %}'" style="cursor:pointer">
+                         {% endif %}
+                    {% else %}
+                        <tr class="text-dark" >
+                    {% endif %}
+                        <td class="text-center">
+                            {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id %}
+                                <a href="{% url 'personnelDetail' personnel.id %}">
+                                    <img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                                         width="55px" height="65px">
+                                </a>
+                            {% else %}
                                 <img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                      width="55px" height="65px">
-                            </a>
-                        {% else %}
-                            <img src="{% static personnel.picture %}" style="margin:0px;" class="rounded-circle"
-                                 width="55px" height="65px">
-                        {% endif %}
-                    </td>
-                    <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
-                    <td>{{ personnel.status }}</td>
-                    <td class="text-center">{{ personnel.type }}</td>
-                    <td class="text-center">{{ personnel.gender }}</td>
-                    <td>{{ personnel.division.name_th }}</td>
-                    <td class="text-center">
-                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-{#                            <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">#}
-{#                                <i class="fa fa-search"> </i> </a>#}
-                            <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-warning">
-                                <i class="fa fa-tools"> </i> </a>
-                        {% endif %}
-                        {% if request.session.userType in 'Administrator' %}
-                            <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger">
-                                <i class="fa fa-trash"> </i> </a>
-                        {% endif %}
-                    </td>
-                </tr>
+                            {% endif %}
+                        </td>
+                        <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}  </td>
+                        <td>{{ personnel.status }}</td>
+                        <td class="text-center">{{ personnel.type }}</td>
+                        <td class="text-center">{{ personnel.gender }}</td>
+                        <td>{{ personnel.division.name_th }}</td>
+                        <td class="text-center">
+                            {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+    {#                            <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">#}
+    {#                                <i class="fa fa-search"> </i> </a>#}
+                                <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-warning">
+                                    <i class="fa fa-tools"> </i> </a>
+                            {% endif %}
+                            {% if request.session.userType in 'Administrator' %}
+                                <a href="{% url 'personnelDelete' personnel.id %}" class="btn btn-danger">
+                                    <i class="fa fa-trash"> </i> </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
         </table>
 

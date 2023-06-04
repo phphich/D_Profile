@@ -99,6 +99,7 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                     ] # method ที่ไม่อนุญาตสำหรับ Personnel
     # print('method: ' + methodName)
     # print('type: ' + uType)
+
     if uType == 'Administrator':
        return True
     elif uType == 'Staff' and methodName in methodDenyStaff:
@@ -126,15 +127,18 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
             userDocIds = Performance.objects.filter(personnel_id=uId).only('id')
         else:
             userDocIds = None
-        uDocId = []
-        for x in userDocIds:
-            uDocId.append(x.id)
-        if docId not in uDocId:
-            return False
-        return True
     elif uType == 'Manager':
+        personnel = Personnel.objects.get(id=uId)
+        userDocIds = personnel.id  # กรณีเพิ่มเอกสารของตนเอง
+        division = personnel.division
+        personnels = division.getPersonnels()
         # ถ้าเป็น List หรือ Detail เข้าดูได้หมดของทุกๆ คน
-        if str(methodName).find('New') != -1 or str(methodName).find('Update') != -1 or str(methodName).find(
+        if str(methodName).find('New') != -1:
+            if docId != userDocIds:
+                return False
+            else:
+                return True
+        elif str(methodName).find('Update') != -1 or str(methodName).find(
                 'Delete') != -1:  # ถ้าเรียกใช้ method ในการแก้ไขหรือลบต้องเป็นการทำกับข้อมูลของตัวเองเท่านั้น
             if docType == 'Personnel':
                 userDocIds = Personnel.objects.filter(id=uId).only('id')  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
@@ -150,17 +154,17 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Performance.objects.filter(personnel_id=uId).only('id')
             else:
                 userDocIds = None
-            uDocId = []
-            for x in userDocIds:
-                uDocId.append(x.id)
-            if docId not in uDocId:
-                return False
-        return True
     elif uType == 'Header':
         personnel = Personnel.objects.get(id=uId)
+        userDocIds = personnel.id #กรณีเพิ่มเอกสารของตนเอง
         division = personnel.division
         personnels = division.getPersonnels()
-        if str(methodName).find('List') != -1 or str(methodName).find('Detail') != -1: # ดูข้อมูลได้ทุกคนในสาขา
+        if str(methodName).find('New') != -1 :
+            if docId == userDocIds:
+                return True
+            else:
+                return False
+        elif str(methodName).find('List') != -1 or str(methodName).find('Detail') != -1: # ดูข้อมูลได้ทุกคนในสาขา
             if docType == 'Personnel':
                 userDocIds = Personnel.objects.filter(id__in=personnels) # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
             elif docType == 'Education':
@@ -175,101 +179,102 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Performance.objects.filter(personnel__in=personnels).only('id')
             else:
                 userDocIds = None
-            uDocId = []
-            for x in userDocIds:
-                uDocId.append(x.id)
-            if docId not in uDocId:
-                return False
-        elif str(methodName).find('New') != -1 :
-            userDocIds = personnel.id
-            if docId != userDocIds:
-                return False
-            else:
-                return True
         elif str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
             # ถ้าเรียกใช้ method ในการแก้ไขหรือลบต้องเป็นการทำกับข้อมูลของตัวเองเท่านั้น
-            personnel = [personnel]
             if docType == 'Personnel':
-                userDocIds = Personnel.objects.filter(id=personnel.id)  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
+                userDocIds = Personnel.objects.filter(id=uId).only('id')  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
             elif docType == 'Education':
-                userDocIds = Education.objects.filter(personnel_id__in=personnel).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds = Education.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Expertise':
-                userDocIds = Expertise.objects.filter(personnel_id__in=personnel).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds = Expertise.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Leave':
-                userDocIds = Leave.objects.filter(personnel_id__in=personnel).only('id')
+                userDocIds = Leave.objects.filter(personnel_id=uId).only('id')
             elif docType == 'Training':
-                userDocIds = Training.objects.filter(personnel_id__in=personnel).only('id')
+                userDocIds = Training.objects.filter(personnel_id=uId).only('id')
             elif docType == 'Performance':
-                userDocIds = Performance.objects.filter(personnel_id__in=personnel).only('id')
+                userDocIds = Performance.objects.filter(personnel_id=uId).only('id')
             else:
+            # personnel = [personnel]
+            # if docType == 'Personnel':
+            #     userDocIds = Personnel.objects.filter(id=personnel.id)  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
+            # elif docType == 'Education':
+            #     userDocIds = Education.objects.filter(personnel_id__in=personnel).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+            # elif docType == 'Expertise':
+            #     userDocIds = Expertise.objects.filter(personnel_id__in=personnel).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+            # elif docType == 'Leave':
+            #     userDocIds = Leave.objects.filter(personnel_id__in=personnel).only('id')
+            # elif docType == 'Training':
+            #     userDocIds = Training.objects.filter(personnel_id__in=personnel).only('id')
+            # elif docType == 'Performance':
+            #     userDocIds = Performance.objects.filter(personnel_id__in=personnel).only('id')
+            # else:
                 userDocIds = None
-            uDocId = []
-            for x in userDocIds:
-                uDocId.append(x.id)
-            if docId not in uDocId:
-                return False
-        return True
     elif uType == 'Staff':
         # ถ้าเป็น List หรือ Detail เข้าดูบุคลากรได้ตามที่ได้รับมอบหมายหน้าที่
         personnel = Personnel.objects.get(id=uId)
+        userDocIds = personnel.id #เพิ่มเอกสารใดๆ ของตนเอง
         divisions = personnel.getDivisionResponsible()
-        # personnels = personnel.getPersonnelResponsible()
-        personnels = Personnel.objects.filter(division__in=divisions)
-        if str(methodName).find('New') != -1:
-            pass
-        elif str(methodName).find('List') != -1 or str(methodName).find('Detail') != -1:
+        personnel=[personnel]
+        personnels = Personnel.objects.filter(division_id__in =divisions)
+        if str(methodName).find('personnelNew') != -1:
+            return True
+        elif str(methodName).find('New') != -1:
+            if docId == userDocIds:
+                return True
+            else:
+                userDocIds=Personnel.objects.filter(id__in=personnels).only('id')  # เอกสารข้อมูลบุคลากรทุกคน ที่ได้รับสิทธิื์ให้เข้าถึงได้
+        else:
             if docType == 'Personnel':
-                userDocIds=Personnel.objects.filter(id__in=personnels)  # เอกสารข้อมูลบุคลากรทุกคน ที่ได้รับสิทธิื์ให้เข้าถึงได้
+                userDocIds=Personnel.objects.filter(Q(id__in=personnels) or Q(personnel_id=uId))  # เอกสารข้อมูลบุคลากรทุกคน ที่ได้รับสิทธิื์ให้เข้าถึงได้
             elif docType == 'Education':
-                userDocIds = Education.objects.filter(personnel__in=personnels).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds1 = Education.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds2 = Education.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
+                userDocIds = userDocIds1.union(userDocIds2)
             elif docType == 'Expertise':
-                userDocIds = Expertise.objects.filter(personnel__in=personnels).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds1 = Expertise.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds2 = Expertise.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
+                userDocIds = userDocIds1.union(userDocIds2)
             elif docType == 'Leave':
-                userDocIds = Leave.objects.filter(personnel__in=personnels).only('id')
+                userDocIds1 = Leave.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds2 = Leave.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
+                userDocIds = userDocIds1.union(userDocIds2)
             elif docType == 'Training':
-                userDocIds = Training.objects.filter(personnel__in=personnels).only('id')
+                userDocIds1 = Training.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds2 = Training.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
+                userDocIds = userDocIds1.union(userDocIds2)
             elif docType == 'Performance':
-                userDocIds = Performance.objects.filter(personnel__in=personnels).only('id')
+                userDocIds1 = Performance.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds2 = Performance.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
+                userDocIds = userDocIds1.union(userDocIds2)
             else:
                 userDocIds = None
-            uDocId = []
-            print(docId)
-            print(uId)
-            if docId == uId:
-                return True
-            for x in userDocIds:
-                uDocId.append(x.id)
-            if docId not in uDocId:
-                return False
-            return True
-        elif str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
-            if docType == 'Personnel':
-                userDocIds = Personnel.objects.filter(
-                    id__in=personnels)  # เอกสารข้อมูลบุคลากรทุกคน ที่ได้รับสิทธิื์ให้เข้าถึงได้
-            elif docType == 'Education':
-                userDocIds = Education.objects.filter(personnel__in=personnels).only(
-                    'id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
-            elif docType == 'Expertise':
-                userDocIds = Expertise.objects.filter(personnel__in=personnels).only(
-                    'id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
-            elif docType == 'Leave':
-                userDocIds = Leave.objects.filter(personnel__in=personnels).only('id')
-            elif docType == 'Training':
-                userDocIds = Training.objects.filter(personnel__in=personnels).only('id')
-            elif docType == 'Performance':
-                userDocIds = Performance.objects.filter(personnel__in=personnels).only('id')
-            else:
-                userDocIds = None
-            uDocId = []
-            print(docId)
-            print(uId)
-            if docId == uId:
-                return True
-            for x in userDocIds:
-                uDocId.append(x.id)
-            if docId not in uDocId:
-                return False
-            return True
+        # elif str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
+        #     if docType == 'Personnel':
+        #         userDocIds = Personnel.objects.filter(
+        #             id__in=personnels)  # เอกสารข้อมูลบุคลากรทุกคน ที่ได้รับสิทธิื์ให้เข้าถึงได้
+        #     elif docType == 'Education':
+        #         userDocIds = Education.objects.filter(personnel__in=personnels).only(
+        #             'id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+        #     elif docType == 'Expertise':
+        #         userDocIds = Expertise.objects.filter(personnel__in=personnels).only(
+        #             'id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+        #     elif docType == 'Leave':
+        #         userDocIds = Leave.objects.filter(personnel__in=personnels).only('id')
+        #     elif docType == 'Training':
+        #         userDocIds = Training.objects.filter(personnel__in=personnels).only('id')
+        #     elif docType == 'Performance':
+        #         userDocIds = Performance.objects.filter(personnel__in=personnels).only('id')
+        #     else:
+        #         userDocIds = None
+    uDocId = []
+    if docId == uId:
+        return True
+    for x in userDocIds:
+        uDocId.append(x.id)
+    if docId not in uDocId:
+        return False
+    else:
+        return True
 
 
 
