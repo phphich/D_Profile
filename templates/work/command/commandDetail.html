@@ -148,15 +148,25 @@
                     </tr>
 
                     {% for commandPerson in command.getCommandPerson %}
+                        {% if request.session.userType != 'Header' %}
+                            {% if personnel.division == commandPerson.personnel.division %}
+                            {% endif %}
+                        {% endif %}
+
                         {% if personnel.id == commandPerson.personnel.id %}
                             <tr class="text-success" style="font-weight:bold">
+                        {% elif personnel.division == commandPerson.personnel.division %}
+{#                            กรณีที่เป็นหัวหน้า#}
+                            <tr class="text-dark" style="font-weight:bold">
                         {% else %}
                             <tr>
                         {% endif %}
                             <td class="text-center">{{ forloop.counter }}</td>
                             <td class="text-end"><img src="{% static commandPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                      width="55px" height="65px"> </td>
-                            <td>{{ commandPerson.personnel }} </td>
+                            <td>
+                                {{ commandPerson.personnel }}
+                            </td>
                             <td>{{ commandPerson.status | slice:"0,30"}}</td>
                             <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ commandPerson.getRecorderAndEditor }}</td>
                             <td class="text-center">
@@ -178,6 +188,8 @@
                                                 <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                             </a>
                                         {% endif %}
+{#                                    {% elif request.session.userType == 'Header' %}#}
+
                                     {% endif %}
                             </td>
                         </tr>

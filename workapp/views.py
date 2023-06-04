@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 import os
 from workapp import common
 
-iterm_per_page = 5
+iterm_per_page = 10
 msgErrorId = 'เป้าหมายที่ท่านระบุ ไม่ปรากฎในระบบหรือท่านไม่มีสิทธิ์ในการเข้าถึง!'
 
 def getSession(request, dtype=None, did=None):
@@ -877,15 +877,23 @@ def commandList(request, pageNo=None):
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        commands1 = Command.objects.filter(commandperson__personnel=recorder).order_by('-eduYear', '-eduSemeter', '-comDate')
-        commands2 = Command.objects.filter(recorder_id__in=personnel)
+        commands1 = Command.objects.filter(commandperson__personnel=recorder).order_by('-eduYear', '-eduSemeter', '-comDate') #คำสั่งที่ได้รับมอบหมาย
+        commands2 = Command.objects.filter(recorder_id__in=personnel) #คำสั่งที่เป็นคนบันทึกไว้เอง
         commands = commands1.union(commands2)
         commands_page = Paginator(commands, iterm_per_page)
         count = commands.count()
-        # count = len(commands)
         context = {'personnel': recorder,'commands': commands_page.page(pageNo), 'count': count}
-    else:
+    elif  request.session['userType'] in ['Administrator', 'Staff', 'Manager'] :
         commands = Command.objects.all().order_by('-eduYear', '-eduSemeter', '-comDate')
+        commands_page = Paginator(commands, iterm_per_page)
+        count = commands.count()
+        context = {'commands': commands_page.page(pageNo), 'count': count}
+    else: # Header
+        division = recorder.division
+        personnels = division.getPersonnels()
+        commands1 = Command.objects.filter(commandperson__personnel__in=personnels).order_by('-eduYear', '-eduSemeter', '-comDate') #คำสั่งที่ได้รับมอบหมาย
+        commands2 = Command.objects.filter(recorder_id__in=personnels) #คำสั่งที่เป็นคนบันทึกไว้เอง
+        commands = commands1.union(commands2)
         commands_page = Paginator(commands, iterm_per_page)
         count = commands.count()
         # if request.session['userType'] == 'Staff':
