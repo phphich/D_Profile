@@ -88,10 +88,13 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == performance.personnel.id%}
+                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
+                            <i class="fa fa-plus text-primary"></i>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </h5>
             <div id="uploadfiles" class="collapse">
@@ -133,7 +136,7 @@
                     <div class="row">
                         {% for f in performance.getPerformanceFiles %}
                             <div class="col-3">
-                                <a href="{% static 'documents/performance/' %}{{ f.file }}" class="filelink" target="_blank">
+                                <a href="{% static 'documents/performance/' %}{{ f.file }}" target="_blank">
                                     {% if f.filetype == "pdf" %}
                                         <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
                                              class="img-thumbnail">
@@ -162,6 +165,8 @@
                                         {% endif %}
                                     {% endif %}
                                     <br>
+                                </a>
+                                <a href="{% static 'documents/performance/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.file.name|length|get_digit:"-1" > 30 %}
                                         {{ f.file.name|slice:"0:30" }}...
                                     {% else %}
@@ -201,10 +206,13 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == performance.personnel.id%}
+                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                            <i class="fa fa-plus text-primary"></i>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </h5>
         </div>
@@ -226,6 +234,7 @@
             <ul class="list-group">
                 {% for link in performance.getPerformanceURLs %}
                     <li class="list-group-item text-primary">
+                        <img src="{% static 'images/iconfiles/web-icon.png' %}" width="40px">
                         <a href={{ link.url }} class="filelink" target="_blank">
                             <i class="fas fa-caret-right"></i> {{ link }}
                         </a>

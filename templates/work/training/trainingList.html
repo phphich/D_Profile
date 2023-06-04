@@ -23,7 +23,7 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <input type="hidden" name="personnelId">
+{#                    <input type="hidden" name="personnelId">#}
                 </form>
             </div>
             <div class="col-1 text-center align-middle">
@@ -56,8 +56,7 @@
     {% if personnel != None %}
         <div class="row">
             <div class="col-10"> <br>
-                <h4 class="align-bottom"> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
-                    สังกัด: {{ personnel.division }} </h4>
+                <h4 class="align-bottom"> {{ personnel }}, สังกัด: {{ personnel.division }} </h4>
             </div>
             <div class="col-2">
                 <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:5px;" class="rounded-circle">

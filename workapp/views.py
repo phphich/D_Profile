@@ -15,33 +15,64 @@ import os
 from workapp import common
 
 iterm_per_page = 5
+msgErrorId = 'เป้าหมายที่ท่านระบุ ไม่ปรากฎในระบบหรือท่านไม่มีสิทธิ์ในการเข้าถึง!'
+
+def getSession(request, dtype=None, did=None):
+    global uId
+    global uType
+    global docType
+    global docId
+    global msgErrorPermission
+    msgErrorPermission='ท่านกำลังพยายามเข้าถึงข้อมูลหรือระบบย่อย ในส่วนที่ไม่ได้รับอนุญาตให้เข้าใช้งานได้!'
+
+    docType = dtype
+    docId = did
+    if 'userId' in request.session:
+        uId = request.session['userId']
+    if 'userType' in request.session:
+        uType = request.session['userType']
+    # print("uid in getsession"+ str(uId))
+    # print("utype in getsession" + str(uType))
+
 #Leave CRUD
 @login_required(login_url='userAuthen')
 def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        personnel = Personnel.objects.filter(id=request.session['userId']).first()
-        leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
+        leaves = Leave.objects.filter(personnel=recorder).order_by('-startDate')
         leaves_page = Paginator(leaves, iterm_per_page)
         count = leaves.count()
-        context = {'personnel': personnel,'leaves': leaves_page.page(pageNo), 'count': count}
+        context = {'personnel': recorder,'leaves': leaves_page.page(pageNo), 'count': count}
     else:
         division = None
         personnel = None
-        divisions = Division.objects.all().order_by('name_th')
+        if request.session['userType'] == 'Staff':
+            divisions = recorder.getDivisionResponsible()
+            division = divisions[0]
+        elif request.session['userType'] == 'Header':
+            divisions = [recorder.division]
+            division = recorder.division
+        else: #Manager, Administrator
+            divisions = Division.objects.all().order_by('name_th')
+            division = divisions.first()
         if request.method == 'POST':
-            divisionId = request.POST['divisionId']
-            personnelId = request.POST['personnelId']
-        if divisionId is not None:
-            division = Division.objects.filter(id=divisionId).first()
-            if personnelId != "":
+            if 'personnelId' in request.POST:
+                personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
+                division = personnel.division
+            else:
+                divisionId = request.POST['divisionId']
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = division.getPersonnels().first()
+        else: #เข้ามาครั้งแรก
+            if divisionId is not None: # กรณี redirect มาจากการ New
+                division = Division.objects.get(id=divisionId)
+                personnel = Personnel.objects.get(id=personnelId)
             else:
                 personnel = division.getPersonnels().first()
-        else:
-            division = Division.objects.all().order_by('name_th').first() #ถ้ายังไม่เคยเลือกสาขา ให้ระบบเลือกสาขาแรก
-            personnel = division.getPersonnels().first() #ถ้ายังไม่เคยเลือกบุคลากร ให้ระบบเลือกบุคลากรคนแรกในสาขา
 
         leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
         count = leaves.count()
@@ -53,7 +84,16 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
 @login_required(login_url='userAuthen')
 def leaveDetail(request, id):
     leave = Leave.objects.filter(id=id).first()
+    if leave is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Leave', did=leave.id)
+    if common.chkPermission(leaveDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     if request.method == 'POST':
         fileForm = LeaveFileForm(request.POST, request.FILES)
         urlForm = LeaveURLForm(request.POST)
@@ -98,7 +138,7 @@ def leaveDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
                 return render(request, 'work/leave/leaveDetail.html', context)
     # else:
-    timeUpdate = leave.getTimeUpdate()
+    timeUpdate =  common.chkUpdateTime(leave.recordDate)
     fileForm = LeaveFileForm(initial={'leave':leave, 'filetype':'Unknow', 'recorder':recorder})
     urlForm = LeaveURLForm(initial={'leave':leave, 'recorder':recorder})
     context={'fileForm': fileForm, 'urlForm':urlForm, 'leave': leave, 'timeUpdate':timeUpdate}
@@ -107,7 +147,16 @@ def leaveDetail(request, id):
 @login_required(login_url='userAuthen')
 def leaveNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Leave', did=personnel.id)
+    if common.chkPermission(leaveNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     if request.method == 'POST':
         form = LeaveForm(data=request.POST)
         if form.is_valid():
@@ -131,9 +180,17 @@ def leaveNew(request, id):
 @login_required(login_url='userAuthen')
 def leaveUpdate(request, id):
     leave = get_object_or_404(Leave, id=id)
+    if leave is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Leave', did=leave.id)
+    if common.chkPermission(leaveUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     personnel = leave.personnel
     form = LeaveForm(data=request.POST or None, instance=leave)
-    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
@@ -155,6 +212,14 @@ def leaveUpdate(request, id):
 @login_required(login_url='userAuthen')
 def leaveDelete(request, id):
     leave = get_object_or_404(Leave, id=id)
+    if leave is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Leave', did=leave.id)
+    if common.chkPermission(leaveDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     form = LeaveForm(data=request.POST or None, instance=leave)
     if request.method == 'POST':
         #ลบไฟล์
@@ -235,32 +300,42 @@ def leaveDeleteURLAll(request, id):
 #Training CRUD
 @login_required(login_url='userAuthen')
 def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
-    if 'userType' not in request.session:
-        return redirect('userAuthen')
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        personnel = Personnel.objects.filter(id=request.session['userId']).first()
-        trainings = Training.objects.filter(personnel=personnel).order_by('-startDate')
-        leaves_page = Paginator(trainings, iterm_per_page)
+        trainings = Training.objects.filter(personnel=recorder).order_by('-startDate')
+        training_page = Paginator(trainings, iterm_per_page)
         count = trainings.count()
-        context = {'personnel': personnel, 'trainings': leaves_page.page(pageNo), 'count': count}
+        context = {'personnel': recorder, 'trainings': training_page.page(pageNo), 'count': count}
     else:
         division = None
         personnel = None
-        divisions = Division.objects.all().order_by('name_th')
+        if request.session['userType'] == 'Staff':
+            divisions = recorder.getDivisionResponsible()
+            division = divisions[0]
+        elif request.session['userType'] == 'Header':
+            divisions = [recorder.division]
+            division = recorder.division
+        else: #Manager, Administrator
+            divisions = Division.objects.all().order_by('name_th')
+            division = divisions.first()
         if request.method == 'POST':
-            divisionId = request.POST['divisionId']
-            personnelId = request.POST['personnelId']
-        if divisionId is not None:
-            division = Division.objects.filter(id=divisionId).first()
-            if personnelId != "":
+            if 'personnelId' in request.POST:
+                personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
+                division = personnel.division
+            else:
+                divisionId = request.POST['divisionId']
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = division.getPersonnels().first()
+        else: #เข้ามาครั้งแรก
+            if divisionId is not None: # กรณี redirect มาจากการ New
+                division = Division.objects.get(id=divisionId)
+                personnel = Personnel.objects.get(id=personnelId)
             else:
                 personnel = division.getPersonnels().first()
-        else:
-            division = Division.objects.all().order_by('name_th').first()
-            personnel = division.getPersonnels().first()
 
         trainings = Training.objects.filter(personnel=personnel).order_by('-fiscalYear', '-startDate')
         count = trainings.count()
@@ -272,7 +347,16 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
 @login_required(login_url='userAuthen')
 def trainingDetail(request, id):
     training = Training.objects.filter(id=id).first()
+    if training is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Training', did=training.id)
+    if common.chkPermission(trainingDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     if request.method == 'POST':
         fileForm = TrainingFileForm(request.POST, request.FILES)
         urlForm = TrainingURLForm(request.POST)
@@ -317,7 +401,7 @@ def trainingDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'training': training}
                 return render(request, 'work/training/trainingDetail.html', context)
     # else:
-    timeUpdate = training.getTimeUpdate()
+    timeUpdate = common.chkUpdateTime(training.recordDate)
     fileForm = TrainingFileForm(initial={'training':training, 'filetype':'Unknow', 'recorder':recorder})
     urlForm = TrainingURLForm(initial={'training':training, 'recorder':recorder})
     context={'fileForm': fileForm, 'urlForm':urlForm, 'training': training, 'timeUpdate':timeUpdate}
@@ -326,7 +410,16 @@ def trainingDetail(request, id):
 @login_required(login_url='userAuthen')
 def trainingNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Training', did=personnel.id)
+    if common.chkPermission(trainingNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     if request.method == 'POST':
         form = TrainignForm(data=request.POST)
         if form.is_valid():
@@ -352,9 +445,17 @@ def trainingNew(request, id):
 @login_required(login_url='userAuthen')
 def trainingUpdate(request, id):
     training = get_object_or_404(Training, id=id)
+    if training is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Training', did=training.id)
+    if common.chkPermission(trainingUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     personnel = training.personnel
     form = TrainignForm(data=request.POST or None, instance=training)
-    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
@@ -376,6 +477,15 @@ def trainingUpdate(request, id):
 @login_required(login_url='userAuthen')
 def trainingDelete(request, id):
     training = get_object_or_404(Training, id=id)
+    if training is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Training', did=training.id)
+    if common.chkPermission(trainingDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+
     form = TrainignForm(data=request.POST or None, instance=training)
     if request.method == 'POST':
         #ลบไฟล์
@@ -456,32 +566,42 @@ def trainingDeleteURLAll(request, id):
 # Performance CRUD
 @login_required(login_url='userAuthen')
 def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
-    if 'userType' not in request.session:
-        return redirect('userAuthen')
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        personnel = Personnel.objects.filter(id=request.session['userId']).first()
-        performances = Performance.objects.filter(personnel=personnel).order_by('-getDate')
-        leaves_page = Paginator(performances, iterm_per_page)
+        performances = Performance.objects.filter(personnel=recorder).order_by('-getDate')
+        performance_page = Paginator(performances, iterm_per_page)
         count = performances.count()
-        context = {'personnel': personnel, 'performances': leaves_page.page(pageNo), 'count': count}
+        context = {'personnel': recorder, 'performances': performance_page.page(pageNo), 'count': count}
     else:
         division = None
         personnel = None
-        divisions = Division.objects.all().order_by('name_th')
+        if request.session['userType'] == 'Staff':
+            divisions = recorder.getDivisionResponsible()
+            division = divisions[0]
+        elif request.session['userType'] == 'Header':
+            divisions = [recorder.division]
+            division = recorder.division
+        else: #Manager, Administrator
+            divisions = Division.objects.all().order_by('name_th')
+            division = divisions.first()
         if request.method == 'POST':
-            divisionId = request.POST['divisionId']
-            personnelId = request.POST['personnelId']
-        if divisionId is not None:
-            division = Division.objects.filter(id=divisionId).first()
-            if personnelId != "":
+            if 'personnelId' in request.POST:
+                personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
+                division = personnel.division
+            else:
+                divisionId = request.POST['divisionId']
+                division = Division.objects.filter(id=divisionId).first()
+                personnel = division.getPersonnels().first()
+        else: #เข้ามาครั้งแรก
+            if divisionId is not None: # กรณี redirect มาจากการ New
+                division = Division.objects.get(id=divisionId)
+                personnel = Personnel.objects.get(id=personnelId)
             else:
                 personnel = division.getPersonnels().first()
-        else:
-            division = Division.objects.all().order_by('name_th').first()
-            personnel = division.getPersonnels().first()
 
         performances = Performance.objects.filter(personnel=personnel).order_by('-fiscalYear', '-getDate')
         count = performances.count()
@@ -493,7 +613,16 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
 @login_required(login_url='userAuthen')
 def performanceDetail(request, id):
     performance = Performance.objects.filter(id=id).first()
+    if performance is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Performance', did=performance.id)
+    if common.chkPermission(performanceDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     if request.method == 'POST':
         fileForm = PerformanceFileForm(request.POST, request.FILES)
         urlForm = PerformanceURLForm(request.POST)
@@ -540,7 +669,7 @@ def performanceDetail(request, id):
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
                 return render(request, 'work/performance/performanceDetail.html', context)
     # else:
-    timeUpdate = performance.getTimeUpdate()
+    timeUpdate =  common.chkUpdateTime(performance.recordDate)
     fileForm = PerformanceFileForm(initial={'performance': performance, 'filetype': 'Unknow','recorder':recorder})
     urlForm = PerformanceURLForm(initial={'performance': performance, 'recorder':recorder})
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance, 'timeUpdate':timeUpdate}
@@ -549,7 +678,16 @@ def performanceDetail(request, id):
 @login_required(login_url='userAuthen')
 def performanceNew(request, id):
     personnel = get_object_or_404(Personnel, id=id)
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Performance', did=personnel.id)
+    if common.chkPermission(performanceNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     if request.method == 'POST':
         form = PerformanceForm(data=request.POST)
         if form.is_valid():
@@ -575,9 +713,18 @@ def performanceNew(request, id):
 @login_required(login_url='userAuthen')
 def performanceUpdate(request, id):
     performance = get_object_or_404(Performance, id=id)
+    if performance is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Performance', did=performance.id)
+    if common.chkPermission(performanceUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     personnel = performance.personnel
     form = PerformanceForm(data=request.POST or None, instance=performance)
-    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     if request.method == 'POST':
         if form.is_valid():
             updateForm = form.save(commit=False)
@@ -599,7 +746,16 @@ def performanceUpdate(request, id):
 @login_required(login_url='userAuthen')
 def performanceDelete(request, id):
     performance = get_object_or_404(Performance, id=id)
+    if performance is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Performance', did=performance.id)
+    if common.chkPermission(performanceDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     form = PerformanceForm(data=request.POST or None, instance=performance)
+
     if request.method == 'POST':
         # ลบไฟล์
         fileList = PerformanceFile.objects.filter(performance=performance)

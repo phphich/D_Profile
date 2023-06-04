@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect, HttpResponse, get_object_or_404
 from baseapp.models import *
 from baseapp.forms import *
 from workapp.models import *
+from workapp import common
 
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
@@ -556,7 +557,7 @@ def personnelUpdate(request, id):
         if request.session['userType'] == 'Administrator':
             form = PersonnelForm(data=request.POST, instance=personnel, files=request.FILES)
         else:
-            form = PersonnelForm(staffId=request.session['userId'], data=request.POST, instance=personnel, files=request.FILES)
+            form = PersonnelForm(userType=request.session['userType'], userId=request.session['userId'], data=request.POST, instance=personnel, files=request.FILES)
         if form.is_valid():
             updateForm = form.save(commit=False)
             id = updateForm.id
@@ -603,8 +604,10 @@ def personnelUpdate(request, id):
         userType = str(user_group)
         if request.session['userType'] == 'Administrator':
             form = PersonnelForm(instance=personnel)
+        # elif request.session['userType'] == 'Staff':
+        #     form = PersonnelForm(userType=request.session['userType'], staffId=request.session['userId'], instance=personnel)
         else:
-            form = PersonnelForm(staffId=request.session['userId'], instance=personnel)
+            form = PersonnelForm(userType=request.session['userType'], userId=request.session['userId'], instance=personnel)
         form.updateForm()
         context = {'form': form, 'personnel': personnel, 'userType':userType}
         return render(request, 'base/personnel/personnelUpdate.html', context)

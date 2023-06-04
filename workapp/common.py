@@ -1,7 +1,7 @@
 import datetime
 from workapp.models import *
+# from baseapp.models import *
 from django.contrib.auth.models import User, Group
-
 
 # ฟังก์ชันสำหรับตัดอักขระจากชื่อไฟล์ที่ระบบไม่รองรับ
 def fileNameCleansing(filename):
@@ -110,12 +110,14 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
     elif uType == 'Personnel' and methodName in methodDenyPersonnel:
         return False
     elif uType == 'Personnel': #ถ้าเป็น Personnel
-        if docType == 'Education':
-            userDocIds = Education.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
-        elif docType == 'Experience':
-            userDocIds = Expertise.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+        if str(methodName).find('New') != -1: #ถ้า New ทุกกรณี
+            userDocIds = Personnel.objects.filter(id=uId).only('id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
         elif docType == 'Personnel':
             userDocIds = Personnel.objects.filter(id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+        elif docType == 'Education':
+            userDocIds = Education.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+        elif docType == 'Expertise':
+            userDocIds = Expertise.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
         elif docType == 'Leave': #เอกสารข้อมูลการลา ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             userDocIds = Leave.objects.filter(personnel_id=uId).only('id')
         elif docType == 'Training': #เอกสารข้อมูลการอบรม ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
@@ -138,7 +140,7 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Personnel.objects.filter(id=uId).only('id')  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
             elif docType == 'Education':
                 userDocIds = Education.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
-            elif docType == 'Experience':
+            elif docType == 'Expertise':
                 userDocIds = Expertise.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Leave':
                 userDocIds = Leave.objects.filter(personnel_id=uId).only('id')
@@ -186,18 +188,19 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 return True
         elif str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
             # ถ้าเรียกใช้ method ในการแก้ไขหรือลบต้องเป็นการทำกับข้อมูลของตัวเองเท่านั้น
+            personnel = [personnel]
             if docType == 'Personnel':
-                userDocIds = Personnel.objects.filter(id__in=personnels)  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
+                userDocIds = Personnel.objects.filter(id=personnel.id)  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
             elif docType == 'Education':
-                userDocIds = Education.objects.filter(personnel__in=personnels).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
-            elif docType == 'Experience':
-                userDocIds = Expertise.objects.filter(personnel__in=personnels).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds = Education.objects.filter(personnel_id__in=personnel).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+            elif docType == 'Expertise':
+                userDocIds = Expertise.objects.filter(personnel_id__in=personnel).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Leave':
-                userDocIds = Leave.objects.filter(personnel__in=personnels).only('id')
+                userDocIds = Leave.objects.filter(personnel_id__in=personnel).only('id')
             elif docType == 'Training':
-                userDocIds = Training.objects.filter(personnel__in=personnels).only('id')
+                userDocIds = Training.objects.filter(personnel_id__in=personnel).only('id')
             elif docType == 'Performance':
-                userDocIds = Performance.objects.filter(personnel__in=personnels).only('id')
+                userDocIds = Performance.objects.filter(personnel_id__in=personnel).only('id')
             else:
                 userDocIds = None
             uDocId = []

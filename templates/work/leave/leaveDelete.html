@@ -4,8 +4,7 @@
     <div class="row">
         <div class="col-10">
             <h2><i class="fa fa-person-hiking"></i> ลบข้อมูลการลา </h2>
-            <h4> {{ personnel.status }}{{ personnel.firstname_th }} {{ personnel.lastname_th }},
-                สังกัด: {{ personnel.division }} </h4>
+            <h4> {{ personnel }},  สังกัด: {{ personnel.division }} </h4>
         </div>
         <div class="col-2">
             <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"
@@ -80,11 +79,7 @@
 
         <div class="row">
             <div class="col-12 text-success">
-                <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ:
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
-                </h5>
+                <h5><i class="fas fa-link"></i> ตำแหน่งลิงก์ตำแหน่งไฟล์เอกสารแนบ: </h5>
             </div>
             <p class="text-primary">
             <ul class="list-group">

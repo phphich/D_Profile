@@ -57,6 +57,11 @@
                     onclick="location.href='{% url 'educationUpdate' education.id  %}'">
                 <i class="fa fa-tools"></i> แก้ไข
             </button>
+        {% elif request.session.userType in 'Manager, Header' and request.session.userId == education.personnel.id %}
+            <button type="button" class="btn btn-warning"
+                    onclick="location.href='{% url 'educationUpdate' education.id  %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
         {% endif %}
     </p>
 

@@ -6,8 +6,7 @@
         <div class="col-10">
             <h2><i class="fa fa-person-hiking"></i> รายละเอียดการลา </h2>
             <h3>
-                {{ leave.personnel.status }}{{ leave.personnel.firstname_th }} {{ leave.personnel.lastname_th }},
-                สังกัด: {{ leave.personnel.division }}
+                {{ leave.personnel }},  สังกัด: {{ leave.personnel.division }}
             </h3>
         </div>
         <div class="col-2">
@@ -130,7 +129,7 @@
                     <div class="row">
                         {% for f in leave.getLeaveFiles %}
                             <div class="col-3">
-                                <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
+                                <a href="{% static 'documents/leave/' %}{{ f.file }}" target="_blank">
                                     {% if f.filetype == "pdf" %}
                                         <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
                                              class="img-thumbnail">
@@ -159,6 +158,8 @@
                                         {% endif %}
                                     {% endif %}
                                     <br>
+                                </a>
+                                <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.file.name|length|get_digit:"-1" > 30 %}
                                         {{ f.file.name|slice:"0:30" }}...
                                     {% else %}
@@ -232,6 +233,7 @@
         <ul class="list-group">
             {% for link in leave.getLeaveURLs %}
                 <li class="list-group-item text-primary">
+                    <img src="{% static 'images/iconfiles/web-icon.png' %}" width="40px">
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}
                     </a>

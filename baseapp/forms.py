@@ -99,19 +99,22 @@ class CurriculumForm(forms.ModelForm):
         self.fields['division'].widget.attrs['readonly'] = True
 
 class PersonnelForm(forms.ModelForm):
-    def __init__(self, staffId=None,  *args, **kwargs):
+    def __init__(self, userType=None, userId=None,  *args, **kwargs):
         super(PersonnelForm, self).__init__(*args, **kwargs)
-        if staffId != None:
-            staff = Personnel.objects.filter(id=staffId).first()
-            divisions = staff.getDivisionResponsible()
-            divIds = []
-            if len(divisions) == 0:
-                divIds = [staff.division]
+        if userId != None:
+            user = Personnel.objects.filter(id=userId).first()
+            if userType == 'Staff':
+                divisions = user.getDivisionResponsible()
+                divIds = []
+                if len(divisions) == 0:
+                    divIds = [user.division]
+                else:
+                    for x in divisions:
+                        divIds.append(x.id)
             else:
-                for x in divisions:
-                    divIds.append(x.id)
+                divIds = [user.division.id]
+
             self.fields['division'].queryset = Division.objects.filter(id__in=divIds)
-            # self.fields['personnel'].queryset = Personnel.objects.filter(type=type)
     class Meta:
         GENDER_CHOICES = (
             ("ชาย", "ชาย"),
