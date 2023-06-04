@@ -6,8 +6,8 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fa fa-person-hiking"></i> รายละเอียดคำสั่ง ({{ command.comId }})</h2>
-                <h3> {{ personnel }},  สังกัด: {{ personnel.division }}  </h3>
+                <h2><i class="fa fa-person-hiking"></i> รายละเอียดคำสั่ง ({{ command.comId }}) </h2>
+                <h4> {{ personnel }},  สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
                 <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"  class="rounded-circle">
@@ -43,7 +43,7 @@
         </tr>
         <tr>
             <th class="text-primary">รายละเอียด</th>
-            <td>{{ command.detail }}</td>
+            <td>{{ command.detail | linebreaks  }}</td>
         </tr>
         <tr>
             <th class="text-primary">วันที่ออกคำสั่ง</th>
@@ -63,10 +63,16 @@
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
         {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-            <button type="button" class="btn btn-warning"
-                    onclick="location.href='{% url 'commandUpdate' command.id %}'">
-                <i class="fa fa-tools"></i> แก้ไข
-            </button>
+            {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    <i class="fa fa-tools"></i> (หมดอายุแก้ไข)
+                </button>
+            {% else  %}
+                <button type="button" class="btn btn-warning"
+                        onclick="location.href='{% url 'commandUpdate' command.id %}'">
+                    <i class="fa fa-tools"></i> แก้ไข
+                </button>
+            {% endif %}
         {% endif %}
     </p>
 
@@ -74,9 +80,12 @@
         <div class="col-12 text-success">
             <h5><i class="fa fa-user-friends"></i> บุคลากรที่ได้รับมอบหมายในคำสั่ง:
                 {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listCommandPerson">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
+                    {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listCommandPerson">
+                            <i class="fa fa-plus text-primary"></i>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </h5>
         </div>
@@ -114,16 +123,25 @@
                 <table class="table table-striped table-hover table-light">
                     <tr class="text-primary">
                         <th class="col-1 text-center">ลำดับที่</th>
-                        <th class="col-4">บุคลากร</th>
-                        <th class="col-5">หน้าที่ที่ได้รับมอบหมาย</th>
-                        <th class="col-2 text-center">
+                        <th class="col-1 text-end"> </th>
+                        <th class="col-3">บุคลากร</th>
+                        <th class="col-3">หน้าที่ที่ได้รับมอบหมาย</th>
+                        <th class="col-2 text-secondary text-sm-start"></th>
+                        <th class="col-2 text-center text-danger">
                             {% if command.getCommandPerson|length > 1 %}
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
+                                {% if request.session.userType == 'Administrator' %}
                                     <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด (ที่ไม่ใช่ผู้บันทึกคำสั่ง) ออกจากคำสั่งนี้!!!' )"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากคำสั่งนี้!!!' )"
                                        class="btn btn-danger">
-                                        <i class="fas fa-trash text-white"></i>ลบบุคลากรรายทั้งหมด
+                                        <i class="fas fa-trash text-white"></i> ลบทุกคนออกจากคำสั่ง
                                     </a>
+                                {% elif request.session.userType == 'Staff' or request.session.userId == command.recorder.id %}
+                                    <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากคำสั่งนี้!!!' )"
+                                       class="btn btn-danger">
+                                        <i class="fas fa-trash text-white"></i> ลบทุกคนที่เคยบันทึก*
+                                    </a><br>
+                                    <i style="font-size: small">(*ผู้ที่ถูกบันทึกโดยผู้ใช้ระบบขณะนี้)</i>
                                 {% endif %}
                             {% endif %}
                         </th>
@@ -131,28 +149,36 @@
 
                     {% for commandPerson in command.getCommandPerson %}
                         {% if personnel.id == commandPerson.personnel.id %}
-                            <tr style="font-size:x-large;color:black ">
+                            <tr class="text-success" style="font-weight:bold">
                         {% else %}
                             <tr>
                         {% endif %}
                             <td class="text-center">{{ forloop.counter }}</td>
+                            <td class="text-end"><img src="{% static commandPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                                     width="55px" height="65px"> </td>
                             <td>{{ commandPerson.personnel }} </td>
-                            <td>{{ commandPerson.status }}</td>
+                            <td>{{ commandPerson.status | slice:"0,30"}}</td>
+                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ commandPerson.getRecorderAndEditor }}</td>
                             <td class="text-center">
-                                {% if right == 'Write' %}
-                                    {% if request.session.userType in 'Administrator, Staff' %}
+                                    {% if request.session.userType == 'Administrator' %}
                                         <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
                                            onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
-                                            <i class="fas fa-minus text-danger"></i>
+                                            <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                         </a>
-                                    {% elif request.session.userId == command.recorder.id and commandPerson.personnel.id != requestion.session.userId %}
-                                        {# รายชื่อที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
+                                    {% elif request.session.userType == 'Staff' and commandPerson.recorder.id == request.session.userId %}
                                         <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
                                            onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
-                                            <i class="fas fa-minus text-danger"></i>
+                                            <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                         </a>
+                                    {% elif request.session.userId == command.recorder.id and commandPerson.recorder.id == request.session.userId %}
+                                        {# ถ้าคำสั่งถูกบันทึกโดยผู้ล็อกอิน และรายชื่อในแถวนั้นที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
+                                        {% if commandPerson.personnel.id  != request.session.userId %}
+                                            <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
+                                               onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
+                                                <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
-                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
@@ -167,9 +193,12 @@
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
                 {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
+                    {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
+                            <i class="fa fa-plus text-primary"></i>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </h5>
             <div id="uploadfiles" class="collapse">
@@ -285,9 +314,12 @@
         <div class="col-12 text-success">
             <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
                 {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
-                        <i class="fa fa-plus text-primary"></i>
-                    </button>
+                    {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                            <i class="fa fa-plus text-primary"></i>
+                        </button>
+                    {% endif %}
                 {% endif %}
             </h5>
         </div>

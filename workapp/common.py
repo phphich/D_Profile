@@ -71,10 +71,8 @@ def chkUpdateTime(documentDate): #ฟังก์ชันตรวจสอบ�
         lastUpdate = datetime.datetime(y+1, 8, 31, 23, 59, 59) # สิ้นเดือนสิงหาคมของปีถัดไป
     today = datetime.datetime.now()
     if today < lastUpdate:
-        print(True)
         return True
     else:
-        print(False)
         return False
 
 def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):

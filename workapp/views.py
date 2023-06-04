@@ -144,7 +144,7 @@ def leaveDetail(request, id):
         else: # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
+                messages.add_message(request, messages.SUCCESS, "บันทึกลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'leave': leave}
@@ -419,7 +419,7 @@ def trainingDetail(request, id):
         else: # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
+                messages.add_message(request, messages.SUCCESS, "บันทึกลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'training': training}
@@ -699,7 +699,7 @@ def performanceDetail(request, id):
         else:  # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
+                messages.add_message(request, messages.SUCCESS, "บันทึกลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
                 context = {'fileForm': fileForm, 'urlForm': urlForm, 'performance': performance}
@@ -871,24 +871,49 @@ def performanceDeleteURLAll(request, id):
 # CRUD. command
 @login_required(login_url='userAuthen')
 def commandList(request, pageNo=None):
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    personnel = [recorder]
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        commands = Command.objects.filter(commandperson__personnel=recorder).order_by('-eduYear', '-eduSemeter', '-comDate')
+        commands1 = Command.objects.filter(commandperson__personnel=recorder).order_by('-eduYear', '-eduSemeter', '-comDate')
+        commands2 = Command.objects.filter(recorder_id__in=personnel)
+        commands = commands1.union(commands2)
         commands_page = Paginator(commands, iterm_per_page)
-        count = len(commands)
+        count = commands.count()
+        # count = len(commands)
         context = {'personnel': recorder,'commands': commands_page.page(pageNo), 'count': count}
     else:
         commands = Command.objects.all().order_by('-eduYear', '-eduSemeter', '-comDate')
         commands_page = Paginator(commands, iterm_per_page)
         count = commands.count()
+        # if request.session['userType'] == 'Staff':
+        #     outside = recorder.getOutsideResponsible()
+        #     divisions = recorder.getDivisionResponsible()
+        #     if outside == True:  # กรณีที่ผู้รับชอบข้อมูลไม่ได้อยู่ในสาขา/หน่วยงานย่อยที่รับผิดชอบ
+        #         divisions.append(recorder.division)
+        #     division = divisions[0]
+        # elif request.session['userType'] == 'Header':
+        #     divisions = [recorder.division]
+        #     division = recorder.division
+        # else: #Manager, Administrator
+        #     divisions = Division.objects.all().order_by('name_th')
+        #     division = divisions.first()
+
         context = {'commands': commands_page.page(pageNo), 'count': count}
     return render(request, 'work/command/commandList.html', context)
 
 @login_required(login_url='userAuthen')
 def commandNew(request):
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    # getSession(request, dtype='Command', did=recorder.id)
+    # if common.chkPermission(commandNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
+    #     return redirect(request.session['last_url'])
+    # request.session['last_url'] = request.path_info
+
     if request.method == 'POST':
         form = CommandForm(data=request.POST)
         if form.is_valid():
@@ -919,27 +944,13 @@ def commandNew(request):
 @login_required(login_url='userAuthen')
 def commandDetail(request, id):
     command = Command.objects.filter(id=id).first()
-
-    if 'userType' not in request.session:
-        return redirect('userAuthen')
+    if command is None:
+        messages.add_message(request, messages.ERROR,msgErrorId)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
-    if (request.session['userType'] == "Personnel"):
-        personnel = Personnel.objects.filter(id=request.session['userId']).first()
-    if request.session['userType'] == 'Administrator':
-        right = 'Write'
-    elif request.session['userType'] == 'Manager':
-        if command.recorder == recorder:
-            right = 'Write'
-        else:
-            right = 'Read'
-    elif request.session['userType'] == 'Personnel':
-        if command.recorder == recorder:
-            right = 'Write'
-        else:
-            right = 'Deny'
-    elif request.session['userType'] == 'Staff':
-        right = 'Write'
-    # ดึงรายชื่อสาขาที่ได้รับมอบหมายให้ดูแลข้อมูลให้ มา
+
+       # ดึงรายชื่อสาขาที่ได้รับมอบหมายให้ดูแลข้อมูลให้ มา
 
     if request.method == 'POST':
         fileForm = CommandFileForm(request.POST, request.FILES)
@@ -974,12 +985,18 @@ def commandDetail(request, id):
                 else:
                     messages.add_message(request, messages.WARNING,
                                          "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+                command.editor = recorder
+                command.editDate = datetime.datetime.now()
+                command.save()
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")                
         elif request.POST['action']=='uploadLink':  # upload link
             if urlForm.is_valid():
                 urlForm.save()
-                messages.add_message(request, messages.SUCCESS, "บันทึกตำแหน่งลิงก์ของเอกสารเรียบร้อย")
+                command.editor = recorder
+                command.editDate = datetime.datetime.now()
+                command.save()
+                messages.add_message(request, messages.SUCCESS, "บันทึกลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
             else:
                 messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
         else: # save uploadPersonnel
@@ -1000,18 +1017,22 @@ def commandDetail(request, id):
                 else:
                     error = True
                     msg = msg + str(person)
+            command.editor = recorder
+            command.editDate = datetime.datetime.now()
+            command.save()
             if error == True:
                 messages.add_message(request, messages.WARNING, msg + " ["+ status + "]")
     fileForm = CommandFileForm(initial={'command': command, 'filetype': 'Unknow', 'recorder':recorder})
     urlForm = CommandURLForm(initial={'command': command, 'recorder':recorder})
     commandPersonForm = CommandPersonForm(command=command, initial={'command':command, 'recorder':recorder, })
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'commandPersonForm':commandPersonForm ,
-               'command': command,'personnel':recorder, 'right':right}
+               'command': command,'personnel':recorder}
     return render(request, 'work/command/commandDetail.html', context)
 
 @login_required(login_url='userAuthen')
 def commandUpdate(request, id):
     command = Command.objects.filter(id=id).first()
+    request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     form = CommandForm(data=request.POST or None, instance=command)
     if request.method == 'POST':
@@ -1035,34 +1056,57 @@ def commandUpdate(request, id):
 @login_required(login_url='userAuthen')
 def commandDelete(request, id):
     command = Command.objects.filter(id=id).first()
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
 
-    form = TrainignForm(data=request.POST or None, instance=command)
+    form = CommandForm(data=request.POST or None, instance=command)
     if request.method == 'POST':
-        #ลบไฟล์
-        fileList = CommandFile.objects.filter(command=command)
-        for f in fileList:
-            fname = f.file.name
-            if os.path.exists('static/documents/command/' + fname):
-                try:
-                    os.remove('static/documents/command/' +fname)  # file exits, delete it
-                except:
-                    messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
-                finally:
-                    f.delete()
-        urlList =CommandURL.objects.filter(command=command)
-        for u in urlList:
-            u.delete()
-        command.delete()
-        messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการฝึกอบรม/สัมมนาที่เลือกเรียบร้อย")
-        return redirect('commandList', divisionId=command.personnel.division.id, personnelId=command.personnel.id)
+        commandPersonnels = command.getCommandPerson()
+        complete = False
+        if len(commandPersonnels) == 0:
+            complete = True
+        elif len(commandPersonnels) == 1:
+            commandPerson = commandPersonnels.first()
+            if commandPerson.recorder == recorder:
+                complete = True
+            else:
+                messages.add_message(request, messages.ERROR,
+                             "คำสั่งที่เลือกมีรายชื่อบุคลากรที่ได้รับมอบหมายในการปฏิบัติหน้าที่ตามคำสั่งนี้อยู่ ไม่สามารถลบได้")
+        else:
+            messages.add_message(request, messages.ERROR,
+                                 "คำสั่งที่เลือกมีรายชื่อบุคลากรที่ได้รับมอบหมายในการปฏิบัติหน้าที่ตามคำสั่งนี้อยู่ ไม่สามารถลบได้")
+        if complete == False:
+            return redirect(request.session['last_url'])
+        else:
+            #ลบคน กรณีเป็นเจ้าของคำสั่ง
+            for commandPerson in commandPersonnels:
+                commandPerson.delete()
+            # ลบไฟล์
+            fileList = CommandFile.objects.filter(command=command)
+            for f in fileList:
+                fname = f.file.name
+                if os.path.exists('static/documents/command/' + fname):
+                    try:
+                        os.remove('static/documents/command/' +fname)  # file exits, delete it
+                    except:
+                        messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
+                    finally:
+                        f.delete()
+            urlList =CommandURL.objects.filter(command=command)
+            for u in urlList:
+                u.delete()
+            command.delete()
+            messages.add_message(request, messages.SUCCESS, "ลบข้อมูลคำสั่งเรียบร้อย")
+            return redirect('commandList')
     else:
         form.deleteForm()
-        context = {'form': form, 'command':command, 'personnel': command.personnel}
+        context = {'form': form, 'command':command, 'personnel': command.recorder}
         return render(request, 'work/command/commandDelete.html', context)
 
 @login_required(login_url='userAuthen')
 def commandDeleteFile(request, id):
     commandFile = CommandFile.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     command = commandFile.command
     fname = commandFile.file.name
     if os.path.exists('static/documents/command/' + fname):
@@ -1072,11 +1116,15 @@ def commandDeleteFile(request, id):
         except:
             messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
     commandFile.delete()
+    command.editor = recorder
+    command.editDate = datetime.datetime.now()
+    command.save()
     return redirect('commandDetail', id=command.id)
 
 @login_required(login_url='userAuthen')
 def commandDeleteFileAll(request, id):
     command = Command.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     commandFiles = command.getCommandFiles()
     success = True
     fileerror = ""
@@ -1094,30 +1142,45 @@ def commandDeleteFileAll(request, id):
         messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดเรียบร้อย")
     else:
         messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+    command.editor = recorder
+    command.editDate = datetime.datetime.now()
+    command.save()
     return redirect('commandDetail', id=command.id)
 
 @login_required(login_url='userAuthen')
 def commandDeleteURL(request, id):
     commandURL = CommandURL.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     command = commandURL.command
     commandURL.delete()
+    command.editor = recorder
+    command.editDate = datetime.datetime.now()
+    command.save()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารที่เลือกเรียบร้อย")
     return redirect('commandDetail', id=command.id)
 
 @login_required(login_url='userAuthen')
 def commandDeleteURLAll(request, id):
     command = Command.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     commandURLs = command.getCommandURLs()
     for commandURL in commandURLs:
         commandURL.delete()
+    command.editor = recorder
+    command.editDate = datetime.datetime.now()
+    command.save()
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
     return redirect('commandDetail', id=command.id)
 
 @login_required(login_url='userAuthen')
 def commandDeleteCommandPerson(request, id):
     commandPerson = CommandPerson.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
     command = commandPerson.command
     commandPerson.delete()
+    command.editor = recorder
+    command.editDate = datetime.datetime.now()
+    command.save()
     messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากคำสั่งเรียบร้อย")
     return redirect('commandDetail', id=command.id)
 
@@ -1125,10 +1188,26 @@ def commandDeleteCommandPerson(request, id):
 def commandDeleteCommandPersonAll(request, id):
     command = Command.objects.filter(id=id).first()
     commandPersons = command.getCommandPerson()
-    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    recorder = command.recorder
+    personnel = Personnel.objects.filter(id=request.session['userId']).first()
+    count = 0
     for commandPerson in commandPersons:
-        if commandPerson.personnel != recorder:
+        if request.session['userType'] =='Administrator': # Admin ลบได้ทั้งหมดใน CommandPerson รวมถึงตัวเอง
             commandPerson.delete()
-    messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดออกจากคำสั่งเรียบร้อย")
+            count+=1
+        elif request.session['userType'] =='Staff': # Staff ลบได้ทั้งหมดที่เคยเพิ่มใน CommandPerson รวมถึงตัวเอง
+            if commandPerson.recorder == personnel:
+                commandPerson.delete()
+                count += 1
+        else: # กรณีเป็นเจ้าของเอกสาร
+            if commandPerson.recorder == recorder and commandPerson.personnel != command.recorder:
+                commandPerson.delete()
+                count += 1
+    if count != 0:
+        command.editor = personnel
+        command.editDate = datetime.datetime.now()
+        command.save()
+        messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดที่ผู้ใช้ระบบเคยบันทึกไว้ ออกจากคำสั่งเรียบร้อย ")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่มีบุคลากรรายใดที่ผู้ใช้ระบบได้เคยบันทึกไว้ถูกลบออกจากคำสั่งนี้")
     return redirect('commandDetail', id=command.id)
-

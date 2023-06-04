@@ -54,8 +54,8 @@
 
                 {% else %}
                     {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id  or request.session.userType == 'Manager' %}
-                         {% if personnel == recorder %}
-                            <tr class="text-danger" onclick="location.href='{% url 'personnelDetail' personnel.id %}'" style="cursor:pointer">
+                         {% if personnel.id == request.session.userId %}
+                            <tr class="text-success" onclick="location.href='{% url 'personnelDetail' personnel.id %}'" style="cursor:pointer;font-weight: bold">
                          {% else %}
                             <tr class="text-dark" onclick="location.href='{% url 'personnelDetail' personnel.id %}'" style="cursor:pointer">
                          {% endif %}

@@ -562,17 +562,17 @@ class CommandForm(forms.ModelForm):
             'editor' : 'ผู้แก้ไข',
         }
 
-        def deleteForm(self):
-            self.fields['commandId'].widget.attrs['readonly'] = True
-            self.fields['commandDate'].widget.attrs['readonly'] = True
-            self.fields['fiscalYear'].widget.attrs['readonly'] = True
-            self.fields['eduYear'].widget.attrs['readonly'] = True
-            self.fields['eduSemeter'].widget.attrs['readonly'] = True
-            self.fields['mission'].widget.attrs['readonly'] = True
-            self.fields['topic'].widget.attrs['readonly'] = True
-            self.fields['detail'].widget.attrs['readonly'] = True
-            self.fields['recorder'].widget.attrs['readonly'] = True
-            self.fields['editor'].widget.attrs['readonly'] = True
+    def deleteForm(self):
+        self.fields['comId'].widget.attrs['readonly'] = True
+        self.fields['comDate'].widget.attrs['readonly'] = True
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['eduYear'].widget.attrs['readonly'] = True
+        self.fields['eduSemeter'].widget.attrs['readonly'] = True
+        self.fields['mission'].widget.attrs['readonly'] = True
+        self.fields['topic'].widget.attrs['readonly'] = True
+        self.fields['detail'].widget.attrs['readonly'] = True
+        self.fields['recorder'].widget.attrs['readonly'] = True
+        self.fields['editor'].widget.attrs['readonly'] = True
 
 class CommandFileForm(forms.ModelForm):
     class Meta:

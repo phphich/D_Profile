@@ -24,7 +24,7 @@
                 <th class="text-center col-1">ภาคเรียนที่ </th>
                 <th class="text-center col-1">เลขที่คำสั่ง</th>
                 <th class="col-5">เรื่อง</th>
-                <th class="text-center col-1">บุคลากร (ราย)</th>
+                <th class="text-center col-1">บุคลากรในคำสั่ง (ราย)</th>
                 <th class="col col-2">
                     {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
                         <a href="{% url 'commandNew' %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
@@ -49,10 +49,20 @@
                     <td>{{ command.topic }}</td>
                     <td class="text-center">{{ command.getCountPersonnel }}</td>
                     <td class="text-center">
-                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
+                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
     {#                        <a href="{% url 'commandDetail' command.id %}" class="btn btn-light"> <i class="fa fa-search"> </i> </a>#}
-                            <a href="{% url 'commandUpdate' command.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
-                            <a href="{% url 'commandDelete' command.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                            {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                                <button class="btn btn-secondary" disabled> <i class="fas fa-file-archive"></i> </button>
+                            {% else %}
+                                <a href="{% url 'commandUpdate' command.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
+                                <a href="{% url 'commandDelete' command.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                            {% endif %}
+                        {% else %}
+                            {% if  command.recordDate|getTimeUpdate == False %}
+                                <button class="btn btn-secondary" disabled> <i class="fas fa-file-archive"></i> </button>
+                            {% else %}
+                                <i style="font-style: italic;font-size: small">โดย{{ command.recorder }} </i>
+                            {% endif %}
                         {% endif %}
                     </td>
                  </tr>
