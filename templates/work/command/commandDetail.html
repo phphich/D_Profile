@@ -213,7 +213,7 @@
                     <div class="row">
                         {% for f in command.getCommandFiles %}
                             <div class="col-3">
-                                <a href="{% static 'documents/command/' %}{{ f.file }}" class="filelink" target="_blank">
+                                <a href="{% static 'documents/command/' %}{{ f.file }}" target="_blank">
                                     {% if f.filetype == "pdf" %}
                                         <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
                                              class="img-thumbnail">
@@ -242,12 +242,15 @@
                                         {% endif %}
                                     {% endif %}
                                     <br>
+                                </a>
+                                <a href="{% static 'documents/command/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.file.name|length|get_digit:"-1" > 30 %}
                                         {{ f.file.name|slice:"0:30" }}...
                                     {% else %}
                                         {{ f.file.name }}
                                     {% endif %}
                                 </a>
+
                                 {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
                                     <a href="{% url 'commandDeleteFile' f.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
@@ -306,6 +309,7 @@
         <ul class="list-group">
             {% for link in command.getCommandURLs %}
                 <li class="list-group-item text-primary">
+                    <img src="{% static 'images/iconfiles/web-icon.png' %}" width="40px">
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}
                     </a>
