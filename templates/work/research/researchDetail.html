@@ -6,7 +6,7 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fa fa-person-hiking"></i> รายละเอียดคำสั่ง ({{ command.comId }}) </h2>
+                <h2><i class="fas fa-flask"></i> รายละเอียดงานวิจัย   </h2>
                 <h4> {{ personnel }},  สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
@@ -14,7 +14,7 @@
             </div>
         {% else %}
             <div class="col-12">
-            <h2><i class="fas fa-clipboard-list"></i> รายละเอียดคำสั่ง ({{ command.comId }}) </h2>
+            <h2><i class="fas fa-flask"></i> รายละเอียดงานวิจัย </h2>
         </div>
         {% endif %}
     </div>
@@ -22,56 +22,64 @@
 
     <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
         <tr>
-            <th class="col-3 text-primary">ปีการศึกษา </th>
-            <td class="col-9">{{ command.eduYear }}</td>
+            <th class="col-3 text-primary">ปีงบประมาณ </th>
+            <td class="col-9">{{ research.fiscalYear }}</td>
         </tr>
         <tr>
-            <th class="text-primary">ภาคเรียนที่ </th>
-            <td>{{ command.getSemeter }}</td>
+            <th class="text-primary">ชื่องานวิจัย (ไทย) </th>
+            <td>{{ research.title_th }}</td>
         </tr>
         <tr>
-            <th class="text-primary">พันธกิจ</th>
-            <td>{{ command.mission }}</td>
+            <th class="text-primary">ชื่องานวิจัย (อังกฤษ) </th>
+            <td>{{ research.title_en }}</td>
         </tr>
         <tr>
-            <th class="text-primary">เลขที่คำสั่ง</th>
-            <td>{{ command.comId }}</td>
+            <th class="text-primary">วัตถุประสงค์การวิจัย</th>
+            <td>{{ research.objective | linebreaks  }}</td>
         </tr>
         <tr>
-            <th class="text-primary">เรื่อง </th>
-            <td>{{ command.topic }}</td>
+            <th class="text-primary">งบประมาณ</th>
+            <td>{{ research.budget }}</td>
         </tr>
         <tr>
-            <th class="text-primary">รายละเอียด</th>
-            <td>{{ command.detail | linebreaks  }}</td>
+            <th class="text-primary">ประเภทงบประมาณ</th>
+            <td>{{ research.budgetType }}</td>
         </tr>
         <tr>
-            <th class="text-primary">วันที่ออกคำสั่ง</th>
-            <td>{{ command.comDate }}</td>
+            <th class="text-primary">หน่วยงานเจ้าของทุนวิจัย</th>
+            <td>{{ research.source }}</td>
         </tr>
         <tr>
-            <th class="text-primary">ปีงบประมาณ</th>
-            <td>{{ command.fiscalYear }}</td>
+            <th class="text-primary">ร้อยละความก้าวหน้า</th>
+            <td>{{ research.percent_success }}%</td>
+        </tr>
+        <tr>
+            <th class="text-primary">การเผยแพร่ผลการวิจัย</th>
+            <td>{{ research.publish_method }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">คำสำคัญ</th>
+            <td>{{ research.keyword |linebreaks}}</td>
         </tr>
     </table>
     <p class="text-end text-secondary" style="border-color: #6c757d">
-        <i>{{ command.getRecorderAndEditor }} </i>
+        <i>{{ research.getRecorderAndEditor }} </i>
     </p>
     <p class="text-center">
         <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'commandList' %}'">
+                onclick="location.href='{% url 'researchList' %}'">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
-        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-            {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+            {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
                 <button type="button" class="btn btn-secondary" disabled>
                     <i class="fa fa-tools"></i> (หมดอายุแก้ไข)
                 </button>
             {% else  %}
-                {% if request.session.userType == 'Staff' and request.session.userId != command.recorder.id %}
+                {% if request.session.userType == 'Staff' and request.session.userId != research.recorder.id %}
                 {% else %}
                     <button type="button" class="btn btn-warning"
-                            onclick="location.href='{% url 'commandUpdate' command.id %}'">
+                            onclick="location.href='{% url 'researchUpdate' research.id %}'">
                         <i class="fa fa-tools"></i> แก้ไข
                     </button>
                 {% endif %}
@@ -81,11 +89,11 @@
 
     <div class="row">
         <div class="col-12 text-success">
-            <h5><i class="fa fa-user-friends"></i> บุคลากรที่ได้รับมอบหมายในคำสั่ง:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                    {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+            <h5><i class="fa fa-user-friends"></i> บุคลากรที่ร่วมวิจัย:
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+                    {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
                     {% else %}
-                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listCommandPerson">
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listResearchPerson">
                             <i class="fa fa-plus text-primary"></i>
                         </button>
                     {% endif %}
@@ -94,18 +102,18 @@
         </div>
     </div>
 
-    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-    <div id="listCommandPerson" class="collapse">
+    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+    <div id="listResearchPerson" class="collapse">
         <input type="checkbox" name='chkAll' id="chkAll" value="Select" onclick='javascript:chkSelect("personnel","chkAll");'>Select All
-        <form method="post" id='frmCommandPerson' enctype="multipart/form-data" class="form-control text-primary" lang="th">
+        <form method="post" id='frmResearchPerson' enctype="multipart/form-data" class="form-control text-primary" lang="th">
             {% csrf_token %}
-            {{ commandPersonForm.as_table }}
+            {{ researchPersonForm.as_table }}
             <p class="text-center">
                 <br>
                 <button type="submit" class="btn btn-success">
-                    <i class="fa-solid fa-floppy-disk"></i> บันทึกกรายชื่อผู้ได้รับคำสั่ง
+                    <i class="fa-solid fa-floppy-disk"></i> บันทึกกรายชื่อผู้ร่วมวิจัย
                 </button>
-                <input type="hidden" name="id" value="{{ command.id }}">
+                <input type="hidden" name="id" value="{{ research.id }}">
                 <input type="hidden" name="action" value="uploadPersonnel">
             </p>
         </form>
@@ -115,11 +123,11 @@
     <div class="row">
         <div class="col-2>"></div>
         <div class="col-8>">
-            {% if command.getCommandPerson|length == 0  %}
+            {% if research.getResearchPerson|length == 0  %}
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="alert-warning col-8 text-center">
-                        <br>....ยังไม่ได้กำหนดรายชื่อบุคลากรที่ได้รับคำสั่งนี้ในระบบ....<br><br></div>
+                        <br>....ยังไม่ได้กำหนดรายชื่อผู้ร่วมวิจัยนี้ในระบบ....<br><br></div>
                     <div class="col-2"></div>
                 </div>
             {% else %}
@@ -132,19 +140,20 @@
                         {% endif %}
                         <th class="col-1 text-end"> </th>
                         <th class="col-3">บุคลากร</th>
-                        <th class="col-3">หน้าที่ที่ได้รับมอบหมาย</th>
+                        <th class="col-2">หน้าที่/ตำแหน่งในงานวิจัย </th>
+                        <th class="col-1 text-center">สัดส่วน (%) </th>
                         <th class="col-2 text-secondary text-sm-start"></th>
                         <th class="col-2 text-center text-danger">
-                            {% if command.getCommandPerson|length > 1 %}
+                            {% if research.getResearchPerson|length > 1 %}
                                 {% if request.session.userType == 'Administrator' %}
-                                    <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากคำสั่งนี้!!!' )"
+                                    <a href="{% url 'researchDeleteResearchPersonAll' research.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากงานวิจัยนี้!!!' )"
                                        class="btn btn-danger">
-                                        <i class="fas fa-trash text-white"></i> ลบทุกคนออกจากคำสั่ง
+                                        <i class="fas fa-trash text-white"></i> ลบทุกคนออกจากงานวิจัย
                                     </a>
-                                {% elif request.session.userType == 'Staff' or request.session.userId == command.recorder.id %}
-                                    <a href="{% url 'commandDeleteCommandPersonAll' command.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากคำสั่งนี้!!!' )"
+                                {% elif request.session.userType == 'Staff' or request.session.userId == research.recorder.id %}
+                                    <a href="{% url 'researchDeleteResearchPersonAll' research.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากงานวิจัยนี้!!!' )"
                                        class="btn btn-danger">
                                         <i class="fas fa-trash text-white"></i> ลบทุกคนที่เคยบันทึก*
                                     </a><br>
@@ -154,65 +163,68 @@
                         </th>
                     </tr>
 
-                    {% for commandPerson in command.getCommandPerson %}
+                    {% for researchPerson in research.getResearchPerson %}
                         {% if request.session.userType != 'Header' %}
-                            {% if personnel.id == commandPerson.personnel.id %}
+                            {% if personnel.id == researchPerson.personnel.id %}
                                 <tr class="text-success" style="font-weight:bold">
                             {% else %}
                                 <tr>
                             {% endif %}
                             <td class="text-center">{{ forloop.counter }}</td>
-                            <td class="text-end"><img src="{% static commandPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                            <td class="text-end"><img src="{% static researchPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                      width="55px" height="65px"> </td>
-                            <td>
-                                {{ commandPerson.personnel }}
-                            </td>
-                            <td>{{ commandPerson.status | slice:"0,30"}}</td>
-                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ commandPerson.getRecorderAndEditor }}</td>
+                            <td> {{ researchPerson.personnel }} </td>
+                            <td> {{ researchPerson.status}}</td>
+                            <td class="text-center"> {{ researchPerson.percent }}  </td>
+                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ researchPerson.getRecorderAndEditor }}</td>
                             <td class="text-center">
-                                    {% if request.session.userType == 'Administrator' %}
-                                        <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
-                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
+                                {% if request.session.userType == 'Administrator' %}
+                                    <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
+                                        <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
+                                    </a>
+                                {% elif request.session.userType == 'Staff' and researchPerson.recorder.id == request.session.userId %}
+                                    <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
+                                        <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
+                                    </a>
+                                {% elif request.session.userId == research.recorder.id and researchPerson.recorder.id == request.session.userId %}
+                                    {# ถ้างานวิจัยถูกบันทึกโดยผู้ล็อกอิน และรายชื่อในแถวนั้นที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
+{#                                    {% if researchPerson.personnel.id  != request.session.userId %}#}
+                                        <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
+                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
                                             <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                         </a>
-                                    {% elif request.session.userType == 'Staff' and commandPerson.recorder.id == request.session.userId %}
-                                        <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
-                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
-                                            <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
-                                        </a>
-                                    {% elif request.session.userId == command.recorder.id and commandPerson.recorder.id == request.session.userId %}
-                                        {# ถ้าคำสั่งถูกบันทึกโดยผู้ล็อกอิน และรายชื่อในแถวนั้นที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
-{#                                        {% if commandPerson.personnel.id  != request.session.userId %}#}
-                                            <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
-                                               onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
-                                                <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
-                                            </a>
-{#                                        {% endif %}#}
-                                    {% endif %}
-                                </td>
-                            </tr>
+{#                                    {% endif %}#}
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% else %}
-                            {% if personnel.id == commandPerson.personnel.id %}
+                            {% if personnel.id == researchPerson.personnel.id %}
                                 <tr class="text-success" style="font-weight:bold">
                             {% else %}
                                 <tr>
                             {% endif %}
-                            {% if personnel.division == commandPerson.personnel.division  %}
+                            {% if personnel.division == researchPerson.personnel.division  %}
+                                {#  ถ้า เป็นคนในสาขาของ Header #}
                                 <td class="text-center"> </td>
-                                <td class="text-end"><img src="{% static commandPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                                <td class="text-end"><img src="{% static researchPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                          width="55px" height="65px"> </td>
                                 <td>
-                                    {{ commandPerson.personnel }}
+                                    {{ researchPerson.personnel }}
                                 </td>
-                                <td>{{ commandPerson.status | slice:"0,30"}}</td>
-                                <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ commandPerson.getRecorderAndEditor }}</td>
+                                <td>{{ researchPerson.status}}</td>
+                                <td class="text-center"> {{ researchPerson.percent }}   </td>
+                                <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ researchPerson.getRecorderAndEditor }}</td>
                                 <td class="text-center">
-                                    {% if commandPerson.recorder.id  == request.session.userId %}
-                                        {# เป็นผู้บันทึกไว้ #}
-                                        <a href="{% url 'commandDeleteCommandPerson' commandPerson.id %}"
-                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากคำสั่งนี้' )">
+                                    {% if researchPerson.recorder.id  == request.session.userId %}
+                                        {#  ถ้า Header เป็นผู้เคยเพิ่มไว้ #}
+                                        <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
+                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
                                             <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                         </a>
+                                        {% else %}
+                                        sdfas
                                     {% endif %}
                                 </td>
                             {% endif %}
@@ -229,8 +241,8 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                    {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+                    {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
                     {% else %}
                         <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
                             <i class="fa fa-plus text-primary"></i>
@@ -253,7 +265,7 @@
                     </div>
                     <div class="row">
                         <div class="col-5 text-center">
-                            <input type="hidden" name="id" value="{{ command.id }}">
+                            <input type="hidden" name="id" value="{{ research.id }}">
                             <input type="hidden" name="action" value="uploadfile">
                         </div>
                         <div class="col-2 text-center" id="upload">
@@ -268,18 +280,18 @@
                 </form>
             </div>
             <p class="text-info">
-                {% if command.getCommandFiles|length == 0 %}
+                {% if research.getResearchFiles|length == 0 %}
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
-                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบคำสั่งนี้ในระบบ....<br><br></div>
+                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบงานวิจัยนี้ในระบบ....<br><br></div>
                         <div class="col-2"></div>
                     </div>
                 {% else %}
                     <div class="row">
-                        {% for f in command.getCommandFiles %}
+                        {% for f in research.getResearchFiles %}
                             <div class="col-3">
-                                <a href="{% static 'documents/command/' %}{{ f.file }}" target="_blank">
+                                <a href="{% static 'documents/research/' %}{{ f.file }}" target="_blank">
                                     {% if f.filetype == "pdf" %}
                                         <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
                                              class="img-thumbnail">
@@ -309,7 +321,7 @@
                                     {% endif %}
                                     <br>
                                 </a>
-                                <a href="{% static 'documents/command/' %}{{ f.file }}" class="filelink" target="_blank">
+                                <a href="{% static 'documents/research/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.file.name|length|get_digit:"-1" > 30 %}
                                         {{ f.file.name|slice:"0:30" }}...
                                     {% else %}
@@ -317,8 +329,8 @@
                                     {% endif %}
                                 </a>
 
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                                    <a href="{% url 'commandDeleteFile' f.id %}"
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+                                    <a href="{% url 'researchDeleteFile' f.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
                                         <i class="fas fa-minus text-danger"></i>
                                     </a>
@@ -326,11 +338,11 @@
                             </div>
                         {% endfor %}
                     </div>
-                    {% if command.getCommandFiles|length > 1 %}
+                    {% if research.getResearchFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                                    <a href="{% url 'commandDeleteFileAll' command.id %}"
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+                                    <a href="{% url 'researchDeleteFileAll' research.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
                                        class="btn btn-danger">
                                         <i class="fas fa-trash text-white"></i>
@@ -350,8 +362,8 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                    {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+                    {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
                     {% else %}
                         <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
                             <i class="fa fa-plus text-primary"></i>
@@ -369,21 +381,21 @@
                     <button type="submit" class="btn btn-success">
                         <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
                     </button>
-                    <input type="hidden" name="id" value="{{ command.id }}">
+                    <input type="hidden" name="id" value="{{ research.id }}">
                     <input type="hidden" name="action" value="uploadLink">
                 </p>
             </form>
         </div>
         <p class="text-primary">
         <ul class="list-group">
-            {% for link in command.getCommandURLs %}
+            {% for link in research.getResearchURLs %}
                 <li class="list-group-item text-primary">
                     <img src="{% static 'images/iconfiles/web-icon.png' %}" width="40px">
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}
                     </a>
-                   {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                        <a href="{% url 'commandDeleteURL' link.id %}"
+                   {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+                        <a href="{% url 'researchDeleteURL' link.id %}"
                            onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
                             <i class="fas fa-minus text-danger"></i>
                         </a>
@@ -392,11 +404,11 @@
             {% endfor %}
         </ul>
 
-        {% if command.getCommandURLs|length > 1 %}
+        {% if research.getResearchURLs|length > 1 %}
             <div class="row">
                 <div class="col-3">
-                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == command.recorder.id %}
-                        <a href="{% url 'commandDeleteURLAll' command.id %}"
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
+                        <a href="{% url 'researchDeleteURLAll' research.id %}"
                            onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
                            class="btn btn-danger">
                             <i class="fas fa-trash text-white"></i>

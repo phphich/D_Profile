@@ -22,12 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$n6&%)#^og5o^x%ghu%x@ova8d_p(azvo_!e2)nrmk_*p$2@sj'
+# 2QnCkpiG9yYICM3faP9HniCcspu_2nafMzzFKsSrtdioUcxQj
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["13a8-2405-9800-ba30-7b2-f48f-bfec-d3cd-9107.ngrok-free.app","localhost", "192.168.0.101"]
 
 # Application definition
 

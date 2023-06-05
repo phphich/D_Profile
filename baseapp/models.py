@@ -130,12 +130,11 @@ class Personnel(models.Model):
     def getOutsideResponsible(self):
         outside = True
         responsibles = Responsible.objects.filter(personnel=self)
-        for div in responsibles:
-            if div == self.division:
+        for resp in responsibles:
+            if resp.division == self.division:
                 outside = False
                 break
         return outside
-
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorderId).first()
         editor  = Personnel.objects.filter(id=self.editorId).first()

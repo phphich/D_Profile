@@ -38,7 +38,7 @@
                         {% csrf_token %}
                         <label for="personnelId">เลือกบุคลากร</label>
                         <select name="personnelId" onchange="this.form.submit();" class="form-control text-success">
-                            {% if onlyStaff == True %}
+                            {% if recorderOnly == True %}
                                 <option value="{{ recorder.id }}" selected> {{ recorder }} (*คุณ) </option>
                                 {% for person in division.getPersonnels %}
                                     {% if person == personnel %}

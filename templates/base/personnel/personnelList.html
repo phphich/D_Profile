@@ -50,7 +50,7 @@
                 </th>
             </tr>
             {% for personnel in personnels %}
-                {% if personnel.division == recorder.division and staffOnly == True and personnel != recorder %}
+                {% if personnel.division == recorder.division and onlyStaff == True and personnel != recorder %}
 
                 {% else %}
                     {% if request.session.userType == 'Administrator' or request.session.userType == 'Staff' or request.session.userId == personnel.id  or request.session.userType == 'Manager' %}

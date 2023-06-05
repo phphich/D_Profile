@@ -398,6 +398,7 @@ def personnelList(request, pageNo=None, divId=None):
         pageNo = 1
 
     # if request.session['userType'] != 'Staff':
+    onlyStaff = False
     if 'userType' not in request.session or request.session['userType'] != 'Staff':
         divisions = Division.objects.all().order_by('name_th')
         listDivName = []
@@ -427,13 +428,13 @@ def personnelList(request, pageNo=None, divId=None):
         divisions = recorder.getDivisionResponsible()
         outside = recorder.getOutsideResponsible()
         if outside == True:
-            staffOnly = True
+            onlyStaff = True
             divisions.append(recorder.division)
         personnels = Personnel.objects.filter(division__in=divisions)
         # personnels = Responsible.getPersonnelResponsibles(request.session['userId']).order_by('division__personnel__firstname_th','division__personnel__lastname_th') #เฉพาะรายชื่อบุคลากรที่รับผิดชอบข้อมูลให้
         personnels_page = Paginator(personnels, iterm_per_page)
         count = personnels.count()
-        context = {'personnels': personnels_page.page(pageNo), 'count': count, 'staffOnly':staffOnly, 'recorder':recorder }
+        context = {'personnels': personnels_page.page(pageNo), 'count': count, 'onlyStaff':onlyStaff, 'recorder':recorder }
     return render(request, 'base/personnel/personnelList.html', context)
 
 # @login_required(login_url='userAuthen')
@@ -567,6 +568,7 @@ def personnelUpdate(request, id):
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     oldpicture = personnel.picture.name  # รูปเดิม
     oldemail = personnel.email  # อีเมล์เดิม
+    olddivision = personnel.division
     if request.method == 'POST':
         if request.session['userType'] == 'Administrator':
             form = PersonnelForm(data=request.POST, instance=personnel, files=request.FILES)
@@ -574,6 +576,10 @@ def personnelUpdate(request, id):
             form = PersonnelForm(userType=request.session['userType'], userId=request.session['userId'], data=request.POST, instance=personnel, files=request.FILES)
         if form.is_valid():
             updateForm = form.save(commit=False)
+            updateDivision = request.POST['division']
+            if str(updateDivision) != str(olddivision.id) and personnel.getHeader() is not None: # เป็นหัวหน้าแต่เปลี่ยนสาขา
+                messages.add_message(request, messages.ERROR, 'มีการเปลี่ยนสาขา/หน่วยงานย่อยใหม่ให้แก่บุคลากร ในขณะที่บุคลากรรายนี้เป็นหัวหน้าสาขา/หน่วยงานปัจจุบันอยู่')
+                return redirect(request.session['last_url'])
             id = updateForm.id
             if updateForm.picture.name != oldpicture:  # หากเลือกรูปใหม่
                 if os.path.exists('static/' + oldpicture):  # delete older picture profile
@@ -641,28 +647,34 @@ def personnelDelete(request, id):
         if error == True:
             messages.add_message(request, messages.ERROR,'ไม่สามารถลบข้อมูลบุคลากรที่เลือกได้ เนื่องจากได้ข้อมูลบุคลากรรายนี้ได้ถูกนำไปใช้ร่วมกันข้อมูลในส่วนอื่น ๆ แล้ว')
             return redirect(request.session['last_url'])
-            # return redirect('personnelList', pageNo=1)
         else:
-            user = User.objects.filter(username=personnel.email).first()
-            user.delete()
-            pid = personnel.id
-            admin = User.groups.filter(user_set__groups='Administrator').first()
-            useRecorder = Personnel.objects.filter(recorderId=pid) #ดึงรายชื่อบุคลากรที่เคยถูกบันทึกข้อมูลด้วยบุคลากรรายที่จะลบ
-            for use in useRecorder:
-                use.recorderId = use.id #เปลี่ยนข้อมูลคนบันทึกเป็นเจ้าของข้อมูล
-                use.save()
-            useEditor = Personnel.objects.filter(editorId=pid)
-            for use in useEditor:
-                use.editorId = use.id
-                use.save()
-            personnel.delete()
-            try:
-                if os.path.exists('static/' + picturefile):
-                    os.remove('static/' + picturefile)  # file exits, delete it
-            except:
-                messages.add_message(request, messages.SUCCESS, 'พบปัญหาการลบไฟล์รูปภาพของบุคลากร')
-            messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลบุคลากรที่เลือกเรียบร้อย')
-            return redirect('personnelList', pageNo=1)
+            if personnel.getHeader() is not None:
+                messages.add_message(request, messages.ERROR, 'ไม่สามารถลบข้อมูลบุคลากรที่เลือกได้ เนื่องจากได้ข้อมูลบุคลากรรายนี้ถูกกำหนดให้เป็นหัวหน้าสาขา/หน่วยงานย่อยอยู่')
+                return redirect(request.session['last_url'])
+            elif personnel.getManager() is not None:
+                messages.add_message(request, messages.ERROR, 'ไม่สามารถลบข้อมูลบุคลากรที่เลือกได้ เนื่องจากได้ข้อมูลบุคลากรรายนี้ถูกกำหนดให้เป็นผู้บริหารหน่วยงานย่อยอยู่')
+                return redirect(request.session['last_url'])
+            else:
+                user = User.objects.filter(username=personnel.email).first()
+                user.delete()
+                pid = personnel.id
+                admin = User.groups.filter(user_set__groups='Administrator').first()
+                useRecorder = Personnel.objects.filter(recorderId=pid) #ดึงรายชื่อบุคลากรที่เคยถูกบันทึกข้อมูลด้วยบุคลากรรายที่จะลบ
+                for use in useRecorder:
+                    use.recorderId = use.id #เปลี่ยนข้อมูลคนบันทึกเป็นเจ้าของข้อมูล
+                    use.save()
+                useEditor = Personnel.objects.filter(editorId=pid)
+                for use in useEditor:
+                    use.editorId = use.id
+                    use.save()
+                personnel.delete()
+                try:
+                    if os.path.exists('static/' + picturefile):
+                        os.remove('static/' + picturefile)  # file exits, delete it
+                except:
+                    messages.add_message(request, messages.SUCCESS, 'พบปัญหาการลบไฟล์รูปภาพของบุคลากร')
+                messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลบุคลากรที่เลือกเรียบร้อย')
+                return redirect('personnelList', pageNo=1)
     else:
         form.deleteForm()
         context = {'form': form, 'personnel': personnel}
@@ -1004,16 +1016,16 @@ def responsibleList(request, pageNo=None):
             responsibles = personnel.getDivisionResponsible()
             duplicate = False
             for responer in responsibles:
-                if responer.division == division:
+                if responer == division:
                     duplicate = True
                     break
             if duplicate == True:
                 messages.add_message(request, messages.ERROR,
                                     'บุคลากรที่เลือกเป็นผู้มีรายชื่อรับผิดชอบข้อมูลสาขา/หน่วยงานย่อยนี้อยู่แล้ว')
-            elif personnel.getHeader().count() !=0 :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
+            elif personnel.getHeader() is not None :  # บุคลากรคนนั้นเป็นหัวหน้าอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นหัวหน้าสาขา/หน่วยงานย่อย')
-            elif personnel.getManager().count() != 0:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
+            elif personnel.getManager() is not None:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นผู้บริหารหน่วยงาน')
             else:
@@ -1044,11 +1056,9 @@ def responsibleList(request, pageNo=None):
 def responsibleDelete(request,id):
     responsible = Responsible.objects.filter(id=id).first()
     user=User.objects.filter(email=responsible.personnel.email).first()
-    responsible.delete()
     personnel = Personnel.objects.filter(email=user.email).first()
-    print('count')
-    print(personnel.getDivisionResponsible().count())
-    if personnel.getDivisionResponsible().count() == 0:
+    responsible.delete()
+    if personnel.getDivisionResponsible() is None:
         rgroup = Group.objects.get(name='Staff')
         user.groups.remove(rgroup)
         pgroup = Group.objects.get(name='Personnel')  # ให้ group กลับคืนเป็นบุคลากร
@@ -1080,6 +1090,9 @@ def headerList(request, pageNo=None):
             elif personnel.getManager() is not None:  # บุคลากรคนนั้นเป็นผู้บริหารอยู่แล้ว
                 messages.add_message(request, messages.ERROR,
                                      'บุคลากรที่เลือกเป็นผู้บริหารหน่วยงาน')
+            elif personnel.division != division:  # บุคลากรคนนั้นไม่ได้สังกัดสาขาที่เลือก
+                messages.add_message(request, messages.ERROR,
+                                     'บุคลากรที่เลือกไม่ได้สังกัดในสาขาที่จะกำหนดให้เป็นหัวหน้า')
             else:
                 newForm.save()
                 email = personnel.email

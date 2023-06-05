@@ -4,7 +4,7 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fa fa-person-hiking"></i> แก้ไขข้อมูลคำสั่ง ({{ command.comId }})</h2>
+                <h2><i class="fas fa-flask"></i> แก้ไขข้อมูลงานวิจัย  </h2>
                 <h4> {{ personnel }}, สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
@@ -13,7 +13,7 @@
             </div>
         {% else %}
             <div class="col-12">
-                <h2><i class="fas fa-clipboard-list"></i> แก้ไขข้อมูลคำสั่ง ({{ command.comId }}) </h2>
+                <h2><i class="fas fa-flask"></i> แก้ไขข้อมูลงานวิจัย  </h2>
             </div>
         {% endif %}
     </div>
@@ -23,7 +23,7 @@
         {{ form.as_p }}
         <p class="text-center">
             <button type="button" class="btn btn-secondary"
-                    onclick="location.href='{% url 'commandList' %}'">
+                    onclick="location.href='{% url 'researchList' %}'">
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
             <button type="submit" class="btn btn-success">

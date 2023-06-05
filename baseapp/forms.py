@@ -362,7 +362,6 @@ class HeaderForm(forms.ModelForm):
         super(HeaderForm, self).__init__(*args, **kwargs)
         self.fields['personnel'].queryset = Personnel.objects.exclude(id__in=Header.objects.values('personnel_id'))
         self.fields['division'].queryset = Division.objects.exclude(id__in=Header.objects.values('division_id'))
-
     #     เฉพาะรายช่อบุคลากรที่ยังไม่ปรากฎในรายชื่อหัวหน้าสาขาอื่น
 
     class Meta:

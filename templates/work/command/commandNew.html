@@ -5,12 +5,13 @@
         <div class="col-10">
             <h2><i class="fa fa-person-hiking"></i> บันทึกคำสั่ง </h2>
             {% if request.session.userType != "Administrator" and request.session.userType != "Staff" %}
-                <h4> {{ personnel }},  สังกัด: {{ personnel.division }} </h4>
+                <h4> {{ personnel }}, สังกัด: {{ personnel.division }} </h4>
             {% endif %}
         </div>
         <div class="col-2">
             {% if request.session.userType != "Administrator" and request.session.userType != "Staff" %}
-                <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"  class="rounded-circle">
+                <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"
+                     class="rounded-circle">
             {% endif %}
         </div>
     </div>
@@ -48,4 +49,5 @@
             </button>
         </p>
     </form>
+    <br><br>
 {% endblock %}

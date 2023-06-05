@@ -1,26 +1,6 @@
 import fileinput
 from django.db import models
 from baseapp.models import *
-# from workapp import common
-
-# def getCommand(self):
-#     commands = Command.objects.filter(personnel=self).order_by('id')
-#     return commands
-# def getResearch(self):
-#     researchs = Research.objects.filter(personnel=self).order_by('id')
-#     return researchs
-# def getSocialService(self):
-#     socialServices = SocialService.objects.filter(personnel=self).order_by('id')
-#     return socialServices
-# def getTraining(self):
-#     trainings = Training.objects.filter(personnel=self).order_by('id')
-#     return trainings
-# def getLeave(self):
-#     leaves = Leave.objects.filter(personnel=self).order_by('id')
-#     return leaves
-# def getPerformance(self):
-#     performances = Performance.objects.filter(personnel=self).order_by('id')
-#     return performances
 
 class Leave(models.Model):
     startDate = models.DateField(default=None)
@@ -251,89 +231,6 @@ class PerformanceURL(models.Model):
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
 
-class Research(models.Model):
-    fiscalYear = models.IntegerField(default=0)
-    title_th = models.TextField(default="")
-    title_en = models.TextField(default="")
-    objective = models.TextField(default="")
-    percent_resp = models.IntegerField(default=100)
-    budget = models.FloatField(default=0.00)
-    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
-    source = models.CharField(max_length=255, default="")
-    keyword = models.TextField(default="")
-    percent_success = models.IntegerField(default=0)
-    publish_method = models.TextField(default="")
-    recorder = models.ForeignKey(Personnel, related_name='RecorderResearch', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add = True)
-    editor = models.ForeignKey(Personnel, related_name='EditorResearch', on_delete=models.CASCADE, default=None)
-    editDate = models.DateTimeField(auto_now_add = True)
-    def __str__(self):
-        return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
-               "  " + self.title_th + " - " + str(self.fiscalYear) + " : " + str(self.budget)
-    def getRecorder(self):
-        return self.personnel.status + self.personnel.firstname_th + ' ' + self.personnel.lastname_th
-    @staticmethod
-    def getCountPersonResearch(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการวิจัย
-        countResearch = Research.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
-        countResearchPerson = ResearchPerson.objects.filter(Q(personnel=personnel) or Q(recorder=personnel)).count()
-        countResearchFile = ResearchFile.objects.filter(recorder=personnel).count()
-        countResearchURL = ResearchURL.objects.filter(recorder=personnel).count()
-        countAll = countResearch + countResearchPerson + countResearchFile + countResearchURL
-        return countAll   
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        editor  = Personnel.objects.filter(id=self.editor.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
-        if recorder == editor and recordDate == editDate:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-        elif recorder == editor and recordDate != editDate:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
-                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
-        else:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
-                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
-
-class ResearchPerson(models.Model):
-    status = models.CharField(max_length=30, default="")
-    percent= models.IntegerField(default=100)
-    research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
-    personnel = models.ForeignKey(Personnel, related_name='PersonnelResearchPerson', on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchPerson', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.research.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
-               "  " +  " (" + self.status + ")"
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
-
-class ResearchFile(models.Model):
-    file = models.FileField(upload_to='static/documents/research', default=None, null=True, blank=True)
-    filetype = models.CharField(max_length=50, default=None)
-    research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchFile', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "(" + str(self.research.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
-
-class ResearchURL(models.Model):
-    url = models.URLField(max_length=255, default=None)
-    research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchURL', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "[" + str(self.research.id) + "_" + str(self.id) + "]_"+ self.url
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
-
 class SocialService(models.Model):
     startDate = models.DateField(default=None)
     endDate = models.DateField(default=None)
@@ -444,7 +341,7 @@ class Command(models.Model):
     def getCommandPerson(self):
         personnels = CommandPerson.objects.filter(command=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
         return personnels
-    def getCountPersonnel(self):
+    def getCountPersonnel(self): #จำนวนคนที่อยู่ในคำสั่ง
         count = CommandPerson.objects.filter(command=self).aggregate(count=Count('id'))
         return count['count']
     def getCommandFiles(self):
@@ -514,3 +411,97 @@ class CommandURL(models.Model):
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
 
+class Research(models.Model):
+    fiscalYear = models.IntegerField(default=0)
+    title_th = models.TextField(default="")
+    title_en = models.TextField(default="")
+    objective = models.TextField(default="")
+    percent_resp = models.IntegerField(default=100)
+    budget = models.FloatField(default=0.00)
+    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
+    source = models.CharField(max_length=255, default="")
+    keyword = models.TextField(default="")
+    percent_success = models.IntegerField(default=0)
+    publish_method = models.TextField(default="")
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearch', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add = True)
+    editor = models.ForeignKey(Personnel, related_name='EditorResearch', on_delete=models.CASCADE, default=None)
+    editDate = models.DateTimeField(auto_now_add = True)
+    def __str__(self):
+        return self.title_th + str(self.fiscalYear) + " : " + str(self.budget)
+    def getResearchPerson(self):
+        personnels = ResearchPerson.objects.filter(research=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
+        return personnels
+    def getCountPersonnel(self): #จำนวนคนที่อยู่ในงานวิจัย
+        count = ResearchPerson.objects.filter(research=self).aggregate(count=Count('id'))
+        return count['count']
+    def getSumPercent(self):  # สัดส่วนการทำวิจัยรวมทุกคน
+        sum = ResearchPerson.objects.filter(research=self).aggregate(sum=Sum('percent'))
+        return sum['sum']
+    def getResearchFiles(self):
+        researchFiles = ResearchFile.objects.filter(research=self)
+        return researchFiles
+    def getResearchURLs(self):
+        researchURLs = ResearchURL.objects.filter(research=self)
+        return researchURLs
+    @staticmethod
+    def getCountPersonResearch(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการวิจัย
+        countResearch = Research.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
+        countResearchPerson = ResearchPerson.objects.filter(Q(personnel=personnel) or Q(recorder=personnel)).count()
+        countResearchFile = ResearchFile.objects.filter(recorder=personnel).count()
+        countResearchURL = ResearchURL.objects.filter(recorder=personnel).count()
+        countAll = countResearch + countResearchPerson + countResearchFile + countResearchURL
+        return countAll
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        editor  = Personnel.objects.filter(id=self.editor.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
+        if recorder == editor and recordDate == editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+        elif recorder == editor and recordDate != editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
+                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
+        else:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
+
+class ResearchPerson(models.Model):
+    status = models.CharField(max_length=30, default="")
+    percent= models.IntegerField(default=100)
+    research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelResearchPerson', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchPerson', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.research.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+               "  " +  " (" + self.status + ")"
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+
+class ResearchFile(models.Model):
+    file = models.FileField(upload_to='static/documents/research', default=None, null=True, blank=True)
+    filetype = models.CharField(max_length=50, default=None)
+    research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchFile', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "(" + str(self.research.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+
+class ResearchURL(models.Model):
+    url = models.URLField(max_length=255, default=None)
+    research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderResearchURL', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "[" + str(self.research.id) + "_" + str(self.id) + "]_"+ self.url
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'

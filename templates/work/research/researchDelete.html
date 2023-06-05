@@ -4,7 +4,7 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fas fa-clipboard-list"></i> ลบคำสั่ง ({{ command.comId }}) </h2>
+                <h2><i class="fas fa-flask"></i></i> ลบงานวิจัย  </h2>
                 <h4> {{ personnel }}, สังกัด: {{ personnel.division }} </h4>
             </div>
             <div class="col-2">
@@ -13,7 +13,7 @@
             </div>
         {% else %}
             <div class="col-12">
-                <h2><i class="fas fa-clipboard-list"></i> ลบคำสั่ง ({{ command.comId }}) </h2>
+                <h2><i class="fas fa-flask"></i> ลบงานวิจัย   </h2>
             </div>
         {% endif %}
     </div>
@@ -23,12 +23,12 @@
         {{ form.as_p }}
         <br>
         <p class="text-center">
-            <button type="button" class="btn btn-secondary" onclick="location.href='{% url 'commandList' %}'">
+            <button type="button" class="btn btn-secondary" onclick="location.href='{% url 'researchList' %}'">
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
             <button type="submit" class="btn btn-danger"
-                    onclick="return confirm('โปรดยืนยันการลบคำสั่งนี้' )">
-                <i class="fa-solid fa-trash"></i> ลบคำสั่ง
+                    onclick="return confirm('โปรดยืนยันการลบงานวิจัยนี้' )">
+                <i class="fa-solid fa-trash"></i> ลบงานวิจัย
             </button>
         </p>
     </form>
@@ -38,11 +38,11 @@
     <div class="row">
         <div class="col-2>"></div>
         <div class="col-8>">
-            {% if command.getCommandPerson|length == 0  %}
+            {% if research.getResearchPerson|length == 0  %}
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="alert-warning col-8 text-center">
-                        <br>....ยังไม่ได้กำหนดรายชื่อบุคลากรที่ได้รับคำสั่งนี้ในระบบ....<br><br></div>
+                        <br>....ยังไม่ได้กำหนดรายชื่อบุคลากรที่ได้รับงานวิจัยนี้ในระบบ....<br><br></div>
                     <div class="col-2"></div>
                 </div>
             {% else %}
@@ -57,18 +57,18 @@
                         </th>
                     </tr>
 
-                    {% for commandPerson in command.getCommandPerson %}
-                        {% if personnel.id == commandPerson.personnel.id %}
+                    {% for researchPerson in research.getResearchPerson %}
+                        {% if personnel.id == researchPerson.personnel.id %}
                             <tr class="text-success" style="font-weight:bold">
                         {% else %}
                             <tr>
                         {% endif %}
                             <td class="text-center">{{ forloop.counter }}</td>
-                            <td class="text-end"><img src="{% static commandPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                            <td class="text-end"><img src="{% static researchPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                      width="55px" height="65px"> </td>
-                            <td>{{ commandPerson.personnel }} </td>
-                            <td>{{ commandPerson.status | slice:"0,30"}}</td>
-                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ commandPerson.getRecorderAndEditor }}</td>
+                            <td>{{ researchPerson.personnel }} </td>
+                            <td>{{ researchPerson.status | slice:"0,30"}}</td>
+                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ researchPerson.getRecorderAndEditor }}</td>
                             <td class="text-center">
 
                             </td>
@@ -83,19 +83,19 @@
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>
             <p class="text-info">
-                {% if command.getCommandFiles|length == 0 %}
+                {% if research.getResearchandFiles|length == 0 %}
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
-                            <br>....ไม่มีเอกสารแนบข้อมูลคำสัง....<br><br>
+                            <br>....ไม่มีเอกสารแนบข้อมูลการวิจัย....<br><br>
                         </div>
                         <div class="col-2"></div>
                     </div>
                 {% else %}
                     <div class="row">
-                        {% for f in command.getCommandFiles %}
+                        {% for f in research.getResearchandFiles %}
                             <div class="col-3">
-                                <a href="{% static 'documents/command/' %}{{ f.file }}" class="filelink"
+                                <a href="{% static 'documents/research/' %}{{ f.file }}" class="filelink"
                                    target="_blank">
                                     {% if f.filetype == "pdf" %}
                                         <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
@@ -148,7 +148,7 @@
         </div>
         <p class="text-primary">
         <ul class="list-group">
-            {% for link in command.getCommandURLs %}
+            {% for link in research.getResearchandURLs %}
                 <li class="list-group-item text-primary">
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}

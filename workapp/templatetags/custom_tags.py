@@ -15,10 +15,21 @@ def getTimeUpdate(docDate):
 def is_in_list(value, given_list):
     return True if value in given_list else False
 
-# @register.filter(name='getPracticeResult')
-# def getPracticeResult(stdid, pid):
-#     score = Score.objects.filter(student_id=stdid).filter(problem_id=pid).first()
-#     if score is None:
-#         return 0
-#     else:
-#         return score.result
+@register.filter(name='getCountCommandPersonnelDivision')
+def getCountCommandPersonnelDivision(divId, comId):
+    command = Command.objects.filter(id=comId).first()
+    division = Division.objects.filter(id=divId).first()
+    personnels= Personnel.objects.filter(division=division)
+    # count = commPerson.count()
+    # print('personnels')
+    # print(personnels)
+    count = CommandPerson.objects.filter(command=command).filter(personnel__in=personnels).aggregate(count=Count('id'))
+    return count['count']
+
+@register.filter(name='getCountResearchPersonnelDivision')
+def getCountResearchPersonnelDivision(divId, comId):
+    research = Research.objects.filter(id=comId).first()
+    division = Division.objects.filter(id=divId).first()
+    personnels= Personnel.objects.filter(division=division)
+    count = ResearchPerson.objects.filter(research=research).filter(personnel__in=personnels).aggregate(count=Count('id'))
+    return count['count']

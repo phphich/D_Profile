@@ -58,24 +58,24 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
-            division = recorder.division
+            division = divisions[0]
         else: #Manager, Administrator
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
 
-        onlyStaff = False
+        recorderOnly = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
                 if divisionId == recorder.division.id and outside == True:  # ต้องแสดงชื่อเฉพาะ Staff
-                    onlyStaff = True
+                    recorderOnly = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
                 if str(divisionId) == str(recorder.division.id) and outside == True:  # ต้องแสดงชื่อเฉพาะ Staff
-                    onlyStaff = True
+                    recorderOnly = True
                     personnel = recorder
                 else:
                     personnel = division.getPersonnels().first()
@@ -90,7 +90,7 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
         count = leaves.count()
         leaves_page = Paginator(leaves, iterm_per_page)
         context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-                   'leaves': leaves_page.page(pageNo), 'count':count,'onlyStaff':onlyStaff, 'recorder':recorder}
+                   'leaves': leaves_page.page(pageNo), 'count':count,'recorderOnly':recorderOnly, 'recorder':recorder}
     return render(request, 'work/leave/leaveList.html', context)
 
 @login_required(login_url='userAuthen')
@@ -333,24 +333,24 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
-            division = recorder.division
+            division = divisions[0]
         else: #Manager, Administrator
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
 
-        onlyStaff = False
+        recorderOnly = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
                 if divisionId == recorder.division.id and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
-                    onlyStaff = True
+                    recorderOnly = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
                 if str(divisionId) == str(recorder.division.id) and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
-                    onlyStaff = True
+                    recorderOnly = True
                     personnel = recorder
                 else:
                     personnel = division.getPersonnels().first()
@@ -365,7 +365,7 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
         count = trainings.count()
         trainings_page = Paginator(trainings, iterm_per_page)
         context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-                   'trainings':trainings_page.page(pageNo),  'count':count, 'onlyStaff':onlyStaff, 'recorder':recorder}
+                   'trainings':trainings_page.page(pageNo),  'count':count, 'recorderOnly':recorderOnly, 'recorder':recorder}
     return render(request, 'work/training/trainingList.html', context)
 
 @login_required(login_url='userAuthen')
@@ -611,24 +611,24 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
             division = divisions[0]
         elif request.session['userType'] == 'Header':
             divisions = [recorder.division]
-            division = recorder.division
+            division = divisions[0]
         else: #Manager, Administrator
             divisions = Division.objects.all().order_by('name_th')
             division = divisions.first()
 
-        onlyStaff = False
+        recorderOnly = False
         if request.method == 'POST':
             if 'personnelId' in request.POST:
                 personnelId = request.POST['personnelId']
                 personnel = Personnel.objects.filter(id=personnelId).first()
                 division = personnel.division
                 if divisionId == recorder.division.id and outside == True:  # ต้องแสดงชื่อเฉพาะ Staff
-                    onlyStaff = True
+                    recorderOnly = True
             else:
                 divisionId = request.POST['divisionId']
                 division = Division.objects.filter(id=divisionId).first()
                 if str(divisionId) == str(recorder.division.id) and outside == True: #ต้องแสดงชื่อเฉพาะ Staff
-                    onlyStaff = True
+                    recorderOnly = True
                     personnel = recorder
                 else:
                     personnel = division.getPersonnels().first()
@@ -643,7 +643,7 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
         count = performances.count()
         performances_page = Paginator(performances, iterm_per_page)
         context = {'divisions': divisions, 'division': division, 'personnel': personnel,
-                   'performances': performances_page.page(pageNo), 'count':count, 'onlyStaff':onlyStaff, 'recorder':recorder}
+                   'performances': performances_page.page(pageNo), 'count':count, 'recorderOnly': recorderOnly, 'recorder':recorder}
     return render(request, 'work/performance/performanceList.html', context)
 
 @login_required(login_url='userAuthen')
@@ -868,7 +868,7 @@ def performanceDeleteURLAll(request, id):
     messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
     return redirect('performanceDetail', id=performance.id)
 
-# CRUD. command
+# CRUD. Command
 @login_required(login_url='userAuthen')
 def commandList(request, pageNo=None):
     request.session['last_url'] = request.path_info
@@ -883,71 +883,21 @@ def commandList(request, pageNo=None):
         commands_page = Paginator(commands, iterm_per_page)
         count = commands.count()
         context = {'personnel': recorder,'commands': commands_page.page(pageNo), 'count': count}
-    elif  request.session['userType'] in ['Administrator', 'Staff', 'Manager'] :
+    elif request.session['userType'] == "Header":
+        division = recorder.getHeader().division #หน่วยงานที่เป็นหัวหน้า
+        personnels = division.getPersonnels()
+        commands1 = Command.objects.filter(commandperson__personnel__in=personnels).distinct().order_by('-eduYear', '-eduSemeter', '-comDate') #คำสั่งที่ได้รับมอบหมาย
+        commands2 = Command.objects.filter(recorder_id=recorder) #คำสั่งที่เป็นคนบันทึกไว้เอง
+        commands =  commands1.union(commands2).order_by('-eduYear', '-eduSemeter', '-comDate')
+        commands_page = Paginator(commands, iterm_per_page)
+        count = commands.count()
+        context = {'personnel': recorder, 'commands': commands_page.page(pageNo), 'count': count}
+    else: # request.session['userType'] in ['Administrator', 'Staff', 'Manager'] :
         commands = Command.objects.all().order_by('-eduYear', '-eduSemeter', '-comDate')
         commands_page = Paginator(commands, iterm_per_page)
         count = commands.count()
         context = {'commands': commands_page.page(pageNo), 'count': count}
-    else: # Header
-        division = recorder.division
-        personnels = division.getPersonnels()
-        commands1 = Command.objects.filter(commandperson__personnel__in=personnels).order_by('-eduYear', '-eduSemeter', '-comDate') #คำสั่งที่ได้รับมอบหมาย
-        commands2 = Command.objects.filter(recorder_id__in=personnels) #คำสั่งที่เป็นคนบันทึกไว้เอง
-        commands = commands1.union(commands2)
-        commands_page = Paginator(commands, iterm_per_page)
-        count = commands.count()
-        # if request.session['userType'] == 'Staff':
-        #     outside = recorder.getOutsideResponsible()
-        #     divisions = recorder.getDivisionResponsible()
-        #     if outside == True:  # กรณีที่ผู้รับชอบข้อมูลไม่ได้อยู่ในสาขา/หน่วยงานย่อยที่รับผิดชอบ
-        #         divisions.append(recorder.division)
-        #     division = divisions[0]
-        # elif request.session['userType'] == 'Header':
-        #     divisions = [recorder.division]
-        #     division = recorder.division
-        # else: #Manager, Administrator
-        #     divisions = Division.objects.all().order_by('name_th')
-        #     division = divisions.first()
-
-        context = {'commands': commands_page.page(pageNo), 'count': count}
     return render(request, 'work/command/commandList.html', context)
-
-@login_required(login_url='userAuthen')
-def commandNew(request):
-    request.session['last_url'] = request.path_info
-    recorder = Personnel.objects.filter(id=request.session['userId']).first()
-    # getSession(request, dtype='Command', did=recorder.id)
-    # if common.chkPermission(commandNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
-    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
-    #     return redirect(request.session['last_url'])
-    # request.session['last_url'] = request.path_info
-
-    if request.method == 'POST':
-        form = CommandForm(data=request.POST)
-        if form.is_valid():
-            form.save()
-            command = Command.objects.last()
-            if(request.session["userType"]=="Personnel"):
-                status = request.POST['status']
-                commandPerson = CommandPerson(command=command, personnel=recorder, recorder=recorder, status=status)
-                commandPerson.status = status
-                commandPerson.save()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลคำสั่งเรียบร้อย")
-            return redirect('commandDetail', id=command.id)
-        else:
-            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
-            context = {'form': form}
-            return render(request, 'work/command/commandNew.html', context)
-    else:
-        fiscalYear = common.getCurrentFiscalYear()
-        eduYear = common.getCurrentEduYear()
-        eduSemeter = common.getCurrentEduSemeter()
-        currentDate = common.getCurrentDate()
-        form = CommandForm(
-            initial={'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
-                     'comDate':currentDate, 'recorder': recorder, 'editor':recorder })
-        context = {'form': form, 'personnel':recorder}
-        return render(request, 'work/command/commandNew.html', context)
 
 @login_required(login_url='userAuthen')
 def commandDetail(request, id):
@@ -955,10 +905,12 @@ def commandDetail(request, id):
     if command is None:
         messages.add_message(request, messages.ERROR,msgErrorId)
         return redirect(request.session['last_url'])
+    getSession(request, dtype='Command', did=command.id)
+    if common.chkPermission(commandDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
-
-       # ดึงรายชื่อสาขาที่ได้รับมอบหมายให้ดูแลข้อมูลให้ มา
 
     if request.method == 'POST':
         fileForm = CommandFileForm(request.POST, request.FILES)
@@ -997,7 +949,7 @@ def commandDetail(request, id):
                 command.editDate = datetime.datetime.now()
                 command.save()
             else:
-                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")                
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
         elif request.POST['action']=='uploadLink':  # upload link
             if urlForm.is_valid():
                 urlForm.save()
@@ -1032,16 +984,67 @@ def commandDetail(request, id):
                 messages.add_message(request, messages.WARNING, msg + " ["+ status + "]")
     fileForm = CommandFileForm(initial={'command': command, 'filetype': 'Unknow', 'recorder':recorder})
     urlForm = CommandURLForm(initial={'command': command, 'recorder':recorder})
-    commandPersonForm = CommandPersonForm(command=command, initial={'command':command, 'recorder':recorder, })
+    if request.session['userType'] == 'Header':
+        commandPersonForm = CommandPersonForm(command=command, division=recorder.division, initial={'command':command, 'recorder':recorder, })
+    elif request.session['userType'] == 'Staff':
+        commandPersonForm = CommandPersonForm(command=command, division=recorder.division, staff=recorder,
+                                              initial={'command': command, 'recorder': recorder, })
+    else:
+        commandPersonForm = CommandPersonForm(command=command, initial={'command':command, 'recorder':recorder, })
+
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'commandPersonForm':commandPersonForm ,
                'command': command,'personnel':recorder}
     return render(request, 'work/command/commandDetail.html', context)
 
 @login_required(login_url='userAuthen')
+def commandNew(request):
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    getSession(request, dtype='Command', did=recorder.id)
+    if common.chkPermission(commandNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+
+    if request.method == 'POST':
+        form = CommandForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            command = Command.objects.last()
+            if(request.session["userType"]=="Personnel"):
+                status = request.POST['status']
+                commandPerson = CommandPerson(command=command, personnel=recorder, recorder=recorder, status=status)
+                commandPerson.status = status
+                commandPerson.save()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลคำสั่งเรียบร้อย")
+            return redirect('commandDetail', id=command.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form}
+            return render(request, 'work/command/commandNew.html', context)
+    else:
+        fiscalYear = common.getCurrentFiscalYear()
+        eduYear = common.getCurrentEduYear()
+        eduSemeter = common.getCurrentEduSemeter()
+        currentDate = common.getCurrentDate()
+        form = CommandForm(
+            initial={'fiscalYear': fiscalYear, 'eduYear': eduYear, 'eduSemeter':eduSemeter,
+                     'comDate':currentDate, 'recorder': recorder, 'editor':recorder })
+        context = {'form': form, 'personnel':recorder}
+        return render(request, 'work/command/commandNew.html', context)
+
+@login_required(login_url='userAuthen')
 def commandUpdate(request, id):
     command = Command.objects.filter(id=id).first()
+    if command is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Command', did=command.id)
+    if common.chkPermission(commandUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
     form = CommandForm(data=request.POST or None, instance=command)
     if request.method == 'POST':
         if form.is_valid():
@@ -1064,6 +1067,13 @@ def commandUpdate(request, id):
 @login_required(login_url='userAuthen')
 def commandDelete(request, id):
     command = Command.objects.filter(id=id).first()
+    if command is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Command', did=command.id)
+    if common.chkPermission(commandDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
 
@@ -1207,8 +1217,8 @@ def commandDeleteCommandPersonAll(request, id):
             if commandPerson.recorder == personnel:
                 commandPerson.delete()
                 count += 1
-        else: # กรณีเป็นเจ้าของเอกสาร
-            if commandPerson.recorder == recorder and commandPerson.personnel != command.recorder:
+        else: # กรณีเป็นเจ้าของเอกสาร Personnel
+            if commandPerson.recorder == recorder:
                 commandPerson.delete()
                 count += 1
     if count != 0:
@@ -1219,3 +1229,381 @@ def commandDeleteCommandPersonAll(request, id):
     else:
         messages.add_message(request, messages.WARNING, "ไม่มีบุคลากรรายใดที่ผู้ใช้ระบบได้เคยบันทึกไว้ถูกลบออกจากคำสั่งนี้")
     return redirect('commandDetail', id=command.id)
+
+
+# ***********************************************************
+# CRUD. Research
+@login_required(login_url='userAuthen')
+def researchList(request, pageNo=None):
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    personnel = [recorder]
+    if pageNo == None:
+        pageNo = 1
+    if request.session['userType'] == "Personnel":
+        researchs1 = Research.objects.filter(researchperson__personnel=recorder).order_by('-fiscalYear', 'title_th') #งานวิจัยในตารางผู้ทำวิจัย
+        researchs2 = Research.objects.filter(recorder_id__in=personnel) #งานวิจัยที่เป็นคนบันทึกไว้เอง
+        researchs = researchs1.union(researchs2)
+        researchs_page = Paginator(researchs, iterm_per_page)
+        count = researchs.count()
+        context = {'personnel': recorder,'researchs': researchs_page.page(pageNo), 'count': count}
+    elif request.session['userType'] == "Header":
+        division = recorder.getHeader().division #หน่วยงานที่เป็นหัวหน้า
+        personnels = division.getPersonnels()
+        researchs1 = Research.objects.filter(researchperson__personnel__in=personnels).distinct().order_by('-fiscalYear', 'title_th') #งานวิจัยในตารางผู้ทำวิจัย
+        researchs2 = Research.objects.filter(recorder_id=recorder) #งานวิจัยที่เป็นคนบันทึกไว้เอง
+        researchs =  researchs1.union(researchs2).order_by('-fiscalYear', 'title_th')
+        researchs_page = Paginator(researchs, iterm_per_page)
+        count = researchs.count()
+        context = {'personnel': recorder, 'researchs': researchs_page.page(pageNo), 'count': count}
+    else: # request.session['userType'] in ['Administrator', 'Staff', 'Manager'] :
+        researchs = Research.objects.all().order_by('-fiscalYear', 'title_th')
+        researchs_page = Paginator(researchs, iterm_per_page)
+        count = researchs.count()
+        context = {'researchs': researchs_page.page(pageNo), 'count': count}
+    return render(request, 'work/research/researchList.html', context)
+
+@login_required(login_url='userAuthen')
+def researchDetail(request, id):
+    research = Research.objects.filter(id=id).first()
+    if research is None:
+        messages.add_message(request, messages.ERROR,msgErrorId)
+        return redirect(request.session['last_url'])
+    # getSession(request, dtype='Research', did=research.id)
+    # if common.chkPermission(researchDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
+    #     return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
+    if request.method == 'POST':
+        fileForm = ResearchFileForm(request.POST, request.FILES)
+        urlForm = ResearchURLForm(request.POST)
+        if request.POST['action'] == 'uploadfile':
+            if fileForm.is_valid():
+                files = request.FILES.getlist("file")
+                success = True
+                fileerror = ""
+                for f in files:
+                    filepath = common.fileNameCleansing(f.name)
+                    point = filepath.rfind('.')
+                    ext = filepath[point:]
+                    filenames = filepath.split('/')
+                    filename = 'documents/research/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
+                    lf, created = ResearchFile.objects.get_or_create(file=f, research=research, recorder=recorder, filetype=ext[1:])
+                    lf.save()
+                    researchFile = ResearchFile.objects.last()
+                    newfilename = '[' + str(research.id) + '_' + str(researchFile.id) + ']-' + filenames[
+                        len(filenames) - 1]  # ชื่อไฟล์ที่ระบบกำหนด
+                    researchFile.file.name = newfilename
+                    researchFile.recorder = recorder
+                    researchFile.save()
+                    try:
+                        os.rename('static/' + filename, 'static/documents/research/' + researchFile.file.name)
+                    except:
+                        fileerror = fileerror + researchFile.file.name + ", "
+                        researchFile.delete()
+                        success = False
+                if success == True:
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารเรียบร้อย")
+                else:
+                    messages.add_message(request, messages.WARNING,
+                                         "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+                research.editor = recorder
+                research.editDate = datetime.datetime.now()
+                research.save()
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+        elif request.POST['action']=='uploadLink':  # upload link
+            if urlForm.is_valid():
+                urlForm.save()
+                research.editor = recorder
+                research.editDate = datetime.datetime.now()
+                research.save()
+                messages.add_message(request, messages.SUCCESS, "บันทึกลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+        else: # save uploadPersonnel
+            # id = request.POST['research']
+            # research = Research.objects.filter(id=id).first()
+            status = request.POST['status']
+            percent = int(request.POST['percent'])
+            status = status.strip()
+            personnelIdList = request.POST.getlist('personnel')
+            #check percent
+            numOfResearch = int(len(personnelIdList))
+            if research.getSumPercent() is not None:
+                sumPercent = int(research.getSumPercent())
+            else:
+                sumPercent = 0
+            totalPercent = sumPercent +(percent * numOfResearch)
+            if totalPercent > 100:
+                messages.add_message(request, messages.WARNING, "สัดส่วนการทำงานวิจัยของนักวิจัยรวมแล้วเกิน 100% ไม่สามารถบันทึกได้")
+                return redirect(request.session['last_url'])
+            if str(status).find('หัวหน้าโครงการ') != -1: # ป้อนตำแหน่งหัวหน้าโครงการ
+                if numOfResearch > 1:
+                    messages.add_message(request, messages.WARNING, "ตำแหน่ง/ความรับผิดชอบ หัวหน้าโครงการ มีได้เพียงคนเดียวเท่านั้น ไม่สามารถบันทึกได้")
+                    return redirect(request.session['last_url'])
+                chkStatus = ResearchPerson.objects.filter(status__contains='หัวหน้าโครงการ').first()
+                if chkStatus is not None:
+                    messages.add_message(request, messages.WARNING, "ตำแหน่ง/ความรับผิดชอบ หัวหน้าโครงการ มีได้เพียงคนเดียวเท่านั้น ไม่สามารถบันทึกได้")
+                    return redirect(request.session['last_url'])
+
+            # เช็คคนซ้ำ
+            msg = "นักวิจัยที่เลือกมีรายชื่อปรากฎอยู่ในงานวิจัยนี้อยู่แล้ว :"
+            error = False
+            for pid in personnelIdList:
+                person = Personnel.objects.filter(id=pid).first()
+                find = ResearchPerson.objects.filter(research=research, personnel=person).first()
+                if find is None:
+                    researchPerson = ResearchPerson(research=research, personnel=person, status=status,
+                                                    percent= percent, recorder=recorder)
+                    researchPerson.save()
+                else:
+                    error = True
+                    msg = msg + str(person)
+            research.editor = recorder
+            research.editDate = datetime.datetime.now()
+            research.save()
+            if error == True:
+                messages.add_message(request, messages.WARNING, msg + " ["+ status + "]")
+    fileForm = ResearchFileForm(initial={'research': research, 'filetype': 'Unknow', 'recorder':recorder})
+    urlForm = ResearchURLForm(initial={'research': research, 'recorder':recorder})
+    if request.session['userType'] == 'Header':
+        researchPersonForm = ResearchPersonForm(research=research, division=recorder.division, initial={'research':research, 'recorder':recorder, })
+    elif request.session['userType'] == 'Staff':
+        researchPersonForm = ResearchPersonForm(research=research, division=recorder.division, staff=recorder,
+                                              initial={'research': research, 'recorder': recorder, })
+    else:
+        researchPersonForm = ResearchPersonForm(research=research, initial={'research':research, 'recorder':recorder, 'status':'หัวหน้าโครงการวิจัย', 'percent':100 })
+
+    context = {'fileForm': fileForm, 'urlForm': urlForm, 'researchPersonForm':researchPersonForm ,
+               'research': research,'personnel':recorder}
+    return render(request, 'work/research/researchDetail.html', context)
+
+@login_required(login_url='userAuthen')
+def researchNew(request):
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    getSession(request, dtype='Research', did=recorder.id)
+    if common.chkPermission(researchNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+
+    if request.method == 'POST':
+        form = ResearchForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            research = Research.objects.last()
+            # if(request.session["userType"]=="Personnel"):
+            #     researchPerson = ResearchPerson(research=research, personnel=recorder, recorder=recorder, percent=research.percent_resp)
+            #     researchPerson.save()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลงานวิจัยเรียบร้อย")
+            return redirect('researchDetail', id=research.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form}
+            return render(request, 'work/research/researchNew.html', context)
+    else:
+        university = Faculty.objects.all().first().university
+        fiscalYear = common.getCurrentFiscalYear()
+        form = ResearchForm(
+            initial={'fiscalYear': fiscalYear, 'percent_resp':100,'percent_success':100, 'source':university, 'recorder': recorder, 'editor' :recorder })
+        context = {'form': form, 'personnel':recorder}
+        return render(request, 'work/research/researchNew.html', context)
+
+@login_required(login_url='userAuthen')
+def researchUpdate(request, id):
+    research = Research.objects.filter(id=id).first()
+    if research is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Research', did=research.id)
+    if common.chkPermission(researchUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
+    form = ResearchForm(data=request.POST or None, instance=research)
+    if request.method == 'POST':
+        if form.is_valid():
+            updateForm = form.save(commit=False)
+            updateForm.recorder = recorder
+            updateForm.save()
+            research.editor = recorder
+            research.editDate = datetime.datetime.now()
+            research.save()
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลงานวิจัยเรียบร้อย")
+            return redirect('researchDetail', id=research.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': recorder, 'research':research}
+            return render(request, 'work/research/researchUpdate.html', context)
+    else:
+        context = {'form': form, 'personnel': recorder,'research':research}
+        return render(request, 'work/research/researchUpdate.html', context)
+
+@login_required(login_url='userAuthen')
+def researchDelete(request, id):
+    research = Research.objects.filter(id=id).first()
+    if research is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    # getSession(request, dtype='Research', did=research.id)
+    # if common.chkPermission(researchDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
+    #     return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
+    form = ResearchForm(data=request.POST or None, instance=research)
+    if request.method == 'POST':
+        researchPersonnels = research.getResearchPerson()
+        complete = False
+        if len(researchPersonnels) == 0:
+            complete = True
+        elif len(researchPersonnels) == 1:
+            researchPerson = researchPersonnels.first()
+            if researchPerson.recorder == recorder:
+                complete = True
+            else:
+                messages.add_message(request, messages.ERROR, "งานวิจัยที่เลือกมีรายชื่อนักวิจัยอยู่ ไม่สามารถลบได้")
+        else:
+            messages.add_message(request, messages.ERROR, "งานวิจัยที่เลือกมีรายชื่อนักวิจัยอยู่ ไม่สามารถลบได้")
+        if complete == False:
+            return redirect(request.session['last_url'])
+        else:
+            #ลบคน กรณีเป็นเจ้าของงานวิจัย
+            for researchPerson in researchPersonnels:
+                researchPerson.delete()
+            # ลบไฟล์
+            fileList = ResearchFile.objects.filter(research=research)
+            for f in fileList:
+                fname = f.file.name
+                if os.path.exists('static/documents/research/' + fname):
+                    try:
+                        os.remove('static/documents/research/' +fname)  # file exits, delete it
+                    except:
+                        messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
+                    finally:
+                        f.delete()
+            urlList =ResearchURL.objects.filter(research=research)
+            for u in urlList:
+                u.delete()
+            research.delete()
+            messages.add_message(request, messages.SUCCESS, "ลบข้อมูลงานวิจัยเรียบร้อย")
+            return redirect('researchList')
+    else:
+        form.deleteForm()
+        context = {'form': form, 'research':research, 'personnel': research.recorder}
+        return render(request, 'work/research/researchDelete.html', context)
+
+@login_required(login_url='userAuthen')
+def researchDeleteFile(request, id):
+    researchFile = ResearchFile.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    research = researchFile.research
+    fname = researchFile.file.name
+    if os.path.exists('static/documents/research/' + fname):
+        try:
+            os.remove('static/documents/research/' + fname)  # file exits, delete it
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารที่เลือกเรียบร้อย")
+        except:
+            messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
+    researchFile.delete()
+    research.editor = recorder
+    research.editDate = datetime.datetime.now()
+    research.save()
+    return redirect('researchDetail', id=research.id)
+
+@login_required(login_url='userAuthen')
+def researchDeleteFileAll(request, id):
+    research = Research.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    researchFiles = research.getResearchFiles()
+    success = True
+    fileerror = ""
+    for researchFile in researchFiles:
+        fname = researchFile.file.name
+        if os.path.exists('static/documents/research/' + fname):
+            try:
+                os.remove('static/documents/research/' + fname)  # file exits, delete it
+            except:
+                success = False
+                fileerror = fileerror + fname + ", "
+            finally:
+                researchFile.delete()
+    if success == True:
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดเรียบร้อย")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+    research.editor = recorder
+    research.editDate = datetime.datetime.now()
+    research.save()
+    return redirect('researchDetail', id=research.id)
+
+@login_required(login_url='userAuthen')
+def researchDeleteURL(request, id):
+    researchURL = ResearchURL.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    research = researchURL.research
+    researchURL.delete()
+    research.editor = recorder
+    research.editDate = datetime.datetime.now()
+    research.save()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารที่เลือกเรียบร้อย")
+    return redirect('researchDetail', id=research.id)
+
+@login_required(login_url='userAuthen')
+def researchDeleteURLAll(request, id):
+    research = Research.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    researchURLs = research.getResearchURLs()
+    for researchURL in researchURLs:
+        researchURL.delete()
+    research.editor = recorder
+    research.editDate = datetime.datetime.now()
+    research.save()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
+    return redirect('researchDetail', id=research.id)
+
+@login_required(login_url='userAuthen')
+def researchDeleteResearchPerson(request, id):
+    researchPerson = ResearchPerson.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    research = researchPerson.research
+    researchPerson.delete()
+    research.editor = recorder
+    research.editDate = datetime.datetime.now()
+    research.save()
+    messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากงานวิจัยเรียบร้อย")
+    return redirect('researchDetail', id=research.id)
+
+@login_required(login_url='userAuthen')
+def researchDeleteResearchPersonAll(request, id):
+    research = Research.objects.filter(id=id).first()
+    researchPersons = research.getResearchPerson()
+    recorder = research.recorder
+    personnel = Personnel.objects.filter(id=request.session['userId']).first()
+    count = 0
+    for researchPerson in researchPersons:
+        if request.session['userType'] =='Administrator': # Admin ลบได้ทั้งหมดใน ResearchPerson รวมถึงตัวเอง
+            researchPerson.delete()
+            count+=1
+        elif request.session['userType'] =='Staff': # Staff ลบได้ทั้งหมดที่เคยเพิ่มใน ResearchPerson รวมถึงตัวเอง
+            if researchPerson.recorder == personnel:
+                researchPerson.delete()
+                count += 1
+        else: # กรณีเป็นเจ้าของเอกสาร Personnel
+            if researchPerson.recorder == recorder :
+                researchPerson.delete()
+                count += 1
+    if count != 0:
+        research.editor = personnel
+        research.editDate = datetime.datetime.now()
+        research.save()
+        messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดที่ผู้ใช้ระบบเคยบันทึกไว้ ออกจากงานวิจัยเรียบร้อย ")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่มีบุคลากรรายใดที่ผู้ใช้ระบบได้เคยบันทึกไว้ถูกลบออกจากงานวิจัยนี้")
+    return redirect('researchDetail', id=research.id)

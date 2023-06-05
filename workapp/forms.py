@@ -289,116 +289,6 @@ class PerformanceURLForm(forms.ModelForm):
         }
 
 # +++++++++++++++
-# ฟอร์มการวิจัย
-class ResearchForm(forms.ModelForm):
-    class Meta:
-        TYPE_CHOICES = (
-            ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
-            ('งบประมาณรายได้', 'งบประมาณรายได้'),
-            ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
-            ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
-        )
-        model = Research
-        fields = (
-            'fiscalYear', 'title_th', 'title_en', 'objective', 'percent_resp', 'budget', 'budgetType', 'source',
-            'keyword', 'percent_success', 'publish_method', 'recorder')
-        widgets = {
-            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'title_th': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
-            'title_en': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
-            'objective': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'percent_resp': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0 }),
-            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
-                                                                    'onchange': 'javascript:chkBudgetType();'}),
-            'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'keyword': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
-            'percent_success': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
-            'keyword': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'fiscalYear': 'ปีงบประมาณ',
-            'title_th': 'หัวข้อวิจัย (ไทย)',
-            'title_en': 'หัวข้อวิจัย (อังกฤษ)',
-            'objective': 'วัตถุประสงค์',
-            'percent_resp': 'สัดส่วนความรับผิดชอบ (%)',
-            'budget': 'งบประมาณ',
-            'budgetType': 'ประเภทงบประมาณ',
-            'source': 'หน่วยงานเจ้าของงบประมาณ',
-            'keyword': 'คำสำคัญ',
-            'percent_success': 'สัดส่วนความก้าวหน้า (%)',
-            'publish_method': 'วิธีการเผยแพร่ผลงาน',
-            'recorder': 'ผู้บันทึก'
-        }
-        
-    def deleteForm(self):
-        self.fields['fiscalYear'].widget.attrs['readonly'] = True
-        self.fields['topic_th'].widget.attrs['readonly'] = True
-        self.fields['topic_en'].widget.attrs['readonly'] = True
-        self.fields['objective'].widget.attrs['readonly'] = True
-        self.fields['percen_resp'].widget.attrs['readonly'] = True
-        self.fields['budget'].widget.attrs['readonly'] = True
-        self.fields['budgetType'].widget.attrs['readonly'] = True
-        self.fields['source'].widget.attrs['readonly'] = True
-        self.fields['keyword'].widget.attrs['readonly'] = True
-        self.fields['percent_success'].widget.attrs['readonly'] = True
-        self.fields['publish_method'].widget.attrs['readonly'] = True
-        self.fields['recorder'].widget.attrs['readonly'] = True
-
-class ResearchFileForm(forms.ModelForm):
-    class Meta:
-        model = ResearchFile
-        fields = ('file', 'filetype', 'research','recorder')
-        widgets = {
-            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
-                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
-                                           'onchange': 'javascript:updateList();'}),
-            'filetype': forms.HiddenInput(),
-            'research': forms.HiddenInput(),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'file': 'เลือกไฟล์เอกสารแนบ',
-            'filetype': 'ชนิดไฟล์',
-            'research': 'งานวิจัย',
-            'recorder': 'ผู้บันทึก',
-        }
-
-class ResearchURLForm(forms.ModelForm):
-    class Meta:
-        model = ResearchURL
-        fields = ('url', 'research', 'recorder')
-        widgets = {
-            'url': forms.URLInput(attrs={'class': 'form-control', }),
-            'research': forms.HiddenInput(),
-            'recorder':forms.HiddenInput(),
-        }
-        labels = {
-            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
-            'research': 'งานวิจัย',
-            'recorder': 'ผู้บันทึก',
-        }
-
-class ResearchPersonForm(forms.ModelForm):
-    class Meta:
-        model = ResearchPerson
-        fields = ('status','percent', 'research', 'personnel',  'recorder')
-        widgets = {
-            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
-            'percent': forms.NumberInput(attrs={'class': 'form-control', 'size': 35}),
-            'research': forms.HiddenInput(),
-            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'research': 'งานวิจัย',
-            'personnel': 'บุคลากร',
-            'status': 'หน้าที่ที่มอบหมาย',
-            'percent': 'สัดส่วนการดำเนินการวิจัย (%)',
-            'recorder': 'ผู้บันทึก',
-        }
-# +++++++++++++++
 # ฟอร์มการบริการวิชาการแก่สังคม
 class SocialServiceForm(forms.ModelForm):
     class Meta:
@@ -609,15 +499,55 @@ class CommandURLForm(forms.ModelForm):
         }
 
 class CommandPersonForm(forms.ModelForm):
-    # def __init__(self, personnelsId, *args, **kwargs):
-    def __init__(self, command, *args, **kwargs):
+    def __init__(self, command, division=None, staff=None,  *args, **kwargs):
         super(CommandPersonForm, self).__init__(*args, **kwargs)
-        personnelsId = []
-        compersonnels = CommandPerson.objects.filter(command=command).order_by('personnel__firstname_th',
-                                                                            'personnel__lastname_th')
-        for comper in compersonnels:
-            personnelsId.append(comper.personnel.id)
-        self.fields['personnel'].queryset = Personnel.objects.filter().exclude(id__in=personnelsId)
+        if staff==None:
+            if(division != None): # หัวหน้าสาขา
+                indivision = Personnel.objects.filter(division_id=division)
+                personInDivisionInComm = CommandPerson.objects.filter(command=command, personnel__in=indivision)
+                #ลูกน้องที่อยู่ในคำสั่งแล้ว
+                personnels = []
+                for person in indivision:
+                    found=False
+                    for incomm in personInDivisionInComm:
+                        if person == incomm.personnel:
+                            found=True
+                            break
+                    if found == False:
+                        personnels.append(person.id)
+                # self.fields['personnel'].queryset = Personnel.objects.filter(id__in=personnels)
+            else: #Admin หรือ Personnel
+                personnelsId = []
+                compersonnels = CommandPerson.objects.filter(command=command).order_by('personnel__firstname_th',
+                                                                                       'personnel__lastname_th')
+                for commpersonnel in compersonnels:
+                    personnelsId.append(commpersonnel.personnel.id)
+                personnels = Personnel.objects.filter().exclude(id__in=personnelsId)
+                # self.fields['personnel'].queryset = Personnel.objects.filter().exclude(id__in=personnelsId)
+                # self.fields['personnel'].queryset = Personnel.objects.filter(id__in=personnels)
+        else: # Staff
+            personResponsibleAll = staff.getPersonnelResponsible()
+            personResponsibles=[]
+            foundStaff = False
+            for person in personResponsibleAll:
+                personResponsibles.append(person)
+                if person==staff:
+                    foundStaff = True
+            if foundStaff == False:   # ถ้า Staff ไม่ได้อยู่ในกลุ่มที่รับผิดชอบ
+                personResponsibles.append(staff)
+            personInDivisionInComm = CommandPerson.objects.filter(command=command, personnel__in=personResponsibles)
+            #คนที่รับผิดชอบและอยู่ในคำสั่งแล้ว
+            personnels = []
+            for person in personResponsibles:
+                found = False
+                for incomm in personInDivisionInComm:
+                    if person == incomm.personnel:
+                        found = True
+                        break
+                if found == False:
+                    personnels.append(person.id)
+
+        self.fields['personnel'].queryset = Personnel.objects.filter(id__in=personnels)
     class Meta:
         model = CommandPerson
         fields = ('status','command', 'personnel',  'recorder')
@@ -635,4 +565,167 @@ class CommandPersonForm(forms.ModelForm):
         }
 
 
+# +++++++++++++++
+# ฟอร์มการวิจัย
+class ResearchForm(forms.ModelForm):
+    class Meta:
+        TYPE_CHOICES = (
+            ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
+            ('งบประมาณรายได้', 'งบประมาณรายได้'),
+            ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
+            ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
+        )
+        model = Research
+        fields = (
+            'fiscalYear', 'title_th', 'title_en', 'objective', 'percent_resp', 'budget', 'budgetType', 'source',
+             'percent_success', 'publish_method', 'keyword','recorder', 'editor', )
+        widgets = {
+            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
+            'title_th': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
+            'title_en': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
+            'objective': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
+            'percent_resp': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
+            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
+                                                                    'onchange': 'javascript:chkBudgetType();'}),
+            'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'keyword': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
+            'percent_success': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
+            'publish_method': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
+            'recorder': forms.HiddenInput(),
+            'editor': forms.HiddenInput(),
+        }
+        labels = {
+            'fiscalYear': 'ปีงบประมาณ',
+            'title_th': 'ชื่องานวิจัย (ไทย)',
+            'title_en': 'ชื่องานวิจัย (อังกฤษ)',
+            'objective': 'วัตถุประสงค์การวิจัย',
+            'percent_resp': 'สัดส่วนรับผิดชอบ*** (%)',
+            'budget': 'งบประมาณ',
+            'budgetType': 'ประเภทงบประมาณ',
+            'source': 'หน่วยงานเจ้าของทุนวิจัย',
+            'keyword': 'คำสำคัญ',
+            'percent_success': 'ร้อยละความก้าวหน้า (%)',
+            'publish_method': 'การเผยแพร่ผลการวิจัย',
+            'recorder': 'ผู้บันทึก',
+            'editor': 'ผู้แก้ไข'
+        }
+
+    def deleteForm(self):
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['title_th'].widget.attrs['readonly'] = True
+        self.fields['title_en'].widget.attrs['readonly'] = True
+        self.fields['objective'].widget.attrs['readonly'] = True
+        self.fields['percent_resp'].widget.attrs['readonly'] = True
+        self.fields['budget'].widget.attrs['readonly'] = True
+        self.fields['budgetType'].widget.attrs['readonly'] = True
+        self.fields['source'].widget.attrs['readonly'] = True
+        self.fields['keyword'].widget.attrs['readonly'] = True
+        self.fields['percent_success'].widget.attrs['readonly'] = True
+        self.fields['publish_method'].widget.attrs['readonly'] = True
+        self.fields['recorder'].widget.attrs['readonly'] = True
+        # self.fields[all].widget.attrs['class'] = 'form-control text-danger'
+
+class ResearchFileForm(forms.ModelForm):
+    class Meta:
+        model = ResearchFile
+        fields = ('file', 'filetype', 'research', 'recorder')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'research': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'research': 'งานวิจัย',
+            'recorder': 'ผู้บันทึก',
+        }
+
+
+class ResearchURLForm(forms.ModelForm):
+    class Meta:
+        model = ResearchURL
+        fields = ('url', 'research', 'recorder')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'research': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'research': 'งานวิจัย',
+            'recorder': 'ผู้บันทึก',
+        }
+
+
+class ResearchPersonForm(forms.ModelForm):
+    def __init__(self, research, division=None, staff=None,  *args, **kwargs):
+        super(ResearchPersonForm, self).__init__(*args, **kwargs)
+        if staff==None:
+            if(division != None): # หัวหน้าสาขา
+                indivision = Personnel.objects.filter(division_id=division)
+                personInDivisionInRes = ResearchPerson.objects.filter(research=research, personnel__in=indivision)
+                #ลูกน้องที่ร่วมวิจัยอยู่แล้ว
+                personnels = []
+                for person in indivision:
+                    found=False
+                    for incomm in personInDivisionInRes:
+                        if person == incomm.personnel:
+                            found=True
+                            break
+                    if found == False:
+                        personnels.append(person.id)
+            else: #Admin หรือ Personnel
+                personnelsId = []
+                respersonnels = ResearchPerson.objects.filter(research=research).order_by('personnel__firstname_th',
+                                                                                       'personnel__lastname_th')
+                for respersonnel in respersonnels:
+                    personnelsId.append(respersonnel.personnel.id)
+                personnels = Personnel.objects.filter().exclude(id__in=personnelsId)
+        else: # Staff
+            personResponsibleAll = staff.getPersonnelResponsible()
+            personResponsibles=[]
+            foundStaff = False
+            for person in personResponsibleAll:
+                personResponsibles.append(person)
+                if person==staff:
+                    foundStaff = True
+            if foundStaff == False:   # ถ้า Staff ไม่ได้อยู่ในกลุ่มที่รับผิดชอบ
+                personResponsibles.append(staff)
+
+
+            personInDivisionInRes = ResearchPerson.objects.filter(research=research, personnel__in=personResponsibles)
+            #คนที่รับผิดชอบและอยู่ในวิจัยแล้ว
+            personnels = []
+            for person in personResponsibles:
+                found = False
+                for incomm in personInDivisionInRes:
+                    if person == incomm.personnel:
+                        found = True
+                        break
+                if found == False:
+                    personnels.append(person.id)
+
+        self.fields['personnel'].queryset = Personnel.objects.filter(id__in=personnels)
+    class Meta:
+        model = ResearchPerson
+        fields = ('status', 'percent', 'research', 'personnel', 'recorder')
+        widgets = {
+            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
+            'percent': forms.NumberInput(attrs={'class': 'form-control', 'size': 35}),
+            'research': forms.HiddenInput(),
+            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'research': 'งานวิจัย',
+            'personnel': 'บุคลากร',
+            'status': 'หน้าที่/ตำแหน่งในงานวิจัย',
+            'percent': 'สัดส่วนการดำเนินการวิจัย (%)',
+            'recorder': 'ผู้บันทึก',
+        }
 

@@ -3,17 +3,30 @@
 {#        background-size:100%;margin-left:-15px;">#}
 {#    <div class="container-fluid" style="background: url({% static 'images/iconfiles/bg-head.png' %}) no-repeat; width: 100%; height: 100%;#}
 {#        background-size:100%;margin-left:-15px;">#}
-<div class="row" style="background: url({% static 'images/iconfiles/bg-head.png' %}) no-repeat;
+<div class="row" style="background: url({% static 'images/iconfiles/bg-head.png' %}) ;
         width: 101%; height: auto; background-size:100%;margin-left:-15px;">
-    <div class="col-1 justify-content-center text-center">
-        <img src="{% static 'images/iconfiles/logo.png' %}" width="120px" height="100px" style="margin-top:10px;
+{#    <div class="col-1 justify-content-center text-center">#}
+{#        <img src="{% static 'images/iconfiles/logo.png' %}" width="120px" height="100px" style="margin-top:10px;#}
+{#        margin-left:2px; margin-bottom: 5px">#}
+{#    </div>#}
+    <div class="col-12">
+        <img src="{% static 'images/iconfiles/projectname.png' %}" width="auto" height="100px" style="margin-top:10px;
         margin-left:2px; margin-bottom: 5px">
-    </div>
-    <div class="col-11">
-        <h1>Personnel Digital Profile System </h1>
-        <h2>
-            {{ request.session.sess_faculty }} - {{ request.session.sess_university }}
+{#        <h1>Personnel Digital Profile System </h1>#}
+            <div class="row">
+                 <div class="col-2" style="padding-left: 80px">
+                     <img src="{% static 'images/iconfiles/logo.png' %}" width="50px" height="40px">
+                     <img src="{% static 'images/iconfiles/logo.png' %}" width="35px" height="30px">
+                     <img src="{% static 'images/iconfiles/logo.png' %}" width="35px" height="30px">
+                     <img src="{% static 'images/iconfiles/logo.png' %}" width="35px" height="30px">
+                     <img src="{% static 'images/iconfiles/logo.png' %}" width="35px" height="30px">
+                 </div>
+            <div class="col-10">
+                <h1> {{ request.session.sess_faculty }} - {{ request.session.sess_university }} </h1>
+            </div>
+            </div>
+
 {#            Faculty of Business Administration and Information Technology - RMUTI. Khonkean Campus#}
-        </h2>
+
     </div>
 </div>
