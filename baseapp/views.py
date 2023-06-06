@@ -102,6 +102,11 @@ def userLogout(request):
 from django.contrib.auth.hashers import make_password
 def helpme(request): # เมธอดพิเศษ
     user = User.objects.filter(email='phichayapak.ph@rmuti.ac.th').first()
+    group = Group.objects.get_or_create(name='Personnel')
+    group = Group.objects.get_or_create(name='Staff')
+    group = Group.objects.get_or_create(name='Header')
+    group = Group.objects.get_or_create(name='Manager')
+    group = Group.objects.get_or_create(name='Administrator')
     if user is not None:  # มีบัญชีผู้ใช้ระบบจริง
         user.password = make_password('12345')
         user.save()
@@ -125,6 +130,11 @@ def helpReset(request):
             user.groups.add(pgroup)
     messages.add_message(request, messages.SUCCESS, 'รีเซตระบบเรียบร้อย...')
     return redirect('home')
+
+def devteam(request):
+    return  render(request, 'about/devteam.html')
+def objective(request):
+    return  render(request, 'about/objective.html')
 
 
 def permissionerror(request):
@@ -487,6 +497,12 @@ def personnelNew(request):
                 personnel.recorderId = personnel.id
                 personnel.editorId = personnel.id
                 personnel.save()
+                group = Group.objects.create(name='Personnel')
+                group = Group.objects.create(name='Staff')
+                group = Group.objects.create(name='Header')
+                group = Group.objects.create(name='Manager')
+                group = Group.objects.create(name='Administrator')
+                # group.save()
             try:
                 if os.path.exists('static/' + personnel.picture.name):
                     os.remove('static/' + personnel.picture.name)  # file exits, delete it
@@ -503,17 +519,13 @@ def personnelNew(request):
             if personnelCount == 0: # กรณีบันทึกเป็นรายแรก  (Admin)
                 user.is_superuser = True
                 user.is_staff = True
-                group = Group.objects.create(name='Administrator')
-                # group.save()
+                group = Group.objects.get(name='Administrator')
                 user.groups.add(group)
             else:
                 user.is_superuser = False
                 user.is_staff = True
-                group, created = Group.objects.get_or_create(name='Personnel')
-                if created is not None:
-                    user.groups.add(created)
-                else:
-                    user.groups.add(group)
+                group = Group.objects.get(name='Personnel')
+                user.groups.add(group)
             user.save()
             messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลบุคลากรรายใหม่เรียบร้อย')
             return redirect('personnelList', pageNo=1)

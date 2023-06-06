@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+    <div class="container mb-5 ">
+        <div class="text-center mb-3"><span class="text-danger">Developer Taem</span>
+            <h3>Digital Business Technology RMUTI.KKC. Team</h3></div>
+        <div class="row g-2 text-center">
+            <div class="col-md-4">
+                <div class="card"><img src="{% static 'images/iconfiles/26.jpg' %}" class="img-fluid rounded">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="info info-yellow"><span class="user-icons">
+                            </span>
+                            <div class="user-profile d-flex flex-row">
+                                <div class="d-flex flex-column mr-4"><span class="name">Dr. Phich</span> <small
+                                        class="designation">Project Manager</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card"><img src="{% static 'images/iconfiles/2.jpg' %}" class="img-fluid rounded">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="info info-green"><span class="user-icons"> </span>
+                            <div class="user-profile d-flex flex-row">
+                                <div class="d-flex flex-column mr-3"><span class="name">Aj. Sarawut</span> <small
+                                        class="designation">Coordinator</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card"><img src="{% static 'images/iconfiles/3.jpg' %}" class="img-fluid rounded">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="info info-blue"><span class="user-icons"></span>
+                            <div class="user-profile d-flex flex-row">
+                                <div class="d-flex flex-column mr-4"><span class="name">Aj. Supaporn Anuphaphaiboon</span> <small
+                                        class="designation">Team Member</small></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

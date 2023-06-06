@@ -81,18 +81,6 @@ chkSelect = function (name, chkAll) {
     }
 }
 
-// chkSelect = function () {
-//     var checkBox = document.getElementById("chkAll");
-//     var personnels = document.getElementsByName("personnel")
-//     var personnelID="";
-//     for(i=0; i<personnels.length;i++){
-//         personnelID = "id_personnel_" + i.toString();
-//         if(checkBox.checked==true) {
-//             document.getElementById(personnelID).setAttribute('checked', 'checked');
-//         }else{
-//             document.getElementById(personnelID).removeAttribute('checked');
-//         }
-//     }
-// }
+/* dev team js */
 
 

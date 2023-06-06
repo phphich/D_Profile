@@ -54,11 +54,10 @@
     <i class="fa-solid fa-person-walking-luggage"></i>
     <a href="{% url 'performanceList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
         <i class="fa-solid fa-award"></i> การรับตำแหน่ง/ผลงาน/รางวัล <i class="fas fa-check"></i> </a>
-    <hr>
     <a href="{% url 'commandList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
         <i class="fas fa-clipboard-list"></i> คำสั่ง <i class="fas fa-check"></i></a>
     <a href="{% url 'researchList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fas fa-flask"></i> การวิจัย </a>
+        <i class="fas fa-flask"></i> การวิจัย <i class="fas fa-check"></i> </a>
     <a href="" class="list-group-item list-group-item-action list-group-item-light text-success">
         <i class="fas fa-people-carry"></i> การบริการทางวิชาการแก่สังคม </a>
 
@@ -88,7 +87,7 @@
 
 <div class="list-group">
     <li class="list-group-item list-group-item-warning text-dark"><b>
-        <i class="fa-solid fa-users-gear"></i> User:</b></li>
+        <i class="fas fa-address-card"></i> User:</b></li>
     <li class="list-group-item text-success">
         {% if request.session.userEmail %}
             <div class="row">
@@ -96,7 +95,7 @@
                     <img src="{% static request.session.userPicture %}" class="rounded-circle" style="width: 60px; height: 60px">
                 </div>
                 <div class="col-9 text-start">
-                    <i class="fa-regular fa-id-card"></i> รหัสผู้ใช้: {{ request.session.userEmail }} <br>
+                    <i class="fas fa-at"></i> รหัสผู้ใช้: {{ request.session.userEmail }} <br>
                     <i class="fa-regular fa-user"></i> ชื่อ - สกุล: {{ request.session.userName }} <br>
                     <i class="fa-solid fa-hand-sparkles"></i> สถานะ:
                     {% if request.session.userType == 'Administrator' %}
@@ -139,6 +138,18 @@
             </p>
         {% endif %}
     </li>
+</div>
+<br>
+<div class="list-group">
+    <li class="list-group-item  list-group-item-warning bg-dark text-white">
+        <i class="fas fa-cogs"></i><b> System:</b></li>
+    <a href="{% url 'objective' %}"
+       class="list-group-item list-group-item-action list-group-item-light text-dark">
+        <i class="fas fa-bullseye"></i> About </a>
+    <a href="{% url 'devteam' %}"
+       class="list-group-item list-group-item-action list-group-item-light text-dark">
+        <i class="fas fa-bug"></i> Development Team </a>
+
 </div>
 <br>
 
