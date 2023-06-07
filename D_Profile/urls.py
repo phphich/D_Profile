@@ -31,7 +31,7 @@ urlpatterns = [
     path('<id>/userResetPassword', baseapp.views.userResetPassword, name='userResetPassword'),
     path('helpme', baseapp.views.helpme, name='helpme'),
     path('helpReset', baseapp.views.helpReset, name='helpReset'),
-    # path('permissionerror', baseapp.views.permissionerror, name='permissionerror'),
+    path('permissionerror', baseapp.views.permissionerror, name='permissionerror'),
     path('devteam', baseapp.views.devteam, name='devteam'),
     path('objective', baseapp.views.objective, name='objective'),
     path('baseapp/', include('baseapp.urls')),

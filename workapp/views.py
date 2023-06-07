@@ -1370,10 +1370,10 @@ def researchDetail(request, id):
     fileForm = ResearchFileForm(initial={'research': research, 'filetype': 'Unknow', 'recorder':recorder})
     urlForm = ResearchURLForm(initial={'research': research, 'recorder':recorder})
     if request.session['userType'] == 'Header':
-        researchPersonForm = ResearchPersonForm(research=research, division=recorder.division, initial={'research':research, 'recorder':recorder, })
+        researchPersonForm = ResearchPersonForm(research=research, division=recorder.division, initial={'research':research, 'recorder':recorder, 'status':'หัวหน้าโครงการวิจัย',  'percent':100 })
     elif request.session['userType'] == 'Staff':
         researchPersonForm = ResearchPersonForm(research=research, division=recorder.division, staff=recorder,
-                                              initial={'research': research, 'recorder': recorder, })
+                                              initial={'research': research, 'recorder': recorder, 'status':'หัวหน้าโครงการวิจัย', 'percent':100  })
     else:
         researchPersonForm = ResearchPersonForm(research=research, initial={'research':research, 'recorder':recorder, 'status':'หัวหน้าโครงการวิจัย', 'percent':100 })
 

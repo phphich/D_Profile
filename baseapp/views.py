@@ -142,10 +142,10 @@ def permissionerror(request):
 
 @login_required(login_url='userAuthen')
 def userChgPassword(request):
-    getSession(request)
-    if common.chkPermission(facultyUpdate.__name__, uType=uType) == False:
-        messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect('home')
+    # getSession(request)
+    # if common.chkPermission(facultyUpdate.__name__, uType=uType) == False:
+    #     messages.add_message(request, messages.ERROR, msgErrorPermission)
+    #     return redirect('home')
     email = request.session['userEmail']
     personnel = Personnel.objects.filter(email=email).first()
     if request.method == 'POST':
@@ -175,6 +175,10 @@ def userChgPassword(request):
 
 @login_required(login_url='userAuthen')
 def userResetPassword(request, id):
+    if request.session['userType'] != 'Administrator':
+        # messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect('permissionerror')
+    request.session['last_url'] = 'home'
     personnel = Personnel.objects.filter(id=id).first()
     getSession(request, dtype='Personnel', did=personnel.id)
     if common.chkPermission(userResetPassword.__name__, uType=uType, uId=uId) == False:

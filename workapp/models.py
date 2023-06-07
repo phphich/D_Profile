@@ -416,7 +416,6 @@ class Research(models.Model):
     title_th = models.TextField(default="")
     title_en = models.TextField(default="")
     objective = models.TextField(default="")
-    percent_resp = models.IntegerField(default=100)
     budget = models.FloatField(default=0.00)
     budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
     source = models.CharField(max_length=255, default="")
@@ -467,7 +466,7 @@ class Research(models.Model):
                    '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
 
 class ResearchPerson(models.Model):
-    status = models.CharField(max_length=30, default="")
+    status = models.CharField(max_length=30, default="หัวหน้าโครงการ")
     percent= models.IntegerField(default=100)
     research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
     personnel = models.ForeignKey(Personnel, related_name='PersonnelResearchPerson', on_delete=models.CASCADE, default=None)

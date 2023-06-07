@@ -577,14 +577,13 @@ class ResearchForm(forms.ModelForm):
         )
         model = Research
         fields = (
-            'fiscalYear', 'title_th', 'title_en', 'objective', 'percent_resp', 'budget', 'budgetType', 'source',
+            'fiscalYear', 'title_th', 'title_en', 'objective', 'budget', 'budgetType', 'source',
              'percent_success', 'publish_method', 'keyword','recorder', 'editor', )
         widgets = {
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'title_th': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'title_en': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'objective': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'percent_resp': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
             'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
             'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
                                                                     'onchange': 'javascript:chkBudgetType();'}),
@@ -600,7 +599,6 @@ class ResearchForm(forms.ModelForm):
             'title_th': 'ชื่องานวิจัย (ไทย)',
             'title_en': 'ชื่องานวิจัย (อังกฤษ)',
             'objective': 'วัตถุประสงค์การวิจัย',
-            'percent_resp': 'สัดส่วนรับผิดชอบ*** (%)',
             'budget': 'งบประมาณ',
             'budgetType': 'ประเภทงบประมาณ',
             'source': 'หน่วยงานเจ้าของทุนวิจัย',
@@ -616,7 +614,6 @@ class ResearchForm(forms.ModelForm):
         self.fields['title_th'].widget.attrs['readonly'] = True
         self.fields['title_en'].widget.attrs['readonly'] = True
         self.fields['objective'].widget.attrs['readonly'] = True
-        self.fields['percent_resp'].widget.attrs['readonly'] = True
         self.fields['budget'].widget.attrs['readonly'] = True
         self.fields['budgetType'].widget.attrs['readonly'] = True
         self.fields['source'].widget.attrs['readonly'] = True
@@ -722,10 +719,10 @@ class ResearchPersonForm(forms.ModelForm):
             'recorder': forms.HiddenInput(),
         }
         labels = {
-            'research': 'งานวิจัย',
-            'personnel': 'บุคลากร',
             'status': 'หน้าที่/ตำแหน่งในงานวิจัย',
             'percent': 'สัดส่วนการดำเนินการวิจัย (%)',
+            'personnel': 'บุคลากร',
+            'research': 'งานวิจัย',
             'recorder': 'ผู้บันทึก',
         }
 
