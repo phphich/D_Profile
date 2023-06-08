@@ -204,6 +204,7 @@ class PersonnelForm(forms.ModelForm):
 class EducationForm(forms.ModelForm):
     class Meta:
         LEVEL_CHOICES = (
+            ("ม.6", "ม.6"),
             ("ปวช.", "ปวช."),
             ("ปวส.", "ปวส."),
             ("ปริญญาตรี", "ปริญญาตรี"),

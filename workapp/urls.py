@@ -85,8 +85,8 @@ urlpatterns = [
     path('<id>/socialserviceDeleteFileAll', views.socialserviceDeleteFileAll, name='socialserviceDeleteFileAll'),
     path('<id>/socialserviceDeleteURL', views.socialserviceDeleteURL, name='socialserviceDeleteURL'),
     path('<id>/socialserviceDeleteURLAll', views.socialserviceDeleteURLAll, name='socialserviceDeleteURLAll'),
-    path('<id>/socialserviceDeleteSocialServicePerson', views.socialserviceDeleteSocialServicePerson, name='socialerviceDeleteSocialServicePerson'),
-    path('<id>/socialserviceDeleteSocialServicePersonAll', views.socialserviceDeleteSocialServicePerson,
+    path('<id>/socialserviceDeleteSocialServicePerson', views.socialserviceDeleteSocialServicePerson, name='socialserviceDeleteSocialServicePerson'),
+    path('<id>/socialserviceDeleteSocialServicePersonAll', views.socialserviceDeleteSocialServicePersonAll,
          name='socialserviceDeleteSocialServicePersonAll'),
 
 ]

@@ -17,7 +17,21 @@
     <hr class="text-primary">
     <form method="POST" enctype="multipart/form-data" class="form form-control text-primary">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="row">
+            <div class="col-12">
+                {{ form.as_p }}
+            </div>
+            <p>
+                {% if request.session.userType == "Personnel" %}
+                    <label for="status" class="text-primary">หน้าที่/ตำแหน่งในงานวิจัย</label>
+                    <input type="text" class="form-control" name="status" required id="status" size="35" maxlength="30"
+                           value="หัวหน้าโครงการ" required="required">
+                    <label for="percent" class="text-primary">สัดส่วนความรับผิดชอบ (%) </label>
+                    <input type="text" class="form-control" name="percent" required id="status" size="35" maxlength="30"
+                           value="100"  min="1" max="100" required="required">
+                {% endif %}
+            </p>
+        </div>
         <hr>
         <p class="text-center">
             <br>

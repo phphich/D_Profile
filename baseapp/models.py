@@ -46,6 +46,7 @@ class Division(models.Model):
         count = Curriculum.objects.filter(division=self).aggregate(count=Count('id'))
         return count['count']
 
+
 class Curriculum(models.Model):
     name_th= models.CharField(max_length=100, default="")
     name_en = models.CharField(max_length=100, default="")
@@ -148,6 +149,27 @@ class Personnel(models.Model):
         else:
             return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
                    '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
+    def getHighestEducation(self):
+        educations = Education.objects.filter(personnel=self)
+        personnelEdu = []
+        highestEdu="ไม่ระบุ"
+        if educations.count() != 0:
+            for edu in educations:
+                personnelEdu.append(edu.level)
+
+            if 'ปริญญาเอก' in personnelEdu:
+                highestEdu='ปริญญาเอก'
+            elif 'ปริญญาโท' in personnelEdu:
+                highestEdu = 'ปริญญาโท'
+            elif 'ปริญญาตรี' in personnelEdu:
+                highestEdu = 'ปริญญาตรี'
+            elif 'ปวส.' in personnelEdu:
+                highestEdu = 'ปวส.'
+            elif 'ปวช.' in personnelEdu:
+                highestEdu = 'ปวช.'
+            elif 'ม.6' in personnelEdu:
+                highestEdu = 'ม.6'
+        return highestEdu
 
 class Education(models.Model):
     level = models.CharField(max_length=30, default="")

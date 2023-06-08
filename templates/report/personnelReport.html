@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลบุคลากร </h2>
+    {% if chart is not None %}
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-4">
+                <table class="table table-info table-bordered">
+                    <tr>
+                        <th class="text-center">สาขา</th>
+                        <th class="text-center">จำนวนบุคลากร</th>
+                    </tr>
+                    {% for division in divisions %}
+                        <tr>
+                            <td>{{ division.name_th }}</td>
+                            <td class="text-center">{{ division.getCountPersonnel }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-center">รวม</td>
+                        <td>{{ count }}</td>
+                    </tr>
+
+                </table>
+            </div>
+
+            <div class="col-2"></div>
+            <div class="col-3">
+                <table class="table table-info table-bordered">
+                    <tr>
+                    {% for col in dataFrameEdu.columns %}
+                        <th class="text-center">{{ col }}</th>
+                    {% endfor %}
+                    </tr>
+                    {% for index, row in dataFrameEdu.iterrows %}
+                        <tr>
+                            <td>{{ row.level }}</td>
+                            <td class="text-center">{{ row.count }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr>
+                        <td class="text-center">รวม</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-1"></div>
+        </div>
+        <br>
+
+        <div class="row text-center align-content-center">
+            <div class="col-1"></div>
+{#            <div class="col-md-2 text-center" style="alignment: center; vertical-align: middle">#}
+{#                <div class="row">#}
+{#                    <div class="card" style="width: 10rem;alignment: center">#}
+{#                        <div>#}
+{#                            <div class="card-body" style="background-color: #bfe2e9">#}
+{#                                <p class="card-text text-success" style="font-size:50px;"><strong> {{ count }} </strong>#}
+{#                                </p>#}
+{#                                <span class="badge bg-info">#}
+{#                                <img class="card-img-top" style="width: 50px; height: 50px; align:center"#}
+{#                                     src="{% static 'images/iconfiles/male.png' %}" alt="Male Personnel">#}
+{#                                <strong class="badge bg-light text-danger"#}
+{#                                        style="font-size:15pt;"> {{ countmale }} </strong> <br>#}
+{#                            </span> <br> <br>#}
+{#                                <span class="badge bg-warning">#}
+{#                                <img class="card-img-top" style="width: 50px; height: 50px; align:center"#}
+{#                                     src="{% static 'images/iconfiles/female.png' %}" alt="Female Personnel">#}
+{#                                <strong class="badge bg-light text-danger"#}
+{#                                        style="font-size:15pt;"> {{ countfemale }} </strong> <br>#}
+{#                            </span>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chart | safe }}
+            </div>
+            <div class="col-md-2"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartEdu | safe }}
+            </div>
+
+            <div class="col-md-1"></div>
+        </div>
+    {% endif %}
+
+{% endblock %}

@@ -588,6 +588,7 @@ class ResearchPersonForm(forms.ModelForm):
                     personnels.append(person.id)
 
         self.fields['personnel'].queryset = Personnel.objects.filter(id__in=personnels)
+        
     class Meta:
         model = ResearchPerson
         fields = ('status', 'percent', 'research', 'personnel', 'recorder')
@@ -719,6 +720,54 @@ class SocialServiceURLForm(forms.ModelForm):
 
 
 class SocialServicePersonForm(forms.ModelForm):
+    def __init__(self, socialservice, division=None, staff=None,  *args, **kwargs):
+        super(SocialServicePersonForm, self).__init__(*args, **kwargs)
+        if staff==None:
+            if(division != None): # หัวหน้าสาขา
+                indivision = Personnel.objects.filter(division_id=division)
+                personInDivisionInRes = SocialServicePerson.objects.filter(socialservice=socialservice, personnel__in=indivision)
+                #ลูกน้องที่ร่วมบริการอยู่แล้ว
+                personnels = []
+                for person in indivision:
+                    found=False
+                    for incomm in personInDivisionInRes:
+                        if person == incomm.personnel:
+                            found=True
+                            break
+                    if found == False:
+                        personnels.append(person.id)
+            else: #Admin หรือ Personnel
+                personnelsId = []
+                respersonnels = SocialServicePerson.objects.filter(socialservice=socialservice).order_by('personnel__firstname_th',
+                                                                                       'personnel__lastname_th')
+                for respersonnel in respersonnels:
+                    personnelsId.append(respersonnel.personnel.id)
+                personnels = Personnel.objects.filter().exclude(id__in=personnelsId)
+        else: # Staff
+            personResponsibleAll = staff.getPersonnelResponsible()
+            personResponsibles=[]
+            foundStaff = False
+            for person in personResponsibleAll:
+                personResponsibles.append(person)
+                if person==staff:
+                    foundStaff = True
+            if foundStaff == False:   # ถ้า Staff ไม่ได้อยู่ในกลุ่มที่รับผิดชอบ
+                personResponsibles.append(staff)
+
+
+            personInDivisionInRes = SocialServicePerson.objects.filter(socialservice=socialservice, personnel__in=personResponsibles)
+            #คนที่รับผิดชอบและอยู่ในวิจัยแล้ว
+            personnels = []
+            for person in personResponsibles:
+                found = False
+                for incomm in personInDivisionInRes:
+                    if person == incomm.personnel:
+                        found = True
+                        break
+                if found == False:
+                    personnels.append(person.id)
+        self.fields['personnel'].queryset = Personnel.objects.filter(id__in=personnels)
+
     class Meta:
         model = SocialServicePerson
         fields = ('status', 'socialservice', 'personnel', 'recorder')

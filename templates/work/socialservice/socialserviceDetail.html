@@ -6,7 +6,7 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fas fa-flask"></i> รายละเอียดงานวิจัย   </h2>
+                <h2><i class="fas fa-people-carry"></i> รายละเอียดการบริการทางวิชาการแก่สังคม   </h2>
                 <h4> {{ personnel }},  สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
@@ -14,7 +14,7 @@
             </div>
         {% else %}
             <div class="col-12">
-            <h2><i class="fas fa-flask"></i> รายละเอียดงานวิจัย </h2>
+            <h2><i class="fas fa-flask"></i> รายละเอียดการบริการทางวิชาการแก่สังคม </h2>
         </div>
         {% endif %}
     </div>
@@ -23,63 +23,75 @@
     <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
         <tr>
             <th class="col-3 text-primary">ปีงบประมาณ </th>
-            <td class="col-9">{{ research.fiscalYear }}</td>
+            <td class="col-9">{{ socialservice.fiscalYear }}</td>
         </tr>
         <tr>
-            <th class="text-primary">ชื่องานวิจัย (ไทย) </th>
-            <td>{{ research.title_th }}</td>
+            <th class="col-3 text-primary">ปีการศึกษา </th>
+            <td class="col-9">{{ socialservice.eduYear }}</td>
         </tr>
         <tr>
-            <th class="text-primary">ชื่องานวิจัย (อังกฤษ) </th>
-            <td>{{ research.title_en }}</td>
+            <th class="col-3 text-primary">ภาคเรียนที่ </th>
+            <td class="col-9">{{ socialservice.eduSemeter }}</td>
         </tr>
         <tr>
-            <th class="text-primary">วัตถุประสงค์การวิจัย</th>
-            <td>{{ research.objective | linebreaks  }}</td>
+            <th class="col-3 text-primary">ชื่อโครงการ </th>
+            <td class="col-9">{{ socialservice.topic }}</td>
+        </tr>
+        <tr>
+            <th class="col-3 text-primary">สถานที่ </th>
+            <td class="col-9">{{ socialservice.place }}</td>
+        </tr>
+        <tr>
+            <th class="col-3 text-primary">กลุ่มผู้รับบริการ </th>
+            <td class="col-9">{{ socialservice.receiver }}</td>
+        </tr>
+        <tr>
+            <th class="col-3 text-primary">จำนวนผู้รับบริการ </th>
+            <td class="col-9">{{ socialservice.num_receiver }}</td>
+        </tr>
+        <tr>
+            <th class="col-3 text-primary">วันที่เริ่มต้น </th>
+            <td class="col-9">{{ socialservice.startDate }}</td>
+        </tr>
+        <tr>
+            <th class="col-3 text-primary">วันที่สิ้นสุด </th>
+            <td class="col-9">{{ socialservice.endDate }}</td>
+        </tr>
+        <tr>
+            <th class="col-3 text-primary">จำนวนวัน </th>
+            <td class="col-9">{{ socialservice.days }}</td>
         </tr>
         <tr>
             <th class="text-primary">งบประมาณ</th>
-            <td>{{ research.budget }}</td>
+            <td>{{ socialservice.budget }}</td>
         </tr>
         <tr>
             <th class="text-primary">ประเภทงบประมาณ</th>
-            <td>{{ research.budgetType }}</td>
+            <td>{{ socialservice.budgetType }}</td>
         </tr>
         <tr>
-            <th class="text-primary">หน่วยงานเจ้าของทุนวิจัย</th>
-            <td>{{ research.source }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">ร้อยละความก้าวหน้า</th>
-            <td>{{ research.percent_success }}%</td>
-        </tr>
-        <tr>
-            <th class="text-primary">การเผยแพร่ผลการวิจัย</th>
-            <td>{{ research.publish_method }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">คำสำคัญ</th>
-            <td>{{ research.keyword |linebreaks}}</td>
+            <th class="text-primary">หน่วยงานเจ้าของงบประมาณ</th>
+            <td>{{ socialservice.source }}</td>
         </tr>
     </table>
     <p class="text-end text-secondary" style="border-color: #6c757d">
-        <i>{{ research.getRecorderAndEditor }} </i>
+        <i>{{ socialservice.getRecorderAndEditor }} </i>
     </p>
     <p class="text-center">
         <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'researchList' %}'">
+                onclick="location.href='{% url 'socialserviceList' %}'">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
-        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-            {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
+        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+            {% if request.session.userId == socialservice.recorder.id and socialservice.recordDate|getTimeUpdate == False %}
                 <button type="button" class="btn btn-secondary" disabled>
                     <i class="fa fa-tools"></i> (หมดอายุแก้ไข)
                 </button>
             {% else  %}
-                {% if request.session.userType == 'Staff' and request.session.userId != research.recorder.id %}
+                {% if request.session.userType == 'Staff' and request.session.userId != socialservice.recorder.id %}
                 {% else %}
                     <button type="button" class="btn btn-warning"
-                            onclick="location.href='{% url 'researchUpdate' research.id %}'">
+                            onclick="location.href='{% url 'socialserviceUpdate' socialservice.id %}'">
                         <i class="fa fa-tools"></i> แก้ไข
                     </button>
                 {% endif %}
@@ -89,11 +101,11 @@
 
     <div class="row">
         <div class="col-12 text-success">
-            <h5><i class="fa fa-user-friends"></i> บุคลากรที่ร่วมวิจัย:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-                    {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
+            <h5><i class="fa fa-user-friends"></i> บุคลากรที่ร่วมบริการทางวิชาการแก่สังคม:
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+                    {% if request.session.userId == socialservice.recorder.id and socialservice.recordDate|getTimeUpdate == False %}
                     {% else %}
-                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listResearchPerson">
+                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#listSocialServicePerson">
                             <i class="fa fa-plus text-primary"></i>
                         </button>
                     {% endif %}
@@ -102,18 +114,18 @@
         </div>
     </div>
 
-    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-    <div id="listResearchPerson" class="collapse">
+    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+    <div id="listSocialServicePerson" class="collapse">
         <input type="checkbox" name='chkAll' id="chkAll" value="Select" onclick='javascript:chkSelect("personnel","chkAll");'>Select All
-        <form method="post" id='frmResearchPerson' enctype="multipart/form-data" class="form-control text-primary" lang="th">
+        <form method="post" id='frmSocialServicePerson' enctype="multipart/form-data" class="form-control text-primary" lang="th">
             {% csrf_token %}
-            {{ researchPersonForm.as_table }}
+            {{ socialservicePersonForm.as_table }}
             <p class="text-center">
                 <br>
                 <button type="submit" class="btn btn-success">
-                    <i class="fa-solid fa-floppy-disk"></i> บันทึกกรายชื่อผู้ร่วมวิจัย
+                    <i class="fa-solid fa-floppy-disk"></i> บันทึกกรายชื่อผู้ร่วมบริการฯ
                 </button>
-                <input type="hidden" name="id" value="{{ research.id }}">
+                <input type="hidden" name="id" value="{{ socialservice.id }}">
                 <input type="hidden" name="action" value="uploadPersonnel">
             </p>
         </form>
@@ -123,11 +135,11 @@
     <div class="row">
         <div class="col-2>"></div>
         <div class="col-8>">
-            {% if research.getResearchPerson|length == 0  %}
+            {% if socialservice.getSocialServicePerson|length == 0  %}
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="alert-warning col-8 text-center">
-                        <br>....ยังไม่ได้กำหนดรายชื่อผู้ร่วมวิจัยนี้ในระบบ....<br><br></div>
+                        <br>....ยังไม่ได้กำหนดรายชื่อผู้ร่วมบริการฯ นี้ในระบบ....<br><br></div>
                     <div class="col-2"></div>
                 </div>
             {% else %}
@@ -139,21 +151,20 @@
                             <th class="col-1 text-center"> </th>
                         {% endif %}
                         <th class="col-1 text-end"> </th>
-                        <th class="col-3">บุคลากร</th>
-                        <th class="col-2">หน้าที่/ตำแหน่งในงานวิจัย </th>
-                        <th class="col-1 text-center">สัดส่วน (%) </th>
+                        <th class="col-4">บุคลากร</th>
+                        <th class="col-2">หน้าที่/ตำแหน่งในการบริการฯ </th>
                         <th class="col-2 text-secondary text-sm-start"></th>
                         <th class="col-2 text-center text-danger">
-                            {% if research.getResearchPerson|length > 1 %}
+                            {% if socialservice.getSocialServicePerson|length > 1 %}
                                 {% if request.session.userType == 'Administrator' %}
-                                    <a href="{% url 'researchDeleteResearchPersonAll' research.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากงานวิจัยนี้!!!' )"
+                                    <a href="{% url 'socialserviceDeleteSocialServicePersonAll' socialservice.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากการบริการฯ นี้!!!' )"
                                        class="btn btn-danger">
-                                        <i class="fas fa-trash text-white"></i> ลบทุกคนออกจากงานวิจัย
+                                        <i class="fas fa-trash text-white"></i> ลบทุกคนออกจากการบริการฯ
                                     </a>
-                                {% elif request.session.userType == 'Staff' or request.session.userId == research.recorder.id %}
-                                    <a href="{% url 'researchDeleteResearchPersonAll' research.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากงานวิจัยนี้!!!' )"
+                                {% elif request.session.userType == 'Staff' or request.session.userId == socialservice.recorder.id %}
+                                    <a href="{% url 'socialserviceDeleteSocialServicePersonAll' socialservice.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบรายชื่อบุคลากรทั้งหมด ออกจากการบริการฯ นี้!!!' )"
                                        class="btn btn-danger">
                                         <i class="fas fa-trash text-white"></i> ลบทุกคนที่เคยบันทึก*
                                     </a><br>
@@ -163,68 +174,67 @@
                         </th>
                     </tr>
 
-                    {% for researchPerson in research.getResearchPerson %}
+                    {% for socialservicePerson in socialservice.getSocialServicePerson %}
                         {% if request.session.userType != 'Header' %}
-                            {% if personnel.id == researchPerson.personnel.id %}
+                            {% if personnel.id == socialservicePerson.personnel.id %}
                                 <tr class="text-success" style="font-weight:bold">
                             {% else %}
                                 <tr>
                             {% endif %}
                             <td class="text-center">{{ forloop.counter }}</td>
-                            <td class="text-end"><img src="{% static researchPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                            <td class="text-end"><img src="{% static socialservicePerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                      width="55px" height="65px"> </td>
-                            <td> {{ researchPerson.personnel }} </td>
-                            <td> {{ researchPerson.status}}</td>
-                            <td class="text-center"> {{ researchPerson.percent }}  </td>
-                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ researchPerson.getRecorderAndEditor }}</td>
+                            <td> {{ socialservicePerson.personnel }} </td>
+                            <td> {{ socialservicePerson.status}}</td>
+                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ socialservicePerson.getRecorderAndEditor }}</td>
                             <td class="text-center">
                                 {% if request.session.userType == 'Administrator' %}
-                                    <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
+                                    <a href="{% url 'socialserviceDeleteSocialServicePerson' socialservicePerson.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากการบริการฯ นี้' )">
                                         <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                     </a>
-                                {% elif request.session.userType == 'Staff' and researchPerson.recorder.id == request.session.userId %}
-                                    <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
-                                       onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
+                                {% elif request.session.userType == 'Staff' and socialservicePerson.recorder.id == request.session.userId %}
+                                    <a href="{% url 'socialserviceDeleteSocialServicePerson' socialservicePerson.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากการบริการฯ นี้' )">
                                         <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                     </a>
-                                {% elif request.session.userId == research.recorder.id and researchPerson.recorder.id == request.session.userId %}
-                                    {# ถ้างานวิจัยถูกบันทึกโดยผู้ล็อกอิน และรายชื่อในแถวนั้นที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
-{#                                    {% if researchPerson.personnel.id  != request.session.userId %}#}
-                                        <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
-                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
+                                {% elif request.session.userId == socialservice.recorder.id and socialservicePerson.recorder.id == request.session.userId %}
+                                    {# ถ้าโครงการถูกบันทึกโดยผู้ล็อกอิน และรายชื่อในแถวนั้นที่ไม่ใช่คนสร้าง สามารถลบออกได้ #}
+{#                                    {% if socialservicePerson.personnel.id  != request.session.userId %}#}
+                                        <a href="{% url 'socialserviceDeleteSocialServicePerson' socialservicePerson.id %}"
+                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากการบริการฯ นี้' )">
                                             <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                         </a>
 {#                                    {% endif %}#}
                                 {% endif %}
                             </td>
                         </tr>
-                        {% else %}
-                            {% if personnel.id == researchPerson.personnel.id %}
+                        {% else %}  {#  Header         #}
+                            {% if personnel.id == socialservicePerson.personnel.id %}
                                 <tr class="text-success" style="font-weight:bold">
                             {% else %}
                                 <tr>
                             {% endif %}
-                            {% if personnel.division == researchPerson.personnel.division  %}
+                            {% if personnel.division == socialservicePerson.personnel.division  %}
                                 {#  ถ้า เป็นคนในสาขาของ Header #}
                                 <td class="text-center"> </td>
-                                <td class="text-end"><img src="{% static researchPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
-                                         width="55px" height="65px"> </td>
-                                <td>
-                                    {{ researchPerson.personnel }}
+                                <td class="text-end">
+                                    <img src="{% static socialservicePerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                                         width="55px" height="65px">
                                 </td>
-                                <td>{{ researchPerson.status}}</td>
-                                <td class="text-center"> {{ researchPerson.percent }}   </td>
-                                <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ researchPerson.getRecorderAndEditor }}</td>
+                                <td>
+                                    {{ socialservicePerson.personnel }}
+                                </td>
+                                <td>{{ socialservicePerson.status}}</td>
+                                <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ socialservicePerson.getRecorderAndEditor }}</td>
                                 <td class="text-center">
-                                    {% if researchPerson.recorder.id  == request.session.userId %}
+                                    {% if socialservicePerson.recorder.id  == request.session.userId %}
                                         {#  ถ้า Header เป็นผู้เคยเพิ่มไว้ #}
-                                        <a href="{% url 'researchDeleteResearchPerson' researchPerson.id %}"
-                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากงานวิจัยนี้' )">
+                                        <a href="{% url 'socialserviceDeleteSocialServicePerson' socialservicePerson.id %}"
+                                           onclick="return confirm('โปรดยืนยันการลบบุคลากรที่เลือกออกจากการบริการฯ นี้' )">
                                             <img src="{% static 'images/iconfiles/remove-icon.png' %}" width="15px">
                                         </a>
-                                        {% else %}
-                                        sdfas
+                                    {% else %}
                                     {% endif %}
                                 </td>
                             {% endif %}
@@ -236,16 +246,13 @@
         </div>
         <div class="col-2>"></div>
     </div>
-    {% if research.getSumPercent != 100 %}
-        <i class="text-danger"> หมายเหตุ: จำนวนสัดส่วนนักวิจัยยังไม่ครบ 100% </i>
-    {% endif %}
     <br><br>
 
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-                    {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+                    {% if request.session.userId == socialservice.recorder.id and socialservice.recordDate|getTimeUpdate == False %}
                     {% else %}
                         <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
                             <i class="fa fa-plus text-primary"></i>
@@ -268,7 +275,7 @@
                     </div>
                     <div class="row">
                         <div class="col-5 text-center">
-                            <input type="hidden" name="id" value="{{ research.id }}">
+                            <input type="hidden" name="id" value="{{ socialservice.id }}">
                             <input type="hidden" name="action" value="uploadfile">
                         </div>
                         <div class="col-2 text-center" id="upload">
@@ -283,18 +290,18 @@
                 </form>
             </div>
             <p class="text-info">
-                {% if research.getResearchFiles|length == 0 %}
+                {% if socialservice.getSocialServiceFiles|length == 0 %}
                     <div class="row">
                         <div class="col-2"></div>
                         <div class="alert-warning col-8 text-center">
-                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบงานวิจัยนี้ในระบบ....<br><br></div>
+                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบการบริการฯ นี้ในระบบ....<br><br></div>
                         <div class="col-2"></div>
                     </div>
                 {% else %}
                     <div class="row">
-                        {% for f in research.getResearchFiles %}
+                        {% for f in socialservice.getSocialServiceFiles %}
                             <div class="col-3">
-                                <a href="{% static 'documents/research/' %}{{ f.file }}" target="_blank">
+                                <a href="{% static 'documents/socialservice/' %}{{ f.file }}" target="_blank">
                                     {% if f.filetype == "pdf" %}
                                         <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
                                              class="img-thumbnail">
@@ -324,7 +331,7 @@
                                     {% endif %}
                                     <br>
                                 </a>
-                                <a href="{% static 'documents/research/' %}{{ f.file }}" class="filelink" target="_blank">
+                                <a href="{% static 'documents/socialservice/' %}{{ f.file }}" class="filelink" target="_blank">
                                     {% if f.file.name|length|get_digit:"-1" > 30 %}
                                         {{ f.file.name|slice:"0:30" }}...
                                     {% else %}
@@ -332,8 +339,8 @@
                                     {% endif %}
                                 </a>
 
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-                                    <a href="{% url 'researchDeleteFile' f.id %}"
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+                                    <a href="{% url 'socialserviceDeleteFile' f.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
                                         <i class="fas fa-minus text-danger"></i>
                                     </a>
@@ -341,11 +348,11 @@
                             </div>
                         {% endfor %}
                     </div>
-                    {% if research.getResearchFiles|length > 1 %}
+                    {% if socialservice.getSocialServiceFiles|length > 1 %}
                         <div class="row">
                             <div class="col-3">
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-                                    <a href="{% url 'researchDeleteFileAll' research.id %}"
+                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+                                    <a href="{% url 'socialserviceDeleteFileAll' socialservice.id %}"
                                        onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
                                        class="btn btn-danger">
                                         <i class="fas fa-trash text-white"></i>
@@ -365,8 +372,8 @@
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-                    {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+                    {% if request.session.userId == socialservice.recorder.id and socialservice.recordDate|getTimeUpdate == False %}
                     {% else %}
                         <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
                             <i class="fa fa-plus text-primary"></i>
@@ -384,21 +391,21 @@
                     <button type="submit" class="btn btn-success">
                         <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
                     </button>
-                    <input type="hidden" name="id" value="{{ research.id }}">
+                    <input type="hidden" name="id" value="{{ socialservice.id }}">
                     <input type="hidden" name="action" value="uploadLink">
                 </p>
             </form>
         </div>
         <p class="text-primary">
         <ul class="list-group">
-            {% for link in research.getResearchURLs %}
+            {% for link in socialservice.getSocialServiceURLs %}
                 <li class="list-group-item text-primary">
                     <img src="{% static 'images/iconfiles/web-icon.png' %}" width="40px">
                     <a href={{ link.url }} class="filelink" target="_blank">
                         <i class="fas fa-caret-right"></i> {{ link }}
                     </a>
-                   {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-                        <a href="{% url 'researchDeleteURL' link.id %}"
+                   {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+                        <a href="{% url 'socialserviceDeleteURL' link.id %}"
                            onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
                             <i class="fas fa-minus text-danger"></i>
                         </a>
@@ -407,11 +414,11 @@
             {% endfor %}
         </ul>
 
-        {% if research.getResearchURLs|length > 1 %}
+        {% if socialservice.getSocialServiceURLs|length > 1 %}
             <div class="row">
                 <div class="col-3">
-                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
-                        <a href="{% url 'researchDeleteURLAll' research.id %}"
+                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
+                        <a href="{% url 'socialserviceDeleteURLAll' socialservice.id %}"
                            onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
                            class="btn btn-danger">
                             <i class="fas fa-trash text-white"></i>

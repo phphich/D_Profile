@@ -879,7 +879,7 @@ def commandList(request, pageNo=None):
     if request.session['userType'] == "Personnel":
         commands1 = Command.objects.filter(commandperson__personnel=recorder).order_by('-eduYear', '-eduSemeter', '-comDate') #คำสั่งที่ได้รับมอบหมาย
         commands2 = Command.objects.filter(recorder_id__in=personnel) #คำสั่งที่เป็นคนบันทึกไว้เอง
-        commands = commands1.union(commands2)
+        commands = commands1.union(commands2).order_by('-eduYear', '-eduSemeter', '-comDate')
         commands_page = Paginator(commands, iterm_per_page)
         count = commands.count()
         context = {'personnel': recorder,'commands': commands_page.page(pageNo), 'count': count}
@@ -1395,9 +1395,13 @@ def researchNew(request):
         if form.is_valid():
             form.save()
             research = Research.objects.last()
-            # if(request.session["userType"]=="Personnel"):
-            #     researchPerson = ResearchPerson(research=research, personnel=recorder, recorder=recorder, percent=research.percent_resp)
-            #     researchPerson.save()
+            if (request.session["userType"] == "Personnel"):
+                status = request.POST['status']
+                percent = request.POST['percent']
+                researchPerson = ResearchPerson(research=research, personnel=recorder, recorder=recorder)
+                researchPerson.status = status
+                researchPerson.percent = percent
+                researchPerson.save()
             messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลงานวิจัยเรียบร้อย")
             return redirect('researchDetail', id=research.id)
         else:
@@ -1618,23 +1622,23 @@ def socialserviceList(request, pageNo=None):
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        socialservices1 = SocialService.objects.filter(socialserviceperson__personnel=recorder).order_by('-fiscalYear', 'title_th') #งานวิจัยในตารางผู้ทำวิจัย
-        socialservices2 = SocialService.objects.filter(recorder_id__in=personnel) #งานวิจัยที่เป็นคนบันทึกไว้เอง
-        socialservices = socialservices1.union(socialservices2)
+        socialservices1 = SocialService.objects.filter(socialserviceperson__personnel=recorder).order_by('-eduYear', '-eduSemeter','-startDate') #การบริการทางวิขาการแก่สังคมในตารางผู้ทำวิจัย
+        socialservices2 = SocialService.objects.filter(recorder_id__in=personnel) #โครงการที่เป็นคนบันทึกไว้เอง
+        socialservices = socialservices1.union(socialservices2).order_by('-eduYear', '-eduSemeter', '-startDate')
         socialservices_page = Paginator(socialservices, iterm_per_page)
         count = socialservices.count()
         context = {'personnel': recorder,'socialservices': socialservices_page.page(pageNo), 'count': count}
     elif request.session['userType'] == "Header":
         division = recorder.getHeader().division #หน่วยงานที่เป็นหัวหน้า
         personnels = division.getPersonnels()
-        socialservices1 = SocialService.objects.filter(socialserviceperson__personnel__in=personnels).distinct().order_by('-eduYear', '-eduSemeter') #โครงการในตารางผู้ร่วมโครงการ
+        socialservices1 = SocialService.objects.filter(socialserviceperson__personnel__in=personnels).distinct().order_by('-eduYear', '-eduSemeter', '-startDate') #โครงการในตารางผู้ร่วมโครงการ
         socialservices2 = SocialService.objects.filter(recorder_id=recorder) #โครงการที่เป็นคนบันทึกไว้เอง
-        socialservices =  socialservices1.union(socialservices2).order_by('-eduYear', '-eduSemeter')
+        socialservices =  socialservices1.union(socialservices2).order_by('-eduYear', '-eduSemeter', '-startDate')
         socialservices_page = Paginator(socialservices, iterm_per_page)
         count = socialservices.count()
         context = {'personnel': recorder, 'socialservices': socialservices_page.page(pageNo), 'count': count}
     else: # request.session['userType'] in ['Administrator', 'Staff', 'Manager'] :
-        socialservices = SocialService.objects.all().order_by('-eduYear', '-eduSemeter')
+        socialservices = SocialService.objects.all().order_by('-eduYear', '-eduSemeter','-startDate')
         socialservices_page = Paginator(socialservices, iterm_per_page)
         count = socialservices.count()
         context = {'socialservices': socialservices_page.page(pageNo), 'count': count}
@@ -1706,9 +1710,7 @@ def socialserviceDetail(request, id):
             status = request.POST['status']
             status = status.strip()
             personnelIdList = request.POST.getlist('personnel')
-            #check percent
             numOfSocialService = int(len(personnelIdList))
-
             if str(status).find('หัวหน้าโครงการ') != -1: # ป้อนตำแหน่งหัวหน้าโครงการ
                 if numOfSocialService > 1:
                     messages.add_message(request, messages.WARNING, "ตำแหน่ง/ความรับผิดชอบ หัวหน้าโครงการ มีได้เพียงคนเดียวเท่านั้น ไม่สามารถบันทึกได้")
@@ -1719,14 +1721,13 @@ def socialserviceDetail(request, id):
                     return redirect(request.session['last_url'])
 
             # เช็คคนซ้ำ
-            msg = "นักวิจัยที่เลือกมีรายชื่อปรากฎอยู่ในงานวิจัยนี้อยู่แล้ว :"
+            msg = "ผู้ร่วมบริการที่เลือกมีรายชื่อปรากฎอยู่ในการบริการทางวิขาการแก่สังคมนี้อยู่แล้ว :"
             error = False
             for pid in personnelIdList:
                 person = Personnel.objects.filter(id=pid).first()
                 find = SocialServicePerson.objects.filter(socialservice=socialservice, personnel=person).first()
                 if find is None:
-                    socialservicePerson = SocialServicePerson(socialservice=socialservice, personnel=person, status=status,
-                                                    percent= percent, recorder=recorder)
+                    socialservicePerson = SocialServicePerson(socialservice=socialservice, personnel=person, status=status, recorder=recorder)
                     socialservicePerson.save()
                 else:
                     error = True
@@ -1738,13 +1739,14 @@ def socialserviceDetail(request, id):
                 messages.add_message(request, messages.WARNING, msg + " ["+ status + "]")
     fileForm = SocialServiceFileForm(initial={'socialservice': socialservice, 'filetype': 'Unknow', 'recorder':recorder})
     urlForm = SocialServiceURLForm(initial={'socialservice': socialservice, 'recorder':recorder})
+
     if request.session['userType'] == 'Header':
-        socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, division=recorder.division, initial={'socialservice':socialservice, 'recorder':recorder, 'status':'หัวหน้าโครงการวิจัย',  'percent':100 })
+        socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, division=recorder.division, initial={'socialservice':socialservice, 'recorder':recorder, 'status':'ผู้ร่วมโครงการ'} )
     elif request.session['userType'] == 'Staff':
         socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, division=recorder.division, staff=recorder,
-                                              initial={'socialservice': socialservice, 'recorder': recorder, 'status':'หัวหน้าโครงการวิจัย', 'percent':100  })
+                                              initial={'socialservice': socialservice, 'recorder': recorder, 'status':'ผู้ร่วมโครงการ',})
     else:
-        socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, initial={'socialservice':socialservice, 'recorder':recorder, 'status':'หัวหน้าโครงการวิจัย', 'percent':100 })
+        socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, initial={'socialservice':socialservice, 'recorder':recorder, 'status':'ผู้ร่วมโครงการ',})
 
     context = {'fileForm': fileForm, 'urlForm': urlForm, 'socialservicePersonForm':socialservicePersonForm ,
                'socialservice': socialservice,'personnel':recorder}
@@ -1764,10 +1766,12 @@ def socialserviceNew(request):
         if form.is_valid():
             form.save()
             socialservice = SocialService.objects.last()
-            # if(request.session["userType"]=="Personnel"):
-            #     socialservicePerson = SocialServicePerson(socialservice=socialservice, personnel=recorder, recorder=recorder, percent=socialservice.percent_resp)
-            #     socialservicePerson.save()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลงานวิจัยเรียบร้อย")
+            if (request.session["userType"] == "Personnel"):
+                status = request.POST['status']
+                socialservicePerson = SocialServicePerson(socialservice=socialservice, personnel=recorder, recorder=recorder)
+                socialservicePerson.status = status
+                socialservicePerson.save()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลการบริการทางวิขาการแก่สังคมเรียบร้อย")
             return redirect('socialserviceDetail', id=socialservice.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
@@ -1780,7 +1784,7 @@ def socialserviceNew(request):
         eduSemeter = common.getCurrentEduSemeter()
         currentDate = common.getCurrentDate()
         form = SocialServiceForm(
-            initial={'fiscalYear': fiscalYear,'eduYear':eduYear, 'eduSemeter':eduSemeter, 'startDate':currentDate, 'endDate':currentDate, 'source':university, 'recorder': recorder, 'editor' :recorder })
+            initial={'fiscalYear': fiscalYear,'eduYear':eduYear, 'eduSemeter':eduSemeter, 'startDate':currentDate, 'endDate':currentDate, 'source':university, 'num_receiver':50, 'recorder': recorder, 'editor' :recorder })
         context = {'form': form, 'personnel':recorder}
         return render(request, 'work/socialservice/socialserviceNew.html', context)
 
@@ -1806,7 +1810,7 @@ def socialserviceUpdate(request, id):
             socialservice.editor = recorder
             socialservice.editDate = datetime.datetime.now()
             socialservice.save()
-            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลงานวิจัยเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการบริการทางวิขาการแก่สังคมเรียบร้อย")
             return redirect('socialserviceDetail', id=socialservice.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
@@ -1840,13 +1844,13 @@ def socialserviceDelete(request, id):
             if socialservicePerson.recorder == recorder:
                 complete = True
             else:
-                messages.add_message(request, messages.ERROR, "งานวิจัยที่เลือกมีรายชื่อนักวิจัยอยู่ ไม่สามารถลบได้")
+                messages.add_message(request, messages.ERROR, "การบริการทางวิขาการแก่สังคมที่เลือกมีรายชื่อบุคลากรอยู่ ไม่สามารถลบได้")
         else:
-            messages.add_message(request, messages.ERROR, "งานวิจัยที่เลือกมีรายชื่อนักวิจัยอยู่ ไม่สามารถลบได้")
+            messages.add_message(request, messages.ERROR, "การบริการทางวิขาการแก่สังคมที่เลือกมีรายชื่อบุคลากรอยู่ ไม่สามารถลบได้")
         if complete == False:
             return redirect(request.session['last_url'])
         else:
-            #ลบคน กรณีเป็นเจ้าของงานวิจัย
+            #ลบคน กรณีเป็นเจ้าของการบริการทางวิขาการแก่สังคม
             for socialservicePerson in socialservicePersonnels:
                 socialservicePerson.delete()
             # ลบไฟล์
@@ -1864,7 +1868,7 @@ def socialserviceDelete(request, id):
             for u in urlList:
                 u.delete()
             socialservice.delete()
-            messages.add_message(request, messages.SUCCESS, "ลบข้อมูลงานวิจัยเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "ลบข้อมูลการบริการทางวิขาการแก่สังคมเรียบร้อย")
             return redirect('socialserviceList')
     else:
         form.deleteForm()
@@ -1949,7 +1953,7 @@ def socialserviceDeleteSocialServicePerson(request, id):
     socialservice.editor = recorder
     socialservice.editDate = datetime.datetime.now()
     socialservice.save()
-    messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากงานวิจัยเรียบร้อย")
+    messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากการบริการทางวิขาการแก่สังคมเรียบร้อย")
     return redirect('socialserviceDetail', id=socialservice.id)
 
 @login_required(login_url='userAuthen')
@@ -1975,8 +1979,8 @@ def socialserviceDeleteSocialServicePersonAll(request, id):
         socialservice.editor = personnel
         socialservice.editDate = datetime.datetime.now()
         socialservice.save()
-        messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดที่ผู้ใช้ระบบเคยบันทึกไว้ ออกจากงานวิจัยเรียบร้อย ")
+        messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดที่ผู้ใช้ระบบเคยบันทึกไว้ ออกจากการบริการทางวิขาการแก่สังคมเรียบร้อย ")
     else:
-        messages.add_message(request, messages.WARNING, "ไม่มีบุคลากรรายใดที่ผู้ใช้ระบบได้เคยบันทึกไว้ถูกลบออกจากงานวิจัยนี้")
+        messages.add_message(request, messages.WARNING, "ไม่มีบุคลากรรายใดที่ผู้ใช้ระบบได้เคยบันทึกไว้ถูกลบออกจากการบริการทางวิขาการแก่สังคมนี้")
     return redirect('socialserviceDetail', id=socialservice.id)
 

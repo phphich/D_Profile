@@ -5,7 +5,7 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fas fa-flask"></i> ประวัติการบริการทางวิชาการแก่สังคม </h2>
+                <h2><i class="fas fa-people-carry"></i> ประวัติการบริการทางวิชาการแก่สังคม </h2>
                 <h4> {{ personnel }},  สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
@@ -13,7 +13,7 @@
             </div>
         {% elif request.session.userType == "Header" %}
             <div class="col-10">
-                <h2><i class="fas fa-flask"></i> ประวัติการบริการทางวิชาการแก่สังคมในสาขา/หน่วยงานย่อย </h2>
+                <h2><i class="fas fa-people-carry"></i> ประวัติการบริการทางวิชาการแก่สังคมในสาขา/หน่วยงานย่อย </h2>
                 <h4> {{ personnel }},  สังกัด: {{ personnel.division }} (ทำหน้าที่หัวหน้า:{{ personnel.getHeader.division }}) </h4>
             </div>
             <div class="col-2">

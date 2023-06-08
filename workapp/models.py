@@ -444,6 +444,9 @@ class SocialService(models.Model):
     def __str__(self):
         return self.recorder.status + self.recorder.firstName_th + " " + self.recorder.lastName_th + \
                "  " + self.topic + " : " + self.place + " : " + str(self.startDate) + "-" + str(self.endDate)
+    def getSocialServicePerson(self):
+        personnels = SocialServicePerson.objects.filter(socialservice=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
+        return personnels
     def getRecorder(self):
         return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
     def getEduYearAndSementer(self):
@@ -451,7 +454,12 @@ class SocialService(models.Model):
     def getCountPersonnel(self): #จำนวนคนที่อยู่ในโครงการบริการวิชาการ
         count = SocialServicePerson.objects.filter(socialservice=self).aggregate(count=Count('id'))
         return count['count']
-
+    def getSocialServiceFiles(self):
+        socialserviceFiles = SocialServiceFile.objects.filter(socialservice=self)
+        return socialserviceFiles
+    def getSocialServiceURLs(self):
+        socialserviceURLs = SocialServiceURL.objects.filter(socialservice=self)
+        return socialserviceURLs
     @staticmethod
     def getCountPersonSocialService(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการบริการทางวิชาการ
         countSocialService = SocialService.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
