@@ -1607,3 +1607,376 @@ def researchDeleteResearchPersonAll(request, id):
     else:
         messages.add_message(request, messages.WARNING, "ไม่มีบุคลากรรายใดที่ผู้ใช้ระบบได้เคยบันทึกไว้ถูกลบออกจากงานวิจัยนี้")
     return redirect('researchDetail', id=research.id)
+
+# ***********************************************************
+# CRUD. SocialService
+@login_required(login_url='userAuthen')
+def socialserviceList(request, pageNo=None):
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    personnel = [recorder]
+    if pageNo == None:
+        pageNo = 1
+    if request.session['userType'] == "Personnel":
+        socialservices1 = SocialService.objects.filter(socialserviceperson__personnel=recorder).order_by('-fiscalYear', 'title_th') #งานวิจัยในตารางผู้ทำวิจัย
+        socialservices2 = SocialService.objects.filter(recorder_id__in=personnel) #งานวิจัยที่เป็นคนบันทึกไว้เอง
+        socialservices = socialservices1.union(socialservices2)
+        socialservices_page = Paginator(socialservices, iterm_per_page)
+        count = socialservices.count()
+        context = {'personnel': recorder,'socialservices': socialservices_page.page(pageNo), 'count': count}
+    elif request.session['userType'] == "Header":
+        division = recorder.getHeader().division #หน่วยงานที่เป็นหัวหน้า
+        personnels = division.getPersonnels()
+        socialservices1 = SocialService.objects.filter(socialserviceperson__personnel__in=personnels).distinct().order_by('-eduYear', '-eduSemeter') #โครงการในตารางผู้ร่วมโครงการ
+        socialservices2 = SocialService.objects.filter(recorder_id=recorder) #โครงการที่เป็นคนบันทึกไว้เอง
+        socialservices =  socialservices1.union(socialservices2).order_by('-eduYear', '-eduSemeter')
+        socialservices_page = Paginator(socialservices, iterm_per_page)
+        count = socialservices.count()
+        context = {'personnel': recorder, 'socialservices': socialservices_page.page(pageNo), 'count': count}
+    else: # request.session['userType'] in ['Administrator', 'Staff', 'Manager'] :
+        socialservices = SocialService.objects.all().order_by('-eduYear', '-eduSemeter')
+        socialservices_page = Paginator(socialservices, iterm_per_page)
+        count = socialservices.count()
+        context = {'socialservices': socialservices_page.page(pageNo), 'count': count}
+    return render(request, 'work/socialservice/socialserviceList.html', context)
+
+@login_required(login_url='userAuthen')
+def socialserviceDetail(request, id):
+    socialservice = SocialService.objects.filter(id=id).first()
+    if socialservice is None:
+        messages.add_message(request, messages.ERROR,msgErrorId)
+        return redirect(request.session['last_url'])
+    # getSession(request, dtype='SocialService', did=socialservice.id)
+    # if common.chkPermission(socialserviceDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
+    #     return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
+    if request.method == 'POST':
+        fileForm = SocialServiceFileForm(request.POST, request.FILES)
+        urlForm = SocialServiceURLForm(request.POST)
+        if request.POST['action'] == 'uploadfile':
+            if fileForm.is_valid():
+                files = request.FILES.getlist("file")
+                success = True
+                fileerror = ""
+                for f in files:
+                    filepath = common.fileNameCleansing(f.name)
+                    point = filepath.rfind('.')
+                    ext = filepath[point:]
+                    filenames = filepath.split('/')
+                    filename = 'documents/socialservice/' + filenames[len(filenames) - 1]  # ชื่อไฟล์ที่อัพโหล
+                    lf, created = SocialServiceFile.objects.get_or_create(file=f, socialservice=socialservice, recorder=recorder, filetype=ext[1:])
+                    lf.save()
+                    socialserviceFile = SocialServiceFile.objects.last()
+                    newfilename = '[' + str(socialservice.id) + '_' + str(socialserviceFile.id) + ']-' + filenames[
+                        len(filenames) - 1]  # ชื่อไฟล์ที่ระบบกำหนด
+                    socialserviceFile.file.name = newfilename
+                    socialserviceFile.recorder = recorder
+                    socialserviceFile.save()
+                    try:
+                        os.rename('static/' + filename, 'static/documents/socialservice/' + socialserviceFile.file.name)
+                    except:
+                        fileerror = fileerror + socialserviceFile.file.name + ", "
+                        socialserviceFile.delete()
+                        success = False
+                if success == True:
+                    messages.add_message(request, messages.SUCCESS, "อัพโหลดไฟล์เอกสารเรียบร้อย")
+                else:
+                    messages.add_message(request, messages.WARNING,
+                                         "ไม่สามารถอัพโหลดไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+                socialservice.editor = recorder
+                socialservice.editDate = datetime.datetime.now()
+                socialservice.save()
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+        elif request.POST['action']=='uploadLink':  # upload link
+            if urlForm.is_valid():
+                urlForm.save()
+                socialservice.editor = recorder
+                socialservice.editDate = datetime.datetime.now()
+                socialservice.save()
+                messages.add_message(request, messages.SUCCESS, "บันทึกลิงก์ตำแหน่งไฟล์เอกสารเรียบร้อย")
+            else:
+                messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+        else: # save uploadPersonnel
+            # id = request.POST['socialservice']
+            # socialservice = SocialService.objects.filter(id=id).first()
+            status = request.POST['status']
+            status = status.strip()
+            personnelIdList = request.POST.getlist('personnel')
+            #check percent
+            numOfSocialService = int(len(personnelIdList))
+
+            if str(status).find('หัวหน้าโครงการ') != -1: # ป้อนตำแหน่งหัวหน้าโครงการ
+                if numOfSocialService > 1:
+                    messages.add_message(request, messages.WARNING, "ตำแหน่ง/ความรับผิดชอบ หัวหน้าโครงการ มีได้เพียงคนเดียวเท่านั้น ไม่สามารถบันทึกได้")
+                    return redirect(request.session['last_url'])
+                chkStatus = SocialServicePerson.objects.filter(status__contains='หัวหน้าโครงการ').first() #??????????????
+                if chkStatus is not None:
+                    messages.add_message(request, messages.WARNING, "ตำแหน่ง/ความรับผิดชอบ หัวหน้าโครงการ มีได้เพียงคนเดียวเท่านั้น ไม่สามารถบันทึกได้")
+                    return redirect(request.session['last_url'])
+
+            # เช็คคนซ้ำ
+            msg = "นักวิจัยที่เลือกมีรายชื่อปรากฎอยู่ในงานวิจัยนี้อยู่แล้ว :"
+            error = False
+            for pid in personnelIdList:
+                person = Personnel.objects.filter(id=pid).first()
+                find = SocialServicePerson.objects.filter(socialservice=socialservice, personnel=person).first()
+                if find is None:
+                    socialservicePerson = SocialServicePerson(socialservice=socialservice, personnel=person, status=status,
+                                                    percent= percent, recorder=recorder)
+                    socialservicePerson.save()
+                else:
+                    error = True
+                    msg = msg + str(person)
+            socialservice.editor = recorder
+            socialservice.editDate = datetime.datetime.now()
+            socialservice.save()
+            if error == True:
+                messages.add_message(request, messages.WARNING, msg + " ["+ status + "]")
+    fileForm = SocialServiceFileForm(initial={'socialservice': socialservice, 'filetype': 'Unknow', 'recorder':recorder})
+    urlForm = SocialServiceURLForm(initial={'socialservice': socialservice, 'recorder':recorder})
+    if request.session['userType'] == 'Header':
+        socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, division=recorder.division, initial={'socialservice':socialservice, 'recorder':recorder, 'status':'หัวหน้าโครงการวิจัย',  'percent':100 })
+    elif request.session['userType'] == 'Staff':
+        socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, division=recorder.division, staff=recorder,
+                                              initial={'socialservice': socialservice, 'recorder': recorder, 'status':'หัวหน้าโครงการวิจัย', 'percent':100  })
+    else:
+        socialservicePersonForm = SocialServicePersonForm(socialservice=socialservice, initial={'socialservice':socialservice, 'recorder':recorder, 'status':'หัวหน้าโครงการวิจัย', 'percent':100 })
+
+    context = {'fileForm': fileForm, 'urlForm': urlForm, 'socialservicePersonForm':socialservicePersonForm ,
+               'socialservice': socialservice,'personnel':recorder}
+    return render(request, 'work/socialservice/socialserviceDetail.html', context)
+
+@login_required(login_url='userAuthen')
+def socialserviceNew(request):
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    getSession(request, dtype='SocialService', did=recorder.id)
+    if common.chkPermission(socialserviceNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+
+    if request.method == 'POST':
+        form = SocialServiceForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            socialservice = SocialService.objects.last()
+            # if(request.session["userType"]=="Personnel"):
+            #     socialservicePerson = SocialServicePerson(socialservice=socialservice, personnel=recorder, recorder=recorder, percent=socialservice.percent_resp)
+            #     socialservicePerson.save()
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลงานวิจัยเรียบร้อย")
+            return redirect('socialserviceDetail', id=socialservice.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form}
+            return render(request, 'work/socialservice/socialserviceNew.html', context)
+    else:
+        university = Faculty.objects.all().first().university
+        fiscalYear = common.getCurrentFiscalYear()
+        eduYear = common.getCurrentEduYear()
+        eduSemeter = common.getCurrentEduSemeter()
+        currentDate = common.getCurrentDate()
+        form = SocialServiceForm(
+            initial={'fiscalYear': fiscalYear,'eduYear':eduYear, 'eduSemeter':eduSemeter, 'startDate':currentDate, 'endDate':currentDate, 'source':university, 'recorder': recorder, 'editor' :recorder })
+        context = {'form': form, 'personnel':recorder}
+        return render(request, 'work/socialservice/socialserviceNew.html', context)
+
+@login_required(login_url='userAuthen')
+def socialserviceUpdate(request, id):
+    socialservice = SocialService.objects.filter(id=id).first()
+    if socialservice is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='SocialService', did=socialservice.id)
+    if common.chkPermission(socialserviceUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
+    form = SocialServiceForm(data=request.POST or None, instance=socialservice)
+    if request.method == 'POST':
+        if form.is_valid():
+            updateForm = form.save(commit=False)
+            updateForm.recorder = recorder
+            updateForm.save()
+            socialservice.editor = recorder
+            socialservice.editDate = datetime.datetime.now()
+            socialservice.save()
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลงานวิจัยเรียบร้อย")
+            return redirect('socialserviceDetail', id=socialservice.id)
+        else:
+            messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")
+            context = {'form': form, 'personnel': recorder, 'socialservice':socialservice}
+            return render(request, 'work/socialservice/socialserviceUpdate.html', context)
+    else:
+        context = {'form': form, 'personnel': recorder,'socialservice':socialservice}
+        return render(request, 'work/socialservice/socialserviceUpdate.html', context)
+
+@login_required(login_url='userAuthen')
+def socialserviceDelete(request, id):
+    socialservice = SocialService.objects.filter(id=id).first()
+    if socialservice is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    # getSession(request, dtype='SocialService', did=socialservice.id)
+    # if common.chkPermission(socialserviceDelete.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
+    #     return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+
+    form = SocialServiceForm(data=request.POST or None, instance=socialservice)
+    if request.method == 'POST':
+        socialservicePersonnels = socialservice.getSocialServicePerson()
+        complete = False
+        if len(socialservicePersonnels) == 0:
+            complete = True
+        elif len(socialservicePersonnels) == 1:
+            socialservicePerson = socialservicePersonnels.first()
+            if socialservicePerson.recorder == recorder:
+                complete = True
+            else:
+                messages.add_message(request, messages.ERROR, "งานวิจัยที่เลือกมีรายชื่อนักวิจัยอยู่ ไม่สามารถลบได้")
+        else:
+            messages.add_message(request, messages.ERROR, "งานวิจัยที่เลือกมีรายชื่อนักวิจัยอยู่ ไม่สามารถลบได้")
+        if complete == False:
+            return redirect(request.session['last_url'])
+        else:
+            #ลบคน กรณีเป็นเจ้าของงานวิจัย
+            for socialservicePerson in socialservicePersonnels:
+                socialservicePerson.delete()
+            # ลบไฟล์
+            fileList = SocialServiceFile.objects.filter(socialservice=socialservice)
+            for f in fileList:
+                fname = f.file.name
+                if os.path.exists('static/documents/socialservice/' + fname):
+                    try:
+                        os.remove('static/documents/socialservice/' +fname)  # file exits, delete it
+                    except:
+                        messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
+                    finally:
+                        f.delete()
+            urlList =SocialServiceURL.objects.filter(socialservice=socialservice)
+            for u in urlList:
+                u.delete()
+            socialservice.delete()
+            messages.add_message(request, messages.SUCCESS, "ลบข้อมูลงานวิจัยเรียบร้อย")
+            return redirect('socialserviceList')
+    else:
+        form.deleteForm()
+        context = {'form': form, 'socialservice':socialservice, 'personnel': socialservice.recorder}
+        return render(request, 'work/socialservice/socialserviceDelete.html', context)
+
+@login_required(login_url='userAuthen')
+def socialserviceDeleteFile(request, id):
+    socialserviceFile = SocialServiceFile.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    socialservice = socialserviceFile.socialservice
+    fname = socialserviceFile.file.name
+    if os.path.exists('static/documents/socialservice/' + fname):
+        try:
+            os.remove('static/documents/socialservice/' + fname)  # file exits, delete it
+            messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารที่เลือกเรียบร้อย")
+        except:
+            messages.add_message(request, messages.ERROR, "ไม่สามารถลบไฟล์เอกสารได้")
+    socialserviceFile.delete()
+    socialservice.editor = recorder
+    socialservice.editDate = datetime.datetime.now()
+    socialservice.save()
+    return redirect('socialserviceDetail', id=socialservice.id)
+
+@login_required(login_url='userAuthen')
+def socialserviceDeleteFileAll(request, id):
+    socialservice = SocialService.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    socialserviceFiles = socialservice.getSocialServiceFiles()
+    success = True
+    fileerror = ""
+    for socialserviceFile in socialserviceFiles:
+        fname = socialserviceFile.file.name
+        if os.path.exists('static/documents/socialservice/' + fname):
+            try:
+                os.remove('static/documents/socialservice/' + fname)  # file exits, delete it
+            except:
+                success = False
+                fileerror = fileerror + fname + ", "
+            finally:
+                socialserviceFile.delete()
+    if success == True:
+        messages.add_message(request, messages.SUCCESS, "ลบไฟล์เอกสารทั้งหมดเรียบร้อย")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่สามารถลบไฟล์เอกสารบางไฟล์ได้ [" + fileerror + "]")
+    socialservice.editor = recorder
+    socialservice.editDate = datetime.datetime.now()
+    socialservice.save()
+    return redirect('socialserviceDetail', id=socialservice.id)
+
+@login_required(login_url='userAuthen')
+def socialserviceDeleteURL(request, id):
+    socialserviceURL = SocialServiceURL.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    socialservice = socialserviceURL.socialservice
+    socialserviceURL.delete()
+    socialservice.editor = recorder
+    socialservice.editDate = datetime.datetime.now()
+    socialservice.save()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารที่เลือกเรียบร้อย")
+    return redirect('socialserviceDetail', id=socialservice.id)
+
+@login_required(login_url='userAuthen')
+def socialserviceDeleteURLAll(request, id):
+    socialservice = SocialService.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    socialserviceURLs = socialservice.getSocialServiceURLs()
+    for socialserviceURL in socialserviceURLs:
+        socialserviceURL.delete()
+    socialservice.editor = recorder
+    socialservice.editDate = datetime.datetime.now()
+    socialservice.save()
+    messages.add_message(request, messages.SUCCESS, "ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมดเรียบร้อย")
+    return redirect('socialserviceDetail', id=socialservice.id)
+
+@login_required(login_url='userAuthen')
+def socialserviceDeleteSocialServicePerson(request, id):
+    socialservicePerson = SocialServicePerson.objects.filter(id=id).first()
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    socialservice = socialservicePerson.socialservice
+    socialservicePerson.delete()
+    socialservice.editor = recorder
+    socialservice.editDate = datetime.datetime.now()
+    socialservice.save()
+    messages.add_message(request, messages.SUCCESS, "ลบบุคลากรที่เลือกออกจากงานวิจัยเรียบร้อย")
+    return redirect('socialserviceDetail', id=socialservice.id)
+
+@login_required(login_url='userAuthen')
+def socialserviceDeleteSocialServicePersonAll(request, id):
+    socialservice = SocialService.objects.filter(id=id).first()
+    socialservicePersons = socialservice.getSocialServicePerson()
+    recorder = socialservice.recorder
+    personnel = Personnel.objects.filter(id=request.session['userId']).first()
+    count = 0
+    for socialservicePerson in socialservicePersons:
+        if request.session['userType'] =='Administrator': # Admin ลบได้ทั้งหมดใน SocialServicePerson รวมถึงตัวเอง
+            socialservicePerson.delete()
+            count+=1
+        elif request.session['userType'] =='Staff': # Staff ลบได้ทั้งหมดที่เคยเพิ่มใน SocialServicePerson รวมถึงตัวเอง
+            if socialservicePerson.recorder == personnel:
+                socialservicePerson.delete()
+                count += 1
+        else: # กรณีเป็นเจ้าของเอกสาร Personnel
+            if socialservicePerson.recorder == recorder :
+                socialservicePerson.delete()
+                count += 1
+    if count != 0:
+        socialservice.editor = personnel
+        socialservice.editDate = datetime.datetime.now()
+        socialservice.save()
+        messages.add_message(request, messages.SUCCESS, "ลบรายชื่อบุคลากรทั้งหมดที่ผู้ใช้ระบบเคยบันทึกไว้ ออกจากงานวิจัยเรียบร้อย ")
+    else:
+        messages.add_message(request, messages.WARNING, "ไม่มีบุคลากรรายใดที่ผู้ใช้ระบบได้เคยบันทึกไว้ถูกลบออกจากงานวิจัยนี้")
+    return redirect('socialserviceDetail', id=socialservice.id)
+

@@ -40,7 +40,7 @@
                 <th class="col col-2">
                     {% if request.session.userType in 'Administrator, Staff, Header' or request.session.userId == personnel.id %}
                         <a href="{% url 'researchNew' %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
-                            <i class="fa fa-plus"></i> เพิ่มงานวิจัย </a>
+                            <i class="fa fa-plus"></i> เพิ่มโครงการวิจัย </a>
                     {% endif %}
                 </th>
             </tr>

@@ -103,6 +103,7 @@ class TrainignForm(forms.ModelForm):
         TYPE_CHOICES = (
             ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
             ('งบประมาณรายได้', 'งบประมาณรายได้'),
+            ('งบประมาณภายนอก', 'งบประมาณภายนอก'),
             ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
@@ -202,6 +203,7 @@ class PerformanceForm(forms.ModelForm):
         TYPE_CHOICES = (
             ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
             ('งบประมาณรายได้', 'งบประมาณรายได้'),
+            ('งบประมาณภายนอก', 'งบประมาณภายนอก'),
             ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
@@ -286,129 +288,6 @@ class PerformanceURLForm(forms.ModelForm):
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
             'performance': 'การฝึกอบรม/สัมมนา',
             'recorder':'ผู้บันทึก',
-        }
-
-# +++++++++++++++
-# ฟอร์มการบริการวิชาการแก่สังคม
-class SocialServiceForm(forms.ModelForm):
-    class Meta:
-        SEMETER_CHOICES = (('1', '1'), ('2', '2'), ('3', 'ฤดูร้อน'))
-        TYPE_CHOICES = (
-            ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
-            ('งบประมาณรายได้', 'งบประมาณรายได้'),
-            ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
-            ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
-        )
-        model = SocialService
-        fields = (
-            'startDate', 'endDate', 'days', 'fiscalYear', 'eduYear', 'eduSemeter', 'topic', 'place', 'budget',
-            'budgetType', 'source', 'receiver', 'num_receiver', 'recorder')
-        widgets = {
-            'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date',
-                                                  'onchange': 'javascript:chkDateDiff();'}),
-            'endDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date',
-                                                'onchange': 'javascript:chkDateDiff();'}),
-            'days': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1,
-                                             'onfocusout': 'javascript:chkDays();'}),
-            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'edulYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
-            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'objective': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
-            'place': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0 }),
-            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
-                                                                    'onchange': 'javascript:chkBudgetType();'}),
-            'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'receiver': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'num_receiver': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'startDate': 'วันที่เริ่มต้น',
-            'endDate': 'วันที่สิ้นสุด',
-            'days': 'จำนวนวันที่ลา',
-            'fiscalYear': 'ปีงบประมาณ',
-            'eduYear': 'ปีการศึกษา',
-            'eduSemeter': 'ภาคเรียนที่',
-            'topic': 'เรื่อง',
-            'objective': 'วัตถุประสงค์',
-            'place': 'สถานที่ให้บริการ',
-            'budget': 'งบประมาณ',
-            'budgetType': 'ประเภทงบประมาณ',
-            'source': 'หน่วยงานเจ้าของงบประมาณ',
-            'receiver': 'กลุ่มเป้าหมาย',
-            'num_receiver': 'จำนวนผู้เข้าร่วมโครงการ',
-            'recorder': 'ผู้บันทึก'
-        }
-
-    def deleteForm(self):
-        self.fields['startDate'].widget.attrs['readonly'] = True
-        self.fields['endDate'].widget.attrs['readonly'] = True
-        self.fields['days'].widget.attrs['readonly'] = True
-        self.fields['fiscalYear'].widget.attrs['readonly'] = True
-        self.fields['eduYear'].widget.attrs['readonly'] = True
-        self.fields['eduSemeter'].widget.attrs['readonly'] = True
-        self.fields['topic'].widget.attrs['readonly'] = True
-        self.fields['objective'].widget.attrs['readonly'] = True
-        self.fields['place'].widget.attrs['readonly'] = True
-        self.fields['budget'].widget.attrs['readonly'] = True
-        self.fields['budgetType'].widget.attrs['readonly'] = True
-        self.fields['source'].widget.attrs['readonly'] = True
-        self.fields['receiver'].widget.attrs['readonly'] = True
-        self.fields['num_receiver'].widget.attrs['readonly'] = True
-        self.fields['recorder'].widget.attrs['readonly'] = True
-
-class SocialServiceFileForm(forms.ModelForm):
-    class Meta:
-        model = SocialServiceFile
-        fields = ('file', 'filetype', 'socialservice','recorder')
-        widgets = {
-            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
-                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
-                                           'onchange': 'javascript:updateList();'}),
-            'filetype': forms.HiddenInput(),
-            'socialservice': forms.HiddenInput(),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'file': 'เลือกไฟล์เอกสารแนบ',
-            'filetype': 'ชนิดไฟล์',
-            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
-            'recorder': 'ผู้บันทึก',
-        }
-
-class SocialServiceURLForm(forms.ModelForm):
-    class Meta:
-        model = SocialServiceURL
-        fields = ('url', 'socialservice', 'recorder')
-        widgets = {
-            'url': forms.URLInput(attrs={'class': 'form-control', }),
-            'socialservice': forms.HiddenInput(),
-            'recorder':forms.HiddenInput(),
-        }
-        labels = {
-            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
-            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
-            'recorder': 'ผู้บันทึก',
-        }
-
-class SocialServicePersonForm(forms.ModelForm):
-    class Meta:
-        model = SocialServicePerson
-        fields = ('status', 'socialservice', 'personnel',  'recorder')
-        widgets = {
-            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
-            'socialservice': forms.HiddenInput(),
-            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
-            'recorder': forms.HiddenInput(),
-        }
-        labels = {
-            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
-            'personnel': 'บุคลากร',
-            'status': 'หน้าที่ในโครงการ',
-            'percent': 'สัดส่วนการดำเนินการวิจัย (%)',
-            'recorder': 'ผู้บันทึก',
         }
 
 # +++++++++++++++
@@ -572,6 +451,7 @@ class ResearchForm(forms.ModelForm):
         TYPE_CHOICES = (
             ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
             ('งบประมาณรายได้', 'งบประมาณรายได้'),
+            ('งบประมาณภายนอก', 'งบประมาณภายนอก'),
             ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
@@ -726,3 +606,134 @@ class ResearchPersonForm(forms.ModelForm):
             'recorder': 'ผู้บันทึก',
         }
 
+
+# ฟอร์มการบริการวิชาการแก่สังคม
+class SocialServiceForm(forms.ModelForm):
+    class Meta:
+        SEMETER_CHOICES = ((1, '1'), (2, '2'), (3, 'ฤดูร้อน'))
+        TYPE_CHOICES = (
+            ('งบประมาณแผ่นดิน', 'งบประมาณแผ่นดิน'),
+            ('งบประมาณรายได้', 'งบประมาณรายได้'),
+            ('งบประมาณภายนอก', 'งบประมาณภายนอก'),
+            ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
+            ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
+        )
+        model = SocialService
+        fields = (
+            'fiscalYear', 'eduYear', 'eduSemeter','topic', 'place','receiver', 'num_receiver', 'startDate', 'endDate', 'days', 'budget',
+            'budgetType', 'source', 'recorder','editor')
+        widgets = {
+            'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
+            'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
+            'eduSemeter': forms.Select(choices=SEMETER_CHOICES, attrs={'class': 'form-control'}),
+            'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date',
+                                                  'onchange': 'javascript:chkDateDiff();'}),
+            'endDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date',
+                                                'onchange': 'javascript:chkDateDiff();'}),
+            'days': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1,
+                                             'onfocusout': 'javascript:chkDays();'}),
+            'topic': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'objective': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 5}),
+            'place': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 0}),
+            'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
+                                                                    'onchange': 'javascript:chkBudgetType();'}),
+            'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'receiver': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
+            'num_receiver': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1}),
+            'recorder': forms.HiddenInput(),
+            'editor': forms.HiddenInput(),
+        }
+        labels = {
+            'startDate': 'วันที่เริ่มต้น',
+            'endDate': 'วันที่สิ้นสุด',
+            'days': 'จำนวนวัน',
+            'fiscalYear': 'ปีงบประมาณ',
+            'eduYear': 'ปีการศึกษา',
+            'eduSemeter': 'ภาคเรียนที่',
+            'topic': 'เรื่อง',
+            'objective': 'วัตถุประสงค์',
+            'place': 'สถานที่ให้บริการ',
+            'budget': 'งบประมาณ',
+            'budgetType': 'ประเภทงบประมาณ',
+            'source': 'หน่วยงานเจ้าของงบประมาณ',
+            'receiver': 'กลุ่มผู้รับบริการ',
+            'num_receiver': 'จำนวนผู้เข้าร่วมโครงการ',
+            'recorder': 'ผู้บันทึก',
+            'editor': 'ผู้แก้ไข',
+        }
+
+    def deleteForm(self):
+        self.fields['startDate'].widget.attrs['readonly'] = True
+        self.fields['endDate'].widget.attrs['readonly'] = True
+        self.fields['days'].widget.attrs['readonly'] = True
+        self.fields['fiscalYear'].widget.attrs['readonly'] = True
+        self.fields['eduYear'].widget.attrs['readonly'] = True
+        self.fields['eduSemeter'].widget.attrs['readonly'] = True
+        self.fields['topic'].widget.attrs['readonly'] = True
+        self.fields['objective'].widget.attrs['readonly'] = True
+        self.fields['place'].widget.attrs['readonly'] = True
+        self.fields['budget'].widget.attrs['readonly'] = True
+        self.fields['budgetType'].widget.attrs['readonly'] = True
+        self.fields['source'].widget.attrs['readonly'] = True
+        self.fields['receiver'].widget.attrs['readonly'] = True
+        self.fields['num_receiver'].widget.attrs['readonly'] = True
+        self.fields['recorder'].widget.attrs['readonly'] = True
+        self.fields['editor'].widget.attrs['readonly'] = True
+
+
+class SocialServiceFileForm(forms.ModelForm):
+    class Meta:
+        model = SocialServiceFile
+        fields = ('file', 'filetype', 'socialservice', 'recorder')
+        widgets = {
+            'file': forms.FileInput(attrs={'class': 'form-control', 'multiple': True,
+                                           'accept': 'application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/pdf',
+                                           'onchange': 'javascript:updateList();'}),
+            'filetype': forms.HiddenInput(),
+            'socialservice': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'file': 'เลือกไฟล์เอกสารแนบ',
+            'filetype': 'ชนิดไฟล์',
+            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
+            'recorder': 'ผู้บันทึก',
+        }
+
+
+class SocialServiceURLForm(forms.ModelForm):
+    class Meta:
+        model = SocialServiceURL
+        fields = ('url', 'socialservice', 'recorder')
+        widgets = {
+            'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'socialservice': forms.HiddenInput(),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
+            'recorder': 'ผู้บันทึก',
+        }
+
+
+class SocialServicePersonForm(forms.ModelForm):
+    class Meta:
+        model = SocialServicePerson
+        fields = ('status', 'socialservice', 'personnel', 'recorder')
+        widgets = {
+            'status': forms.TextInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
+            'socialservice': forms.HiddenInput(),
+            'personnel': forms.CheckboxSelectMultiple(attrs={'class': ''}),
+            'recorder': forms.HiddenInput(),
+        }
+        labels = {
+            'socialservice': 'งานบริการทางวิชาการแก่สังคม',
+            'personnel': 'บุคลากร',
+            'status': 'หน้าที่ในโครงการ',
+            'percent': 'สัดส่วนการดำเนินการวิจัย (%)',
+            'recorder': 'ผู้บันทึก',
+        }
+
+# +++++++++++++++

@@ -478,7 +478,7 @@ def personnelNew(request):
             form = PersonnelForm(staffId=request.session['userId'], data=request.POST or None, files=request.FILES)
         passwd = request.POST['passwd']
         confpasswd = request.POST['confpasswd']
-        userType  = request.POST['userType']
+
         if form.is_valid():
             if passwd != confpasswd:
                 messages.add_message(request, messages.WARNING, "กำหนดรหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน!")

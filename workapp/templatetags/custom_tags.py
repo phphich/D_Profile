@@ -33,3 +33,11 @@ def getCountResearchPersonnelDivision(divId, comId):
     personnels= Personnel.objects.filter(division=division)
     count = ResearchPerson.objects.filter(research=research).filter(personnel__in=personnels).aggregate(count=Count('id'))
     return count['count']
+
+@register.filter(name='getCountsocialservicePersonnelDivision')
+def getCountsocialservicePersonnelDivision(divId, socialserviceId):
+    socialservice = SocialService.objects.filter(id=socialserviceId).first()
+    division = Division.objects.filter(id=divId).first()
+    personnels= Personnel.objects.filter(division=division)
+    count = SocialServicePerson.objects.filter(socialservice=socialservice).filter(personnel__in=personnels).aggregate(count=Count('id'))
+    return count['count']

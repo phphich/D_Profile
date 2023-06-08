@@ -231,91 +231,6 @@ class PerformanceURL(models.Model):
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
 
-class SocialService(models.Model):
-    startDate = models.DateField(default=None)
-    endDate = models.DateField(default=None)
-    days = models.IntegerField(default=1)
-    fiscalYear = models.IntegerField(default=0)
-    eduYear = models.IntegerField(default=0)
-    eduSemeter = models.IntegerField(default=0)
-    topic = models.FloatField(default=0.00)
-    objective = models.TextField(default="")
-    place = models.CharField(max_length=255, default="")
-    budget = models.FloatField(default=0.00)
-    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
-    source = models.CharField(max_length=255, default="")
-    receiver = models.CharField(max_length=255, default="")
-    num_receiver = models.IntegerField(default = 0)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialService', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add = True)
-    editor = models.ForeignKey(Personnel, related_name='EditorSocialService', on_delete=models.CASCADE, default=None)
-    editDate = models.DateTimeField(auto_now_add = True)
-    def __str__(self):
-        return self.recorder.status + self.recorder.firstName_th + " " + self.recorder.lastName_th + \
-               "  " + self.topic + " : " + self.place + " : " + str(self.startDate) + "-" + str(self.endDate)
-    def getRecorder(self):
-        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
-    @staticmethod
-    def getCountPersonSocialService(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการบริการทางวิชาการ
-        countSocialService = SocialService.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
-        countSocialServicePerson = SocialServicePerson.objects.filter(Q(personnel=personnel) or Q(recorder=personnel)).count()
-        countSocialServiceFile = SocialServiceFile.objects.filter(recorder=personnel).count()
-        countSocialServiceURL = SocialServiceURL.objects.filter(recorder=personnel).count()
-        countAll = countSocialService + countSocialServicePerson + countSocialServiceFile + countSocialServiceURL
-        return countAll 
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        editor  = Personnel.objects.filter(id=self.editor.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
-        if recorder == editor and recordDate == editDate:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-        elif recorder == editor and recordDate != editDate:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
-                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
-        else:
-            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
-                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
-
-class SocialServicePerson(models.Model):
-    status = models.CharField(max_length=30, default="")
-    socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
-    personnel = models.ForeignKey(Personnel, related_name='PersonnelSocialServicePerson', on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServicePerson', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add = True)
-    def __str__(self):
-        return self.socialservice.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
-               "  " +  " (" + self.status + ")"
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
-
-class SocialServiceFile(models.Model):
-    file = models.FileField(upload_to='static/documents/socialservice', default=None, null=True, blank=True)
-    filetype = models.CharField(max_length=50, default=None)
-    socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServiceFile', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "(" + str(self.socialservice.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
-
-class SocialServiceURL(models.Model):
-    url = models.URLField(max_length=255, default=None)
-    socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServiceURL', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "[" + str(self.socialservice.id) + "_" + str(self.id) + "]_"+ self.url
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
-
 class Command(models.Model):
     comId = models.CharField(max_length=30, default="")
     comDate = models.DateField(default=None)
@@ -500,6 +415,114 @@ class ResearchURL(models.Model):
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return "[" + str(self.research.id) + "_" + str(self.id) + "]_"+ self.url
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+
+
+class SocialService(models.Model):
+    startDate = models.DateField(default=None)
+    endDate = models.DateField(default=None)
+    days = models.IntegerField(default=1)
+    fiscalYear = models.IntegerField(default=0)
+    eduYear = models.IntegerField(default=0)
+    eduSemeter = models.IntegerField(default=0)
+    topic = models.TextField(default="")
+    objective = models.TextField(default="")
+    place = models.CharField(max_length=255, default="")
+    budget = models.FloatField(default=0.00)
+    budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
+    source = models.CharField(max_length=255, default="")
+    receiver = models.CharField(max_length=255, default="")
+    num_receiver = models.IntegerField(default=0)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialService', on_delete=models.CASCADE,
+                                 default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    editor = models.ForeignKey(Personnel, related_name='EditorSocialService', on_delete=models.CASCADE, default=None)
+    editDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.recorder.status + self.recorder.firstName_th + " " + self.recorder.lastName_th + \
+               "  " + self.topic + " : " + self.place + " : " + str(self.startDate) + "-" + str(self.endDate)
+    def getRecorder(self):
+        return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
+    def getEduYearAndSementer(self):
+        return self.eduYear + self.eduSemeter
+    def getCountPersonnel(self): #จำนวนคนที่อยู่ในโครงการบริการวิชาการ
+        count = SocialServicePerson.objects.filter(socialservice=self).aggregate(count=Count('id'))
+        return count['count']
+
+    @staticmethod
+    def getCountPersonSocialService(personnel):  # นับจำนวนครั้งที่บุคลากรรายหนึ่งทำเกี่ยวกับการบริการทางวิชาการ
+        countSocialService = SocialService.objects.filter(Q(recorder=personnel) or Q(editor=personnel)).count()
+        countSocialServicePerson = SocialServicePerson.objects.filter(
+            Q(personnel=personnel) or Q(recorder=personnel)).count()
+        countSocialServiceFile = SocialServiceFile.objects.filter(recorder=personnel).count()
+        countSocialServiceURL = SocialServiceURL.objects.filter(recorder=personnel).count()
+        countAll = countSocialService + countSocialServicePerson + countSocialServiceFile + countSocialServiceURL
+        return countAll
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        editor = Personnel.objects.filter(id=self.editor.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
+        if recorder == editor and recordDate == editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+        elif recorder == editor and recordDate != editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขเมื่อ:' + ' (' + editDate + ')'
+        else:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' (' + editDate + ')'
+
+
+class SocialServicePerson(models.Model):
+    status = models.CharField(max_length=30, default="")
+    socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelSocialServicePerson', on_delete=models.CASCADE,
+                                  default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServicePerson', on_delete=models.CASCADE,
+                                 default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.socialservice.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+               "  " + " (" + self.status + ")"
+
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+
+
+class SocialServiceFile(models.Model):
+    file = models.FileField(upload_to='static/documents/socialservice', default=None, null=True, blank=True)
+    filetype = models.CharField(max_length=50, default=None)
+    socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServiceFile', on_delete=models.CASCADE,
+                                 default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "(" + str(self.socialservice.id) + "_" + str(
+            self.id) + ") filename: " + self.file.name + ", filetype: " + self.filetype
+
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + ')'
+
+
+class SocialServiceURL(models.Model):
+    url = models.URLField(max_length=255, default=None)
+    socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServiceURL', on_delete=models.CASCADE,
+                                 default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "[" + str(self.socialservice.id) + "_" + str(self.id) + "]_" + self.url
+
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')

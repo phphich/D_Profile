@@ -5,7 +5,7 @@
     <div class="row">
         {% if request.session.userType == "Personnel" %}
             <div class="col-10">
-                <h2><i class="fas fa-clipboard-list"></i></i> ประวัติการรับคำสั่ง </h2>
+                <h2><i class="fas fa-flask"></i> ประวัติการบริการทางวิชาการแก่สังคม </h2>
                 <h4> {{ personnel }},  สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
@@ -13,16 +13,15 @@
             </div>
         {% elif request.session.userType == "Header" %}
             <div class="col-10">
-                <h2><i class="fas fa-clipboard-list"></i> ประวัติการรับคำสั่งในสาขา/หน่วยงานย่อย </h2>
+                <h2><i class="fas fa-flask"></i> ประวัติการบริการทางวิชาการแก่สังคมในสาขา/หน่วยงานย่อย </h2>
                 <h4> {{ personnel }},  สังกัด: {{ personnel.division }} (ทำหน้าที่หัวหน้า:{{ personnel.getHeader.division }}) </h4>
             </div>
             <div class="col-2">
                 <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"  class="rounded-circle">
             </div>
-
         {% else %}
             <div class="col-12">
-            <h2><i class="fas fa-clipboard-list"></i> คำสั่ง </h2>
+            <h2><i class="fas fa-flask"></i>ประวัติการบริการทางวิชาการแก่สังคม </h2>
         </div>
         {% endif %}
     </div>
@@ -31,61 +30,66 @@
             <tr class="text-primary">
                 <th class="col-1 text-center">ปีการศึกษา</th>
                 <th class="col-1 text-center">ภาคเรียนที่ </th>
-                <th class="col-1 text-center">เลขที่คำสั่ง</th>
-                <th class="col-5">เรื่อง</th>
-                <th class="text-center col-1">บุคลากรในคำสั่ง (ราย)</th>
+                <th class="col-3">ชื่อโครงการ</th>
+                <th class="col-3">สถานที่ </th>
+                <th class="col-1 text-center">ผู้รับบริการ (คน)</th>
+                {% if request.session.userType != 'Header' %}
+                    <th class="text-center col-1">จำนวนบุคลากร</th>
+                {% else %}
+                    <th class="text-center col-1">บุคลากรสาขา/รวม</th>
+                {% endif %}
                 <th class="col col-2">
                     {% if request.session.userType in 'Administrator, Staff, Header' or request.session.userId == personnel.id %}
-                        <a href="{% url 'commandNew' %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
-                            <i class="fa fa-plus"></i> เพิ่มคำสั่ง </a>
+                        <a href="{% url 'socialserviceNew' %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
+                            <i class="fa fa-plus"></i> เพิ่มโครงการบริการฯ </a>
                     {% endif %}
                 </th>
             </tr>
             {% groupValue "" as nYear %}
-            {% for command in commands  %}
-                 <tr class="text-dark" onclick="location.href='{% url 'commandDetail' command.id %}'" style="cursor: pointer">
-                     {% if nYear != command.getEduYearAndSementer %}
+            {% for socialservice in socialservices  %}
+                 <tr class="text-dark" onclick="location.href='{% url 'socialserviceDetail' socialservice.id %}'" style="cursor: pointer">
+                     {% if nYear != socialservice.getEduYearAndSementer %}
                          <td class="text-center">
-                            {% groupValue command.getEduYearAndSementer as nYear %}
+                            {% groupValue socialservice.getEduYearAndSementer as nYear %}
                             {{ nYear }}
                         </td>
-                        <td class="text-center">{{ command.eduSemeter }}</td>
+                        <td class="text-center">{{ socialservice.eduSemeter }}</td>
                      {% else %}
                          <td> </td>
                          <td> </td>
                      {% endif %}
-                    <td class="text-center">{{ command.comId }}</td>
-                    <td>{{ command.topic | slice:"0,100" }}
-                        <i class="text-dark" style="font-size: small";>({{ command.recordDate|date:"d/m/Y" }})</i>
-                    </td>
+                    <td>  {{ socialservice.topic | slice:"0,100" }} </td>
+                    <td>  {{ socialservice.place | slice:"0,100" }} </td>
+                    <td class="text-center">{{ socialservice.num_receiver}} </td>
                     <td class="text-center">
                          {% if request.session.userType == 'Header' %}
-                            {{ personnel.getHeader.division.id|getCountCommandPersonnelDivision:command.id }}/
+                            {{ personnel.getHeader.division.id|getCountsocialservicePersonnelDivision:socialservice.id }}/
                         {% endif %}
-                        {{ command.getCountPersonnel }}
+                        {{ socialservice.getCountPersonnel }}
                     </td>
                     <td class="text-center">
-                        {% if request.session.userType == 'Administrator' or request.session.userId == command.recorder.id %}
-                            {% if request.session.userId == command.recorder.id and command.recordDate|getTimeUpdate == False %}
+                        {% if request.session.userType == 'Administrator' or request.session.userId == socialservice.recorder.id %}
+                            {% if request.session.userId == socialservice.recorder.id and socialservice.recordDate|getTimeUpdate == False %}
                                 <button class="btn btn-secondary" disabled> <i class="fas fa-file-archive"></i> </button>
+                                <i class="text-dark" style="font-size: small";>({{ socialservice.recordDate|date:"d/m/Y" }})</i>
                             {% else %}
-                                <a href="{% url 'commandUpdate' command.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
-                                <a href="{% url 'commandDelete' command.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                                <a href="{% url 'socialserviceUpdate' socialservice.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
+                                <a href="{% url 'socialserviceDelete' socialservice.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
                             {% endif %}
                         {% elif request.session.userType == 'Staff' %}
-                            {% if command.recordDate|getTimeUpdate == False %}
+                            {% if socialservice.recordDate|getTimeUpdate == False %}
                                 <button class="btn btn-secondary" disabled> <i class="fas fa-file-archive"></i> </button>
-                            {% elif request.session.userId == command.recorder.id %}
-                                <a href="{% url 'commandUpdate' command.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
-                                <a href="{% url 'commandDelete' command.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                            {% elif request.session.userId == socialservice.recorder.id %}
+                                <a href="{% url 'socialserviceUpdate' socialservice.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
+                                <a href="{% url 'socialserviceDelete' socialservice.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
                             {% else %}
-                                <i style="font-style: italic;font-size: small">โดย{{ command.recorder }} </i>
+                                <i style="font-style: italic;font-size: small">โดย{{ socialservice.recorder }} </i>
                             {% endif %}
                         {% else %}
-                            {% if  command.recordDate|getTimeUpdate == False %}
+                            {% if  socialservice.recordDate|getTimeUpdate == False %}
                                 <button class="btn btn-secondary" disabled> <i class="fas fa-file-archive"></i> </button>
                             {% else %}
-                                <i style="font-style: italic;font-size: small">โดย{{ command.recorder }} </i>
+                                <i style="font-style: italic;font-size: small">โดย{{ socialservice.recorder }} </i>
                             {% endif %}
                         {% endif %}
                     </td>
@@ -94,45 +98,45 @@
 
      </table>
     
-     {% if commands.has_other_pages %}
+     {% if socialservices.has_other_pages %}
          <div class="row">
              <div class="col-12 text-center ">
                  <div class="btn-group text-center" role="group" aria-label="Item pagination">
-                     {% if commands.has_previous %}
+                     {% if socialservices.has_previous %}
                          {% if request.session.userType != "Personnel" %}
-                            <a href="{% url 'commandList' commands.previous_page_number %}"
+                            <a href="{% url 'socialserviceList' socialservices.previous_page_number %}"
                                 class="btn btn-outline-primary">&laquo;</a>
                          {% else %}
-                             <a href="{% url 'commandList' personnel.id commands.previous_page_number %}"
+                             <a href="{% url 'socialserviceList' personnel.id socialservices.previous_page_number %}"
                                 class="btn btn-outline-primary">&raquo;</a>
                          {% endif %}
                      {% endif %}
 
-                     {% for page_number in commands.paginator.page_range %}
-                         {% if commands.number == page_number %}
+                     {% for page_number in socialservices.paginator.page_range %}
+                         {% if socialservices.number == page_number %}
                              <button class="btn btn-outline-primary active">
                                  <span>{{ page_number }} <span class="sr-only">(current)</span></span>
                              </button>
                          {% else %}
                              {% if request.session.userType != "Personnel" %}
-                                 <a href="{% url 'commandList' page_number %}"
+                                 <a href="{% url 'socialserviceList' page_number %}"
                                     class="btn btn-outline-primary">
                                      {{ page_number }}
                                  </a>
                              {% else %}
-                                 <a href="{% url 'commandList' personnel.id page_number %}" class="btn btn-outline-primary">
+                                 <a href="{% url 'socialserviceList' personnel.id page_number %}" class="btn btn-outline-primary">
                                      {{ page_number }}
                                  </a>
                              {% endif %}
                          {% endif %}
                      {% endfor %}
 
-                     {% if commands.has_next %}
+                     {% if socialservices.has_next %}
                          {% if request.session.userType != "Personnel" %}
-                             <a href="{% url 'commandList'  commands.next_page_number %}"
+                             <a href="{% url 'socialserviceList'  socialservices.next_page_number %}"
                                 class="btn btn-outline-primary">&raquo;</a>
                          {% else %}
-                             <a href="{% url 'commandList' personnel.id commands.next_page_number %}"
+                             <a href="{% url 'socialserviceList' personnel.id socialservices.next_page_number %}"
                                 class="btn btn-outline-primary">&raquo;</a>
                          {% endif %}
                      {% endif %}

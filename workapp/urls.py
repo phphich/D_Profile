@@ -74,5 +74,20 @@ urlpatterns = [
     path('<id>/researchDeleteResearchPersonAll', views.researchDeleteResearchPersonAll,
          name='researchDeleteResearchPersonAll'),
 
+    # บริการทางวิชาการแก่สังคม 
+    path('socialserviceList', views.socialserviceList, name='socialserviceList'),
+    path('<pageNo>/socialserviceList', views.socialserviceList, name='socialserviceList'),
+    path('<id>/socialserviceDetail', views.socialserviceDetail, name='socialserviceDetail'),
+    path('socialserviceNew', views.socialserviceNew, name='socialserviceNew'),
+    path('<id>/socialserviceUpdate', views.socialserviceUpdate, name='socialserviceUpdate'),
+    path('<id>/socialserviceDelete', views.socialserviceDelete, name='socialserviceDelete'),
+    path('<id>/socialserviceDeleteFile', views.socialserviceDeleteFile, name='socialserviceDeleteFile'),
+    path('<id>/socialserviceDeleteFileAll', views.socialserviceDeleteFileAll, name='socialserviceDeleteFileAll'),
+    path('<id>/socialserviceDeleteURL', views.socialserviceDeleteURL, name='socialserviceDeleteURL'),
+    path('<id>/socialserviceDeleteURLAll', views.socialserviceDeleteURLAll, name='socialserviceDeleteURLAll'),
+    path('<id>/socialserviceDeleteSocialServicePerson', views.socialserviceDeleteSocialServicePerson, name='socialerviceDeleteSocialServicePerson'),
+    path('<id>/socialserviceDeleteSocialServicePersonAll', views.socialserviceDeleteSocialServicePerson,
+         name='socialserviceDeleteSocialServicePersonAll'),
+
 ]
 
