@@ -2,12 +2,44 @@
 {% load static %}
 {% block content %}
     <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลบุคลากร </h2>
-    {% if chart is not None %}
+    <div class="row">
+        <div class="col-3">
+            <label class="text-success" for="id_reportType">เลือกรูปแบบรายงานที่ต้องการ =>  </label>
+        </div>
+        {% if reportType == 'dashboard' %}
+            <div class="col-2">
+                <a href="{% url 'personnelReport' 'dashboard' %}" class="btn btn-success" style="width: 100%">
+                    <i class="fas fa-chart-area text-white"></i> Dashboard <i class="fas fa-check"></i>
+                </a>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'personnelReport' 'table' %}" class="btn btn-secondary" style="width: 100%">
+                    <i class="fas fa-table text-white"></i> Table
+                </a>
+            </div>
+        {% else %}
+            <div class="col-2">
+                <a href="{% url 'personnelReport' 'dashboard' %}" class="btn btn-secondary" style="width: 100%">
+                    <i class="fas fa-chart-area text-white"></i> Dashboard
+                </a>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'personnelReport' 'table' %}" class="btn btn-success" style="width: 100%">
+                    <i class="fas fa-table text-white"></i> Table <i class="fas fa-check"></i>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    {# ************************ Table *****************************#}
+    <hr class="text-primary">
+    <br>
+    {% if reportType == 'table' %}
         <div class="row">
             <div class="col-1"></div>
-            <div class="col-4">
-                <table class="table table-info table-bordered">
-                    <tr>
+            <div class="col-5">
+                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามสาขา: </label>
+                <table class="table table-bordered text-primary" style="width: 100%">
+                    <tr class="bg-primary" style="b-color: #0a53be;color: white">
                         <th class="text-center">สาขา</th>
                         <th class="text-center">จำนวนบุคลากร</th>
                     </tr>
@@ -19,74 +51,109 @@
                     {% endfor %}
                     <tr>
                         <td class="text-center">รวม</td>
-                        <td>{{ count }}</td>
+                        <td class="text-center">{{ count }}</td>
                     </tr>
-
                 </table>
             </div>
-
-            <div class="col-2"></div>
-            <div class="col-3">
-                <table class="table table-info table-bordered">
-                    <tr>
+            <div class="col-1"></div>
+            <div class="col-4">
+                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามระดับการศึกษา: </label>
+                <table class="table table-bordered text-primary" style="width: 100%">
+                    <tr class="bg-primary text-white">
                     {% for col in dataFrameEdu.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
                     {% for index, row in dataFrameEdu.iterrows %}
                         <tr>
-                            <td>{{ row.level }}</td>
-                            <td class="text-center">{{ row.count }}</td>
+                            <td>{{ row.Level }}</td>
+                            <td class="text-center">{{ row.Count }}</td>
                         </tr>
                     {% endfor %}
-
                     <tr>
                         <td class="text-center">รวม</td>
-                        <td>{{ count }}</td>
+                        <td class="text-center">{{ count }}</td>
                     </tr>
                 </table>
             </div>
             <div class="col-1"></div>
         </div>
-        <br>
 
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-5">
+                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามตำแหน่งทางวิชาการ: </label>
+                <table class="table table-bordered text-primary" style="width: 100%">
+                    <tr class="bg-primary text-white" >
+                    {% for col in dataFrameStatus.columns %}
+                        <th class="text-center">{{ col }}</th>
+                    {% endfor %}
+                    </tr>
+                    {% for index, row in dataFrameStatus.iterrows %}
+                        <tr>
+                            <td>{{ row.Status }}</td>
+                            <td class="text-center">{{ row.Count }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-center">รวม</td>
+                        <td class="text-center">{{ count }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-4">
+                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามเพศ: </label>
+                <table class="table table-bordered text-primary" style="width: 100%">
+                    <tr class="bg-primary text-white" >
+                    {% for col in dataFrameGender.columns %}
+                        <th class="text-center">{{ col }}</th>
+                    {% endfor %}
+                    </tr>
+                    {% for index, row in dataFrameGender.iterrows %}
+                        <tr>
+                            <td>{{ row.Gender }}</td>
+                            <td class="text-center">{{ row.Count }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    <tr>
+                        <td class="text-center">รวม</td>
+                        <td class="text-center">{{ count }}</td>
+                    </tr>
+                </table>
+
+            </div>
+            <div class="col-1"></div>
+        </div>
+        <br><br>
+    {% else %}
+        {# ************************ Dashboard *****************************#}
         <div class="row text-center align-content-center">
             <div class="col-1"></div>
-{#            <div class="col-md-2 text-center" style="alignment: center; vertical-align: middle">#}
-{#                <div class="row">#}
-{#                    <div class="card" style="width: 10rem;alignment: center">#}
-{#                        <div>#}
-{#                            <div class="card-body" style="background-color: #bfe2e9">#}
-{#                                <p class="card-text text-success" style="font-size:50px;"><strong> {{ count }} </strong>#}
-{#                                </p>#}
-{#                                <span class="badge bg-info">#}
-{#                                <img class="card-img-top" style="width: 50px; height: 50px; align:center"#}
-{#                                     src="{% static 'images/iconfiles/male.png' %}" alt="Male Personnel">#}
-{#                                <strong class="badge bg-light text-danger"#}
-{#                                        style="font-size:15pt;"> {{ countmale }} </strong> <br>#}
-{#                            </span> <br> <br>#}
-{#                                <span class="badge bg-warning">#}
-{#                                <img class="card-img-top" style="width: 50px; height: 50px; align:center"#}
-{#                                     src="{% static 'images/iconfiles/female.png' %}" alt="Female Personnel">#}
-{#                                <strong class="badge bg-light text-danger"#}
-{#                                        style="font-size:15pt;"> {{ countfemale }} </strong> <br>#}
-{#                            </span>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-
             <div class="col-md-4 text-center" style="alignment: center">
                 {{ chart | safe }}
             </div>
-            <div class="col-md-2"></div>
+            <div class="col-md-1"></div>
             <div class="col-md-4 text-center" style="alignment: center">
                 {{ chartEdu | safe }}
             </div>
-
             <div class="col-md-1"></div>
         </div>
+        <BR>
+        <div class="row text-center align-content-center">
+            <div class="col-1"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartStatus | safe }}
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartGender | safe }}
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <br><br>
+        <m style="color: #aeccf8"></m>
     {% endif %}
 
 {% endblock %}

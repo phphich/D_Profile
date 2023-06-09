@@ -415,28 +415,13 @@ def personnelList(request, pageNo=None, divId=None):
     onlyStaff = False
     if 'userType' not in request.session or request.session['userType'] != 'Staff':
         divisions = Division.objects.all().order_by('name_th')
-        listDivName = []
-        listDivCountPersonnel=[]
         if division is None:
             personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
-            for div in divisions:
-                listDivName.append(div.name_th)
-                listDivCountPersonnel.append(div.getCountPersonnel())
         else:
             personnels = division.getPersonnels()
-            listDivName.append(division.name_th)
-            listDivCountPersonnel.append(division.getCountPersonnel())
-        dataFrame = pd.DataFrame({'สาขา': listDivName, 'จำนวน': listDivCountPersonnel}, columns=['สาขา', 'จำนวน'])
-        fig = px.bar(dataFrame, x='สาขา', y='จำนวน', title='จำนวนบุคลากรแยกตามสาขา')
-        fig.update_layout(autosize=False, width=600, height=400,
-                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
-                          paper_bgcolor="aliceblue")
-        chart = fig.to_html()
         personnels_page = Paginator(personnels, iterm_per_page)
         count = personnels.count()
-        cm = personnels.filter(gender='ชาย').count()
-        cfm = personnels.filter(gender='หญิง').count()
-        context = {'divisions':divisions, 'division':division, 'personnels': personnels_page.page(pageNo), 'chart':chart, 'count':count, 'countmale':cm, 'countfemale':cfm}
+        context = {'divisions':divisions, 'division':division, 'personnels': personnels_page.page(pageNo), 'count':count,}
     else:
         recorder = Personnel.objects.filter(id=request.session['userId']).first()
         divisions = recorder.getDivisionResponsible()
@@ -445,7 +430,6 @@ def personnelList(request, pageNo=None, divId=None):
             onlyStaff = True
             divisions.append(recorder.division)
         personnels = Personnel.objects.filter(division__in=divisions)
-        # personnels = Responsible.getPersonnelResponsibles(request.session['userId']).order_by('division__personnel__firstname_th','division__personnel__lastname_th') #เฉพาะรายชื่อบุคลากรที่รับผิดชอบข้อมูลให้
         personnels_page = Paginator(personnels, iterm_per_page)
         count = personnels.count()
         context = {'personnels': personnels_page.page(pageNo), 'count': count, 'onlyStaff':onlyStaff, 'recorder':recorder }
@@ -1191,54 +1175,4 @@ def managerDelete(request,id):
     user.groups.add(pgroup)
     messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลผู้บริหารที่เลือกเรียบร้อย')
     return redirect('managerList')
-
-# ******************** Report personnel ***********************
-
-def personnelReport(request):
-    divisions = Division.objects.all().order_by('name_th')
-    if divisions is None:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
-        return redirect(request.session['last_url'])
-    request.session['last_url'] = request.path_info
-    listDivName = []
-    listDivCountPersonnel = []
-    personnels = Personnel.objects.all().order_by('division__name_th', 'firstname_th', 'lastname_th')
-    for div in divisions:
-        listDivName.append(div.name_th)
-        listDivCountPersonnel.append(div.getCountPersonnel())
-    dataFrame = pd.DataFrame({'สาขา': listDivName, 'จำนวน': listDivCountPersonnel}, columns=['สาขา', 'จำนวน'])
-    fig = px.bar(dataFrame, x='สาขา', y='จำนวน', title='จำนวนบุคลากรแยกตามสาขา')
-    fig.update_layout(autosize=False, width=600, height=400,
-                      margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
-                      paper_bgcolor="aliceblue")
-    chart = fig.to_html()
-    count = personnels.count()
-    cm = personnels.filter(gender='ชาย').count()
-    cfm = personnels.filter(gender='หญิง').count()
-
-    levels = Education.objects.all().values('level').distinct()
-    educations = []
-    for l in levels:
-        educations.append(l['level'])
-    educations.append('ไม่ระบุ')
-
-    educationSet = []
-    educationCount = []
-    for personnel in personnels:
-        educationSet.append(personnel.getHighestEducation())
-
-    for education in educations:
-        countlevel = educationSet.count(education)
-        educationCount.append(countlevel)
-    dataFrameEdu=pd.DataFrame({'level':educations, 'count':educationCount},columns=['level', 'count'] )
-
-    figEdu = px.pie(dataFrameEdu, names='level', values='count', title='จำนวนบุคลากรแยกตามระดับการศึกษา')
-    figEdu.update_layout(autosize=False, width=500, height=400,
-                      margin=dict(l=10, r=10, b=10, t=50, pad=5, ),
-                      paper_bgcolor="aliceblue")
-    chartEdu = figEdu.to_html()
-
-
-    context = {'divisions': divisions, 'dataFrameEdu': dataFrameEdu,'chart': chart, 'chartEdu': chartEdu, 'count': count, 'countmale': cm, 'countfemale': cfm}
-    return render(request, 'report/personnelReport.html', context)
 

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'baseapp.apps.BaseappConfig',
     'workapp.apps.WorkappConfig',
+    'reportapp.apps.ReportappConfig',
     'fontawesome_6',
 ]
 

@@ -52,8 +52,5 @@ urlpatterns = [
     path('managerList', views.managerList, name='managerList'),
     path('<id>/managerDelete', views.managerDelete, name='managerDelete'),
 
-    # report **************
-    path('personnelReport', views.personnelReport, name='personnelReport'),
-    
 
 ]

@@ -36,5 +36,5 @@ urlpatterns = [
     path('objective', baseapp.views.objective, name='objective'),
     path('baseapp/', include('baseapp.urls')),
     path('workapp/', include('workapp.urls')),
-
+    path('reportapp/', include('reportapp.urls')),
 ]

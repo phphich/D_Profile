@@ -1616,6 +1616,8 @@ def researchDeleteResearchPersonAll(request, id):
 # CRUD. SocialService
 @login_required(login_url='userAuthen')
 def socialserviceList(request, pageNo=None):
+
+
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     personnel = [recorder]
@@ -1650,10 +1652,10 @@ def socialserviceDetail(request, id):
     if socialservice is None:
         messages.add_message(request, messages.ERROR,msgErrorId)
         return redirect(request.session['last_url'])
-    # getSession(request, dtype='SocialService', did=socialservice.id)
-    # if common.chkPermission(socialserviceDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
-    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
-    #     return redirect(request.session['last_url'])
+    getSession(request, dtype='SocialService', did=socialservice.id)
+    if common.chkPermission(socialserviceDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
 
