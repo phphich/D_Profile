@@ -10,10 +10,10 @@ class LeaveForm(forms.ModelForm):
             ("ลากิจส่วนตัว", "ลากิจส่วนตัว"),
             ("ลาพักผ่อนประจำปี", "ลาพักผ่อนประจำปี"),
             ("ลาคลอดบุตร", "ลาคลอดบุตร"),
-            ("ไปช่วยเหลือภริยาที่คลอดบุตร", "ไปช่วยเหลือภริยาที่คลอดบุตร"),
+            ("ลาไปช่วยเหลือภริยาที่คลอดบุตร", "ลาไปช่วยเหลือภริยาที่คลอดบุตร"),
             ("ลาอุปสมบทหรือการลาไปประกอบพิธีฮัจย์", "ลาอุปสมบทหรือการลาไปประกอบพิธีฮัจย์"),
             ("ลาเข้ารับการตรวจเลือกหรือเข้ารับการเตรียมพล", "ลาเข้ารับการตรวจเลือกหรือเข้ารับการเตรียมพล"),
-            ("การลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน", "การลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน"),
+            ("ลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน", "ลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน"),
             ("ลาไปปฏิบัติงานในองค์กรระหว่างประเทศ", "ลาไปปฏิบัติงานในองค์กรระหว่างประเทศ")
         )
         model = Leave
@@ -84,14 +84,16 @@ class LeaveFileForm(forms.ModelForm):
 class LeaveURLForm(forms.ModelForm):
     class Meta:
         model = LeaveURL
-        fields = ('url', 'leave', 'recorder')
+        fields = ('url','description', 'leave', 'recorder')
         widgets = {
             'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'description': forms.TextInput(attrs={'class': 'form-control', }),
             'leave': forms.HiddenInput(),
             'recorder':forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'description': 'คำอธิบายลิงก์ ',
             'leave': 'ใบลา',
             'recorder': 'ผู้บันทึก',
         }
@@ -184,14 +186,16 @@ class TrainingFileForm(forms.ModelForm):
 class TrainingURLForm(forms.ModelForm):
     class Meta:
         model = TrainingURL
-        fields = ('url', 'training', 'recorder')
+        fields = ('url','description', 'training', 'recorder')
         widgets = {
             'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'description': forms.TextInput(attrs={'class': 'form-control', }),
             'training': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'description': 'คำอธิบายลิงก์ ',
             'training': 'การฝึกอบรม/สัมมนา',
             'recorder': 'ผู้บันทึก',
         }
@@ -278,14 +282,16 @@ class PerformanceFileForm(forms.ModelForm):
 class PerformanceURLForm(forms.ModelForm):
     class Meta:
         model = PerformanceURL
-        fields = ('url', 'performance','recorder')
+        fields = ('url','description', 'performance','recorder')
         widgets = {
             'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'description': forms.TextInput(attrs={'class': 'form-control', }),
             'performance': forms.HiddenInput(),
             'recorder':forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'description': 'คำอธิบายลิงก์ ',
             'performance': 'การฝึกอบรม/สัมมนา',
             'recorder':'ผู้บันทึก',
         }
@@ -297,8 +303,8 @@ class CommandForm(forms.ModelForm):
         MISSION_CHOICES = (
             ("การจัดการเรียนการสอน", "การจัดการเรียนการสอน"),
             ("การวิจัย", "การวิจัย"),
-            ("บริการทางวิชาการแก่สังคม", "บริการทางวิชาการแก่สังคม"),
-            ("ทำนุบำรุงศิลปวัฒนธรรม", "การทำนุบำรุงศิลปวัฒนธรรม"),
+            ("การบริการทางวิชาการแก่สังคม", "การบริการทางวิชาการแก่สังคม"),
+            ("การทำนุบำรุงศิลปวัฒนธรรม", "การทำนุบำรุงศิลปวัฒนธรรม"),
             ("สนองโครงการอันเนื่องมาจากพระราชดำริ", "สนองโครงการอันเนื่องมาจากพระราชดำริ"),
             ("งานอื่น ๆ ที่ได้รับมอบหมาย", "งานอื่น ๆ ที่ได้รับมอบหมาย"),
         )
@@ -365,14 +371,16 @@ class CommandFileForm(forms.ModelForm):
 class CommandURLForm(forms.ModelForm):
     class Meta:
         model = CommandURL
-        fields = ('url', 'command', 'recorder')
+        fields = ('url','description', 'command', 'recorder')
         widgets = {
             'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'description': forms.TextInput(attrs={'class': 'form-control', }),
             'command': forms.HiddenInput(),
             'recorder':forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'description': 'คำอธิบายลิงก์ ',
             'command': 'คำสั่ง',
             'recorder': 'ผู้บันทึก',
         }
@@ -526,14 +534,16 @@ class ResearchFileForm(forms.ModelForm):
 class ResearchURLForm(forms.ModelForm):
     class Meta:
         model = ResearchURL
-        fields = ('url', 'research', 'recorder')
+        fields = ('url', 'description', 'research', 'recorder')
         widgets = {
             'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'description': forms.TextInput(attrs={'class': 'form-control', }),
             'research': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'description': 'คำอธิบายลิงก์ ',
             'research': 'งานวิจัย',
             'recorder': 'ผู้บันทึก',
         }
@@ -706,14 +716,16 @@ class SocialServiceFileForm(forms.ModelForm):
 class SocialServiceURLForm(forms.ModelForm):
     class Meta:
         model = SocialServiceURL
-        fields = ('url', 'socialservice', 'recorder')
+        fields = ('url', 'description', 'socialservice', 'recorder')
         widgets = {
             'url': forms.URLInput(attrs={'class': 'form-control', }),
+            'description': forms.TextInput(attrs={'class': 'form-control', }),
             'socialservice': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
         }
         labels = {
             'url': 'ลิงก์ตำแหน่งไฟล์เอกสาร',
+            'description': 'คำอธิบายลิงก์ ',
             'socialservice': 'งานบริการทางวิชาการแก่สังคม',
             'recorder': 'ผู้บันทึก',
         }

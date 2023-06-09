@@ -17,7 +17,7 @@
                                 <label for="id_divId" class="text-success">เลือกสาขา/หน่วยงานย่อย:</label>
                                 <select name="divId" class="form-control text-success" id="id_divId"
                                         onchange="form.submit();">
-                                    {% if divId == "0" %}
+                                    {% if division is None %}
                                         <option value="0" selected> (ทั้งหมด) </option>
                                     {% else %}
                                         <option value="0"> (ทั้งหมด) </option>

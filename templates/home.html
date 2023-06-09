@@ -6,138 +6,62 @@
         <div class="mt-4 p-5 text-white rounded text-end" style="background-color: #b6d4fe">
             <div class="row">
                 <div class="col-2">
-                    <img src="{% static 'images/iconfiles/dprofile.png' %}">
+                    <img src="{% static 'images/iconfiles/pdps_folder.png' %}" width="150px" height="auto">
                 </div>
                 <div class="col-10">
-                    <h1 class="display-4 text-primary"> <b> Personnel Digital Profile System</b></h1>
-                    <p class="lead">
-                    <h2 class="text-primary">ระบบบริหารจัดการแฟ้มข้อมูลดิจิทัลประจำตัวบุคลากร </h2>
-                    <br>
-                    <h1 class="text-white" style="font-size:40px;font-weight: bold;">
-                        <i class="fas fa-angle-double-right"></i>
-                        <i class="fas fa-angle-double-right"></i>
-{#                        <i class="fas fa-sync-alt fa-spin text-white"></i>#}
-                            -----------L------E-----R-----D--
-                        <i class="fas fa-angle-right fa-sm"></i>
-                        <i class="fas fa-bullseye"></i>
-                    </h1>
+                    <h2 class="display-6 text-primary">ระบบบริหารจัดการแฟ้มข้อมูลดิจิทัลประจำตัวบุคลากร </h2>
+                    <label class="text-secondary" style="font-size:30px;font-weight: bold;">
+                           เพื่อพัฒนาองค์กรสู่ความเป็นเลิศ <i class="fas fa-angle-right fa-sm"></i> <i class="fas fa-angle-right fa-sm"></i> "LERD"
+                    </label>
                     </p>
                 </div>
             </div>
         </div>
     </div>
-    <br><br>
-    <div class="row text-center container-fluid justify-content-center">
-        {#        <div class="col-3 card bg-primary text-white" style="background-image: url('{% static 'images/bg.jpg' %}') no-repeat;width: 100px; height: 150px;">#}
-        <div class="col-3 card text-white">
-            <div class="card-body"
-            style="background-image: url({% static 'images/iconfiles/logo.png' %});
-                    width:100%; height:50%;">
+    <br>
+    <hr class="text-primary">
+    {% if chartDiv is not None %}
+        <div class="row text-center align-content-center">
+            <div class="col-1"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartDiv | safe }}
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartEdu | safe }}
+            </div>
+            <div class="col-md-1"></div>
+        </div>
 
-                <div class="row">
-                    <div class="col-2 text-lg-start"><h2 class="fas fa-id-card text-lg-start"></h2></div>
-                    <div class="col-10"><h5 class="card-title"> ข้อมูลพื้นฐานส่วนตัว</h5></div>
-                </div>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-                <br><br><br>
+        <div class="row text-center align-content-center">
+            <div class="col-1"></div>
+            <div class="col-md-4 text-center" style=" alignment: center">
+                <table class="table table-bordered text-primary">
+                    <tr class=text-dark style="color: #c1cbda;background-color: #b6d4fe;">
+                        <td class="text-sm-center" style="font-size: 11pt">สาขา/หน่วยงานย่อย</td>
+                        <td class="text-sm-center" style="font-size: 11pt">จำนวนบุคลากร</td>
+                    </tr>
+                    {% for index, row in dataFrameDiv.iterrows %}
+                        <tr style="font-size: 11pt">
+                            <td class="text-sm-start text-secondary">{{ row.Division }}</td>
+                            <td class="text-sm-center text-secondary">{{ row.Count }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr style="background-color: rgba(239,240,243,0.88)">
+                        <td class="text-sm-center text-secondary">รวม</td>
+                        <td class="text-sm-center text-secondary">{{ count }}</td>
+                    </tr>
+                </table>
             </div>
-        </div>
-        <div class="col-1"></div>
-        <div class="col-3 card bg-info text-white">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-2 text-lg-start"><h2 class="fas fa-clipboard-list text-lg-start"></h2></div>
-                    <div class="col-10"><h5 class="card-title">คำสั่งที่ได้รับมอบหมาย</h5></div>
-                </div>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
+            <div class="col-md-2"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartStatus | safe }}
             </div>
+            <div class="col-md-1"></div>
         </div>
-        <div class="col-1"></div>
-        <div class="col-3 card bg-light">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-2 text-lg-start"><h2 class="fas fa-flask text-lg-start"></h2></div>
-                    <div class="col-10"><h5 class="card-title">การวิจัย</h5></div>
-                </div>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-            </div>
-        </div>
-    </div>
-    <br>
-    <div class="row text-center container-fluid justify-content-center">
-        <div class="col-3 card bg-secondary text-warning">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-2 text-lg-start"><h2 class="fas fa-people-carry text-lg-start"></h2></div>
-                    <div class="col-10"><h5 class="card-title">การบริการทางวิชาการแก่สังคม</h5></div>
-                </div>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-            </div>
-        </div>
-        <div class="col-1"></div>
-        <div class="col-3 card bg-warning">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-2 text-lg-start"><h2 class="fa-solid fa-puzzle-piece text-lg-start"></h2></div>
-                    <div class="col-10"><h5 class="card-title">การฝึกอบรม/สัมมนา</h5></div>
-                </div>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-            </div>
-        </div>
-        <div class="col-1"></div>
-        <div class="col-3 card bg-danger  text-white">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-2 text-lg-start"><h2 class="fa-solid fa-person-hiking text-lg-start"></h2></div>
-                    <div class="col-10"><h5 class="card-title">ประวัติการลา</h5></div>
-                </div>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-            </div>
-        </div>
-    </div>
-    <br>
-    <div class="row text-center container-fluid justify-content-center">
-        <div class="col-3 card bg-success text-white">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-2 text-lg-start"><h2 class="fa-solid fa-award text-lg-start"></h2></div>
-                    <div class="col-10"><h5 class="card-title">ผลงานและรางวัล</h5></div>
-                </div>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-            </div>
-        </div>
-        <div class="col-1"></div>
-        <div class="col-3 card">
-            <div class="card-body">
-                <h5 class="card-title">อื่น ๆ</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-            </div>
-        </div>
-        <div class="col-1"></div>
-        <div class="col-3 card">
-            <div class="card-body">
-                <h5 class="card-title">อื่น ๆ</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                    card's content.</p>
-            </div>
-        </div>
-    </div>
+
+
+    {% endif %}
+
     <br><br>
 {% endblock %}

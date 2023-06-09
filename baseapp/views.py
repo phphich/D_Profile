@@ -5,6 +5,7 @@ from baseapp.models import *
 from baseapp.forms import *
 from workapp.models import *
 from workapp import common
+from reportapp import statistic
 
 from django.contrib import messages
 from django.core.paginator import (Paginator, EmptyPage,PageNotAnInteger,)
@@ -38,6 +39,7 @@ def getSession(request, dtype=None, did=None):
     # print("uid in getsession"+ str(uId))
     # print("utype in getsession" + str(uType))
 
+
 def home(request):
     faculty = Faculty.objects.first()
     if faculty is not None:
@@ -52,12 +54,37 @@ def home(request):
         messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
         return  redirect('personnelNew')
     else:
-        # getSession(request, dtype='Personnel', did=23)
-        # print("uid in home " + str(uId))
-        # print("utype in home " + str(uType))
-        # print("dtype in home " + str(docType))
-        # print("did in home " + str(docId))
-        return render(request, 'home.html')
+        context = {}
+        if Personnel.objects.all().count()> 0:
+            count = Personnel.objects.all().count()
+            dataFrameDiv = statistic.getDivisionSet()
+            dataFrameEdu = statistic.getEducationSet()
+            dataFrameStatus = statistic.getStatusSet()
+            dataFrameGender = statistic.getGenderSet()
+            figDiv = px.bar(dataFrameDiv, x='Division', y='Count', title='บุคลากรแยกตามสาขา')
+            figDiv.update_layout(autosize=False, width=500, height=400,
+                                 margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+            # paper_bgcolor="aliceblue")
+            chartDiv = figDiv.to_html()
+
+            figEdu = px.pie(dataFrameEdu, names='Level', values='Count', title='บุคลากรแยกตามระดับการศึกษา')
+            figEdu.update_layout(autosize=False, width=350, height=350,
+                                 margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+            chartEdu = figEdu.to_html()
+
+            figStatus = px.pie(dataFrameStatus, names='Status', values='Count', title='บุคลากรแยกตามตำแหน่งทางวิชาการ')
+            figStatus.update_layout(autosize=False, width=350, height=300,
+                                    margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+            chartStatus = figStatus.to_html()
+
+            figGender = px.bar(dataFrameGender, x='Gender', y='Count', title='บุคลากรแยกตามเพศ')
+            figGender.update_layout(autosize=False, width=300, height=300,
+                                    margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+            chartGender = figGender.to_html()
+
+            context = {'chartDiv': chartDiv, 'chartEdu': chartEdu, 'chartStatus': chartStatus,
+                       'dataFrameDiv':dataFrameDiv }
+        return render(request, 'home.html', context)
 
 # ตรวจสอบ Login
 def userAuthen(request):
@@ -405,7 +432,7 @@ def personnelList(request, pageNo=None, divId=None):
     if pageNo == None:
         pageNo = 1
     divId = request.POST.get('divId')
-    if divId == None or int(divId)==0:
+    if divId == None or int(divId)== 0:
         division=None
     else:
         division = Division.objects.filter(id=divId).first()

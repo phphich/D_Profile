@@ -210,7 +210,6 @@ class EducationForm(forms.ModelForm):
             ("ปริญญาตรี", "ปริญญาตรี"),
             ("ปริญญาโท", "ปริญญาโท"),
             ("ปริญญาเอก", "ปริญญาเอก"),
-            ("ประกาศนียบัตร", "ประกาศนียบัตร"),
         )
         model = Education
         fields = ('level', 'degree_th', 'degree_en','degree_th_sh','degree_en_sh','institute','yearGraduate', 'personnel', 'recorder', 'editor')

@@ -74,7 +74,7 @@ def chkUpdateTime(documentDate): #ฟังก์ชันตรวจสอบ�
         return True
     else:
         return False
-
+# ********************* Check Permission ***************************/
 def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
     methodDenyStaff = ['facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
                         'curriculumNew','curriculumUpdate','curriculumDelete', 'personnelDelete',
@@ -288,14 +288,12 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
     uDocId = []
     if docId == uId:
         return True
-
     for x in userDocIds:
         uDocId.append(x.id)
     if docId not in uDocId:
         return False
     else:
         return True
-
 
 
 

@@ -53,7 +53,7 @@ class LeaveFile(models.Model):
     filetype = models.CharField(max_length=50, default=None)
     leave = models.ForeignKey(Leave, on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderLeaveFile', on_delete=models.CASCADE, default=None)
-    editDate = models.DateTimeField(auto_now_add=True)
+    recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return "(" + str(self.leave.id) + "_" + str(self.id) + ") filename: " + self.file.name +  ", filetype: "   + self.filetype
     def getRecorderAndEditor(self):
@@ -63,11 +63,13 @@ class LeaveFile(models.Model):
 
 class LeaveURL(models.Model):
     url = models.URLField(max_length=255, default=None)
+    description = models.CharField(max_length=255, default=None)
     leave = models.ForeignKey(Leave, on_delete=models.CASCADE, default=None)
+    description = models.CharField(max_length=255, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderLeaveURL', on_delete=models.CASCADE, default=None)
-    editDate = models.DateTimeField(auto_now_add=True)
+    recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "[" + str(self.leave.id) + "_" + str(self.id) + "]_"+ self.url
+        return self.description + ' (' + self.url + ')'
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
@@ -142,11 +144,12 @@ class TrainingFile(models.Model):
 
 class TrainingURL(models.Model):
     url = models.URLField(max_length=255, default=None)
+    description = models.CharField(max_length=255, default=None)
     training = models.ForeignKey(Training, on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderTrainingURL', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "[" + str(self.training.id) + "_" + str(self.id) + "]_"+ self.url
+        return self.description + ' (' + self.url + ')'
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
@@ -221,11 +224,12 @@ class PerformanceFile(models.Model):
 
 class PerformanceURL(models.Model):
     url = models.URLField(max_length=255, default=None)
+    description = models.CharField(max_length=255, default=None)
     performance = models.ForeignKey(Performance, on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderPerformanceURL', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "[" + str(self.performance.id) + "_" + str(self.id) + "]_"+ self.url
+        return self.description + ' (' + self.url + ')'
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
@@ -316,11 +320,12 @@ class CommandFile(models.Model):
 
 class CommandURL(models.Model):
     url = models.URLField(max_length=255, default=None)
+    description = models.CharField(max_length=255, default=None)
     command = models.ForeignKey(Command, on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderCommandURL', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "[" + str(self.command.id) + "_" + str(self.id) + "]_"+ self.url
+        return self.description + ' (' + self.url + ')'
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
@@ -410,11 +415,12 @@ class ResearchFile(models.Model):
 
 class ResearchURL(models.Model):
     url = models.URLField(max_length=255, default=None)
+    description = models.CharField(max_length=255, default=None)
     research = models.ForeignKey(Research, on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderResearchURL', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "[" + str(self.research.id) + "_" + str(self.id) + "]_"+ self.url
+        return self.description + ' (' + self.url + ')'
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
@@ -523,13 +529,14 @@ class SocialServiceFile(models.Model):
 
 class SocialServiceURL(models.Model):
     url = models.URLField(max_length=255, default=None)
+    description = models.CharField(max_length=255, default=None)
     socialservice = models.ForeignKey(SocialService, on_delete=models.CASCADE, default=None)
     recorder = models.ForeignKey(Personnel, related_name='RecorderSocialServiceURL', on_delete=models.CASCADE,
                                  default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "[" + str(self.socialservice.id) + "_" + str(self.id) + "]_" + self.url
+        return self.description + ' (' + self.url + ')'
 
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()

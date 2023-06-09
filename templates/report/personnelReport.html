@@ -3,8 +3,8 @@
 {% block content %}
     <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลบุคลากร </h2>
     <div class="row">
-        <div class="col-3">
-            <label class="text-success" for="id_reportType">เลือกรูปแบบรายงานที่ต้องการ =>  </label>
+        <div class="col-3 text-end">
+            <label class="text-success" for="id_reportType">เลือกรูปแบบรายงานที่ต้องการ </label>
         </div>
         {% if reportType == 'dashboard' %}
             <div class="col-2">
@@ -29,9 +29,42 @@
                 </a>
             </div>
         {% endif %}
+        <div class="col-2 text-end">
+            <label class="text-success"> เลือกสาขา/หน่วยงานย่อย</label>
+        </div>
+        <div class="col-3">
+            <form method="post">
+                {% csrf_token %}
+                <select name="divId" class="form-control" onchange="this.form.submit();">
+                    {% if division is None %}
+                        <option value="0" selected> (ทั้งหมด) </option>
+                    {% else %}
+                        <option value="0"> (ทั้งหมด) </option>
+                    {% endif %}
+                    {% for div in divisions %}
+                        {% if div == division %}
+                            <option value="{{ div.id }}" selected> {{ div }} </option>
+                        {% else %}
+                            <option value="{{ div.id }}">  {{ div }} </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="reportType" value="{{ reportType }}">
+            </form>
+        </div>
     </div>
     {# ************************ Table *****************************#}
     <hr class="text-primary">
+    <div class="row" style="background-color: #d3f8df">
+        <div class="col-1"> </div>
+        <div class="col-11 text-primary">
+            {% if division is not None %}
+                <label> เฉพาะสาขา/หน่วยงานย่อย:  {{ division }}</label>
+            {% else %}
+                <label> ภาพรวมทั้งคณะ </label>
+            {% endif %}
+        </div>
+    </div>
     <br>
     {% if reportType == 'table' %}
         <div class="row">
@@ -39,17 +72,18 @@
             <div class="col-5">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามสาขา: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
-                    <tr class="bg-primary" style="b-color: #0a53be;color: white">
-                        <th class="text-center">สาขา</th>
-                        <th class="text-center">จำนวนบุคลากร</th>
+                    <tr class="bg-primary text-white">
+                        {% for col in dataFrameDiv.columns %}
+                            <th class="text-center">{{ col }}</th>
+                        {% endfor %}
                     </tr>
-                    {% for division in divisions %}
+                    {% for index, row in dataFrameDiv.iterrows %}
                         <tr>
-                            <td>{{ division.name_th }}</td>
-                            <td class="text-center">{{ division.getCountPersonnel }}</td>
+                            <td>{{ row.Division }}</td>
+                            <td class="text-center">{{ row.Count }}</td>
                         </tr>
                     {% endfor %}
-                    <tr>
+                    <tr style="background-color: rgba(239,240,243,0.88)">
                         <td class="text-center">รวม</td>
                         <td class="text-center">{{ count }}</td>
                     </tr>
@@ -70,7 +104,7 @@
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
                     {% endfor %}
-                    <tr>
+                    <tr style="background-color: rgba(239,240,243,0.88)">
                         <td class="text-center">รวม</td>
                         <td class="text-center">{{ count }}</td>
                     </tr>
@@ -95,7 +129,7 @@
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
                     {% endfor %}
-                    <tr>
+                    <tr style="background-color: rgba(239,240,243,0.88)">
                         <td class="text-center">รวม</td>
                         <td class="text-center">{{ count }}</td>
                     </tr>
@@ -116,8 +150,7 @@
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
                     {% endfor %}
-
-                    <tr>
+                    <tr style="background-color: rgba(239,240,243,0.88)">
                         <td class="text-center">รวม</td>
                         <td class="text-center">{{ count }}</td>
                     </tr>
@@ -132,7 +165,7 @@
         <div class="row text-center align-content-center">
             <div class="col-1"></div>
             <div class="col-md-4 text-center" style="alignment: center">
-                {{ chart | safe }}
+                {{ chartDiv | safe }}
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-4 text-center" style="alignment: center">

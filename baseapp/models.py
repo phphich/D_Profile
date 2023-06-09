@@ -240,6 +240,30 @@ class CurrAffiliation(models.Model):
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
 
+class Manager(models.Model): # ผู้บริหาร
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelManager', on_delete=models.CASCADE, default=None)
+    status = models.CharField(max_length=50, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderManager', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return str(self.personnel) + " - " + self.status
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+
+class Header(models.Model): # หัวหน้าสาขา
+    division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelHeader', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderHeader', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.division.name_th + ' header is: ' + str(self.personnel)
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+
 class Responsible(models.Model): # เจ้าหน้าที่รับผิดชอบจัดการข้อมูลสาขา
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
     personnel = models.ForeignKey(Personnel, related_name='PersonnelResponsible', on_delete=models.CASCADE, default=None)
@@ -265,28 +289,3 @@ class Responsible(models.Model): # เจ้าหน้าที่รับผ
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
         return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-
-class Header(models.Model): # หัวหน้าสาขา
-    division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
-    personnel = models.ForeignKey(Personnel, related_name='PersonnelHeader', on_delete=models.CASCADE, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderHeader', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return self.division.name_th + ' header is: ' + str(self.personnel)
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-
-class Manager(models.Model): # ผู้บริหาร
-    personnel = models.ForeignKey(Personnel, related_name='PersonnelManager', on_delete=models.CASCADE, default=None)
-    status = models.CharField(max_length=50, default=None)
-    recorder = models.ForeignKey(Personnel, related_name='RecorderManager', on_delete=models.CASCADE, default=None)
-    recordDate = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return str(self.personnel) + " - " + self.status
-    def getRecorderAndEditor(self):
-        recorder = Personnel.objects.filter(id=self.recorder.id).first()
-        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
-        return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
-
