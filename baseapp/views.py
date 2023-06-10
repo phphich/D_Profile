@@ -62,25 +62,20 @@ def home(request):
             dataFrameStatus = statistic.getStatusSet()
             dataFrameGender = statistic.getGenderSet()
             figDiv = px.bar(dataFrameDiv, x='Division', y='Count', title='บุคลากรแยกตามสาขา')
-            figDiv.update_layout(autosize=False, width=500, height=400,
+            figDiv.update_layout(autosize=False, width=400, height=350,
                                  margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
             # paper_bgcolor="aliceblue")
             chartDiv = figDiv.to_html()
 
             figEdu = px.pie(dataFrameEdu, names='Level', values='Count', title='บุคลากรแยกตามระดับการศึกษา')
-            figEdu.update_layout(autosize=False, width=350, height=350,
+            figEdu.update_layout(autosize=False, width=300, height=300,
                                  margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
             chartEdu = figEdu.to_html()
 
             figStatus = px.pie(dataFrameStatus, names='Status', values='Count', title='บุคลากรแยกตามตำแหน่งทางวิชาการ')
-            figStatus.update_layout(autosize=False, width=350, height=300,
+            figStatus.update_layout(autosize=False, width=300, height=250,
                                     margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
             chartStatus = figStatus.to_html()
-
-            figGender = px.bar(dataFrameGender, x='Gender', y='Count', title='บุคลากรแยกตามเพศ')
-            figGender.update_layout(autosize=False, width=300, height=300,
-                                    margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
-            chartGender = figGender.to_html()
 
             context = {'chartDiv': chartDiv, 'chartEdu': chartEdu, 'chartStatus': chartStatus,
                        'dataFrameDiv':dataFrameDiv }

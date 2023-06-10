@@ -347,7 +347,7 @@ class Research(models.Model):
     editor = models.ForeignKey(Personnel, related_name='EditorResearch', on_delete=models.CASCADE, default=None)
     editDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
-        return self.title_th + str(self.fiscalYear) + " : " + str(self.budget)
+        return self.title_th + ' (' + str(self.fiscalYear) +  ") : " + str(self.budget)
     def getResearchPerson(self):
         personnels = ResearchPerson.objects.filter(research=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
         return personnels

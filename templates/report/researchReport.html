@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลงานวิจัย  </h2>
+    <div class="row">
+        <div class="col-2 text-end">
+            <label class="text-success"> ประเภทงบประมาณ </label>
+        </div>
+        <div class="col-2">
+            <form method="post" action="{% url 'researchReport' %}">
+                {% csrf_token %}
+                <select name="budgetType" class="form-control text-success" onchange="this.form.submit();">
+                    {% if budgetType is None %}
+                        <option value="0" selected> (ทั้งหมด) </option>
+                    {% else %}
+                        <option value="0"> (ทั้งหมด) </option>
+                    {% endif %}
+                    {% for budget in budgetTypes %}
+                        {% if budget == budgetType %}
+                            <option value="{{ budget }}" selected> {{ budget }} </option>
+                        {% else %}
+                            <option value="{{ budget }}">  {{ budget }} </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="fiscalYearStart" value="{{ fiscalYearStart }}">
+                <input type="hidden" name="fiscalYearEnd" value="{{ fiscalYearEnd }}">
+                <input type="hidden" name="reportType" value="{{ reportType }}">
+            </form>
+        </div>
+        <div class="col-2 text-end">
+            <label class="text-success"> เลือกปีงบประมาณ </label>
+        </div>
+        <div class="col-2 text-center">
+            <form method="post" action="{% url 'researchReport' %}">
+                {% csrf_token %}
+                <select name="fiscalYearStart" class="form-control text-success" onchange="this.form.submit();">
+                    {% for fisYear in fiscalYearResearch %}
+                        {% if fisYear == fiscalYearStart %}
+                            <option value="{{ fisYear }}" selected> {{ fisYear }} </option>
+                        {% else %}
+                            <option value="{{ fisYear }}"> {{ fisYear }} </option>
+                        {% endif %}
+                    {% endfor %}                
+                </select>
+                <input type="hidden" name="budgetType" value="{{ budgetType }}">
+                <input type="hidden" name="fiscalYearEnd" value="{{ fiscalYearEnd }}">
+                <input type="hidden" name="reportType" value="{{ reportType }}">
+            </form>
+            <label class="text-success text-center"> ถึง </label>
+
+            <form method="post" action="{% url 'researchReport' %}">
+                {% csrf_token %}
+                <select name="fiscalYearEnd" class="form-control text-success" onchange="this.form.submit();">
+                    {% for fisYear in fiscalYearResearch %}
+                        {% if fisYear >= fiscalYearStart %}
+                            {% if fisYear == fiscalYearEnd %}
+                                <option value="{{ fisYear }}" selected> {{ fisYear }} </option>
+                            {% else %}
+                                <option value="{{ fisYear }}">  {{ fisYear }} </option>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input type="hidden" name="budgetType" value="{{ budgetType }}">
+                <input type="hidden" name="fiscalYearStart" value="{{ fiscalYearStart }}">
+                <input type="hidden" name="reportType" value="{{ reportType }}">
+            </form>
+        </div>
+
+        {% if reportType == 'dashboard' %}
+            <div class="col-2">
+                {% if budgetType is None %}
+                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-success disabled" style="width: 100%">
+                        <i class="fas fa-chart-area text-white"></i> Dashboard <i class="fas fa-check"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-success disabled" style="width: 100%">
+                        <i class="fas fa-chart-area text-white"></i> Dashboard <i class="fas fa-check"></i>
+                    </a>
+                {% endif %}
+
+            </div>
+            <div class="col-2">
+                {% if budgetType is None %}
+                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-secondary" style="width: 100%">
+                        <i class="fas fa-table text-white"></i> Table
+                    </a>
+                {% else %}
+                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-secondary" style="width: 100%">
+                        <i class="fas fa-table text-white"></i> Table
+                    </a>
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="col-2">
+                {% if budgetType is None %}
+                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-secondary" style="width: 100%">
+                        <i class="fas fa-chart-area text-white"></i> Dashboard
+                    </a>
+                {% else %}
+                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-secondary" style="width: 100%">
+                        <i class="fas fa-chart-area text-white"></i> Dashboard
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col-2">
+                {% if budgetType is None %}
+                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-success disabled" style="width: 100%">
+                        <i class="fas fa-table text-white"></i> Table <i class="fas fa-check"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-success disabled" style="width: 100%">
+                        <i class="fas fa-table text-white"></i> Table <i class="fas fa-check"></i>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+    <hr class="text-primary">
+    <div class="row" style="background-color: #d3f8df">
+        <div class="col-1"> </div>
+        <div class="col-11 text-primary">
+            {% if budgetType is None %}
+                <label> เฉพาะงบประมาณประเภท:  {{ budgetType }}, ปีงบประมาณ {{ fiscalYearStart }} - {{ fiscalYearEnd }} (รวม: {{ count }} โครงการ) </label>
+            {% else %}
+                <label> งบประมาณประเภท: ทุกประเภท, ปีงบประมาณ: {{ fiscalYearStart }} - {{ fiscalYearEnd }} (รวม: {{ count }} โครงการ)</label>
+            {% endif %}
+        </div>
+    </div>
+    <br>
+    {# ************************ Table *****************************#}
+    {% if reportType == 'table' %}
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-5">
+                <label class="text-primary" style="font-weight: bold"> งานวิจัยแยกตามปีงบประมาณ: </label>
+                <table class="table table-bordered text-primary" style="width: 100%">
+                    <tr class="bg-primary text-white">
+                        {% for col in dfResearchCount.columns %}
+                            <th class="text-center">{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                    {% for index, row in dfResearchCount.iterrows %}
+                        <tr>
+                            <td>{{ row.Year }}</td>
+                            <td class="text-center">{{ row.Count }}</td>
+                        </tr>
+                    {% endfor %}
+                    <tr style="background-color: rgba(239,240,243,0.88)">
+                        <td class="text-center">รวม</td>
+                        <td class="text-center">{{ count }}</td>
+                    </tr>
+                </table>
+            </div>
+{#            <div class="col-1"></div>#}
+{#            <div class="col-4">#}
+{#                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามระดับการศึกษา: </label>#}
+{#                <table class="table table-bordered text-primary" style="width: 100%">#}
+{#                    <tr class="bg-primary text-white">#}
+{#                    {% for col in dataFrameEdu.columns %}#}
+{#                        <th class="text-center">{{ col }}</th>#}
+{#                    {% endfor %}#}
+{#                    </tr>#}
+{#                    {% for index, row in dataFrameEdu.iterrows %}#}
+{#                        <tr>#}
+{#                            <td>{{ row.Level }}</td>#}
+{#                            <td class="text-center">{{ row.Count }}</td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{#                    <tr style="background-color: rgba(239,240,243,0.88)">#}
+{#                        <td class="text-center">รวม</td>#}
+{#                        <td class="text-center">{{ count }}</td>#}
+{#                    </tr>#}
+{#                </table>#}
+{#            </div>#}
+{#            <div class="col-1"></div>#}
+{#        </div>#}
+{##}
+{#        <div class="row">#}
+{#            <div class="col-1"></div>#}
+{#            <div class="col-5">#}
+{#                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามตำแหน่งทางวิชาการ: </label>#}
+{#                <table class="table table-bordered text-primary" style="width: 100%">#}
+{#                    <tr class="bg-primary text-white" >#}
+{#                    {% for col in dataFrameStatus.columns %}#}
+{#                        <th class="text-center">{{ col }}</th>#}
+{#                    {% endfor %}#}
+{#                    </tr>#}
+{#                    {% for index, row in dataFrameStatus.iterrows %}#}
+{#                        <tr>#}
+{#                            <td>{{ row.Status }}</td>#}
+{#                            <td class="text-center">{{ row.Count }}</td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{#                    <tr style="background-color: rgba(239,240,243,0.88)">#}
+{#                        <td class="text-center">รวม</td>#}
+{#                        <td class="text-center">{{ count }}</td>#}
+{#                    </tr>#}
+{#                </table>#}
+{#            </div>#}
+{#            <div class="col-1"></div>#}
+{#            <div class="col-4">#}
+{#                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามเพศ: </label>#}
+{#                <table class="table table-bordered text-primary" style="width: 100%">#}
+{#                    <tr class="bg-primary text-white" >#}
+{#                    {% for col in dataFrameGender.columns %}#}
+{#                        <th class="text-center">{{ col }}</th>#}
+{#                    {% endfor %}#}
+{#                    </tr>#}
+{#                    {% for index, row in dataFrameGender.iterrows %}#}
+{#                        <tr>#}
+{#                            <td>{{ row.Gender }}</td>#}
+{#                            <td class="text-center">{{ row.Count }}</td>#}
+{#                        </tr>#}
+{#                    {% endfor %}#}
+{#                    <tr style="background-color: rgba(239,240,243,0.88)">#}
+{#                        <td class="text-center">รวม</td>#}
+{#                        <td class="text-center">{{ count }}</td>#}
+{#                    </tr>#}
+{#                </table>#}
+{##}
+{#            </div>#}
+{#            <div class="col-1"></div>#}
+        </div>
+        <br><br>
+    {% else %}
+        {# ************************ Dashboard *****************************#}
+        <div class="row text-center align-content-center">
+            <div class="col-1"></div>
+            <div class="col-md-4 text-center" style="alignment: center" >
+                {{ chartResearchCount | safe }}
+            </div>
+{#            <div class="col-md-1"></div>#}
+{#            <div class="col-md-4 text-center" style="alignment: center">#}
+{#                {{ chartEdu | safe }}#}
+{#            </div>#}
+{#            <div class="col-md-1"></div>#}
+{#        </div>#}
+{#        <br>#}
+{#        <div class="row text-center align-content-center">#}
+{#            <div class="col-1"></div>#}
+{#            <div class="col-md-4 text-center" style="alignment: center">#}
+{#                {{ chartStatus | safe }}#}
+{#            </div>#}
+{#            <div class="col-md-1"></div>#}
+{#            <div class="col-md-4 text-center" style="alignment: center">#}
+{#                {{ chartGender | safe }}#}
+{#            </div>#}
+{#            <div class="col-md-1"></div>#}
+        </div>
+        <br><br>
+        <m style="color: #aeccf8"></m>
+    {% endif %}
+{% endblock %}
