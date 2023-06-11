@@ -6,7 +6,11 @@ import pandas as pd
 def getBudgetType():
     budgetTypes = ['งบประมาณแผ่นดิน', 'งบประมาณรายได้', 'งบประมาณภายนอก', 'งบประมาณส่วนตัว', 'ไม่ใช้งบประมาณ']
     return budgetTypes
-
+def getMission():
+    missions = ['การจัดการเรียนการสอน', 'การวิจัย', 'การบริการทางวิชาการแก่สังคม', 'การทำนุบำรุงศิลปวัฒนธรรม',
+                'สนองโครงการอันเนื่องมาจากพระราชดำริ', 'งานอื่น ๆ ที่ได้รับมอบหมาย',
+                ]
+    return missions
 def getLeavetype():
     leaveTypes=["ลาป่วย","ลากิจส่วนตัว", "ลาพักผ่อนประจำปี","ลาคลอดบุตร","ลาไปช่วยเหลือภริยาที่คลอดบุตร","ลาอุปสมบทหรือการลาไปประกอบพิธีฮัจย์",
                 "ลาเข้ารับการตรวจเลือกหรือเข้ารับการเตรียมพล","ลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน","ลาไปปฏิบัติงานในองค์กรระหว่างประเทศ",
@@ -175,11 +179,11 @@ def getSocialServiceCountSet(budgetType, fiscalYearStart, fiscalYearEnd):
 
 def getSocialServiceBudgetSet(budgetType, fiscalYearStart, fiscalYearEnd):
     if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
-        socialservicess = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+        socialservices = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
                                              ).values('fiscalYear').annotate(sum=Sum('budget'))\
             .order_by('fiscalYear')
     else:
-        socialservicess = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+        socialservices = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
                                              budgetType=budgetType).values('fiscalYear').annotate(sum=Sum('budget'))\
             .order_by('fiscalYear')
     socialserviceYear = []
@@ -187,7 +191,7 @@ def getSocialServiceBudgetSet(budgetType, fiscalYearStart, fiscalYearEnd):
     if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
         socialserviceYear.append("0")
         socialserviceSum.append(0.00)
-    for socialservice in socialservicess:
+    for socialservice in socialservices:
         socialserviceYear.append(str(socialservice['fiscalYear']))
         socialserviceSum.append(socialservice['sum'])
     dfSocialServiceBudget = pd.DataFrame({'Year': socialserviceYear, 'Budget': socialserviceSum}, columns=['Year', 'Budget'])
@@ -212,6 +216,71 @@ def getSocialServiceBudgetTypeSet(budgetType, fiscalYearStart, fiscalYearEnd):
     dfSocialServiceBudgetType = pd.DataFrame({'Type': socialserviceBudgetType, 'Count':socialserviceCount , 'Budget': socialserviceSum},
                                         columns=['Type', 'Count',  'Budget'])
     return dfSocialServiceBudgetType
+
+# *********************** Command ************************
+def getCommandEduYears():
+    eduYearDatas = Command.objects.all().values('eduYear').distinct().order_by('eduYear')
+    eduYears = []  # ปีงบประมาณแบบไม่ซ้ำ
+    for f in eduYearDatas:
+        eduYears.append(f['eduYear'])
+    return eduYears
+
+def getCommandCountSet(mission, eduYearStart, eduYearEnd):
+    if mission is None or mission == 'None' or mission == '0':  # เลือกทั้งหมด
+        commands = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd
+                                                       ).values('eduYear').annotate(count=Count('eduYear')) \
+            .order_by('eduYear')
+    else:
+        commands = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd,
+                                                       mission=mission).values('eduYear').annotate(
+            count=Count('eduYear')).order_by('eduYear')
+    commandYear = []
+    commandCount = []
+    for command in commands:
+        commandYear.append(str(command['eduYear']))
+        commandCount.append(command['count'])
+    dfCommandCount = pd.DataFrame({'Year': commandYear, 'Count': commandCount}, columns=['Year', 'Count'])
+    return dfCommandCount
+
+# def getCommandBudgetSet(mission, eduYearStart, eduYearEnd):
+#     if mission is None or mission == 'None' or mission == '0':  # เลือกทั้งหมด
+#         commandss = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd
+#                                                        ).values('eduYear').annotate(sum=Sum('budget')) \
+#             .order_by('eduYear')
+#     else:
+#         commandss = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd,
+#                                                        mission=mission).values('eduYear').annotate(
+#             sum=Sum('budget')).order_by('eduYear')
+#     commandYear = []
+#     commandSum = []
+#     if eduYearStart == eduYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
+#         commandYear.append("0")
+#         commandSum.append(0.00)
+#     for command in commandss:
+#         commandYear.append(str(command['eduYear']))
+#         commandSum.append(command['sum'])
+#     dfCommandBudget = pd.DataFrame({'Year': commandYear, 'Budget': commandSum},
+#                                          columns=['Year', 'Budget'])
+#     return dfCommandBudget
+
+def getCommandMissionSet(mission, eduYearStart, eduYearEnd):
+    if mission is None or mission == 'None' or mission == '0':  # เลือกทั้งหมด
+        commands = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd
+                                                      ).values('mission').annotate(count=Count('mission')) \
+            .order_by('mission')
+    else:
+        commands = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd,
+                                                      mission=mission).values('mission'). \
+            annotate(count=Count('mission')).order_by('mission')
+    commandMission = []
+    commandCount = []    
+    for command in commands:
+        commandMission.append(str(command['mission']))
+        commandCount.append(command['count'])        
+    dfCommandMission = pd.DataFrame({'Mission': commandMission, 'Count': commandCount},
+        columns=['Mission', 'Count'])
+    return dfCommandMission
+
 
 # *********************** Trainning ************************
 def getTrainingFiscalYears():
@@ -304,12 +373,6 @@ def getLeaveTypeSet(division, fiscalYearStart, fiscalYearEnd):
     leaveType = []
     leaveCount = []
     leaveDays = []
-    # if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
-    #     leaveType.append("?")
-    #     leaveCount.append((0))
-    # elif leaveTypes.count() == 1:
-    #     leaveType.append("?")
-    #     leaveCount.append(0)
     for leave in leaveTypes:
         leaveType.append(str(leave['leaveType']))
         leaveCount.append(leave['count'])

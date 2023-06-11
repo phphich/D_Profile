@@ -278,7 +278,7 @@ def trainingReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None
         messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
-    fiscalYearTrainings = statistic.getTrainingFiscalYears() #ปีวิจัยที่มีในฐานข้อมูล
+    fiscalYearTrainings = statistic.getTrainingFiscalYears() #ปีฝึกอบรมที่มีในฐานข้อมูล
     divisions = Division.objects.all().order_by('name_th')
 
     if divId is not None:#มาจากคลิ้กลิงก์
@@ -445,3 +445,99 @@ def leaveReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, r
 
                'count':count, 'sum': sum}
     return render(request, 'report/leaveReport.html', context)
+
+# ********************* คำสั่ง  ***********************
+def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, reportType=None):
+    commandCount = Command.objects.all().count()
+    if commandCount == 0:
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    eduYearCommands = statistic.getCommandEduYears() #ปีออกคำสั้่งที่มีในฐานข้อมูล
+    missions = statistic.getMission()
+
+    if mission is not None:#มาจากคลิ้กลิงก์
+        mission=mission
+        eduYearStart = int(eduYearStart)
+        eduYearEnd = int(eduYearEnd)
+        reportType = reportType
+    elif 'mission' in request.POST:
+        mission = request.POST['mission']
+        eduYearStart = int(request.POST['eduYearStart'])
+        eduYearEnd = int(request.POST['eduYearEnd'])
+        if eduYearEnd < eduYearStart:
+            eduYearEnd = eduYearStart
+        reportType = request.POST['reportType']
+    else:
+        print("c")
+        mission = None
+        eduYearStart = eduYearCommands[len(eduYearCommands)-1]
+        eduYearEnd = eduYearCommands[len(eduYearCommands)-1]
+        reportType = 'dashboard'
+
+    if mission is None or mission =='None' or mission == '0':  # เลือกทั้งหมด
+        count = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd).count()
+    else:
+        print("e")
+        count = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd, mission=mission).count()
+
+    #ปีการศึกษา
+    eduYearCommands = list(reversed( eduYearCommands)) #กลับด้านลิสต์ จากมากไปน้อย
+    # print("**************************")
+    # print('eduYearCommand')
+    # print(eduYearCommands)
+    # print('missions')
+    # print(missions)
+    # print('mission')
+    # print(mission)
+    # print('eduYearStart')
+    # print(eduYearStart)
+    # print('eduYearEnd')
+    # print(eduYearEnd)
+    # print("count")
+    # print(count)
+    # print("**************************")
+    #
+    dfCommandCount = statistic.getCommandCountSet(mission=mission, eduYearStart=eduYearStart,
+                                                    eduYearEnd=eduYearEnd)
+    # dfCommandBudget = statistic.getCommandBudgetSet(mission=mission, eduYearStart=eduYearStart,
+    #                                                 eduYearEnd=eduYearEnd)
+    dfCommandMission = statistic.getCommandMissionSet(mission=mission, eduYearStart=eduYearStart,
+                                                    eduYearEnd=eduYearEnd)
+    print('dfCommandMission')
+    print(dfCommandMission)
+    figCommandCount = px.bar(dfCommandCount, x='Year', y='Count', title='จำนวนคำสั่งแยกตามปีงบประมาณ')
+    figCommandCount.update_layout(autosize=False, width=450, height=350,
+                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    chartCommandCount = figCommandCount.to_html()
+
+    # figCommandBudget = px.line(dfCommandBudget, x="Year", y="Budget", title='งบประมาณที่ใช้แยกตามปีงบประมาณ')
+    # figCommandBudget.update_layout(autosize=False, width=400, height=300,
+    #                       margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    # chartCommandBudget = figCommandBudget.to_html()
+
+    figCommandMission = px.pie(dfCommandMission, names='Mission', values='Count', title='จำนวนคำสั่งแยกตามพันธกิจ')
+    figCommandMission.update_layout(autosize=False, width=400, height=400,
+                         margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    chartCommandMission = figCommandMission.to_html()
+
+    # figCommandMissionCount = px.pie(dfCommandMission, names='Type', values='Count', title='จำนวนโครงการบริการฯ แยกตามประเภทงบประมาณ')
+    # figCommandMissionCount.update_layout(autosize=False, width=350, height=350,
+    #                      margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    # chartCommandMissionCount = figCommandMissionCount.to_html()
+
+    # figSum = go.Figure(go.Indicator(
+    #     mode="gauge+number",
+    #     value=sum,
+    #     domain={'x': [0, 1], 'y': [0, 1]},
+    #     title={'text': "ทุนวิจัยรวม'"}))
+    # figSum.update_layout(autosize=False, width=200, height=200,
+    #                                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    # chartSum = figSum.to_html()
+    context = {'missions':missions, 'mission':mission,
+               'eduYearCommands':eduYearCommands,
+               'eduYearStart':eduYearStart, 'eduYearEnd':eduYearEnd, 'reportType':reportType,
+               'dfCommandCount':dfCommandCount,'chartCommandCount':chartCommandCount,
+               'dfCommandMission': dfCommandMission, 'chartCommandMission': chartCommandMission,
+               'count':count}
+    return render(request, 'report/commandReport.html', context)
