@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'workapp.apps.WorkappConfig',
     'reportapp.apps.ReportappConfig',
     'fontawesome_6',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [

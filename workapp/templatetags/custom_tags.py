@@ -5,7 +5,15 @@ from workapp import common
 register = template.Library()
 @register.simple_tag
 def groupValue(val=None):
-  return val
+    return val
+
+@register.filter(name='aimphich')
+def iamphich(name=None):
+    a = "***-" + name + "-***"
+
+@register.filter(name='strFormatValue')
+def strFormatValue(strValue=None):
+    return strValue
 
 @register.filter(name='getTimeUpdate')
 def getTimeUpdate(docDate):
@@ -41,3 +49,4 @@ def getCountsocialservicePersonnelDivision(divId, socialserviceId):
     personnels= Personnel.objects.filter(division=division)
     count = SocialServicePerson.objects.filter(socialservice=socialservice).filter(personnel__in=personnels).aggregate(count=Count('id'))
     return count['count']
+

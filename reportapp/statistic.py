@@ -13,6 +13,7 @@ def getLeavetype():
                 ]
     return leaveTypes
 
+# *********************** Personnel **********************
 def getDivisionSet(division=None):
     if division is None:
         divisions = Division.objects.all()
@@ -82,19 +83,16 @@ def getGenderSet(division=None):
     dfGender = pd.DataFrame({'Gender': genderName, 'Count': genderCount}, columns=['Gender', 'Count'])
     return dfGender
 
+# *********************** Research ************************
 def getResearchFiscalYears():
-    fiscalYearDatas = Research.objects.all().values('fiscalYear').distinct().order_by('-fiscalYear')
+    fiscalYearDatas = Research.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
     fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
     for f in fiscalYearDatas:
         fiscalYears.append(f['fiscalYear'])
     return fiscalYears
 
 def getResearchCountSet(budgetType, fiscalYearStart, fiscalYearEnd):
-
-    # for i in range(fiscalYearStart, fiscalYearEnd+1):
-    #     researchYear.append(i)
-
-    if budgetType is None or budgetType == '0':  # เลือกทั้งหมด
+    if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
         researchss = Research.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
                                              ).values('fiscalYear').annotate(count=Count('fiscalYear'))\
             .order_by('fiscalYear')
@@ -107,5 +105,164 @@ def getResearchCountSet(budgetType, fiscalYearStart, fiscalYearEnd):
     for research in researchss:
         researchYear.append(str(research['fiscalYear']))
         researchCount.append(research['count'])
-    df = pd.DataFrame({'Year': researchYear, 'Count': researchCount}, columns=['Year', 'Count'])
-    return df
+    dfResearchCount = pd.DataFrame({'Year': researchYear, 'Count': researchCount}, columns=['Year', 'Count'])
+    return dfResearchCount
+
+def getResearchBudgetSet(budgetType, fiscalYearStart, fiscalYearEnd):
+    if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
+        researchss = Research.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('fiscalYear').annotate(sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    else:
+        researchss = Research.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             budgetType=budgetType).values('fiscalYear').annotate(sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    researchYear = []
+    researchSum = []
+    if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
+        researchYear.append("0")
+        researchSum.append(0.00)
+    for research in researchss:
+        researchYear.append(str(research['fiscalYear']))
+        researchSum.append(research['sum'])
+    dfResearchBudget = pd.DataFrame({'Year': researchYear, 'Budget': researchSum}, columns=['Year', 'Budget'])
+    return dfResearchBudget
+
+def getResearchBudgetTypeSet(budgetType, fiscalYearStart, fiscalYearEnd):
+    if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
+        researchs = Research.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('budgetType').annotate(count=Count('budget'), sum=Sum('budget'))\
+            .order_by('budgetType')
+    else:
+        researchs = Research.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             budgetType=budgetType).values('budgetType').\
+            annotate(count=Count('budget'), sum=Sum('budget')).order_by('budgetType')
+    researchBudgetType = []
+    researchCount = []
+    researchSum = []
+    for research in researchs:
+        researchBudgetType.append(str(research['budgetType']))
+        researchCount.append(research['count'])
+        researchSum.append(research['sum'])
+    dfResearchBudgetType = pd.DataFrame({'Type': researchBudgetType, 'Count':researchCount , 'Budget': researchSum},
+                                        columns=['Type', 'Count',  'Budget'])
+    return dfResearchBudgetType
+
+#  ******************** Social Service *********************
+def getSocialServiceFiscalYears():
+    fiscalYearDatas = SocialService.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
+    for f in fiscalYearDatas:
+        fiscalYears.append(f['fiscalYear'])
+    return fiscalYears
+
+def getSocialServiceCountSet(budgetType, fiscalYearStart, fiscalYearEnd):
+    if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
+        socialservicess = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('fiscalYear').annotate(count=Count('fiscalYear'))\
+            .order_by('fiscalYear')
+    else:
+        socialservicess = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             budgetType=budgetType).values('fiscalYear').annotate(count=Count('fiscalYear'))\
+            .order_by('fiscalYear')
+    socialserviceYear = []
+    socialserviceCount = []
+    for socialservice in socialservicess:
+        socialserviceYear.append(str(socialservice['fiscalYear']))
+        socialserviceCount.append(socialservice['count'])
+    dfSocialServiceCount = pd.DataFrame({'Year': socialserviceYear, 'Count': socialserviceCount}, columns=['Year', 'Count'])
+    return dfSocialServiceCount
+
+def getSocialServiceBudgetSet(budgetType, fiscalYearStart, fiscalYearEnd):
+    if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
+        socialservicess = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('fiscalYear').annotate(sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    else:
+        socialservicess = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             budgetType=budgetType).values('fiscalYear').annotate(sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    socialserviceYear = []
+    socialserviceSum = []
+    if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
+        socialserviceYear.append("0")
+        socialserviceSum.append(0.00)
+    for socialservice in socialservicess:
+        socialserviceYear.append(str(socialservice['fiscalYear']))
+        socialserviceSum.append(socialservice['sum'])
+    dfSocialServiceBudget = pd.DataFrame({'Year': socialserviceYear, 'Budget': socialserviceSum}, columns=['Year', 'Budget'])
+    return dfSocialServiceBudget
+
+def getSocialServiceBudgetTypeSet(budgetType, fiscalYearStart, fiscalYearEnd):
+    if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
+        socialservices = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('budgetType').annotate(count=Count('budget'), sum=Sum('budget'))\
+            .order_by('budgetType')
+    else:
+        socialservices = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             budgetType=budgetType).values('budgetType').\
+            annotate(count=Count('budget'), sum=Sum('budget')).order_by('budgetType')
+    socialserviceBudgetType = []
+    socialserviceCount = []
+    socialserviceSum = []
+    for socialservice in socialservices:
+        socialserviceBudgetType.append(str(socialservice['budgetType']))
+        socialserviceCount.append(socialservice['count'])
+        socialserviceSum.append(socialservice['sum'])
+    dfSocialServiceBudgetType = pd.DataFrame({'Type': socialserviceBudgetType, 'Count':socialserviceCount , 'Budget': socialserviceSum},
+                                        columns=['Type', 'Count',  'Budget'])
+    return dfSocialServiceBudgetType
+
+# *********************** Trainning ************************
+def getTrainingFiscalYears():
+    fiscalYearDatas = Training.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
+    for f in fiscalYearDatas:
+        fiscalYears.append(f['fiscalYear'])
+    return fiscalYears
+
+def getTrainingCountSet(division, fiscalYearStart, fiscalYearEnd):
+    if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
+        trainings = Training.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('personnel__division__name_th').annotate(count=Count('personnel__division'))\
+            .order_by('personnel__division__name_th')
+    else:
+        trainings = Training.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             personnel__division=division).values('personnel__division__name_th').\
+            annotate(count=Count('personnel__division'))\
+            .order_by('personnel__division__name_th')
+    trainingDivision = []
+    trainingCount = []
+    for training in trainings:
+        trainingDivision.append(str(training['personnel__division__name_th']))
+        trainingCount.append(training['count'])
+    dfTrainingCount = pd.DataFrame({'Division': trainingDivision, 'Count': trainingCount}, columns=['Division', 'Count'])
+    return dfTrainingCount
+
+def getTrainingBudgetSet(division, fiscalYearStart, fiscalYearEnd):
+    if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
+        trainings = Training.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('fiscalYear').annotate(count=Count('fiscalYear'), sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    else:
+        trainings = Training.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             personnel__division=division).values('fiscalYear').annotate(count=Count('fiscalYear'),sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    traingYear = []
+    trainingCount = []
+    trainingSum = []
+    if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
+        traingYear.append("0")
+        trainingCount.append((0))
+        trainingSum.append(0.00)
+    elif trainings.count() == 1:
+        traingYear.append(str(fiscalYearStart))
+        trainingCount.append(0)
+        trainingSum.append(0.00)
+    for training in trainings:
+        traingYear.append(str(training['fiscalYear']))
+        trainingCount.append(training['count'])
+        trainingSum.append(training['sum'])
+    dfTrainingBudget = pd.DataFrame({'Year': traingYear, 'Count': trainingCount,  'Budget': trainingSum}, columns=['Year', 'Count', 'Budget'])
+    return dfTrainingBudget
+

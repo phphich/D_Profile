@@ -487,7 +487,7 @@ class ResearchForm(forms.ModelForm):
             'title_th': 'ชื่องานวิจัย (ไทย)',
             'title_en': 'ชื่องานวิจัย (อังกฤษ)',
             'objective': 'วัตถุประสงค์การวิจัย',
-            'budget': 'งบประมาณ',
+            'budget': 'ทุนวิจัย',
             'budgetType': 'ประเภทงบประมาณ',
             'source': 'หน่วยงานเจ้าของทุนวิจัย',
             'keyword': 'คำสำคัญ',

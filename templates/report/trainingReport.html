@@ -3,25 +3,25 @@
 {% load humanize %}
 {% load custom_tags %}
 {% block content %}
-    <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลงานวิจัย  </h2>
+    <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลการฝึกอบรม/สัมมนา </h2>
     <div class="row">
         <div class="col-2 text-end">
-            <label class="text-success"> ประเภทงบประมาณ </label>
+            <label class="text-success"> สาขา/หน่วยงานย่อย   </label>
         </div>
         <div class="col-2">
-            <form method="post" action="{% url 'researchReport' %}">
+            <form method="post" action="{% url 'trainingReport' %}">
                 {% csrf_token %}
-                <select name="budgetType" class="form-control text-success" onchange="this.form.submit();">
-                    {% if budgetType is None %}
+                <select name="divId" class="form-control text-success" onchange="this.form.submit();">
+                    {% if division is None %}
                         <option value="0" selected> (ทั้งหมด) </option>
                     {% else %}
                         <option value="0"> (ทั้งหมด) </option>
                     {% endif %}
-                    {% for budget in budgetTypes %}
-                        {% if budget == budgetType %}
-                            <option value="{{ budget }}" selected> {{ budget }} </option>
+                    {% for div in divisions %}
+                        {% if div == division %}
+                            <option value="{{ div.id }}" selected> {{ div }} </option>
                         {% else %}
-                            <option value="{{ budget }}">  {{ budget }} </option>
+                            <option value="{{ div.id }}">  {{ div }} </option>
                         {% endif %}
                     {% endfor %}
                 </select>
@@ -34,10 +34,10 @@
             <label class="text-success"> เลือกปีงบประมาณ </label>
         </div>
         <div class="col-1 text-center">
-            <form method="post" action="{% url 'researchReport' %}">
+            <form method="post" action="{% url 'trainingReport' %}">
                 {% csrf_token %}
                 <select name="fiscalYearStart" class="form-control text-success" onchange="this.form.submit();">
-                    {% for fisYear in fiscalYearResearchs %}
+                    {% for fisYear in fiscalYearTrainings %}
                         {% if fisYear == fiscalYearStart %}
                             <option value="{{ fisYear }}" selected> {{ fisYear }} </option>
                         {% else %}
@@ -45,16 +45,16 @@
                         {% endif %}
                     {% endfor %}                
                 </select>
-                <input type="hidden" name="budgetType" value="{{ budgetType }}">
+                <input type="hidden" name="divId" value="{{ division.id }}">
                 <input type="hidden" name="fiscalYearEnd" value="{{ fiscalYearEnd }}">
                 <input type="hidden" name="reportType" value="{{ reportType }}">
             </form>
             <label class="text-success text-center"> ถึง </label>
 
-            <form method="post" action="{% url 'researchReport' %}">
+            <form method="post" action="{% url 'trainingReport' %}">
                 {% csrf_token %}
                 <select name="fiscalYearEnd" class="form-control text-success" onchange="this.form.submit();">
-                    {% for fisYear in fiscalYearResearchs %}
+                    {% for fisYear in fiscalYearTrainings %}
                         {% if fisYear >= fiscalYearStart %}
                             {% if fisYear == fiscalYearEnd %}
                                 <option value="{{ fisYear }}" selected> {{ fisYear }} </option>
@@ -64,7 +64,7 @@
                         {% endif %}
                     {% endfor %}
                 </select>
-                <input type="hidden" name="budgetType" value="{{ budgetType }}">
+                <input type="hidden" name="divId" value="{{ division.id }}">
                 <input type="hidden" name="fiscalYearStart" value="{{ fiscalYearStart }}">
                 <input type="hidden" name="reportType" value="{{ reportType }}">
             </form>
@@ -72,47 +72,47 @@
 
         {% if reportType == 'dashboard' %}
             <div class="col-2">
-                {% if budgetType is None %}
-                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-success disabled" style="width: 100%">
+                {% if division is None %}
+                    <a href="{% url 'trainingReport' 0 fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-success disabled" style="width: 100%">
                         <i class="fas fa-chart-area text-white"></i> Dashboard <i class="fas fa-check"></i>
                     </a>
                 {% else %}
-                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-success disabled" style="width: 100%">
+                    <a href="{% url 'trainingReport' division.id fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-success disabled" style="width: 100%">
                         <i class="fas fa-chart-area text-white"></i> Dashboard <i class="fas fa-check"></i>
                     </a>
                 {% endif %}
 
             </div>
             <div class="col-2">
-                {% if budgetType is None %}
-                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-secondary" style="width: 100%">
+                {% if division is None %}
+                    <a href="{% url 'trainingReport' 0 fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-secondary" style="width: 100%">
                         <i class="fas fa-table text-white"></i> Table
                     </a>
                 {% else %}
-                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-secondary" style="width: 100%">
+                    <a href="{% url 'trainingReport' division.id fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-secondary" style="width: 100%">
                         <i class="fas fa-table text-white"></i> Table
                     </a>
                 {% endif %}
             </div>
         {% else %}
             <div class="col-2">
-                {% if budgetType is None %}
-                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-secondary" style="width: 100%">
+                {% if division is None %}
+                    <a href="{% url 'trainingReport' 0 fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-secondary" style="width: 100%">
                         <i class="fas fa-chart-area text-white"></i> Dashboard
                     </a>
                 {% else %}
-                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-secondary" style="width: 100%">
+                    <a href="{% url 'trainingReport' division.id fiscalYearStart fiscalYearEnd 'dashboard' %}" class="btn btn-secondary" style="width: 100%">
                         <i class="fas fa-chart-area text-white"></i> Dashboard
                     </a>
                 {% endif %}
             </div>
             <div class="col-2">
-                {% if budgetType is None %}
-                    <a href="{% url 'researchReport' 0 fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-success disabled" style="width: 100%">
+                {% if division is None %}
+                    <a href="{% url 'trainingReport' 0 fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-success disabled" style="width: 100%">
                         <i class="fas fa-table text-white"></i> Table <i class="fas fa-check"></i>
                     </a>
                 {% else %}
-                    <a href="{% url 'researchReport' budgetType fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-success disabled" style="width: 100%">
+                    <a href="{% url 'trainingReport' division.id fiscalYearStart fiscalYearEnd 'table' %}" class="btn btn-success disabled" style="width: 100%">
                         <i class="fas fa-table text-white"></i> Table <i class="fas fa-check"></i>
                     </a>
                 {% endif %}
@@ -123,15 +123,15 @@
     {% if reportType == 'dashboard' %}
         {% groupValue "color:blue; background-color:#d3f8df " as lineColor %}
     {% else %}
-        {% groupValue "color:white; background-color:#a1dabe " as lineColor %}
+        {% groupValue "color:while; background-color:#e2d7f3 " as lineColor %}
     {% endif %}
-    <div class="row" style="{{ lineColor }}">
+    <div class="row"  style="{{ lineColor }}">
         <div class="col-1"> </div>
-        <div class="col-11">
-            {% if budgetType is None or budgetType == 'None' or budgetType == '0' %}
-                <label> งบประมาณประเภท: ทุกประเภท, ปีงบประมาณ: {{ fiscalYearStart }} - {{ fiscalYearEnd }}  </label>
+        <div class="col-11 text-dark">
+            {% if division is None or division == 'None' or division == '0' %}
+                <label> สาขา/หน่วยงานย่อย: ทั้งหมด, ปีงบประมาณ: {{ fiscalYearStart }} - {{ fiscalYearEnd }}  </label>
             {% else %}
-                <label> เฉพาะงบประมาณประเภท:  {{ budgetType }}, ปีงบประมาณ {{ fiscalYearStart }} - {{ fiscalYearEnd }}  </label>
+                <label> เฉพาะสาขา/หน่วยงานย่อย:  {{ division }}, ปีงบประมาณ {{ fiscalYearStart }} - {{ fiscalYearEnd }}  </label>
             {% endif %}
         </div>
     </div>
@@ -141,17 +141,17 @@
     {% if reportType == 'table' %}
         <div class="row">
             <div class="col-1"></div>
-            <div class="col-3">
-                <label class="text-primary" style="font-weight: bold"> จำนวนโครงการวิจัยแยกตามปีงบประมาณ: </label>
+            <div class="col-4">
+                <label class="text-primary" style="font-weight: bold"> จำนวนครั้งการฝึกอบรม/สัมมนาแยกตามสาขา: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
                     <tr style="{{ lineColor }}">
-                        {% for col in dfResearchCount.columns %}
+                        {% for col in dfTrainingCount.columns %}
                             <th class="text-center">{{ col }}</th>
                         {% endfor %}
                     </tr>
-                    {% for index, row in dfResearchCount.iterrows %}
+                    {% for index, row in dfTrainingCount.iterrows %}
                         <tr>
-                            <td class="text-center">{{ row.Year }}</td>
+                            <td class="text-center">{{ row.Division }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
                     {% endfor %}
@@ -165,46 +165,19 @@
             <div class="col-1"></div>
 
             <div class="col-4">
-                <label class="text-primary" style="font-weight: bold"> ทุนวิจัยแยกตามปีงบประมาณ: </label>
+                <label class="text-primary" style="font-weight: bold"> งบประมาณที่ใช้แยกตามปีงบประมาณ: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
                     <tr style="{{ lineColor }}">
-                    {% for col in dfResearchBudget.columns %}
+                    {% for col in dfTrainingBudget.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
-                    {% for index, row in dfResearchBudget.iterrows %}
+                    {% for index, row in dfTrainingBudget.iterrows %}
                         {% if row.Year != '0' %}
                             <tr>
                                 <td class="text-center">{{ row.Year }}</td>
-                                <td class="text-center">{{ row.Budget  | floatformat:2 | intcomma}}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                    <tr style="background-color: rgba(239,240,243,0.88)">
-                        <td class="text-center">รวม</td>
-                        <td class="text-center">{{ sum  | floatformat:2 | intcomma }}</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="col-1"></div>
-        </div>
-
-        <div class="row">
-            <div class="col-1"></div>
-            <div class="col-6">
-                <label class="text-primary" style="font-weight: bold">ทุนวิจัยแยกตามประเภทงบประมาณ: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
-                    <tr style="{{ lineColor }}">
-                    {% for col in dfResearchBudgetType.columns %}
-                        <th class="text-center">{{ col }}</th>
-                    {% endfor %}
-                    </tr>
-                    {% for index, row in dfResearchBudgetType.iterrows %}
-                        {% if row.Year != 0 %}
-                            <tr>
-                                <td class="text-center">{{ row.Type }}</td>
                                 <td class="text-center">{{ row.Count }}</td>
-                                <td class="text-center">{{ row.Budget  | floatformat:2 | intcomma}}</td>
+                                <td class="text-center"> {{ row.Budget  | floatformat:2 | intcomma}}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}
@@ -215,8 +188,36 @@
                 </table>
             </div>
             <div class="col-1"></div>
-
         </div>
+
+{#        <div class="row">#}
+{#            <div class="col-1"></div>#}
+{#            <div class="col-6">#}
+{#                <label class="text-primary" style="font-weight: bold">จำนวนครั้งการฝึกอบรม/สัมมนาแยกสาขา: </label>#}
+{#                <table class="table table-bordered text-primary" style="width: 100%">#}
+{#                    <tr class="text-white" style="background-color: #a1dabe">#}
+{#                    {% for col in dfTrainingBudgetType.columns %}#}
+{#                        <th class="text-center">{{ col }}</th>#}
+{#                    {% endfor %}#}
+{#                    </tr>#}
+{#                    {% for index, row in dfTrainingBudgetType.iterrows %}#}
+{#                        {% if row.Year != 0 %}#}
+{#                            <tr>#}
+{#                                <td class="text-center">{{ row.Type }}</td>#}
+{#                                <td class="text-center">{{ row.Count }}</td>#}
+{#                                <td class="text-center">{{ row.Budget }}</td>#}
+{#                            </tr>#}
+{#                        {% endif %}#}
+{#                    {% endfor %}#}
+{#                    <tr style="background-color: rgba(239,240,243,0.88)">#}
+{#                        <td class="text-center" colspan="2">รวม</td>#}
+{#                        <td class="text-center">{{ sum }}</td>#}
+{#                    </tr>#}
+{#                </table>#}
+{#            </div>#}
+{#            <div class="col-1"></div>#}
+{##}
+{#        </div>#}
         <br><br>
     {% else %}
         {# ************************ Dashboard *****************************#}
@@ -224,7 +225,7 @@
             <div class="col-3"></div>
             <div class="col-2 text-center" style="background-color: #76a1e0">
                     <span class="badge" style="background-color: #76a1e0">
-                        <label class="text-start">จำนวนโครงการวิจัย</label> <br>
+                        <label class="text-start">จำนวนครั้งในการฝึกอบรม/สัมมนา</label> <br>
                         <label style="font-weight: bold;font-size: 35pt; margin: 20px">{{ count }}</label>
                     </span>
             </div>
@@ -232,8 +233,8 @@
             <div class="col-3 text-center" style="background-color: #7eab84">
 {#                {{ chartSum | safe }}#}
                     <span class="badge"  style="background-color: #7eab84">
-                        <label class="text-start" >ทุนวิจัยรวม</label> <br>
-                        <label style="font-weight: bold;font-size: 35pt; margin: 20px">{{ strsum  | floatformat:2 | intcomma}} </label>
+                        <label class="text-start" >งบประมาณที่ใช้รวม</label> <br>
+                        <label style="font-weight: bold;font-size: 35pt; margin: 20px">{{ strsum }} </label>
                     </span>
             </div>
         </div>
@@ -241,11 +242,11 @@
         <div class="row text-center align-content-center">
             <div class="col-1"></div>
             <div class="col-md-4 text-center" style="alignment: center" >
-                {{ chartResearchCount | safe }}
+                {{ chartTrainingCount | safe }}
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-4 text-center" style="alignment: center">
-                {{ chartResearchBudget | safe }}
+                {{ chartTrainingBudget | safe }}
             </div>
             <div class="col-md-1"></div>
         </div>
@@ -253,11 +254,11 @@
         <div class="row text-center align-content-center">
             <div class="col-2"></div>
             <div class="col-md-4 text-center" style="alignment: center">
-                {{ chartResearchBudgetType | safe }}
+                {{ chartTrainingBudgetType | safe }}
             </div>
 {#            <div class="col-md-1"></div>#}
             <div class="col-md-4 text-center" style="alignment: center">
-                {{ chartResearchBudgetTypeCount| safe }}
+                {{ chartTrainingBudgetTypeCount| safe }}
             </div>
             <div class="col-md-1"></div>
         </div>

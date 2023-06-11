@@ -57,28 +57,37 @@ def home(request):
         context = {}
         if Personnel.objects.all().count()> 0:
             count = Personnel.objects.all().count()
-            dataFrameDiv = statistic.getDivisionSet()
-            dataFrameEdu = statistic.getEducationSet()
-            dataFrameStatus = statistic.getStatusSet()
-            dataFrameGender = statistic.getGenderSet()
-            figDiv = px.bar(dataFrameDiv, x='Division', y='Count', title='บุคลากรแยกตามสาขา')
+            dfDiv = statistic.getDivisionSet()
+            dfReserchYear = statistic.getResearchFiscalYears()
+            yearStart=dfReserchYear[0]
+            yearEnd=dfReserchYear[len(dfReserchYear)-1]
+            dfResearchBudget = statistic.getResearchBudgetSet(budgetType=None, fiscalYearStart=yearStart, fiscalYearEnd=yearEnd)
+            dfEdu = statistic.getEducationSet()
+            dfStatus = statistic.getStatusSet()
+
+            figDiv = px.bar(dfDiv, x='Division', y='Count', title='บุคลากรแยกตามสาขา')
             figDiv.update_layout(autosize=False, width=400, height=350,
                                  margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
-            # paper_bgcolor="aliceblue")
             chartDiv = figDiv.to_html()
 
-            figEdu = px.pie(dataFrameEdu, names='Level', values='Count', title='บุคลากรแยกตามระดับการศึกษา')
+            figResearchBudget = px.line(dfResearchBudget, x="Year", y="Budget", title='ทุนวิจัยแยกตามปีงบประมาณ')
+            figResearchBudget.update_layout(autosize=False, width=400, height=300,
+                                            margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+            chartResearchBudget = figResearchBudget.to_html()
+
+            figEdu = px.pie(dfEdu, names='Level', values='Count', title='บุคลากรแยกตามระดับการศึกษา')
             figEdu.update_layout(autosize=False, width=300, height=300,
                                  margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
             chartEdu = figEdu.to_html()
 
-            figStatus = px.pie(dataFrameStatus, names='Status', values='Count', title='บุคลากรแยกตามตำแหน่งทางวิชาการ')
+            figStatus = px.pie(dfStatus, names='Status', values='Count', title='บุคลากรแยกตามตำแหน่งทางวิชาการ')
             figStatus.update_layout(autosize=False, width=300, height=250,
                                     margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
             chartStatus = figStatus.to_html()
 
-            context = {'chartDiv': chartDiv, 'chartEdu': chartEdu, 'chartStatus': chartStatus,
-                       'dataFrameDiv':dataFrameDiv }
+            context = {'chartDiv': chartDiv, 'chartResearchBudget': chartResearchBudget,
+                       'chartEdu': chartEdu, 'chartStatus': chartStatus,
+                       }
         return render(request, 'home.html', context)
 
 # ตรวจสอบ Login

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load custom_tags %}
 {% block content %}
     <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลบุคลากร </h2>
     <div class="row">
@@ -78,9 +79,14 @@
 
     </div>
     <hr class="text-primary">
-    <div class="row" style="background-color: #d3f8df">
+    {% if reportType == 'dashboard' %}
+        {% groupValue "color:blue; background-color:#d3f8df " as lineColor %}
+    {% else %}
+        {% groupValue "color:white; background-color:#8bb2ec " as lineColor %}
+    {% endif %}
+    <div class="row"  style="{{ lineColor }}">
         <div class="col-1"> </div>
-        <div class="col-11 text-primary">
+        <div class="col-11">
             {% if division is not None %}
                 <label> เฉพาะสาขา/หน่วยงานย่อย:  {{ division }}</label>
             {% else %}
@@ -96,7 +102,7 @@
             <div class="col-5">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามสาขา: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
-                    <tr class="bg-primary text-white">
+                    <tr class="text-white" style="{{ lineColor }}">
                         {% for col in dfDiv.columns %}
                             <th class="text-center">{{ col }}</th>
                         {% endfor %}
@@ -117,7 +123,7 @@
             <div class="col-4">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามระดับการศึกษา: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
-                    <tr class="bg-primary text-white">
+                    <tr class="text-white" style="{{ lineColor }}">
                     {% for col in dfEdu.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
@@ -142,7 +148,7 @@
             <div class="col-5">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามตำแหน่งทางวิชาการ: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
-                    <tr class="bg-primary text-white" >
+                    <tr style="{{ lineColor }}">
                     {% for col in dfStatus.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
@@ -163,7 +169,7 @@
             <div class="col-4">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามเพศ: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
-                    <tr class="bg-primary text-white" >
+                    <tr style="{{ lineColor }}">
                     {% for col in dfGender.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
