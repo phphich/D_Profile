@@ -151,7 +151,7 @@
                     </tr>
                     {% for index, row in dfTrainingCount.iterrows %}
                         <tr>
-                            <td class="text-center">{{ row.Division }}</td>
+                            <td class="text-start">{{ row.Division }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
                     {% endfor %}
@@ -189,36 +189,7 @@
             </div>
             <div class="col-1"></div>
         </div>
-
-{#        <div class="row">#}
-{#            <div class="col-1"></div>#}
-{#            <div class="col-6">#}
-{#                <label class="text-primary" style="font-weight: bold">จำนวนครั้งการฝึกอบรม/สัมมนาแยกสาขา: </label>#}
-{#                <table class="table table-bordered text-primary" style="width: 100%">#}
-{#                    <tr class="text-white" style="background-color: #a1dabe">#}
-{#                    {% for col in dfTrainingBudgetType.columns %}#}
-{#                        <th class="text-center">{{ col }}</th>#}
-{#                    {% endfor %}#}
-{#                    </tr>#}
-{#                    {% for index, row in dfTrainingBudgetType.iterrows %}#}
-{#                        {% if row.Year != 0 %}#}
-{#                            <tr>#}
-{#                                <td class="text-center">{{ row.Type }}</td>#}
-{#                                <td class="text-center">{{ row.Count }}</td>#}
-{#                                <td class="text-center">{{ row.Budget }}</td>#}
-{#                            </tr>#}
-{#                        {% endif %}#}
-{#                    {% endfor %}#}
-{#                    <tr style="background-color: rgba(239,240,243,0.88)">#}
-{#                        <td class="text-center" colspan="2">รวม</td>#}
-{#                        <td class="text-center">{{ sum }}</td>#}
-{#                    </tr>#}
-{#                </table>#}
-{#            </div>#}
-{#            <div class="col-1"></div>#}
-{##}
-{#        </div>#}
-        <br><br>
+       <br><br>
     {% else %}
         {# ************************ Dashboard *****************************#}
         <div class="row">

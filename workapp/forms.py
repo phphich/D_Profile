@@ -631,7 +631,7 @@ class SocialServiceForm(forms.ModelForm):
         )
         model = SocialService
         fields = (
-            'fiscalYear', 'eduYear', 'eduSemeter','topic', 'place','receiver', 'num_receiver', 'startDate', 'endDate', 'days', 'budget',
+            'fiscalYear', 'eduYear', 'eduSemeter','topic', 'objective', 'place','receiver', 'num_receiver', 'startDate', 'endDate', 'days', 'budget',
             'budgetType', 'source', 'recorder','editor')
         widgets = {
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),

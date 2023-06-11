@@ -58,35 +58,41 @@ def home(request):
         if Personnel.objects.all().count()> 0:
             count = Personnel.objects.all().count()
             dfDiv = statistic.getDivisionSet()
+            figDiv = px.bar(dfDiv, x='Division', y='Count', title='บุคลากรแยกตามสาขา')
+            figDiv.update_layout(autosize=False, width=450, height=350,
+                                 margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+            chartDiv = figDiv.to_html()
+
             dfReserchYear = statistic.getResearchFiscalYears()
             yearStart=dfReserchYear[0]
             yearEnd=dfReserchYear[len(dfReserchYear)-1]
             dfResearchBudget = statistic.getResearchBudgetSet(budgetType=None, fiscalYearStart=yearStart, fiscalYearEnd=yearEnd)
-            dfEdu = statistic.getEducationSet()
-            dfStatus = statistic.getStatusSet()
-
-            figDiv = px.bar(dfDiv, x='Division', y='Count', title='บุคลากรแยกตามสาขา')
-            figDiv.update_layout(autosize=False, width=400, height=350,
-                                 margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
-            chartDiv = figDiv.to_html()
-
             figResearchBudget = px.line(dfResearchBudget, x="Year", y="Budget", title='ทุนวิจัยแยกตามปีงบประมาณ')
             figResearchBudget.update_layout(autosize=False, width=400, height=300,
                                             margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
             chartResearchBudget = figResearchBudget.to_html()
 
-            figEdu = px.pie(dfEdu, names='Level', values='Count', title='บุคลากรแยกตามระดับการศึกษา')
-            figEdu.update_layout(autosize=False, width=300, height=300,
+            dfSocialServiceYear = statistic.getSocialServiceFiscalYears()
+            yearStart=dfSocialServiceYear[0]
+            yearEnd=dfSocialServiceYear[len(dfSocialServiceYear)-1]
+            dfSocialService = statistic.getSocialServiceCountSet(budgetType=None, fiscalYearStart=yearStart, fiscalYearEnd=yearEnd)
+            figSocialService = px.bar(dfSocialService, x='Year', y='Count', title='จำนวนโครงการบริการทางวิชาการแยกตามปีงบประมาณ')
+            figSocialService.update_layout(autosize=False, width=300, height=300,
                                  margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
-            chartEdu = figEdu.to_html()
+            chartSocialService= figSocialService.to_html()
 
+            # divisions = Division.objects.all().order_by('name_th')
+            dfStatus = statistic.getStatusSet(division=None)
             figStatus = px.pie(dfStatus, names='Status', values='Count', title='บุคลากรแยกตามตำแหน่งทางวิชาการ')
-            figStatus.update_layout(autosize=False, width=300, height=250,
+            figStatus.update_layout(autosize=False, width=350, height=350,
                                     margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
             chartStatus = figStatus.to_html()
 
+            # dfEdu = statistic.getEducationSet()
+            # dfStatus = statistic.getStatusSet()
+
             context = {'chartDiv': chartDiv, 'chartResearchBudget': chartResearchBudget,
-                       'chartEdu': chartEdu, 'chartStatus': chartStatus,
+                       'chartSocialService': chartSocialService,'chartStatus':chartStatus,
                        }
         return render(request, 'home.html', context)
 

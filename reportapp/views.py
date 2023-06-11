@@ -126,8 +126,6 @@ def researchReport(request, budgetType=None, fiscalYearStart=None, fiscalYearEnd
                                                     fiscalYearEnd=fiscalYearEnd)
     dfResearchBudgetType = statistic.getResearchBudgetTypeSet(budgetType=budgetType, fiscalYearStart=fiscalYearStart,
                                                     fiscalYearEnd=fiscalYearEnd)
-    print('dfResearchBudgetType')
-    print(dfResearchBudgetType)
     figResearchCount = px.bar(dfResearchCount, x='Year', y='Count', title='จำนวนโครงการวิจัยแยกตามปีงบประมาณ')
     figResearchCount.update_layout(autosize=False, width=450, height=350,
                           margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
@@ -283,18 +281,6 @@ def trainingReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None
     fiscalYearTrainings = statistic.getTrainingFiscalYears() #ปีวิจัยที่มีในฐานข้อมูล
     divisions = Division.objects.all().order_by('name_th')
 
-
-    # if divId == None or int(divId) == 0:
-    #     division = None
-    #     if reportType is not None:
-    #         reportType = reportType
-    #     else:
-    #         reportType = 'dashboard'
-    #     count = Personnel.objects.all().count()
-    # else:
-    #     division = Division.objects.filter(id=divId).first()
-    #     count = Personnel.objects.filter(division=division).count()
-
     if divId is not None:#มาจากคลิ้กลิงก์
         divId=divId
         fiscalYearStart = int(fiscalYearStart)
@@ -371,3 +357,91 @@ def trainingReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None
                'dfTrainingBudget': dfTrainingBudget, 'chartTrainingBudget': chartTrainingBudget,
                'count':count,'sum':sum, 'strsum':strsum}
     return render(request, 'report/trainingReport.html', context)
+
+# ********************* การลา **********************
+def leaveReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, reportType=None):
+    leaveCount = Leave.objects.all().count()
+    if leaveCount == 0:
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    fiscalYearLeaves = statistic.getLeaveFiscalYears() #ปีวิจัยที่มีในฐานข้อมูล
+    divisions = Division.objects.all().order_by('name_th')
+
+    if divId is not None:#มาจากคลิ้กลิงก์
+        divId=divId
+        fiscalYearStart = int(fiscalYearStart)
+        fiscalYearEnd = int(fiscalYearEnd)
+        reportType = reportType
+    elif 'divId' in request.POST:#มาจากเลือก Selecct box
+        divId = request.POST['divId']
+        fiscalYearStart = int(request.POST['fiscalYearStart'])
+        fiscalYearEnd = int(request.POST['fiscalYearEnd'])
+        if fiscalYearEnd < fiscalYearStart:
+            fiscalYearEnd = fiscalYearStart
+        reportType = request.POST['reportType']
+    else:
+        print("c")
+        division = None
+        fiscalYearStart = fiscalYearLeaves[len(fiscalYearLeaves)-1]
+        fiscalYearEnd = fiscalYearLeaves[len(fiscalYearLeaves)-1]
+        reportType = 'dashboard'
+    if divId is None or divId =='None' or divId == '0' or divId == '':  # เลือกทั้งหมด
+        division = None
+        count = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd).count()
+        rsum = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                        ).aggregate(sum=Sum('days'))
+        sum = rsum['sum']
+    else:
+        print("e")
+        division = Division.objects.filter(id=divId).first()
+        count = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd, personnel__division=division).count()
+        rsum = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                        personnel__division=division).aggregate(sum=Sum('days'))
+        sum = rsum['sum']
+
+    #ปีงบประมาณ
+    fiscalYearLeaves = list(reversed(fiscalYearLeaves)) #กลับด้านลิสต์ จากมากไปน้อย
+    print("**************************")
+    print('fiscalYearSocialService')
+    print(fiscalYearLeaves)
+    print('division')
+    print(division)
+    print('fiscalYearStart')
+    print(fiscalYearStart)
+    print('fiscalYearEnd')
+    print(fiscalYearEnd)
+    print("count")
+    print(count)
+    print('sum')
+    print(sum)
+
+    print("**************************")
+
+    dfLeaveCount = statistic.getLeaveCountSet(division=division, fiscalYearStart=fiscalYearStart,
+                                                    fiscalYearEnd=fiscalYearEnd)
+    dfLeaveType = statistic.getLeaveTypeSet(division=division, fiscalYearStart=fiscalYearStart,
+                                                    fiscalYearEnd=fiscalYearEnd)
+    figLeaveCount = px.bar(dfLeaveCount, x='Division', y='Count', title='จำนวนครั้งในการลาแยกตามสาขา')
+    figLeaveCount.update_layout(autosize=False, width=450, height=350,
+                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    chartLeaveCount = figLeaveCount.to_html()
+
+    figLeaveType = px.pie(dfLeaveType, names="Type", values="Count", title='จำนวนครั้งในการลาแยกตามประเภท')
+    figLeaveType.update_layout(autosize=False, width=350, height=350,
+                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    chartLeaveType = figLeaveType.to_html()
+
+    figLeaveDays = px.pie(dfLeaveType, names="Type", values="Days", title='จำนวนวันลาแยกตามประเภท')
+    figLeaveDays.update_layout(autosize=False, width=350, height=350,
+                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    chartLeaveDays = figLeaveDays.to_html()
+
+    context = {'divisions':divisions, 'division':division,
+               'fiscalYearLeaves':fiscalYearLeaves,
+               'fiscalYearStart':fiscalYearStart, 'fiscalYearEnd':fiscalYearEnd, 'reportType':reportType,
+               'dfLeaveCount':dfLeaveCount,'chartLeaveCount':chartLeaveCount,
+               'dfLeaveType': dfLeaveType, 'chartLeaveType': chartLeaveType, 'chartLeaveDays': chartLeaveDays,
+
+               'count':count, 'sum': sum}
+    return render(request, 'report/leaveReport.html', context)

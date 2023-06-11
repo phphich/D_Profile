@@ -3,7 +3,7 @@
 {% block content %}
     <div class="row">
         <div class="col-10">
-            <h2><i class="fas fa-people-carry"></i> บันทึกการบริการทางวิชาการแก่สังคม </h2>
+            <h2><i class="fas fa-person-booth"></i> บันทึกการบริการทางวิชาการแก่สังคม </h2>
             {% if request.session.userType != "Administrator" and request.session.userType != "Staff" %}
                 <h4> {{ personnel }},  สังกัด: {{ personnel.division }} </h4>
             {% endif %}
@@ -23,7 +23,7 @@
             </div>
             <p>
                 {% if request.session.userType == "Personnel" %}
-                    <label for="status" class="text-primary">หน้าที่ที่ได้รับมอบหมาย</label>
+                    <label for="status" class="text-primary"> หน้าที่ที่ได้รับมอบหมาย</label>
                     <input type="text" class="form-control" name="status" required id="status" size="35" maxlength="30"
                            value="ผู้ร่วมโครงการ" required="required">
                 {% endif %}

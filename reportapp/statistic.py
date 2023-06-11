@@ -248,21 +248,71 @@ def getTrainingBudgetSet(division, fiscalYearStart, fiscalYearEnd):
         trainings = Training.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
                                              personnel__division=division).values('fiscalYear').annotate(count=Count('fiscalYear'),sum=Sum('budget'))\
             .order_by('fiscalYear')
-    traingYear = []
+    trainingYear = []
     trainingCount = []
     trainingSum = []
     if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
-        traingYear.append("0")
+        trainingYear.append("0")
         trainingCount.append((0))
         trainingSum.append(0.00)
     elif trainings.count() == 1:
-        traingYear.append(str(fiscalYearStart))
+        trainingYear.append(str(fiscalYearStart))
         trainingCount.append(0)
         trainingSum.append(0.00)
     for training in trainings:
-        traingYear.append(str(training['fiscalYear']))
+        trainingYear.append(str(training['fiscalYear']))
         trainingCount.append(training['count'])
         trainingSum.append(training['sum'])
-    dfTrainingBudget = pd.DataFrame({'Year': traingYear, 'Count': trainingCount,  'Budget': trainingSum}, columns=['Year', 'Count', 'Budget'])
+    dfTrainingBudget = pd.DataFrame({'Year': trainingYear, 'Count': trainingCount,  'Budget': trainingSum}, columns=['Year', 'Count', 'Budget'])
     return dfTrainingBudget
 
+# *********************** Leave ************************
+def getLeaveFiscalYears():
+    fiscalYearDatas = Leave.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
+    for f in fiscalYearDatas:
+        fiscalYears.append(f['fiscalYear'])
+    return fiscalYears
+
+def getLeaveCountSet(division, fiscalYearStart, fiscalYearEnd):
+    if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
+        leaves = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('personnel__division__name_th').annotate(count=Count('personnel__division'))\
+            .order_by('personnel__division__name_th')
+    else:
+        leaves = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             personnel__division=division).values('personnel__division__name_th').\
+            annotate(count=Count('personnel__division'))\
+            .order_by('personnel__division__name_th')
+    leaveDivision = []
+    leaveCount = []
+    for leave in leaves:
+        leaveDivision.append(str(leave['personnel__division__name_th']))
+        leaveCount.append(leave['count'])
+    dfLeaveCount = pd.DataFrame({'Division': leaveDivision, 'Count': leaveCount}, columns=['Division', 'Count'])
+    return dfLeaveCount
+
+def getLeaveTypeSet(division, fiscalYearStart, fiscalYearEnd):
+    if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
+        leaveTypes = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('leaveType').annotate(count=Count('leaveType'), days=Sum('days'))\
+            .order_by('leaveType')
+    else:
+        leaveTypes = Leave.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             personnel__division=division).values('leaveType').annotate(count=Count('leaveType'), days=Sum('days'))\
+            .order_by('leaveType')
+    leaveType = []
+    leaveCount = []
+    leaveDays = []
+    # if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
+    #     leaveType.append("?")
+    #     leaveCount.append((0))
+    # elif leaveTypes.count() == 1:
+    #     leaveType.append("?")
+    #     leaveCount.append(0)
+    for leave in leaveTypes:
+        leaveType.append(str(leave['leaveType']))
+        leaveCount.append(leave['count'])
+        leaveDays.append(leave['days'])
+    dfLeaveBudget = pd.DataFrame({'Type': leaveType, 'Count': leaveCount, 'Days' : leaveDays}, columns=['Type', 'Count', 'Days'])
+    return dfLeaveBudget
