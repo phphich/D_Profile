@@ -1008,6 +1008,13 @@ def commandNew(request):
     if request.method == 'POST':
         form = CommandForm(data=request.POST)
         if form.is_valid():
+            newForm = form.save(commit=False)
+            comId = request.POST['comId']
+            duplicate = Command.objects.filter(comId=comId).first()
+            if duplicate is not None:
+                messages.add_message(request, messages.WARNING, "หมายเลขคำสั่งซ้ำกับที่มีอยู่แล้วในระบบ (อาจถูกบันทึกโดยบุคลากรรายอื่นไว้แล้ว) ")
+                context = {'form': form}
+                return render(request, 'work/command/commandNew.html', context)
             form.save()
             command = Command.objects.last()
             if(request.session["userType"]=="Personnel"):
