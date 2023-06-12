@@ -17,7 +17,7 @@ import pandas as pd
 import plotly.express as px
 from django.db.models import F, Sum, Q, Count
 
-#ล็อกเอ๊าท์ผ่านระบบ Authen ของ Django
+
 def personnelReport(request, divId=None, reportType=None):
     divisions = Division.objects.all().order_by('name_th')
     if divisions is None:
@@ -504,6 +504,8 @@ def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, rep
     #                                                 eduYearEnd=eduYearEnd)
     dfCommandMission = statistic.getCommandMissionSet(mission=mission, eduYearStart=eduYearStart,
                                                     eduYearEnd=eduYearEnd)
+    print('dfCommandCount')
+    print(dfCommandCount)
     print('dfCommandMission')
     print(dfCommandMission)
     figCommandCount = px.bar(dfCommandCount, x='Year', y='Count', title='จำนวนคำสั่งแยกตามปีงบประมาณ')
@@ -517,7 +519,7 @@ def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, rep
     # chartCommandBudget = figCommandBudget.to_html()
 
     figCommandMission = px.pie(dfCommandMission, names='Mission', values='Count', title='จำนวนคำสั่งแยกตามพันธกิจ')
-    figCommandMission.update_layout(autosize=False, width=400, height=400,
+    figCommandMission.update_layout(autosize=False, width=450, height=450,
                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
     chartCommandMission = figCommandMission.to_html()
 
@@ -541,3 +543,45 @@ def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, rep
                'dfCommandMission': dfCommandMission, 'chartCommandMission': chartCommandMission,
                'count':count}
     return render(request, 'report/commandReport.html', context)
+
+# ********************* Sub Report - Personnel ******************** #
+def reportSubPersonnel(request, subNo, divId, paraValue):
+    if subNo=='1': #บุคลากรตามรหัสสาขา
+        name_th = paraValue
+        division = Division.objects.filter(name_th=name_th).first()
+        personnels = division.getPersonnels()
+        count = personnels.count()
+    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
+        level = paraValue
+        if divId is None or divId == 'None' or  divId == '0':
+            persons = Personnel.objects.all()
+        else:
+            division = Division.objects.filter(id = divId).first()
+            persons = division.getPersonnels()
+        personnels = []
+        for personnel in persons:
+            if personnel.getHighestEducation() == level:
+                personnels.append(personnel)
+        count = len(personnels) #list
+    elif subNo == '3': #บุคลากรตามตำแหน่งทางวิชาการ
+        status = paraValue
+        if divId is None or divId == 'None' or divId == '0':
+            personnels = Personnel.objects.filter(status=status)
+        else:
+            division = Division.objects.filter(id=divId).first()
+            personnels = Personnel.objects.filter(status=status, division=division)
+        count = personnels.count()
+    else: #บุคลากรตามเพศ
+        gender = paraValue
+        if divId is None or divId == 'None' or divId == '0':
+            personnels = Personnel.objects.filter(gender=gender)
+        else:
+            division = Division.objects.filter(id=divId).first()
+            personnels = Personnel.objects.filter(gender=gender, division=division)
+        count = personnels.count()
+
+    context = {'personnels': personnels, 'subNo': subNo, 'parameter': paraValue, 'count':count}
+    return render(request, 'report/personnelSubReport.html', context)
+
+
+

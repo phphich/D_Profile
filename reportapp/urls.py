@@ -4,6 +4,8 @@ from reportapp import views
 urlpatterns = [
     path('personnelReport', views.personnelReport, name='personnelReport'),
     path('<divId>/<reportType>/personnelReport', views.personnelReport, name='personnelReport'),
+    path('<subNo>/<divId>/<paraValue>/personnelSubReport', views.reportSubPersonnel, name='personnelSubReport'),
+    # -------------------------------- #
     path('researchReport', views.researchReport, name='researchReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/researchReport', views.researchReport, name='researchReport'),
     path('socialserviceReport', views.socialserviceReport, name='socialserviceReport'),
@@ -17,7 +19,7 @@ urlpatterns = [
          name='leaveReport'),
 
     path('commandReport', views.commandReport, name='commandReport'),
-    path('<mission>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/commandReport', views.commandReport,
+    path('<mission>/<eduYearStart>/<eduYearEnd>/<reportType>/commandReport', views.commandReport,
          name='commandReport'),
 
 ]

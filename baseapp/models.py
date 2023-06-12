@@ -156,7 +156,6 @@ class Personnel(models.Model):
         if educations.count() != 0:
             for edu in educations:
                 personnelEdu.append(edu.level)
-
             if 'ปริญญาเอก' in personnelEdu:
                 highestEdu='ปริญญาเอก'
             elif 'ปริญญาโท' in personnelEdu:
@@ -170,6 +169,32 @@ class Personnel(models.Model):
             elif 'ม.6' in personnelEdu:
                 highestEdu = 'ม.6'
         return highestEdu
+    def getHighestEducationName(self):
+        educations = Education.objects.filter(personnel=self)
+        personnelEdu = []
+        personnelEduName = []
+        highestEdu="ไม่ระบุ"
+        if educations.count() != 0:
+            i=None
+            for edu in educations:
+                personnelEdu.append(edu.level)
+                personnelEduName.append(edu.degree_th_sh)
+            if 'ปริญญาเอก' in personnelEdu:
+                i  = personnelEdu.index('ปริญญาเอก')
+            elif 'ปริญญาโท' in personnelEdu:
+                i  = personnelEdu.index('ปริญญาโท')
+            elif 'ปริญญาตรี' in personnelEdu:
+                i = personnelEdu.index('ปริญญาตรี')
+            elif 'ปวส.' in personnelEdu:
+                i = personnelEdu.index('ปวส.')
+            elif 'ปวช.' in personnelEdu:
+                i = personnelEdu.index('ปวช.')
+            elif 'ม.6' in personnelEdu:
+                i = personnelEdu.index('ม.6')
+            if i is not None:
+                highestEdu = personnelEduName[i]
+        return highestEdu
+
 
 class Education(models.Model):
     level = models.CharField(max_length=30, default="")

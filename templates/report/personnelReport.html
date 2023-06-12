@@ -96,19 +96,24 @@
     </div>
     <br>
     {# ************************ Table *****************************#}
+    {% if division is None %}
+        {% groupValue "0" as divValue %}
+    {% else %}
+        {% groupValue division.id as divValue %}
+    {% endif %}
     {% if reportType == 'table' %}
         <div class="row">
             <div class="col-1"></div>
             <div class="col-5">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามสาขา: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr class="text-white" style="{{ lineColor }}">
                         {% for col in dfDiv.columns %}
                             <th class="text-center">{{ col }}</th>
                         {% endfor %}
                     </tr>
                     {% for index, row in dfDiv.iterrows %}
-                        <tr>
+                        <tr onclick="location.href='{% url 'personnelSubReport'  '1' divValue row.Division %}'" style="cursor:pointer;">
                             <td>{{ row.Division }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -122,14 +127,14 @@
             <div class="col-1"></div>
             <div class="col-4">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามระดับการศึกษา: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr class="text-white" style="{{ lineColor }}">
                     {% for col in dfEdu.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
                     {% for index, row in dfEdu.iterrows %}
-                        <tr>
+                        <tr onclick="location.href='{% url 'personnelSubReport' '2' divValue row.Level %}'" style="cursor:pointer;">
                             <td>{{ row.Level }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -147,14 +152,14 @@
             <div class="col-1"></div>
             <div class="col-5">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามตำแหน่งทางวิชาการ: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr style="{{ lineColor }}">
                     {% for col in dfStatus.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
                     {% for index, row in dfStatus.iterrows %}
-                        <tr>
+                        <tr onclick="location.href='{% url 'personnelSubReport' '3' divValue row.Status %}'" style="cursor:pointer;">
                             <td>{{ row.Status }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -168,14 +173,14 @@
             <div class="col-1"></div>
             <div class="col-4">
                 <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามเพศ: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr style="{{ lineColor }}">
                     {% for col in dfGender.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
                     {% for index, row in dfGender.iterrows %}
-                        <tr>
+                        <tr onclick="location.href='{% url 'personnelSubReport' '4' divValue row.Gender %}'" style="cursor:pointer;">
                             <td>{{ row.Gender }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>

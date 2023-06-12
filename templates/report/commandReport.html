@@ -12,16 +12,16 @@
             <form method="post" action="{% url 'commandReport' %}">
                 {% csrf_token %}
                 <select name="mission" class="form-control text-success" onchange="this.form.submit();">
-                    {% if budgetType is None %}
+                    {% if missions is None %}
                         <option value="0" selected> (ทั้งหมด) </option>
                     {% else %}
                         <option value="0"> (ทั้งหมด) </option>
                     {% endif %}
-                    {% for budget in budgetTypes %}
-                        {% if budget == budgetType %}
-                            <option value="{{ mission }}" selected> {{ mission }} </option>
+                    {% for mis in missions %}
+                        {% if mis == mission %}
+                            <option value="{{ mis }}" selected> {{ mis }} </option>
                         {% else %}
-                            <option value="{{ mission }}">  {{ mission }} </option>
+                            <option value="{{ mis }}">  {{ mis }} </option>
                         {% endif %}
                     {% endfor %}
                 </select>
@@ -123,8 +123,9 @@
     {% if reportType == 'dashboard' %}
         {% groupValue "color:blue; background-color:#d3f8df " as lineColor %}
     {% else %}
-        {% groupValue "color:white; background-color:#a1dabe " as lineColor %}
+        {% groupValue "color:dark; background-color:#dbf5f5 " as lineColor %}
     {% endif %}
+{#    <p style="background-color: #dbf5f5"> </p> #}
     <div class="row" style="{{ lineColor }}">
         <div class="col-1"> </div>
         <div class="col-11">
@@ -168,14 +169,14 @@
                 <label class="text-primary" style="font-weight: bold"> จำนวนคำสั่งแยกตามพันธกิจ: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
                     <tr style="{{ lineColor }}">
-                    {% for col in dfCommandBudget.columns %}
+                    {% for col in dfCommandMission.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
-                    {% for index, row in dfCommandBudget.iterrows %}
+                    {% for index, row in dfCommandMission.iterrows %}
                         {% if row.Year != '0' %}
                             <tr>
-                                <td class="text-center">{{ row.Mission }}</td>
+                                <td class="text-start">{{ row.Mission }}</td>
                                 <td class="text-center">{{ row.Count  }}</td>
                             </tr>
                         {% endif %}
@@ -224,7 +225,7 @@
             <div class="col-3"></div>
             <div class="col-2 text-center" style="background-color: #76a1e0">
                     <span class="badge" style="background-color: #76a1e0">
-                        <label class="text-start">จำนวนคำสั่ง</label> <br>
+                        <label class="text-start">จำนวนคำสั่งรวม</label> <br>
                         <label style="font-weight: bold;font-size: 35pt; margin: 20px">{{ count }}</label>
                     </span>
             </div>
@@ -245,7 +246,7 @@
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-4 text-center" style="alignment: center">
-                {{ chartCommandBudget | safe }}
+                {{ chartCommandMission | safe }}
             </div>
             <div class="col-md-1"></div>
         </div>
