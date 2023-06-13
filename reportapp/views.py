@@ -550,6 +550,7 @@ def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, rep
 
 # ********************* Sub Report - Personnel ******************** #
 def reportSubPersonnel(request, subNo, divId, paraValue):
+    request.session['last_url'] = request.path_info
     if subNo=='1': #บุคลากรตามรหัสสาขา
         name_th = paraValue
         division = Division.objects.filter(name_th=name_th).first()
@@ -589,7 +590,8 @@ def reportSubPersonnel(request, subNo, divId, paraValue):
 
 
 # ********************* Sub Report - Research ******************** #
-def reportSubReport(request, subNo, budgetType, paraValue):
+def researchSubReport(request, subNo, budgetType, paraValue):
+    request.session['last_url'] = request.path_info
     if subNo=='1': #วิจัย ปี/จำนวน
         fiscalYear = int(paraValue)
         researchs = None
@@ -632,6 +634,34 @@ def reportSubReport(request, subNo, budgetType, paraValue):
 
     # context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'count':count}
     return render(request, 'report/researchSubReport.html', context)
+
+
+# *************************** Personnel Detail Report ************************
+def personnelDetailReport(request, personnelId):
+    if 'clickBack' in request.POST:
+        return redirect(request.session['last_url'])
+    personnel = Personnel.objects.filter(id=personnelId).first()
+    educations = Education.objects.filter(personnel_id=personnelId)
+    expertises = Expertise.objects.filter(personnel_id=personnelId)
+    curraffs = CurrAffiliation.objects.filter(personnel__id=personnelId)
+
+    trainings = Training.objects.filter(personnel_id=personnelId)
+    researchs = Research.objects.filter(researchperson__personnel__id=personnelId)
+    socialservices = SocialService.objects.filter(socialserviceperson__personnel__id=personnelId)
+    performances = Performance.objects.filter(personnel_id=personnelId)
+    leaves = Leave.objects.filter(personnel_id=personnelId)
+    commands = Command.objects.filter(commandperson__personnel__id=personnelId)
+    choices = None
+    if 'choices' in request.POST:
+        choices = request.POST.getlist('choices')
+        print('choices')
+        print(choices)
+
+    context = {'personnel':personnel, 'educations':educations, 'expertises':expertises, 'curraffs':curraffs,
+               'trainings':trainings, 'researchs':researchs, 'socialservices':socialservices,
+               'performances':performances,'leaves':leaves, 'commands':commands, 'choices': choices,
+               }
+    return render(request, 'report/personnelDetailReport.html', context)
 
 
 

@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load humanize %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2> <i class="fa fa-user"></i> แฟ้มประวัติบุคลากรเฉพาะราย </h2>
+            <h4> {{ personnel }},   สังกัด: {{ personnel.division }}   </h4>
+        </div>
+    </div>
+    <hr class="text-primary">
+    {#    ข้อมูลพื้นฐานส่วนตัว #}
+    <div class="row">
+        <div class="col-10">
+            <h5 style="font-weight: bold;color: green"> ข้อมูลพื้นฐาน </h5>
+            <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                <tr>
+                    <th class="col-3 text-primary">เลขที่ตำแหน่ง</th>
+                    <td class="col-9" colspan="3">{{ personnel.sId }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">ชื่อ-สกุล (ภาษาไทย)</th>
+                    <td>
+                        {{ personnel.title }}
+                        {{ personnel.firstname_th }} {{ personnel.lastname_th }}
+                    </td>
+                    <th class="text-primary">ชื่อ-สกุล (ภาษาอังกฤษ)</th>
+                    <td>{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">ประเภทบุคลากร</th>
+                    <td> {{ personnel.status }}</td>
+                    <th class="text-primary">ประเภทบุคลากร</th>
+                    <td>{{ personnel.type }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">ที่อยู่</th>
+                    <td colspan="3">{{ personnel.address }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">เพศ</th>
+                    <td>{{ personnel.gender }}</td>
+                    <th class="text-primary">วันเดือนปีเกิด</th>
+                    <td>{{ personnel.birthDate |date:'d/m/Y' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">วันที่เริ่มบรรจุเข้าทำงาน</th>
+                    <td>{{ personnel.hiringDate |date:'d/m/Y' }}</td>
+                    <th class="text-primary">สังกัดสาขา</th>
+                    <td>{{ personnel.division.name_th }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">อีเมล์</th>
+                    <td colspan="3">{{ personnel.email }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="col-2 text-center">
+            <br>
+            <img class="img-thumbnail" src="{% static personnel.picture %}" width="200px" height="auto"
+                 style="margin-top:10px;">
+        </div>
+    </div>
+    <br>
+
+    {#    ประวัติการศึกษา #}
+    <div class="row">
+        <div class="12">
+            <h5 style="font-weight: bold;color: green"> ประวัติการศึกษา</h5>
+             <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+                 <tr class="text-primary">
+                     <th class="col-2">ระดับการศึกษา</th>
+                     <th class="col-3">คุณวุฒิการศึกษา</th>
+                     <th class="col-5">สถาบันการศึกษาที่สำเร็จ</th>
+                     <th class="col-2 text-center">ปีที่สำเร็จ</th>
+                 </tr>
+                 {% for education in educations %}
+                     <tr>
+                         <td>{{ education.level }}</td>
+                         <td>{{ education.degree_th_sh }}</td>
+                         <td>{{ education.institute }}</td>
+                         <td class="text-center">{{ education.yearGraduate }}</td>
+                     </tr>
+                 {% endfor %}
+             </table>
+        </div>
+    </div>
+    <br>
+
+{#    ประวัติความเชี่ยวชาญ #}
+    <div class="row">
+        <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ความเชี่ยวชาญ</h5>
+             <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                 <tr class="text-primary">
+                     <th class="col-4">ความเชี่ยวชาญ</th>
+                     <th class="col-4">รายละเอียด</th>
+                     <th class="col-4">ประสบการณ์/ผลงาน</th>
+                 </tr>
+                 {% for expert in expertises %}
+                     <tr>
+                         <td>{{ expert.topic }}</td>
+                         <td>{{ expert.detail }}</td>
+                         <td>{{ expert.experience }}</td>
+                     </tr>
+                 {% endfor %}
+             </table>
+        </div>
+    </div>
+    <br>
+
+    {% if personnel.type == 'สายวิชาการ' %}
+        {% if curraffs.count != 0 %}
+            {#    การบริหารหลักสุตร #}
+            <div class="row">
+                <div class="col-12">
+                    <h5 style="font-weight: bold;color: green"> การบริหารหลักสูตร </h5>
+                     <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                         <tr class="text-primary">
+                             <th class="col-5">หลักสูตร</th>
+                             <th class="col-7">ความรับผิดชอบ </th>
+                         </tr>
+                         {% for curraff in curraffs %}
+                             <tr>
+                                 <td>{{ curraff.curriculum.name_th }}({{ curraff.curriculum.level }})</td>
+                                 <td>{{ curraff.status }}</td>
+                             </tr>
+                         {% endfor %}
+                     </table>
+                </div>
+            </div>
+            <br>
+        {% endif %}
+    {% endif %}
+    <a name="choicearea"></a>
+    <form method="post" class="form-control" style="border-color: #6c757d; color: #0a53be">
+                {% csrf_token %}
+        <label style="color: green">แสดงประวัติ: </label>
+        <div class="row">
+            <div class="col-2">
+                {% if 'training' in choices %}
+                    <input type="checkbox" name="choices" value="training" checked onclick="this.form.submit();">
+                    การฝึกอบรม/สัมมนา
+                {% else %}
+                    <input type="checkbox" name="choices" value="training" onclick="this.form.submit();">
+                    การฝึกอบรม/สัมมนา
+                {% endif %}
+            </div>
+            <div class="col-1">
+                {% if 'research' in choices %}
+                    <input type="checkbox" name="choices" value="research" checked onclick="this.form.submit();">
+                    การวิจัย
+                {% else %}
+                    <input type="checkbox" name="choices" value="research" onclick="this.form.submit();"> การวิจัย
+                {% endif %}
+            </div>
+            <div class="col-3">
+                {% if 'socialservice' in choices %}
+                    <input type="checkbox" name="choices" value="socialservice" checked onclick="this.form.submit();">
+                    การบริการทางวิชาการแก่สังคม
+                {% else %}
+                    <input type="checkbox" name="choices" value="socialservice" onclick="this.form.submit();">
+                    การบริการทางวิชาการแก่สังคม
+                {% endif %}
+            </div>
+            <div class="col-3">
+                {% if 'performance' in choices %}
+                    <input type="checkbox" name="choices" value="performance" checked onclick="this.form.submit();">
+                    การรับตำแหน่ง/ผลงาน/รางวัล
+                {% else %}
+                    <input type="checkbox" name="choices" value="performance" onclick="this.form.submit();">
+                    การรับตำแหน่ง/ผลงาน/รางวัล
+                {% endif %}
+            </div>
+            <div class="col-1">
+                {% if 'leave' in choices %}
+                    <input type="checkbox" name="choices" value="leave" checked onclick="this.form.submit();"> การลา
+                {% else %}
+                    <input type="checkbox" name="choices" value="leave" onclick="this.form.submit();"> การลา
+                {% endif %}
+            </div>
+            <div class="col-2">
+                {% if 'command' in choices %}
+                    <input type="checkbox" name="choices" value="command" checked onclick="this.form.submit();">
+                    คำสั่งปฏิบัติงาน
+                {% else %}
+                    <input type="checkbox" name="choices" value="command" onclick="this.form.submit();"> คำสั่งปฏิบัติงาน
+                {% endif %}
+            </div>
+        </div>
+    </form>
+
+    {% if 'training' in choices %}
+        {#    ประวัติการฝึกอบรม #}
+        <div class="row">
+            <div class="col-12">
+                <h5 style="font-weight: bold;color: green"> ประวัติการฝึกอบรม/สัมมนา</h5>
+                 <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                     <tr class="text-primary">
+                         <th class="col-1 text-center">ปีงบประมาณ</th>
+                         <th class="col-2 text-center">วันที่ฝึกอบรม/สัมมนา</th>
+                         <th class="col-3">หัวข้อ</th>
+                         <th class="col-4">หน่วยงานหรือสถานที่จัดฝึกอบรมฯ</th>
+                         <th class="col-2 text-end">งบประมาณ</th>
+                     </tr>
+                     {% if trainings.count == 0  %}
+                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการฝึกอบรม/สัมมนาของบุคลากรในระบบ--</td></tr>
+                     {% else %}
+                         {% for training in trainings %}
+                             <tr>
+                                 <td class="text-center">{{ training.fiscalYear }}</td>
+                                 <td class="text-center">{{ training.startDate |date:'d/m/Y'}} - {{ training.endDate |date:'d/m/Y'}}</td>
+                                 <td>{{ training.topic }}</td>
+                                 <td>{{ training.place }}</td>
+                                 <td class="text-end">{{ training.budget|floatformat:2|intcomma }}</td>
+                             </tr>
+                         {% endfor %}
+                     {% endif %}
+                 </table>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    {% if 'research' in choices %}
+        {#    ประวัติการวิจัย #}
+        <div class="row">
+            <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ประวัติการวิจัย </h5>
+                 <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                     <tr class="text-primary">
+                         <th class="col-1 text-center">ปีงบประมาณ</th>
+                         <th class="col-5">ชื่องานวิจัย </th>
+                         <th class="col-1 text-center">สัดส่วนความรับผิดชอบ</th>
+                         <th class="col-2 text-end">งบประมาณ </th>
+                         <th class="col-3">หน่วยงานเจ้าของทุนวิจัย </th>
+                     </tr>
+                     {% if researchs.count == 0  %}
+                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการวิจัยของบุคลากรในระบบ--</td></tr>
+                     {% else %}
+                         {% groupValue '' as nValue %}
+                         {% for research in researchs %}
+                             <tr>
+                                 <td class="text-center">
+                                     {% if research.fiscalYear != nValue %}
+                                        {{ research.fiscalYear }}
+                                        {% groupValue research.fiscalYear as nValue %}
+                                     {% endif %}
+                                 </td>
+                                 <td>{{ research.title_th }}<br>
+                                     ({{ research.title_en }})</td>
+                                 <td class="text-center"> ?% </td>
+                                 <td class="text-end">{{ research.budget|floatformat:2|intcomma }}</td>
+                                 <td>{{ research.source }}</td>
+                             </tr>
+                         {% endfor %}
+                     {% endif %}
+                 </table>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    {% if 'socialservice' in choices %}
+    {#    ประวัติการบริการทางวิชาการ #}
+        <div class="row">
+            <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ประวัติการบริการทางวิชาการแก่สังคม </h5>
+                 <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                     <tr class="text-primary">
+                         <th class="col-1 text-center">ปีงบประมาณ</th>
+                         <th class="col-4">ชื่อโครงการ </th>
+                         <th class="col-2 text-center">สถานที่จัดโครงการ</th>
+                         <th class="col-2 text-end">ผู้รับบริการ </th>
+                         <th class="col-1 text-center"> จำนวน </th>
+                         <th class="col-2 text-end">งบประมาณ </th>
+                     </tr>
+                     {% if socialservices.count == 0  %}
+                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการบริการทางวิชาการแก่สังคมของบุคลากรในระบบ--</td></tr>
+                     {% else %}
+                         {% groupValue '' as nValue %}
+                         {% for socialservice in socialservices %}
+                             <tr>
+                                 <td class="text-center">
+                                     {% if socialservice.fiscalYear != nValue %}
+                                        {{ socialservice.fiscalYear }}
+                                        {% groupValue socialservice.fiscalYear as nValue %}
+                                     {% endif %}
+                                 </td>
+                                 <td>{{ socialservice.topic }}<br>
+                                 <td> {{ socialservice.place }} </td>
+                                 <td> {{ socialservice.receiver }} </td>
+                                 <td class="text-center"> {{ socialservice.num_receiver }} </td>
+                                 <td class="text-end">{{ socialservice.budget|floatformat:2|intcomma }}</td>
+                             </tr>
+                         {% endfor %}
+                     {% endif %}
+                 </table>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    {% if 'performance' in choices %}
+        {#    ประวัติการรับตำแหน่งผลงานรางวัล #}
+        <div class="row">
+            <div class="col-12">
+                <h5 style="font-weight: bold;color: green"> การรับตำแหน่ง/ผลงาน/รางวัล</h5>
+                 <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                     <tr class="text-primary">
+                         <th class="col-2">วันที่</th>
+                         <th class="col-5">ชื่อตำแหน่ง/ผลงาน/รางวัล</th>
+                         <th class="col-7">รายละเอียด</th>
+                         <th class="col-7">ผู้มอบ</th>
+                     </tr>
+                     {% if performances.count == 0  %}
+                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการรับตำแหน่ง/ผลงาน/รางวัลของบุคลากรในระบบ--</td></tr>
+                     {% else %}
+                         {% for performance in performances %}
+                             <tr>
+                                 <td>{{ performance.getDate | date:'d/m/Y' }}</td>
+                                 <td>{{ performance.topic }}</td>
+                                 <td>{{ performance.detail }}</td>
+                                 <td>{{ performance.source }}</td>
+                             </tr>
+                         {% endfor %}
+                     {% endif %}
+                 </table>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    {% if 'leave' in choices %}
+    {#    ประวัติการลา #}
+        <div class="row">
+            <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ประวัติการลา </h5>
+                 <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                     <tr class="text-primary">
+                         <th class="col-1 text-center">ปีงบประมาณ</th>
+                         <th class="col-3 text-center"> วันที่ลา </th>
+                         <th class="col-2 text-center">จำนวนวันลา </th>
+                         <th class="col-3">ประเภทการลา</th>
+                         <th class="col-3">เหตุผลประกอบ</th>
+                     </tr>
+                     {% if leaves.count == 0  %}
+                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการลาของบุคลากรในระบบ--</td></tr>
+                     {% else %}
+                         {% groupValue '' as nValue %}
+                         {% for leave in leaves %}
+                             <tr>
+                                 <td class="text-center">
+                                     {% if leave.fiscalYear != nValue %}
+                                         {{ leave.fiscalYear }}
+                                         {% groupValue leave.fiscalYear as nValue %}
+                                     {% endif %}
+                                 </td>
+                                 <td class="text-center">{{ leave.startDate |date:'d/m/Y' }} -
+                                     {{ leave.endDate |date:'d/m/Y' }}</td>
+                                 <td class="text-center"> {{ leave.days }} </td>
+                                 <td> {{ leave.leaveType }} </td>
+                                 <td>{{ leave.reason }}</td>
+                             </tr>
+                         {% endfor %}
+                     {% endif %}
+                 </table>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    {% if 'command' in choices %}
+    {#    ประวัติคำสั่งปฏิบัติงาน #}
+        <div class="row">
+            <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ประวัติคำสั่งปฏิบัติงาน </h5>
+                 <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                     <tr class="text-primary">
+                         <th class="col-1 text-center">ปีงบประมาณ</th>
+                         <th class="col-2 text-center">เลขที่คำสั่ง</th>
+                         <th class="col-5">เรื่อง </th>
+                         <th class="col-1 text-center">วันที่ออกคำสั่ง </th>
+                         <th class="col-3">พัธกิจ</th>
+                     </tr>
+                     {% if commands.count == 0  %}
+                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลคำสั่งปฏิบัติหน้าที่ของบุคลากรในระบบ--</td></tr>
+                     {% else %}
+                        {% groupValue '' as nValue %}
+                         {% for command in commands %}
+                             <tr>
+                                 <td class="text-center">
+                                     {% if command.fiscalYear != nValue %}
+                                        {{ command.fiscalYear }}
+                                        {% groupValue command.fiscalYear as nValue %}
+                                     {% endif %}
+                                 </td>
+                                 <td class="text-center">{{ command.comId }} </td>
+                                 <td> {{ command.topic }} </td>
+                                <td class="text-center">{{ command.comDate |date:'d/m/Y'}}</td>
+                                 <td>{{ command.mission }}</td>
+                             </tr>
+                         {% endfor %}
+                     {% endif %}
+                 </table>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <form method="post">
+                {% csrf_token %}
+                <p class="text-center">
+                    <input type="hidden" name="clickBack" value="000">
+                    <button type="button"  class="btn btn-secondary" onclick="this.form.submit();">
+                        <i class="fa fa-rotate-back"></i> ย้อนกลับ
+                    </button>
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

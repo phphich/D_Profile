@@ -5,10 +5,11 @@ urlpatterns = [
     path('personnelReport', views.personnelReport, name='personnelReport'),
     path('<divId>/<reportType>/personnelReport', views.personnelReport, name='personnelReport'),
     path('<subNo>/<divId>/<paraValue>/personnelSubReport', views.reportSubPersonnel, name='personnelSubReport'),
+    path('<personnelId>/personnelDetailReport', views.personnelDetailReport, name='personnelDetailReport'),
     # -------------------------------- #
     path('researchReport', views.researchReport, name='researchReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/researchReport', views.researchReport, name='researchReport'),
-    path('<subNo>/<budgetType>/<paraValue>/researchSubReport', views.reportSubReport, name='researchSubReport'),
+    path('<subNo>/<budgetType>/<paraValue>/researchSubReport', views.researchSubReport, name='researchSubReport'),
     # -------------------------------- #
     path('socialserviceReport', views.socialserviceReport, name='socialserviceReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/socialserviceReport', views.socialserviceReport,

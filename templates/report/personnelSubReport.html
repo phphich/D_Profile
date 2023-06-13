@@ -18,9 +18,16 @@
                     <th class="col-3">คุณวุฒิการศึกษา</th>
                 </tr>
                 {% for personnel in personnels %}
-                    <tr class="text-primary">
+                    <tr class="text-primary" onclick="location.href='{% url 'personnelDetailReport' personnel.id %}'" style="cursor:pointer;">
                         <td class="text-center">{{ forloop.counter }}</td>
-                        <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
+                        <td>
+                            {% if personnel.type == 'สายสนับสนุน' %}
+                                {{ personnel.title }}
+                            {% else %}
+                                {{ personnel.status }}
+                            {% endif %}
+                            {{ personnel.firstname_th }} {{ personnel.lastname_th }}
+                        </td>
                         <td>{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>
                         <td class="text-center">{{ personnel.status }}</td>
                         <td>{{ personnel.getHighestEducationName }}</td>
@@ -41,9 +48,16 @@
                     <th class="col-2">คุณวุฒิการศึกษา</th>
                 </tr>
                 {% for personnel in personnels %}
-                    <tr class="text-primary">
+                    <tr class="text-primary" onclick="location.href='{% url 'personnelDetailReport' personnel.id %}'" style="cursor:pointer;">
                         <td class="col-1 text-center">{{ forloop.counter }}</td>
-                        <td class="col-3">{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
+                        <td class="col-3">
+                            {% if personnel.type == 'สายสนับสนุน' %}
+                                {{ personnel.title }}
+                            {% else %}
+                                {{ personnel.status }}
+                            {% endif %}
+                            {{ personnel.firstname_th }} {{ personnel.lastname_th }}
+                        </td>
                         <td class="col-3">{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>
                         <td class="col-3 text-center">{{ personnel.status }}</td>
                         <td>{{ personnel.getHighestEducationName }}</td>
@@ -64,9 +78,16 @@
                     <th class="col-2">คุณวุฒิการศึกษา</th>
                 </tr>
                 {% for personnel in personnels %}
-                    <tr class="text-primary">
+                    <tr class="text-primary" onclick="location.href='{% url 'personnelDetailReport' personnel.id %}'" style="cursor:pointer;">
                         <td class="col-1 text-center">{{ forloop.counter }}</td>
-                        <td class="col-3">{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
+                        <td class="col-3">
+                            {% if personnel.type == 'สายสนับสนุน' %}
+                                {{ personnel.title }}
+                            {% else %}
+                                {{ personnel.status }}
+                            {% endif %}
+                            {{ personnel.firstname_th }} {{ personnel.lastname_th }}
+                        </td>
                         <td class="col-3">{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>
                         <td class="col-3 text-center">{{ personnel.division.name_th }}</td>
                         <td>{{ personnel.getHighestEducationName }}</td>
@@ -87,11 +108,17 @@
                     <th class="col-3">คุณวุฒิการศึกษา </th>
                 </tr>
                 {% for personnel in personnels %}
-                    <tr class="text-primary">
+                    <tr class="text-primary" onclick="location.href='{% url 'personnelDetailReport' personnel.id %}'" style="cursor:pointer;">
                         <td class="col-1 text-center">{{ forloop.counter }}</td>
-                        <td class="col-3">{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
+                        <td class="col-3">
+                            {% if personnel.type == 'สายสนับสนุน' %}
+                                {{ personnel.title }}
+                            {% else %}
+                                {{ personnel.status }}
+                            {% endif %}
+                            {{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>
                         <td class="col-3">{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>
-                        <td class="col-3 text-center">{{ personnel.division.name_th }}</td>
+                        <td class="col-3">{{ personnel.division.name_th }}</td>
                         <td>{{ personnel.getHighestEducationName }}</td>
                     </tr>
                 {% endfor %}
@@ -104,9 +131,6 @@
     </div>
     <br><br>
     <p class="text-center">
-{#        <button type="button" class="btn btn-primary text-white" onclick="location.href='{% url 'home' %}'">#}
-{#            <i class="fa fa-home"></i> Home#}
-{#        </button>  #}
         <button type="button" class="btn btn-secondary" onclick="history.back()">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>

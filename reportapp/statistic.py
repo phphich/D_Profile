@@ -1,4 +1,3 @@
-import datetime
 from workapp.models import *
 from baseapp.models import *
 import pandas as pd
@@ -128,9 +127,19 @@ def getResearchBudgetSet(budgetType, fiscalYearStart, fiscalYearEnd):
     if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
         researchYear.append("0")
         researchSum.append(0.00)
+    i=1
+    n=researchss.count()
     for research in researchss:
+        if i == 1 and research['fiscalYear'] > fiscalYearStart: #กรณีข้อมูลที่ได้รอบแรกไม่เป็นปีเริ่มต้น
+            researchYear.append(str(fiscalYearStart))
+            researchSum.append(0.00)
         researchYear.append(str(research['fiscalYear']))
         researchSum.append(research['sum'])
+        i=i+1
+    if i < n:
+        researchYear.append(str(fiscalYearEnd))
+        researchSum.append(0.00)
+
     dfResearchBudget = pd.DataFrame({'Year': researchYear, 'Budget': researchSum}, columns=['Year', 'Budget'])
     return dfResearchBudget
 

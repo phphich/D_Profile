@@ -374,6 +374,9 @@ class Research(models.Model):
         countResearchURL = ResearchURL.objects.filter(recorder=personnel).count()
         countAll = countResearch + countResearchPerson + countResearchFile + countResearchURL
         return countAll
+    def getResearchs(personnel):
+        researchs = Research.objects.filter(personnel=personnel)
+        return researchs
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         editor  = Personnel.objects.filter(id=self.editor.id).first()

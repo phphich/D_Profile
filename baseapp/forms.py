@@ -276,9 +276,9 @@ class ExpertiseForm(forms.ModelForm):
         self.fields['personnel'].widget.attrs['readonly'] = True
 
 class CurrAffiliationForm(forms.ModelForm):
-    def __init__(self, type,  *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(CurrAffiliationForm, self).__init__(*args, **kwargs)
-        self.fields['personnel'].queryset = Personnel.objects.filter(type=type)
+        self.fields['personnel'].queryset = Personnel.objects.filter(type='สายวิชาการ')
     class Meta:
         STATUS_CHOICES = (
             ("ผู้รับผิดชอบหลักสูตร", "ผู้รับผิดชอบหลักสูตร"),

@@ -1025,7 +1025,7 @@ def currAffiliationList(request, curriculumId = None):
         curriculum = Curriculum.objects.filter(id=curriculumId).first()
     else:
         curriculum = curriculums.first()
-    form = CurrAffiliationForm(type='สายวิชาการ', initial={'curriculum': curriculum, 'recorder': recorder})
+    form = CurrAffiliationForm(initial={'curriculum': curriculum, 'recorder': recorder})
     context = {'curriculums': curriculums, 'curriculum': curriculum, 'form': form}
     return render(request, 'base/currAffiliation/currAffiliationList.html', context)
 
