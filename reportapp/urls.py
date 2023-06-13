@@ -8,6 +8,8 @@ urlpatterns = [
     # -------------------------------- #
     path('researchReport', views.researchReport, name='researchReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/researchReport', views.researchReport, name='researchReport'),
+    path('<subNo>/<budgetType>/<paraValue>/researchSubReport', views.reportSubReport, name='researchSubReport'),
+    # -------------------------------- #
     path('socialserviceReport', views.socialserviceReport, name='socialserviceReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/socialserviceReport', views.socialserviceReport,
          name='socialserviceReport'),

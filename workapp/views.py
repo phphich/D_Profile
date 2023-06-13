@@ -42,7 +42,7 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        leaves = Leave.objects.filter(personnel=recorder).order_by('-startDate')
+        leaves = Leave.objects.filter(personnel=recorder).order_by('-fiscalYear', '-startDate')
         leaves_page = Paginator(leaves, iterm_per_page)
         count = leaves.count()
         context = {'personnel': recorder,'leaves': leaves_page.page(pageNo), 'count': count}
@@ -86,7 +86,7 @@ def leaveList(request, divisionId=None, personnelId=None, pageNo=None):
             else:
                 personnel = division.getPersonnels().first()
 
-        leaves = Leave.objects.filter(personnel=personnel).order_by('-startDate')
+        leaves = Leave.objects.filter(personnel=personnel).order_by('-fiscalYear', '-startDate')
         count = leaves.count()
         leaves_page = Paginator(leaves, iterm_per_page)
         context = {'divisions': divisions, 'division': division, 'personnel': personnel,
@@ -317,7 +317,7 @@ def trainingList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        trainings = Training.objects.filter(personnel=recorder).order_by('-startDate')
+        trainings = Training.objects.filter(personnel=recorder).order_by('-fiscalYear', '-startDate')
         training_page = Paginator(trainings, iterm_per_page)
         count = trainings.count()
         context = {'personnel': recorder, 'trainings': training_page.page(pageNo), 'count': count}
@@ -595,7 +595,7 @@ def performanceList(request, divisionId=None, personnelId=None, pageNo=None):
     if pageNo == None:
         pageNo = 1
     if request.session['userType'] == "Personnel":
-        performances = Performance.objects.filter(personnel=recorder).order_by('-getDate')
+        performances = Performance.objects.filter(personnel=recorder).order_by('-fiscalYear', '-getDate')
         performance_page = Paginator(performances, iterm_per_page)
         count = performances.count()
         context = {'personnel': recorder, 'performances': performance_page.page(pageNo), 'count': count}
@@ -1347,15 +1347,16 @@ def researchDetail(request, id):
             if totalPercent > 100:
                 messages.add_message(request, messages.WARNING, "สัดส่วนการทำงานวิจัยของนักวิจัยรวมแล้วเกิน 100% ไม่สามารถบันทึกได้")
                 return redirect(request.session['last_url'])
-            if str(status).find('หัวหน้าโครงการ') != -1: # ป้อนตำแหน่งหัวหน้าโครงการ
+            if str(status).find('หัวหน้า') != -1: # ป้อนตำแหน่งหัวหน้าโครงการ
                 if numOfResearch > 1:
                     messages.add_message(request, messages.WARNING, "ตำแหน่ง/ความรับผิดชอบ หัวหน้าโครงการ มีได้เพียงคนเดียวเท่านั้น ไม่สามารถบันทึกได้")
                     return redirect(request.session['last_url'])
-                chkStatus = ResearchPerson.objects.filter(status__contains='หัวหน้าโครงการ').first()
-                if chkStatus is not None:
+                header = research.getResearchHeader()
+                print('header')
+                print(header)
+                if header.count() != 0:
                     messages.add_message(request, messages.WARNING, "ตำแหน่ง/ความรับผิดชอบ หัวหน้าโครงการ มีได้เพียงคนเดียวเท่านั้น ไม่สามารถบันทึกได้")
                     return redirect(request.session['last_url'])
-
             # เช็คคนซ้ำ
             msg = "นักวิจัยที่เลือกมีรายชื่อปรากฎอยู่ในงานวิจัยนี้อยู่แล้ว :"
             error = False
@@ -1623,8 +1624,6 @@ def researchDeleteResearchPersonAll(request, id):
 # CRUD. SocialService
 @login_required(login_url='userAuthen')
 def socialserviceList(request, pageNo=None):
-
-
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     personnel = [recorder]

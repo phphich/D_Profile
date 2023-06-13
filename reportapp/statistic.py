@@ -137,21 +137,23 @@ def getResearchBudgetSet(budgetType, fiscalYearStart, fiscalYearEnd):
 def getResearchBudgetTypeSet(budgetType, fiscalYearStart, fiscalYearEnd):
     if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
         researchs = Research.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
-                                             ).values('budgetType').annotate(count=Count('budget'), sum=Sum('budget'))\
-            .order_by('budgetType')
+                                             ).values('budgetType', 'fiscalYear').annotate(count=Count('budget'), sum=Sum('budget'))\
+            .order_by('fiscalYear','budgetType')
     else:
         researchs = Research.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
-                                             budgetType=budgetType).values('budgetType').\
-            annotate(count=Count('budget'), sum=Sum('budget')).order_by('budgetType')
+                                             budgetType=budgetType).values('budgetType', 'fiscalYear').\
+            annotate(count=Count('budget'), sum=Sum('budget')).order_by('fiscalYear', 'budgetType')
     researchBudgetType = []
+    researchYear = []
     researchCount = []
     researchSum = []
     for research in researchs:
         researchBudgetType.append(str(research['budgetType']))
+        researchYear.append(research['fiscalYear'])
         researchCount.append(research['count'])
         researchSum.append(research['sum'])
-    dfResearchBudgetType = pd.DataFrame({'Type': researchBudgetType, 'Count':researchCount , 'Budget': researchSum},
-                                        columns=['Type', 'Count',  'Budget'])
+    dfResearchBudgetType = pd.DataFrame({'Year':researchYear,'Type': researchBudgetType,  'Count':researchCount , 'Budget': researchSum},
+                                        columns=['Year','Type',  'Count',  'Budget'])
     return dfResearchBudgetType
 
 #  ******************** Social Service *********************

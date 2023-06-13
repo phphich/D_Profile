@@ -126,6 +126,7 @@ def researchReport(request, budgetType=None, fiscalYearStart=None, fiscalYearEnd
                                                     fiscalYearEnd=fiscalYearEnd)
     dfResearchBudgetType = statistic.getResearchBudgetTypeSet(budgetType=budgetType, fiscalYearStart=fiscalYearStart,
                                                     fiscalYearEnd=fiscalYearEnd)
+
     figResearchCount = px.bar(dfResearchCount, x='Year', y='Count', title='จำนวนโครงการวิจัยแยกตามปีงบประมาณ')
     figResearchCount.update_layout(autosize=False, width=450, height=350,
                           margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
@@ -154,6 +155,9 @@ def researchReport(request, budgetType=None, fiscalYearStart=None, fiscalYearEnd
     figSum.update_layout(autosize=False, width=200, height=200,
                                              margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
     chartSum = figSum.to_html()
+
+    # dfResearchBudgetType = list(reversed(dfResearchBudgetType)) # กลับด้านลิสต์ จากมากไปน้อย
+
     context = {'budgetTypes':budgetTypes, 'budgetType':budgetType,
                'fiscalYearResearchs':fiscalYearResearchs,
                'fiscalYearStart':fiscalYearStart, 'fiscalYearEnd':fiscalYearEnd, 'reportType':reportType,
@@ -178,7 +182,7 @@ def socialserviceReport(request, budgetType=None, fiscalYearStart=None, fiscalYe
         fiscalYearStart = int(fiscalYearStart)
         fiscalYearEnd = int(fiscalYearEnd)
         reportType = reportType
-    elif 'budgetType' in request.POST: #กลับด้านลิสต์ จากมากไปน้อย
+    elif 'budgetType' in request.POST: #มาจากเลือก Select
         budgetType = request.POST['budgetType']
         fiscalYearStart = int(request.POST['fiscalYearStart'])
         fiscalYearEnd = int(request.POST['fiscalYearEnd'])
@@ -582,6 +586,52 @@ def reportSubPersonnel(request, subNo, divId, paraValue):
 
     context = {'personnels': personnels, 'subNo': subNo, 'parameter': paraValue, 'count':count}
     return render(request, 'report/personnelSubReport.html', context)
+
+
+# ********************* Sub Report - Research ******************** #
+def reportSubReport(request, subNo, budgetType, paraValue):
+    if subNo=='1': #วิจัย ปี/จำนวน
+        fiscalYear = int(paraValue)
+        researchs = None
+        researchs = Research.objects.filter(fiscalYear=fiscalYear)
+        count = researchs.count()
+        context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'count': count}
+    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
+        fiscalYear = int(paraValue)
+        researchs = None
+        researchs = Research.objects.filter(fiscalYear=fiscalYear, budgetType=budgetType)
+        count = researchs.count()
+        context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'budgetType':budgetType, 'count': count}
+    #     level = paraValue
+    #     if divId is None or divId == 'None' or  divId == '0':
+    #         persons = Personnel.objects.all()
+    #     else:
+    #         division = Division.objects.filter(id = divId).first()
+    #         persons = division.getPersonnels()
+    #     personnels = []
+    #     for personnel in persons:
+    #         if personnel.getHighestEducation() == level:
+    #             personnels.append(personnel)
+    #     count = len(personnels) #list
+    # elif subNo == '3': #บุคลากรตามตำแหน่งทางวิชาการ
+    #     status = paraValue
+    #     if divId is None or divId == 'None' or divId == '0':
+    #         personnels = Personnel.objects.filter(status=status)
+    #     else:
+    #         division = Division.objects.filter(id=divId).first()
+    #         personnels = Personnel.objects.filter(status=status, division=division)
+    #     count = personnels.count()
+    # else: #บุคลากรตามเพศ
+    #     gender = paraValue
+    #     if divId is None or divId == 'None' or divId == '0':
+    #         personnels = Personnel.objects.filter(gender=gender)
+    #     else:
+    #         division = Division.objects.filter(id=divId).first()
+    #         personnels = Personnel.objects.filter(gender=gender, division=division)
+    #     count = personnels.count()
+
+    # context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'count':count}
+    return render(request, 'report/researchSubReport.html', context)
 
 
 

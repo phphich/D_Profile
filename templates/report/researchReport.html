@@ -150,7 +150,7 @@
                         {% endfor %}
                     </tr>
                     {% for index, row in dfResearchCount.iterrows %}
-                        <tr>
+                        <tr onclick="location.href='{% url 'researchSubReport' '1' budgetType row.Year %}'" style="cursor:pointer;">
                             <td class="text-center">{{ row.Year }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -174,7 +174,7 @@
                     </tr>
                     {% for index, row in dfResearchBudget.iterrows %}
                         {% if row.Year != '0' %}
-                            <tr>
+                            <tr onclick="location.href='{% url 'researchSubReport' '1' budgetType row.Year %}'" style="cursor:pointer;">
                                 <td class="text-center">{{ row.Year }}</td>
                                 <td class="text-center">{{ row.Budget  | floatformat:2 | intcomma}}</td>
                             </tr>
@@ -191,7 +191,7 @@
 
         <div class="row">
             <div class="col-1"></div>
-            <div class="col-6">
+            <div class="col-9">
                 <label class="text-primary" style="font-weight: bold">ทุนวิจัยแยกตามประเภทงบประมาณ: </label>
                 <table class="table table-bordered text-primary" style="width: 100%">
                     <tr style="{{ lineColor }}">
@@ -199,9 +199,16 @@
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
+                     {% groupValue '' as nYear %}
                     {% for index, row in dfResearchBudgetType.iterrows %}
                         {% if row.Year != 0 %}
-                            <tr>
+                            <tr onclick="location.href='{% url 'researchSubReport' '2' row.Type row.Year %}'" style="cursor:pointer;">
+                                <td class="text-center">
+                                    {% if nYear != row.Year %}
+                                        {% groupValue row.Year as nYear %}
+                                        {{ nYear }}
+                                    {% endif %}
+                                </td>
                                 <td class="text-center">{{ row.Type }}</td>
                                 <td class="text-center">{{ row.Count }}</td>
                                 <td class="text-center">{{ row.Budget  | floatformat:2 | intcomma}}</td>
@@ -209,7 +216,7 @@
                         {% endif %}
                     {% endfor %}
                     <tr style="background-color: rgba(239,240,243,0.88)">
-                        <td class="text-center" colspan="2">รวม</td>
+                        <td class="text-center" colspan="3">รวม</td>
                         <td class="text-center">{{ sum  | floatformat:2 | intcomma}}</td>
                     </tr>
                 </table>

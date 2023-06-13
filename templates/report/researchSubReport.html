@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load humanize %}
+{% block content %}
+    <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลการวิจัย  </h2>
+    <hr class="text-primary">
+    <div class="row">
+{#        <div class="col-1"></div>#}
+        <div class="col-12">
+            <h5> ปีงบประมาณ : {{ parameter }}
+                {% if subNo == '2' %}
+                     ประเภททุนวิจัย: {{ budgetType }}
+                {% endif %}
+            </h5>
+            <table class="table table-bordered table-hover" >
+                <tr class="text-center" style="color:white; background-color:#8bb2ec">
+                    <th class="col-1">ลำดับที่</th>
+                    <th class="col-4">ชื่อโครงการวิจัย </th>
+                    <th class="col-2">งบประมาณ </th>
+                    <th class="col-2">แหล่งทุนวิจัย </th>
+                    <th class="col-3">รายชื่อนักวิจัย </th>
+                </tr>
+                {% for research in researchs %}
+                    <tr class="text-primary">
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td>{{ research.title_th }} ({{ research.title_en }}) </td>
+                        <td class="text-end">{{ research.budget | floatformat:2 | intcomma  }}  </td>
+                        <td class="text-center">{{ research.budgetType }}  </td>
+                        <td >
+                            {% for researcher in research.getResearchPerson  %}
+                                {{ researcher.personnel.firstname_th }} {{ researcher.personnel.lastname_th }}
+                                {{ researcher.personnel.lstname_th }} ({{ researcher.status }}) <br>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                <tr style="background-color: rgba(244,245,246,0.88);color: #484343">
+                    <td class="text-center" colspan="5">รวมโครงการวิจัย:  {{ count }} โครงการ </td>
+                </tr>
+            </table>
+{#        {% elif subNo == '2' %} {# level #}
+{#            <h5> คุณระะดับวุฒิการศึกษา: {{ parameter }} </h5>#}
+{#            <table class="table table-bordered table-hover" >#}
+{#                <tr class="text-center" style="color:white; background-color:#8bb2ec">#}
+{#                    <th class="col-1 text-center">ลำดับที่</th>#}
+{#                    <th class="col-3">ชื่อ-สกุล (ภาษาไทย) </th>#}
+{#                    <th class="col-3">ชื่อ-สกุล (ภาษาอังกฤษ) </th>#}
+{#                    <th class="col-3">ตำแหน่ง </th>#}
+{#                    <th class="col-2">คุณวุฒิการศึกษา</th>#}
+{#                </tr>#}
+{#                {% for personnel in personnels %}#}
+{#                    <tr class="text-primary">#}
+{#                        <td class="col-1 text-center">{{ forloop.counter }}</td>#}
+{#                        <td class="col-3">{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>#}
+{#                        <td class="col-3">{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>#}
+{#                        <td class="col-3 text-center">{{ personnel.status }}</td>#}
+{#                        <td>{{ personnel.getHighestEducationName }}</td>#}
+{#                    </tr>#}
+{#                {% endfor %}#}
+{#                <tr style="background-color: rgba(244,245,246,0.88);color: #484343">#}
+{#                    <td class="text-center" colspan="5">รวมบุคลากร:  {{ count }} ราย</td>#}
+{#                </tr>#}
+{#            </table>#}
+{#        {% elif subNo == '3' %} {# status #}
+{#            <h5> ตำแหน่งทางวิชาการ: {{ parameter }} </h5>#}
+{#            <table class="table table-bordered table-hover" >#}
+{#                <tr class="text-center" style="color:white; background-color:#8bb2ec">#}
+{#                    <th class="col-1">ลำดับที่</th>#}
+{#                    <th class="col-3">ชื่อ-สกุล (ภาษาไทย) </th>#}
+{#                    <th class="col-3">ชื่อ-สกุล (ภาษาอังกฤษ) </th>#}
+{#                    <th class="col-3">สังกัด </th>#}
+{#                    <th class="col-2">คุณวุฒิการศึกษา</th>#}
+{#                </tr>#}
+{#                {% for personnel in personnels %}#}
+{#                    <tr class="text-primary">#}
+{#                        <td class="col-1 text-center">{{ forloop.counter }}</td>#}
+{#                        <td class="col-3">{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>#}
+{#                        <td class="col-3">{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>#}
+{#                        <td class="col-3 text-center">{{ personnel.division.name_th }}</td>#}
+{#                        <td>{{ personnel.getHighestEducationName }}</td>#}
+{#                    </tr>#}
+{#                {% endfor %}#}
+{#                <tr style="background-color: rgba(244,245,246,0.88);color: #484343">#}
+{#                    <td class="text-center" colspan="5">รวมบุคลากร:  {{ count }} ราย</td>#}
+{#                </tr>#}
+{#            </table>#}
+{#        {% else %} {# gender #}
+{#            <h5> เพศ: {{ parameter }} </h5>#}
+{#            <table class="table table-bordered table-hover" >#}
+{#                <tr class="text-center" style="color:white; background-color:#8bb2ec">#}
+{#                    <th class="col-1">ลำดับที่</th>#}
+{#                    <th class="col-3">ชื่อ-สกุล (ภาษาไทย) </th>#}
+{#                    <th class="col-3">ชื่อ-สกุล (ภาษาอังกฤษ) </th>#}
+{#                    <th class="col-2">สังกัด</th>#}
+{#                    <th class="col-3">คุณวุฒิการศึกษา </th>#}
+{#                </tr>#}
+{#                {% for personnel in personnels %}#}
+{#                    <tr class="text-primary">#}
+{#                        <td class="col-1 text-center">{{ forloop.counter }}</td>#}
+{#                        <td class="col-3">{{ personnel.firstname_th }} {{ personnel.lastname_th }}</td>#}
+{#                        <td class="col-3">{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>#}
+{#                        <td class="col-3 text-center">{{ personnel.division.name_th }}</td>#}
+{#                        <td>{{ personnel.getHighestEducationName }}</td>#}
+{#                    </tr>#}
+{#                {% endfor %}#}
+{#                <tr style="background-color: rgba(244,245,246,0.88);color: #484343">#}
+{#                    <td class="text-center" colspan="5">รวมบุคลากร:  {{ count }} ราย</td>#}
+{#                </tr>#}
+{#            </table>#}
+{#        {% endif %}#}
+        </div>
+    </div>
+    <br><br>
+    <p class="text-center">
+{#        <button type="button" class="btn btn-primary text-white" onclick="location.href='{% url 'home' %}'">#}
+{#            <i class="fa fa-home"></i> Home#}
+{#        </button>  #}
+        <button type="button" class="btn btn-secondary" onclick="history.back()">
+            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        </button>
+    </p>
+    <br><br>
+{% endblock %}

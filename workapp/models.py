@@ -351,6 +351,9 @@ class Research(models.Model):
     def getResearchPerson(self):
         personnels = ResearchPerson.objects.filter(research=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
         return personnels
+    def getResearchHeader(self):
+        personnels = ResearchPerson.objects.filter(research=self, status__contains='หัวหน้า').order_by('personnel__firstname_th', 'personnel__lastname_th')
+        return personnels
     def getCountPersonnel(self): #จำนวนคนที่อยู่ในงานวิจัย
         count = ResearchPerson.objects.filter(research=self).aggregate(count=Count('id'))
         return count['count']
@@ -393,7 +396,7 @@ class ResearchPerson(models.Model):
     recorder = models.ForeignKey(Personnel, related_name='RecorderResearchPerson', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.research.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+        return str(self.research.id) + " : " + self.personnel.firstname_th + " " + self.personnel.lastname_th + \
                "  " +  " (" + self.status + ")"
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
