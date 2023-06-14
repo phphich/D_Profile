@@ -213,21 +213,23 @@ def getSocialServiceBudgetSet(budgetType, fiscalYearStart, fiscalYearEnd):
 def getSocialServiceBudgetTypeSet(budgetType, fiscalYearStart, fiscalYearEnd):
     if budgetType is None or budgetType =='None' or budgetType == '0':  # เลือกทั้งหมด
         socialservices = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
-                                             ).values('budgetType').annotate(count=Count('budget'), sum=Sum('budget'))\
+                                             ).values('budgetType','fiscalYear').annotate(count=Count('budget'), sum=Sum('budget'))\
             .order_by('budgetType')
     else:
         socialservices = SocialService.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
-                                             budgetType=budgetType).values('budgetType').\
+                                             budgetType=budgetType).values('budgetType','fiscalYear').\
             annotate(count=Count('budget'), sum=Sum('budget')).order_by('budgetType')
     socialserviceBudgetType = []
+    socialserviceYear = []
     socialserviceCount = []
     socialserviceSum = []
     for socialservice in socialservices:
         socialserviceBudgetType.append(str(socialservice['budgetType']))
+        socialserviceYear.append(socialservice['fiscalYear'])
         socialserviceCount.append(socialservice['count'])
         socialserviceSum.append(socialservice['sum'])
-    dfSocialServiceBudgetType = pd.DataFrame({'Type': socialserviceBudgetType, 'Count':socialserviceCount , 'Budget': socialserviceSum},
-                                        columns=['Type', 'Count',  'Budget'])
+    dfSocialServiceBudgetType = pd.DataFrame({'Type': socialserviceBudgetType, 'Year': socialserviceYear, 'Count':socialserviceCount , 'Budget': socialserviceSum},
+                                        columns=['Type', 'Year', 'Count',  'Budget'])
     return dfSocialServiceBudgetType
 
 # *********************** Command ************************

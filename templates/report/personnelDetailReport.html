@@ -300,9 +300,10 @@
                  <table class="table table-light table-striped" style="border-color: #0b5ed7">
                      <tr class="text-primary">
                          <th class="col-1 text-center">ปีงบประมาณ</th>
-                         <th class="col-4">ชื่อโครงการ </th>
+                         <th class="col-3">ชื่อโครงการ </th>
                          <th class="col-2 text-center">สถานที่จัดโครงการ</th>
-                         <th class="col-2 text-end">ผู้รับบริการ </th>
+                         <th class="col-2 text-center">วันที่</th>
+                         <th class="col-1">ผู้รับบริการ </th>
                          <th class="col-1 text-center"> จำนวน </th>
                          <th class="col-2 text-end">งบประมาณ </th>
                      </tr>
@@ -320,6 +321,7 @@
                                  </td>
                                  <td>{{ socialservice.topic }}<br>
                                  <td> {{ socialservice.place }} </td>
+                                 <td class="text-center"> {{ socialservice.startDate |date:'d/m/y' }}-{{ socialservice.endDate |date:'d/m/y' }} </td>
                                  <td> {{ socialservice.receiver }} </td>
                                  <td class="text-center"> {{ socialservice.num_receiver }} </td>
                                  <td class="text-end">{{ socialservice.budget|floatformat:2|intcomma }}</td>
@@ -441,15 +443,15 @@
 
     <div class="row">
         <div class="col-12">
-            <form method="post">
+{#            <form method="post">#}
                 {% csrf_token %}
                 <p class="text-center">
                     <input type="hidden" name="clickBack" value="000">
-                    <button type="button"  class="btn btn-secondary" onclick="this.form.submit();">
+                    <button type="button"  class="btn btn-secondary" onclick="history.back();">
                         <i class="fa fa-rotate-back"></i> ย้อนกลับ
                     </button>
                 </p>
-            </form>
+{#            </form>#}
         </div>
     </div>
 {% endblock %}

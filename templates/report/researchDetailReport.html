@@ -54,9 +54,9 @@
              <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
                  <tr class="text-primary">
                      <th class="col-1 text-center">ลำดับที่</th>
-                     <th class="col-2">ชื่อ-สกุล</th>
+                     <th class="col-3">ชื่อ-สกุล</th>
                      <th class="col-3">สังกัด</th>
-                     <th class="col-4">ความรับผิดชอบต่อโครงการ</th>
+                     <th class="col-3">หน้าที่ความรับผิดชอบ</th>
                      <th class="col-2 text-center">สัดส่วน</th>
                  </tr>
                  {% for researcher in researchers %}
@@ -69,7 +69,7 @@
                                 {{ researcher.personnel.status }}
                              {% endif %}
                              {{ researcher.personnel.firstname_th }} {{ researcher.personnel.lastname_th }}</td>
-                         <td>{{ researcher.division.name_th }}</td>
+                         <td>{{ researcher.personnel.division.name_th }}</td>
                          <td>{{ researcher.status }}</td>
                          <td class="text-center">{{ researcher.percent }}</td>
                      </tr>

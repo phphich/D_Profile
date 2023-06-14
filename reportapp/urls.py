@@ -15,6 +15,7 @@ urlpatterns = [
     path('socialserviceReport', views.socialserviceReport, name='socialserviceReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/socialserviceReport', views.socialserviceReport,
          name='socialserviceReport'),
+    path('<subNo>/<budgetType>/<paraValue>/socialserviceSubReport', views.socialserviceSubReport, name='socialserviceSubReport'),
     path('<socialserviceId>/soreserviceDetailReport', views.socialserviceDetailReport, name='socialserviceDetailReport'),
     # -------------------------------- #
     path('trainingReport', views.trainingReport, name='trainingReport'),

@@ -235,9 +235,10 @@ def socialserviceReport(request, budgetType=None, fiscalYearStart=None, fiscalYe
                                                     fiscalYearEnd=fiscalYearEnd)
     dfSocialServiceBudgetType = statistic.getSocialServiceBudgetTypeSet(budgetType=budgetType, fiscalYearStart=fiscalYearStart,
                                                     fiscalYearEnd=fiscalYearEnd)
+
     print('dfSocialServiceBudgetType')
     print(dfSocialServiceBudgetType)
-    figSocialServiceCount = px.bar(dfSocialServiceCount, x='Year', y='Count', title='จำนวนโครงการบริการฯ แยกตามปีงบประมาณ')
+    figSocialServiceCount = px.bar(dfSocialServiceCount, x='Year', y='Count', title='จำนวนโครงการฯ แยกตามปีงบประมาณ')
     figSocialServiceCount.update_layout(autosize=False, width=450, height=350,
                           margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
     chartSocialServiceCount = figSocialServiceCount.to_html()
@@ -252,7 +253,7 @@ def socialserviceReport(request, budgetType=None, fiscalYearStart=None, fiscalYe
                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
     chartSocialServiceBudgetType = figSocialServiceBudgetType.to_html()
 
-    figSocialServiceBudgetTypeCount = px.pie(dfSocialServiceBudgetType, names='Type', values='Count', title='จำนวนโครงการบริการฯ แยกตามประเภทงบประมาณ')
+    figSocialServiceBudgetTypeCount = px.pie(dfSocialServiceBudgetType, names='Type', values='Count', title='จำนวนโครงการฯ แยกตามประเภทงบประมาณ')
     figSocialServiceBudgetTypeCount.update_layout(autosize=False, width=350, height=350,
                          margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
     chartSocialServiceBudgetTypeCount = figSocialServiceBudgetTypeCount.to_html()
@@ -594,13 +595,11 @@ def researchSubReport(request, subNo, budgetType, paraValue):
     request.session['last_url'] = request.path_info
     if subNo=='1': #วิจัย ปี/จำนวน
         fiscalYear = int(paraValue)
-        researchs = None
         researchs = Research.objects.filter(fiscalYear=fiscalYear)
         count = researchs.count()
         context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'count': count}
     elif subNo=='2':  #บุคลากรตามระดับการศึกษา
         fiscalYear = int(paraValue)
-        researchs = None
         researchs = Research.objects.filter(fiscalYear=fiscalYear, budgetType=budgetType)
         count = researchs.count()
         context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'budgetType':budgetType, 'count': count}
@@ -635,6 +634,20 @@ def researchSubReport(request, subNo, budgetType, paraValue):
     # context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'count':count}
     return render(request, 'report/researchSubReport.html', context)
 
+# ********************* Sub Report - SocialService ******************** #
+def socialserviceSubReport(request, subNo, budgetType, paraValue):
+    request.session['last_url'] = request.path_info
+    if subNo=='1': #วิจัย ปี/จำนวน
+        fiscalYear = int(paraValue)
+        socialservices = SocialService.objects.filter(fiscalYear=fiscalYear)
+        count = socialservices.count()
+        context = {'socialservices': socialservices, 'subNo': subNo, 'parameter': paraValue, 'count': count}
+    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
+        fiscalYear = int(paraValue)
+        socialservices = SocialService.objects.filter(fiscalYear=fiscalYear, budgetType=budgetType)
+        count = socialservices.count()
+        context = {'socialservices': socialservices, 'subNo': subNo, 'parameter': paraValue, 'budgetType':budgetType, 'count': count}
+    return render(request, 'report/socialserviceSubReport.html', context)
 
 # *************************** Personnel Detail Report ************************
 def personnelDetailReport(request, personnelId):
@@ -665,6 +678,7 @@ def personnelDetailReport(request, personnelId):
 
 # *************************** Research Detail Report ************************
 def researchDetailReport(request, researchId):
+    request.session['last_url'] = request.path_info
     research = Research.objects.filter(id=researchId).first()
     researchers = ResearchPerson.objects.filter(research__id=researchId)
     context = {'research':research, 'researchers':researchers }
@@ -672,6 +686,7 @@ def researchDetailReport(request, researchId):
 
 # *************************** SocialService Detail Report ************************
 def socialserviceDetailReport(request, socialserviceId):
+    request.session['last_url'] = request.path_info
     socialservice = SocialService.objects.filter(id=socialserviceId).first()
     operators = SocialServicePerson.objects.filter(socialservice__id=socialserviceId)
     context = {'socialservice':socialservice, 'operators':operators }
