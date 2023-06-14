@@ -24,9 +24,10 @@ urlpatterns = [
     path('leaveReport', views.leaveReport, name='leaveReport'),
     path('<divId>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/leaveReport', views.leaveReport,
          name='leaveReport'),
-
+    # -------------------------------- #
     path('commandReport', views.commandReport, name='commandReport'),
     path('<mission>/<eduYearStart>/<eduYearEnd>/<reportType>/commandReport', views.commandReport,
          name='commandReport'),
-
+    path('<subNo>/<mission>/<paraValue>/commandSubReport', views.commandSubReport, name='commandSubReport'),
+    path('<commandId>/commandDetailReport', views.commandDetailReport, name='commandDetailReport'),
 ]

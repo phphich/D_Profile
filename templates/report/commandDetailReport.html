@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load humanize %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2> <i class="fa fa-user"></i> ข้อมูลรายละเอียดคำสั่ง </h2>
+            <h4> คำสั่ง: {{ command.topic }} ({{ command.eduSemeter }}/{{ command.eduYear }})   </h4>
+        </div>
+    </div>
+    <hr class="text-primary">
+
+    {#    ข้อมูลคำสั่ง   #}
+    <div class="row">
+        <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ข้อมูลคำสั่ง </h5>
+            <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                <tr>
+                    <th class="col-2 text-primary">เลขที่คำสั่ง </th>
+                    <td class="col-4">{{ command.comId }}</td>
+                    <th class="col-2 text-primary">พันธกิจ </th>
+                    <td class="col-4">{{ command.mission }}</td>
+                </tr>
+                <tr>
+                    <th class="col-2 text-primary">เรื่อง </th>
+                    <td class="col-10" colspan="3">{{ command.topic }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">รายละเอียด</th>
+                    <td class="col-10" colspan="3"> {{ command.detail | linebreaks }} </td>
+                </tr>
+                <tr>
+                    <th class="col-2 text-primary">วันที่ออกคำสั่ง</th> <td> {{ command.comDate|date:'d/m/Y'}}</td>
+                    <th class="col-2 text-primary">ปีงบประมาณ</th> <td> {{ command.fiscalYear }}</td>
+                </tr>
+                <tr>
+                    <th class="col-2 text-primary">ภาคเรียนที่ </th>   <td class="col-2">{{ command.eduSemeter }} </td>
+                    <th class="col-2 text-primary">ปีการศึกษา </th>   <td class="col-2">{{ command.eduYear }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br>
+
+    {#    นักวิจัย #}
+    <div class="row">
+        <div class="12">
+            <h5 style="font-weight: bold;color: green"> ข้อมูลผู้รับคำสั่ง </h5>
+             <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+                 <tr class="text-primary">
+                     <th class="col-1 text-center">ลำดับที่</th>
+                     <th class="col-4">ชื่อ-สกุล</th>
+                     <th class="col-4">สังกัด</th>
+                     <th class="col-3">หน้าที่ความรับผิดชอบ</th>
+                 </tr>
+                 {% for staff in staffs %}
+                     <tr onclick="location.href='{% url 'personnelDetailReport' staff.personnel.id %}'" style="cursor:pointer;">
+                         <td class="text-center">{{ forloop.counter }}</td>
+                         <td>
+                             {% if staff.personnel.type == 'สายสนับสนุน'  %}
+                                {{ staff.personnel.title }}
+                             {% else %}
+                                {{ staff.personnel.status }}
+                             {% endif %}
+                             {{ staff.personnel.firstname_th }} {{ staff.personnel.lastname_th }}</td>
+                         <td>{{ staff.personnel.division.name_th }}</td>
+                         <td>{{ staff.status }}</td>
+                     </tr>
+                 {% endfor %}
+             </table>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-12">
+            <form method="post">
+                {% csrf_token %}
+                <p class="text-center">
+                    <input type="hidden" name="clickBack" value="000">
+                    <button type="button"  class="btn btn-secondary" onclick="history.back();">
+                        <i class="fa fa-rotate-back"></i> ย้อนกลับ
+                    </button>
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

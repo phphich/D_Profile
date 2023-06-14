@@ -29,8 +29,7 @@
                         <td class="text-center">{{ research.budgetType }}  </td>
                         <td >
                             {% for researcher in research.getResearchPerson  %}
-                                <a href="{% url 'personnelDetailReport'  researcher.personnel.id %}"
-                                   style="--link-hover-color: red;">
+                                <a href="{% url 'personnelDetailReport'  researcher.personnel.id %}">
                                 {{ researcher.personnel.firstname_th }} {{ researcher.personnel.lastname_th }}
                                 {{ researcher.personnel.lstname_th }} ({{ researcher.status }}) </a>
                                 <br>

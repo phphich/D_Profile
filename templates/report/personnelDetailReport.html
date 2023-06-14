@@ -89,12 +89,12 @@
             <h5 style="font-weight: bold;color: green"> ข้อมูลพื้นฐาน </h5>
             <table class="table table-light table-striped" style="border-color: #0b5ed7">
                 <tr>
-                    <th class="col-3 text-primary">เลขที่ตำแหน่ง</th>
-                    <td class="col-9" colspan="3">{{ personnel.sId }}</td>
+                    <th class="col-2 text-primary">เลขที่ตำแหน่ง</th>
+                    <td class="col-10" colspan="3">{{ personnel.sId }}</td>
                 </tr>
                 <tr>
-                    <th class="text-primary">ชื่อ-สกุล (ภาษาไทย)</th>
-                    <td>
+                    <th class="col-2 text-primary">ชื่อ-สกุล (ภาษาไทย)</th>
+                    <td class="col-4">
                         {{ personnel.title }}
                         {{ personnel.firstname_th }} {{ personnel.lastname_th }}
                     </td>
@@ -109,7 +109,7 @@
                 </tr>
                 <tr>
                     <th class="text-primary">ที่อยู่</th>
-                    <td colspan="3">{{ personnel.address }}</td>
+                    <td colspan="4">{{ personnel.address }}</td>
                 </tr>
                 <tr>
                     <th class="text-primary">เพศ</th>

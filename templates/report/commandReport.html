@@ -31,7 +31,7 @@
             </form>
         </div>
         <div class="col-2 text-end">
-            <label class="text-success"> เลือกปีงบประมาณ </label>
+            <label class="text-success"> เลือกปีการศึกษา </label>
         </div>
         <div class="col-1 text-center">
             <form method="post" action="{% url 'commandReport' %}">
@@ -130,9 +130,9 @@
         <div class="col-1"> </div>
         <div class="col-11">
             {% if budgetType is None or budgetType == 'None' or budgetType == '0' %}
-                <label> พันธกิจ: ทุกประเภท, ปีงบประมาณ: {{ eduYearStart }} - {{ eduYearEnd }}  </label>
+                <label> พันธกิจ: ทุกประเภท, ปีการศึกษา: {{ eduYearStart }} - {{ eduYearEnd }}  </label>
             {% else %}
-                <label> เฉพาะพันธกิจ:  {{ budgetType }}, ปีงบประมาณ {{ eduYearStart }} - {{ eduYearEnd }}  </label>
+                <label> เฉพาะพันธกิจ:  {{ budgetType }}, ปีการศึกษา {{ eduYearStart }} - {{ eduYearEnd }}  </label>
             {% endif %}
         </div>
     </div>
@@ -143,15 +143,15 @@
         <div class="row">
             <div class="col-1"></div>
             <div class="col-3">
-                <label class="text-primary" style="font-weight: bold"> จำนวนคำสั่งแยกตามปีงบประมาณ: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+                <label class="text-primary" style="font-weight: bold"> จำนวนคำสั่งแยกตามปีการศึกษา: </label>
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr style="{{ lineColor }}">
                         {% for col in dfCommandCount.columns %}
                             <th class="text-center">{{ col }}</th>
                         {% endfor %}
                     </tr>
                     {% for index, row in dfCommandCount.iterrows %}
-                        <tr>
+                        <tr onclick="location.href='{% url 'commandSubReport' '1' mission row.Year %}'" style="cursor:pointer;">
                             <td class="text-center">{{ row.Year }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -165,24 +165,32 @@
 
             <div class="col-1"></div>
 
-            <div class="col-4">
+            <div class="col-6">
                 <label class="text-primary" style="font-weight: bold"> จำนวนคำสั่งแยกตามพันธกิจ: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr style="{{ lineColor }}">
                     {% for col in dfCommandMission.columns %}
                         <th class="text-center">{{ col }}</th>
                     {% endfor %}
                     </tr>
+                    {% groupValue '' as nValue %}
                     {% for index, row in dfCommandMission.iterrows %}
                         {% if row.Year != '0' %}
-                            <tr>
+                            <tr onclick="location.href='{% url 'commandSubReport' '2' row.Mission row.Year %}'" style="cursor:pointer;">
+                                <td class="text-center">
+                                    {% if row.Year != nValue %}
+                                        {% groupValue row.Year as nValue %}
+                                        {{ nValue }}
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ row.Semeter }}</td>
                                 <td class="text-start">{{ row.Mission }}</td>
                                 <td class="text-center">{{ row.Count  }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}
                     <tr style="background-color: rgba(239,240,243,0.88)">
-                        <td class="text-center">รวม</td>
+                        <td class="text-center" colspan="3">รวม</td>
                         <td class="text-center">{{ count  }}</td>
                     </tr>
                 </table>

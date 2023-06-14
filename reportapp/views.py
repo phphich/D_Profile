@@ -513,7 +513,7 @@ def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, rep
     print(dfCommandCount)
     print('dfCommandMission')
     print(dfCommandMission)
-    figCommandCount = px.bar(dfCommandCount, x='Year', y='Count', title='จำนวนคำสั่งแยกตามปีงบประมาณ')
+    figCommandCount = px.bar(dfCommandCount, x='Year', y='Count', title='จำนวนคำสั่งแยกตามปีการศึกษา')
     figCommandCount.update_layout(autosize=False, width=450, height=350,
                           margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
     chartCommandCount = figCommandCount.to_html()
@@ -603,35 +603,6 @@ def researchSubReport(request, subNo, budgetType, paraValue):
         researchs = Research.objects.filter(fiscalYear=fiscalYear, budgetType=budgetType)
         count = researchs.count()
         context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'budgetType':budgetType, 'count': count}
-    #     level = paraValue
-    #     if divId is None or divId == 'None' or  divId == '0':
-    #         persons = Personnel.objects.all()
-    #     else:
-    #         division = Division.objects.filter(id = divId).first()
-    #         persons = division.getPersonnels()
-    #     personnels = []
-    #     for personnel in persons:
-    #         if personnel.getHighestEducation() == level:
-    #             personnels.append(personnel)
-    #     count = len(personnels) #list
-    # elif subNo == '3': #บุคลากรตามตำแหน่งทางวิชาการ
-    #     status = paraValue
-    #     if divId is None or divId == 'None' or divId == '0':
-    #         personnels = Personnel.objects.filter(status=status)
-    #     else:
-    #         division = Division.objects.filter(id=divId).first()
-    #         personnels = Personnel.objects.filter(status=status, division=division)
-    #     count = personnels.count()
-    # else: #บุคลากรตามเพศ
-    #     gender = paraValue
-    #     if divId is None or divId == 'None' or divId == '0':
-    #         personnels = Personnel.objects.filter(gender=gender)
-    #     else:
-    #         division = Division.objects.filter(id=divId).first()
-    #         personnels = Personnel.objects.filter(gender=gender, division=division)
-    #     count = personnels.count()
-
-    # context = {'researchs': researchs, 'subNo': subNo, 'parameter': paraValue, 'count':count}
     return render(request, 'report/researchSubReport.html', context)
 
 # ********************* Sub Report - SocialService ******************** #
@@ -648,6 +619,20 @@ def socialserviceSubReport(request, subNo, budgetType, paraValue):
         count = socialservices.count()
         context = {'socialservices': socialservices, 'subNo': subNo, 'parameter': paraValue, 'budgetType':budgetType, 'count': count}
     return render(request, 'report/socialserviceSubReport.html', context)
+
+def commandSubReport(request, subNo, mission, paraValue):
+    request.session['last_url'] = request.path_info
+    if subNo=='1': #วิจัย ปี/จำนวน
+        eduYear = int(paraValue)
+        commands = Command.objects.filter(eduYear=eduYear)
+        count = commands.count()
+        context = {'commands': commands, 'subNo': subNo, 'parameter': paraValue, 'count': count}
+    elif subNo=='2':  #วิจัยตามประเภทงบประมาณ
+        eduYear = int(paraValue)
+        commands = Command.objects.filter(eduYear=eduYear, mission=mission)
+        count = commands.count()
+        context = {'commands': commands, 'subNo': subNo, 'parameter': paraValue, 'mission':mission, 'count': count}
+    return render(request, 'report/commandSubReport.html', context)
 
 # *************************** Personnel Detail Report ************************
 def personnelDetailReport(request, personnelId):
@@ -680,7 +665,7 @@ def personnelDetailReport(request, personnelId):
 def researchDetailReport(request, researchId):
     request.session['last_url'] = request.path_info
     research = Research.objects.filter(id=researchId).first()
-    researchers = ResearchPerson.objects.filter(research__id=researchId)
+    researchers = ResearchPerson.objects.filter(research=research)
     context = {'research':research, 'researchers':researchers }
     return render(request, 'report/researchDetailReport.html', context)
 
@@ -688,8 +673,16 @@ def researchDetailReport(request, researchId):
 def socialserviceDetailReport(request, socialserviceId):
     request.session['last_url'] = request.path_info
     socialservice = SocialService.objects.filter(id=socialserviceId).first()
-    operators = SocialServicePerson.objects.filter(socialservice__id=socialserviceId)
+    operators = SocialServicePerson.objects.filter(socialservice=socialservice)
     context = {'socialservice':socialservice, 'operators':operators }
     return render(request, 'report/socialserviceDetailReport.html', context)
+
+# *************************** Command Detail Report ************************
+def commandDetailReport(request, commandId):
+    request.session['last_url'] = request.path_info
+    command = Command.objects.filter(id=commandId).first()
+    staffs = CommandPerson.objects.filter(command=command)
+    context = {'command':command, 'staffs':staffs }
+    return render(request, 'report/commandDetailReport.html', context)
 
 

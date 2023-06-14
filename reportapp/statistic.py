@@ -281,19 +281,23 @@ def getCommandCountSet(mission, eduYearStart, eduYearEnd):
 def getCommandMissionSet(mission, eduYearStart, eduYearEnd):
     if mission is None or mission == 'None' or mission == '0':  # เลือกทั้งหมด
         commands = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd
-                                                      ).values('mission').annotate(count=Count('mission')) \
-            .order_by('mission')
+                                                      ).values('mission','eduYear', 'eduSemeter').annotate(count=Count('mission')) \
+            .order_by('eduYear', 'eduSemeter', 'mission')
     else:
         commands = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd,
-                                                      mission=mission).values('mission'). \
-            annotate(count=Count('mission')).order_by('mission')
+                                                      mission=mission).values('mission''eduYear', 'eduSemeter'). \
+            annotate(count=Count('mission')).order_by('eduYear', 'eduSemeter', 'mission')
+    commandYear = []
+    commandSemeter =[]
     commandMission = []
     commandCount = []    
     for command in commands:
+        commandYear.append(str(command['eduYear']))
+        commandSemeter.append(str(command['eduSemeter']))
         commandMission.append(str(command['mission']))
         commandCount.append(command['count'])        
-    dfCommandMission = pd.DataFrame({'Mission': commandMission, 'Count': commandCount},
-        columns=['Mission', 'Count'])
+    dfCommandMission = pd.DataFrame({'Year':commandYear, 'Semeter': commandSemeter, 'Mission': commandMission, 'Count': commandCount},
+        columns=['Year', 'Semeter', 'Mission', 'Count'])
     return dfCommandMission
 
 
