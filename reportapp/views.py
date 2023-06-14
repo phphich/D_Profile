@@ -663,5 +663,18 @@ def personnelDetailReport(request, personnelId):
                }
     return render(request, 'report/personnelDetailReport.html', context)
 
+# *************************** Research Detail Report ************************
+def researchDetailReport(request, researchId):
+    research = Research.objects.filter(id=researchId).first()
+    researchers = ResearchPerson.objects.filter(research__id=researchId)
+    context = {'research':research, 'researchers':researchers }
+    return render(request, 'report/researchDetailReport.html', context)
+
+# *************************** SocialService Detail Report ************************
+def socialserviceDetailReport(request, socialserviceId):
+    socialservice = SocialService.objects.filter(id=socialserviceId).first()
+    operators = SocialServicePerson.objects.filter(socialservice__id=socialserviceId)
+    context = {'socialservice':socialservice, 'operators':operators }
+    return render(request, 'report/socialserviceDetailReport.html', context)
 
 

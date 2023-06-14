@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load humanize %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2> <i class="fa fa-user"></i> ข้อมูลรายละเอียดงานวิจัย </h2>
+            <h4> โครงการวิจัย: {{ research.title_th }} ({{ research.fiscalYear }})   </h4>
+        </div>
+    </div>
+    <hr class="text-primary">
+
+    {#    ข้อมูลโครงการวิจัย   #}
+    <div class="row">
+        <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ข้อมูลโครงการ </h5>
+            <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                <tr>
+                    <th class="col-3 text-primary">ชื่องานวิจัย (ภาษาไทย) </th>
+                    <td class="col-9" colspan="3">{{ research.title_th }}</td>
+                </tr>
+                <tr>
+                    <th class="col-3 text-primary">ชื่องานวิจัย (ภาษาอังกฤษ) </th>
+                    <td class="col-9" colspan="3">{{ research.title_en }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">วัตถุประสงค์ของงานวิจัย</th>
+                    <td class="col-9" colspan="3"> {{ research.objective | linebreaks }} </td>
+                </tr>
+                <tr>
+                    <th class="col-3 text-primary">ทุนวิจัย</th> <td class="col-3"> {{ research.budget | floatformat:2 |intcomma}}</td>
+                    <th class="col-3 text-primary">ประเภทงบประมาณ</th> <td class="col-3"> {{ research.bugetType }}</td>
+                </tr>
+                <tr>
+                    <th class="col-3 text-primary">หน่วยงานเจ้าของทุนวิจัย</th> {{ research.source  }}  <td colspan="3"> </td>
+                </tr>
+                <tr>
+                    <th class="col-3 text-primary">ร้อยละความก้าวหน้า</th> <td> {{ research.percent_success }} </td>
+                    <th class="col-3 text-primary">การเผยแพร่ผลการวิจัย</th> <td> {{ research.publish_method }} </td>
+                </tr>
+               <tr>
+                    <th class="col-3 text-primary">คำสำคัญ (Keywords)</th>   <td colspan="3">{{ research.keyword }}</td>
+               </tr>
+            </table>
+        </div>
+    </div>
+    <br>
+
+    {#    นักวิจัย #}
+    <div class="row">
+        <div class="12">
+            <h5 style="font-weight: bold;color: green"> ข้อมูลนักวิจัยในโครงการ </h5>
+             <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+                 <tr class="text-primary">
+                     <th class="col-1 text-center">ลำดับที่</th>
+                     <th class="col-2">ชื่อ-สกุล</th>
+                     <th class="col-3">สังกัด</th>
+                     <th class="col-4">ความรับผิดชอบต่อโครงการ</th>
+                     <th class="col-2 text-center">สัดส่วน</th>
+                 </tr>
+                 {% for researcher in researchers %}
+                     <tr onclick="location.href='{% url 'personnelDetailReport' researcher.personnel.id %}'" style="cursor:pointer;">
+                         <td class="text-center">{{ forloop.counter }}</td>
+                         <td>
+                             {% if researcher.personnel.type == 'สายสนับสนุน'  %}
+                                {{ researcher.personnel.title }}
+                             {% else %}
+                                {{ researcher.personnel.status }}
+                             {% endif %}
+                             {{ researcher.personnel.firstname_th }} {{ researcher.personnel.lastname_th }}</td>
+                         <td>{{ researcher.division.name_th }}</td>
+                         <td>{{ researcher.status }}</td>
+                         <td class="text-center">{{ researcher.percent }}</td>
+                     </tr>
+                 {% endfor %}
+             </table>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-12">
+            <form method="post">
+                {% csrf_token %}
+                <p class="text-center">
+                    <input type="hidden" name="clickBack" value="000">
+                    <button type="button"  class="btn btn-secondary" onclick="history.back();">
+                        <i class="fa fa-rotate-back"></i> ย้อนกลับ
+                    </button>
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

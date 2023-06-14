@@ -10,10 +10,13 @@ urlpatterns = [
     path('researchReport', views.researchReport, name='researchReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/researchReport', views.researchReport, name='researchReport'),
     path('<subNo>/<budgetType>/<paraValue>/researchSubReport', views.researchSubReport, name='researchSubReport'),
+    path('<researchId>/researchDetailReport', views.researchDetailReport, name='researchDetailReport'),
     # -------------------------------- #
     path('socialserviceReport', views.socialserviceReport, name='socialserviceReport'),
     path('<budgetType>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/socialserviceReport', views.socialserviceReport,
          name='socialserviceReport'),
+    path('<socialserviceId>/soreserviceDetailReport', views.socialserviceDetailReport, name='socialserviceDetailReport'),
+    # -------------------------------- #
     path('trainingReport', views.trainingReport, name='trainingReport'),
     path('<divId>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/trainingReport', views.trainingReport,
          name='trainingReport'),

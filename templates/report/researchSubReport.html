@@ -22,15 +22,18 @@
                     <th class="col-3">รายชื่อนักวิจัย </th>
                 </tr>
                 {% for research in researchs %}
-                    <tr class="text-primary">
+                    <tr class="text-primary" onclick="location.href='{% url 'researchDetailReport' research.id %}'" style="cursor:pointer;">
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>{{ research.title_th }} ({{ research.title_en }}) </td>
                         <td class="text-end">{{ research.budget | floatformat:2 | intcomma  }}  </td>
                         <td class="text-center">{{ research.budgetType }}  </td>
                         <td >
                             {% for researcher in research.getResearchPerson  %}
+                                <a href="{% url 'personnelDetailReport'  researcher.personnel.id %}"
+                                   style="--link-hover-color: red;">
                                 {{ researcher.personnel.firstname_th }} {{ researcher.personnel.lastname_th }}
-                                {{ researcher.personnel.lstname_th }} ({{ researcher.status }}) <br>
+                                {{ researcher.personnel.lstname_th }} ({{ researcher.status }}) </a>
+                                <br>
                             {% endfor %}
                         </td>
                     </tr>

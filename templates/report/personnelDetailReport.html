@@ -10,6 +10,79 @@
         </div>
     </div>
     <hr class="text-primary">
+
+    <form method="post" class="form-control" style="border-color: #6c757d; color: #0a53be">
+        {% csrf_token %}
+        <label style="color: green">แสดงข้อมูลประวัติ: </label>
+        <div class="row">
+            <div class="col-2">
+                <input type="checkbox" name="choices" value="base" checked disabled="disabled">
+                ข้อมูลพื้นฐาน
+            </div>
+            <div class="col-2">
+                <input type="checkbox" name="choices" value="education" checked disabled="disabled">
+                การศึกษา
+            </div>
+            <div class="col-2">
+                <input type="checkbox" name="choices" value="expertise" checked disabled="disabled">
+                ความเชี่ยวชาญ
+            </div>
+        </div>
+    <div class="row">
+            <div class="col-2">
+                {% if 'training' in choices %}
+                    <input type="checkbox" name="choices" value="training" checked onclick="this.form.submit();">
+                    การฝึกอบรม/สัมมนา
+                {% else %}
+                    <input type="checkbox" name="choices" value="training" onclick="this.form.submit();">
+                    การฝึกอบรม/สัมมนา
+                {% endif %}
+            </div>
+            <div class="col-1">
+                {% if 'research' in choices %}
+                    <input type="checkbox" name="choices" value="research" checked onclick="this.form.submit();">
+                    การวิจัย
+                {% else %}
+                    <input type="checkbox" name="choices" value="research" onclick="this.form.submit();"> การวิจัย
+                {% endif %}
+            </div>
+            <div class="col-3">
+                {% if 'socialservice' in choices %}
+                    <input type="checkbox" name="choices" value="socialservice" checked onclick="this.form.submit();">
+                    การบริการทางวิชาการแก่สังคม
+                {% else %}
+                    <input type="checkbox" name="choices" value="socialservice" onclick="this.form.submit();">
+                    การบริการทางวิชาการแก่สังคม
+                {% endif %}
+            </div>
+            <div class="col-3">
+                {% if 'performance' in choices %}
+                    <input type="checkbox" name="choices" value="performance" checked onclick="this.form.submit();">
+                    การรับตำแหน่ง/ผลงาน/รางวัล
+                {% else %}
+                    <input type="checkbox" name="choices" value="performance" onclick="this.form.submit();">
+                    การรับตำแหน่ง/ผลงาน/รางวัล
+                {% endif %}
+            </div>
+            <div class="col-1">
+                {% if 'leave' in choices %}
+                    <input type="checkbox" name="choices" value="leave" checked onclick="this.form.submit();"> การลา
+                {% else %}
+                    <input type="checkbox" name="choices" value="leave" onclick="this.form.submit();"> การลา
+                {% endif %}
+            </div>
+            <div class="col-2">
+                {% if 'command' in choices %}
+                    <input type="checkbox" name="choices" value="command" checked onclick="this.form.submit();">
+                    คำสั่งปฏิบัติงาน
+                {% else %}
+                    <input type="checkbox" name="choices" value="command" onclick="this.form.submit();"> คำสั่งปฏิบัติงาน
+                {% endif %}
+            </div>
+        </div>
+    </form>
+    <hr class="text-primary">
+
     {#    ข้อมูลพื้นฐานส่วนตัว #}
     <div class="row">
         <div class="col-10">
@@ -76,6 +149,10 @@
                      <th class="col-5">สถาบันการศึกษาที่สำเร็จ</th>
                      <th class="col-2 text-center">ปีที่สำเร็จ</th>
                  </tr>
+                 {% if expertises.count == 0 %}
+                     <tr> <td class="text-center text-secondary" colspan="4">--ไม่มีข้อมูลประวัติการศึกษาของบุคลากรในระบบ--</td></tr>
+                 {% else %}
+
                  {% for education in educations %}
                      <tr>
                          <td>{{ education.level }}</td>
@@ -84,6 +161,7 @@
                          <td class="text-center">{{ education.yearGraduate }}</td>
                      </tr>
                  {% endfor %}
+             {% endif %}
              </table>
         </div>
     </div>
@@ -99,13 +177,17 @@
                      <th class="col-4">รายละเอียด</th>
                      <th class="col-4">ประสบการณ์/ผลงาน</th>
                  </tr>
-                 {% for expert in expertises %}
-                     <tr>
-                         <td>{{ expert.topic }}</td>
-                         <td>{{ expert.detail }}</td>
-                         <td>{{ expert.experience }}</td>
-                     </tr>
-                 {% endfor %}
+                 {% if expertises.count == 0 %}
+                     <tr> <td class="text-center text-secondary" colspan="3">--ไม่มีข้อมูลความเชี่ยวชาญของบุคลากรในระบบ--</td></tr>
+                 {% else %}
+                     {% for expert in expertises %}
+                         <tr>
+                             <td>{{ expert.topic }}</td>
+                             <td>{{ expert.detail }}</td>
+                             <td>{{ expert.experience }}</td>
+                         </tr>
+                     {% endfor %}
+                {% endif %}
              </table>
         </div>
     </div>
@@ -122,75 +204,22 @@
                              <th class="col-5">หลักสูตร</th>
                              <th class="col-7">ความรับผิดชอบ </th>
                          </tr>
-                         {% for curraff in curraffs %}
-                             <tr>
-                                 <td>{{ curraff.curriculum.name_th }}({{ curraff.curriculum.level }})</td>
-                                 <td>{{ curraff.status }}</td>
-                             </tr>
-                         {% endfor %}
+                         {% if curraffs.count == 0 %}
+                             <tr> <td class="text-center text-secondary" colspan="2">--ไม่มีข้อมูลการบริหารหลักสูตรของบุคลากรในระบบ--</td></tr>
+                         {% else %}
+                             {% for curraff in curraffs %}
+                                 <tr>
+                                     <td>{{ curraff.curriculum.name_th }}({{ curraff.curriculum.level }})</td>
+                                     <td>{{ curraff.status }}</td>
+                                 </tr>
+                             {% endfor %}
+                         {% endif %}
                      </table>
                 </div>
             </div>
             <br>
         {% endif %}
     {% endif %}
-    <a name="choicearea"></a>
-    <form method="post" class="form-control" style="border-color: #6c757d; color: #0a53be">
-                {% csrf_token %}
-        <label style="color: green">แสดงประวัติ: </label>
-        <div class="row">
-            <div class="col-2">
-                {% if 'training' in choices %}
-                    <input type="checkbox" name="choices" value="training" checked onclick="this.form.submit();">
-                    การฝึกอบรม/สัมมนา
-                {% else %}
-                    <input type="checkbox" name="choices" value="training" onclick="this.form.submit();">
-                    การฝึกอบรม/สัมมนา
-                {% endif %}
-            </div>
-            <div class="col-1">
-                {% if 'research' in choices %}
-                    <input type="checkbox" name="choices" value="research" checked onclick="this.form.submit();">
-                    การวิจัย
-                {% else %}
-                    <input type="checkbox" name="choices" value="research" onclick="this.form.submit();"> การวิจัย
-                {% endif %}
-            </div>
-            <div class="col-3">
-                {% if 'socialservice' in choices %}
-                    <input type="checkbox" name="choices" value="socialservice" checked onclick="this.form.submit();">
-                    การบริการทางวิชาการแก่สังคม
-                {% else %}
-                    <input type="checkbox" name="choices" value="socialservice" onclick="this.form.submit();">
-                    การบริการทางวิชาการแก่สังคม
-                {% endif %}
-            </div>
-            <div class="col-3">
-                {% if 'performance' in choices %}
-                    <input type="checkbox" name="choices" value="performance" checked onclick="this.form.submit();">
-                    การรับตำแหน่ง/ผลงาน/รางวัล
-                {% else %}
-                    <input type="checkbox" name="choices" value="performance" onclick="this.form.submit();">
-                    การรับตำแหน่ง/ผลงาน/รางวัล
-                {% endif %}
-            </div>
-            <div class="col-1">
-                {% if 'leave' in choices %}
-                    <input type="checkbox" name="choices" value="leave" checked onclick="this.form.submit();"> การลา
-                {% else %}
-                    <input type="checkbox" name="choices" value="leave" onclick="this.form.submit();"> การลา
-                {% endif %}
-            </div>
-            <div class="col-2">
-                {% if 'command' in choices %}
-                    <input type="checkbox" name="choices" value="command" checked onclick="this.form.submit();">
-                    คำสั่งปฏิบัติงาน
-                {% else %}
-                    <input type="checkbox" name="choices" value="command" onclick="this.form.submit();"> คำสั่งปฏิบัติงาน
-                {% endif %}
-            </div>
-        </div>
-    </form>
 
     {% if 'training' in choices %}
         {#    ประวัติการฝึกอบรม #}
@@ -278,7 +307,7 @@
                          <th class="col-2 text-end">งบประมาณ </th>
                      </tr>
                      {% if socialservices.count == 0  %}
-                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการบริการทางวิชาการแก่สังคมของบุคลากรในระบบ--</td></tr>
+                         <tr> <td class="text-center text-secondary" colspan="6">--ไม่มีข้อมูลการบริการทางวิชาการแก่สังคมของบุคลากรในระบบ--</td></tr>
                      {% else %}
                          {% groupValue '' as nValue %}
                          {% for socialservice in socialservices %}
