@@ -139,7 +139,7 @@ class TrainignForm(forms.ModelForm):
             'eduYear': 'ปีการศึกษา',
             'eduSemeter': 'ภาคเรียนที่',
             'topic': 'หัวข้ออบรม/สัมมนา',
-            'place': 'สถานที่ฝึกอบรม/สัมมนา',
+            'place': 'สถานที่/ผู้จัดโครงการ',
             'budget': 'งบประมาณที่ใช้',
             'budgetType': 'ประเภทงบประมาณ',
             'personnel': 'บุคลากร',

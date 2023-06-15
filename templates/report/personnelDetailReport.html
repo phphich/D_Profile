@@ -240,7 +240,7 @@
                          {% for training in trainings %}
                              <tr>
                                  <td class="text-center">{{ training.fiscalYear }}</td>
-                                 <td class="text-center">{{ training.startDate |date:'d/m/Y'}} - {{ training.endDate |date:'d/m/Y'}}</td>
+                                 <td class="text-center">{{ training.startDate |date:'d/m/y'}} - {{ training.endDate |date:'d/m/y'}}</td>
                                  <td>{{ training.topic }}</td>
                                  <td>{{ training.place }}</td>
                                  <td class="text-end">{{ training.budget|floatformat:2|intcomma }}</td>
@@ -321,7 +321,7 @@
                                  </td>
                                  <td>{{ socialservice.topic }}<br>
                                  <td> {{ socialservice.place }} </td>
-                                 <td class="text-center"> {{ socialservice.startDate |date:'d/m/y' }}-{{ socialservice.endDate |date:'d/m/y' }} </td>
+                                 <td class="text-center"> {{ socialservice.startDate |date:'d/m/y' }} - {{ socialservice.endDate |date:'d/m/y' }} </td>
                                  <td> {{ socialservice.receiver }} </td>
                                  <td class="text-center"> {{ socialservice.num_receiver }} </td>
                                  <td class="text-end">{{ socialservice.budget|floatformat:2|intcomma }}</td>
@@ -351,7 +351,7 @@
                      {% else %}
                          {% for performance in performances %}
                              <tr>
-                                 <td>{{ performance.getDate | date:'d/m/Y' }}</td>
+                                 <td>{{ performance.getDate | date:'d/m/y' }}</td>
                                  <td>{{ performance.topic }}</td>
                                  <td>{{ performance.detail }}</td>
                                  <td>{{ performance.source }}</td>
@@ -389,8 +389,8 @@
                                          {% groupValue leave.fiscalYear as nValue %}
                                      {% endif %}
                                  </td>
-                                 <td class="text-center">{{ leave.startDate |date:'d/m/Y' }} -
-                                     {{ leave.endDate |date:'d/m/Y' }}</td>
+                                 <td class="text-center">{{ leave.startDate |date:'d/m/y' }} -
+                                     {{ leave.endDate |date:'d/m/y' }}</td>
                                  <td class="text-center"> {{ leave.days }} </td>
                                  <td> {{ leave.leaveType }} </td>
                                  <td>{{ leave.reason }}</td>
@@ -430,7 +430,7 @@
                                  </td>
                                  <td class="text-center">{{ command.comId }} </td>
                                  <td> {{ command.topic }} </td>
-                                <td class="text-center">{{ command.comDate |date:'d/m/Y'}}</td>
+                                <td class="text-center">{{ command.comDate |date:'d/m/y'}}</td>
                                  <td>{{ command.mission }}</td>
                              </tr>
                          {% endfor %}

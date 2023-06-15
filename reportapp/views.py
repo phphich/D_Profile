@@ -589,6 +589,23 @@ def reportSubPersonnel(request, subNo, divId, paraValue):
     context = {'personnels': personnels, 'subNo': subNo, 'parameter': paraValue, 'count':count}
     return render(request, 'report/personnelSubReport.html', context)
 
+# ********************* Sub Report - Research ******************** #
+def trainingSubReport(request, subNo, fiscalYear, paraValue):
+    request.session['last_url'] = request.path_info
+    if subNo=='1': #วิจัย ปี/จำนวน
+        name_th = paraValue
+        fiscalYear = int(paraValue)
+        division = Division.objects.filter(name_th=name_th).first()
+        trainings = Training.objects.filter(fiscalYear=fiscalYear, division=division)
+        count = trainings.count()
+        context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'division': division, 'count': count}
+    elif subNo=='1':  #บุคลากรตามระดับการศึกษา
+        fiscalYear = int(paraValue)
+        trainings = Training.objects.filter(fiscalYear=fiscalYear)
+        count = trainings.count()
+        context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'count': count}
+    return render(request, 'report/trainingSubReport.html', context)
+
 
 # ********************* Sub Report - Research ******************** #
 def researchSubReport(request, subNo, budgetType, paraValue):

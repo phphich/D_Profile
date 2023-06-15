@@ -257,27 +257,6 @@ def getCommandCountSet(mission, eduYearStart, eduYearEnd):
     dfCommandCount = pd.DataFrame({'Year': commandYear, 'Count': commandCount}, columns=['Year', 'Count'])
     return dfCommandCount
 
-# def getCommandBudgetSet(mission, eduYearStart, eduYearEnd):
-#     if mission is None or mission == 'None' or mission == '0':  # เลือกทั้งหมด
-#         commandss = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd
-#                                                        ).values('eduYear').annotate(sum=Sum('budget')) \
-#             .order_by('eduYear')
-#     else:
-#         commandss = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd,
-#                                                        mission=mission).values('eduYear').annotate(
-#             sum=Sum('budget')).order_by('eduYear')
-#     commandYear = []
-#     commandSum = []
-#     if eduYearStart == eduYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
-#         commandYear.append("0")
-#         commandSum.append(0.00)
-#     for command in commandss:
-#         commandYear.append(str(command['eduYear']))
-#         commandSum.append(command['sum'])
-#     dfCommandBudget = pd.DataFrame({'Year': commandYear, 'Budget': commandSum},
-#                                          columns=['Year', 'Budget'])
-#     return dfCommandBudget
-
 def getCommandMissionSet(mission, eduYearStart, eduYearEnd):
     if mission is None or mission == 'None' or mission == '0':  # เลือกทั้งหมด
         commands = Command.objects.filter(eduYear__gte=eduYearStart, eduYear__lte=eduYearEnd
@@ -312,19 +291,21 @@ def getTrainingFiscalYears():
 def getTrainingCountSet(division, fiscalYearStart, fiscalYearEnd):
     if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
         trainings = Training.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
-                                             ).values('personnel__division__name_th').annotate(count=Count('personnel__division'))\
-            .order_by('personnel__division__name_th')
+                                             ).values('fiscalYear', 'personnel__division__name_th').annotate(count=Count('personnel__division'))\
+            .order_by('fiscalYear','personnel__division__name_th')
     else:
         trainings = Training.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
-                                             personnel__division=division).values('personnel__division__name_th').\
+                                             personnel__division=division).values('fiscalYear','personnel__division__name_th').\
             annotate(count=Count('personnel__division'))\
-            .order_by('personnel__division__name_th')
+            .order_by('fiscalYear','personnel__division__name_th')
+    trainingYear = []
     trainingDivision = []
     trainingCount = []
     for training in trainings:
+        trainingYear.append(str(training['fiscalYear']))
         trainingDivision.append(str(training['personnel__division__name_th']))
         trainingCount.append(training['count'])
-    dfTrainingCount = pd.DataFrame({'Division': trainingDivision, 'Count': trainingCount}, columns=['Division', 'Count'])
+    dfTrainingCount = pd.DataFrame({'Year': trainingYear , 'Division': trainingDivision, 'Count': trainingCount}, columns=['Year', 'Division', 'Count'])
     return dfTrainingCount
 
 def getTrainingBudgetSet(division, fiscalYearStart, fiscalYearEnd):
