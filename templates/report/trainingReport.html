@@ -175,10 +175,10 @@
                     </tr>
                     {% for index, row in dfTrainingBudget.iterrows %}
                         {% if row.Year != '0' %}
-                            <tr onclick="location.href='{% url 'trainingSubReport' '2' row.Year division %}'" style="cursor:pointer;">
+                            <tr onclick="location.href='{% url 'trainingSubReport' '2' 'None' row.Year %}'" style="cursor:pointer;">
                                 <td class="text-center">{{ row.Year }}</td>
                                 <td class="text-center">{{ row.Count }}</td>
-                                <td class="text-center">{{ row.budget }}</td>
+                                <td class="text-center">{{ row.Budget }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}

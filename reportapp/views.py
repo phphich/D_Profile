@@ -589,17 +589,17 @@ def reportSubPersonnel(request, subNo, divId, paraValue):
     context = {'personnels': personnels, 'subNo': subNo, 'parameter': paraValue, 'count':count}
     return render(request, 'report/personnelSubReport.html', context)
 
-# ********************* Sub Report - Research ******************** #
-def trainingSubReport(request, subNo, fiscalYear, paraValue):
+# ********************* Sub Report - Training ******************** #
+def trainingSubReport(request, subNo, divName=None, paraValue=None):
     request.session['last_url'] = request.path_info
     if subNo=='1': #วิจัย ปี/จำนวน
-        name_th = paraValue
+        name_th = divName
         fiscalYear = int(paraValue)
         division = Division.objects.filter(name_th=name_th).first()
-        trainings = Training.objects.filter(fiscalYear=fiscalYear, division=division)
+        trainings = Training.objects.filter(fiscalYear=fiscalYear, personnel__division = division)
         count = trainings.count()
         context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'division': division, 'count': count}
-    elif subNo=='1':  #บุคลากรตามระดับการศึกษา
+    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
         fiscalYear = int(paraValue)
         trainings = Training.objects.filter(fiscalYear=fiscalYear)
         count = trainings.count()
@@ -637,6 +637,7 @@ def socialserviceSubReport(request, subNo, budgetType, paraValue):
         context = {'socialservices': socialservices, 'subNo': subNo, 'parameter': paraValue, 'budgetType':budgetType, 'count': count}
     return render(request, 'report/socialserviceSubReport.html', context)
 
+# ********************* Sub Report - Command ******************** #
 def commandSubReport(request, subNo, mission, paraValue):
     request.session['last_url'] = request.path_info
     if subNo=='1': #วิจัย ปี/จำนวน
@@ -701,5 +702,14 @@ def commandDetailReport(request, commandId):
     staffs = CommandPerson.objects.filter(command=command)
     context = {'command':command, 'staffs':staffs }
     return render(request, 'report/commandDetailReport.html', context)
+
+# *************************** Command Detail Report ************************
+def trainingDetailReport(request, trainingId):
+    request.session['last_url'] = request.path_info
+    training = Training.objects.filter(id=trainingId).first()
+    # staffs = CommandPerson.objects.filter(command=command)
+    context = {'training':training }
+    return render(request, 'report/trainingDetailReport.html', context)
+    return redirect('home')
 
 

@@ -23,7 +23,7 @@
                 </tr>
                 {% for training in trainings %}
                     <tr>
-{#                    <tr class="text-primary" onclick="location.href='{% url 'trainingDetailReport' training.id %}'" style="cursor:pointer;">#}
+                    <tr class="text-primary" onclick="location.href='{% url 'trainingDetailReport' training.id %}'" style="cursor:pointer;">
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>{{ training.topic }}  </td>
                         <td>{{ training.place }}</td>

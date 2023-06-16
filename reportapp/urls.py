@@ -21,7 +21,8 @@ urlpatterns = [
     path('trainingReport', views.trainingReport, name='trainingReport'),
     path('<divId>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/trainingReport', views.trainingReport,
          name='trainingReport'),
-    path('<subNo>/<fiscalYear>/<paraValue>/trainingSubReport', views.trainingSubReport, name='trainingSubReport'),
+    path('<subNo>/<divName>/<paraValue>/trainingSubReport', views.trainingSubReport, name='trainingSubReport'),
+    path('<trainingId>/trainingDetailReport', views.trainingDetailReport, name='trainingDetailReport'),
     # -------------------------------- #
     path('leaveReport', views.leaveReport, name='leaveReport'),
     path('<divId>/<fiscalYearStart>/<fiscalYearEnd>/<reportType>/leaveReport', views.leaveReport,

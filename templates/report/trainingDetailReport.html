@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load humanize %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2> <i class="fa fa-user"></i> ข้อมูลรายละเอียดการฝึกอบรม/สัมมนา </h2>
+            <h4> หัวข้อ: {{ training.topic }} ({{ training.fiscalYear }})   </h4>
+        </div>
+    </div>
+    <hr class="text-primary">
+
+    {#    ข้อมูลการฝึกอบรม  #}
+    <div class="row">
+        <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> ข้อมูลการฝึกอบรม </h5>
+            <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                <tr>
+                    <th class="col-3 text-primary">ชื่อโครงการ </th>
+                    <td class="col-9" colspan="3">{{ training.topic }}</td>
+                </tr>
+                <tr>
+                    <th class="col-3 text-primary">วัตถุประสงค์โครงการ </th>
+                    <td class="col-9" colspan="3">{{ training.objective |linebreaks }}</td>
+                </tr>
+                <tr>
+                    <th class="col-3 text-primary">ปีงบประมาณ </th> <td class="col-3"> {{ training.fiscalYear }} </td>
+                    <th class="col-3 text-primary">ปีการศึกษา </th> <td class="col-3"> {{ training.eduSemeter }}/{{ training.eduYear }} </td>
+                </tr>
+                <tr>
+                    <th class="col-3 text-primary">วันที่จัดโครงการ </th> <td class="col-3"> {{ training.startDate |date:'d/m/Y' }} - {{ training.endDate|date:'d/m/Y'  }}</td>
+                    <th class="col-3 text-primary">จำนวนวัน </th> <td class="col-3"> {{ training.days }} </td>
+                </tr>
+
+                <tr>
+                    <th class="text-primary">สถานที่จัดโครงการ </th> <td> {{ training.place }}</td>
+                    <th class="text-primary">กลุ่มผู้รับบริการ </th> <td> {{ training.receiver }} ({{ training.num_receiver }} คน)</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">งบประมาณที่ใช้ </th> <td> {{ training.budget |floatformat:2|intcomma }}</td>
+                    <th class="text-primary">ประเภทงบประมาณ </th> <td> {{ training.budgetType }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">หน่วยงานเจ้าของงบประมาณ </th> <td colspan="3"> {{ training.source }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br>
+
+    {#    นักวิจัย #}
+    <div class="row">
+        <div class="12">
+            <h5 style="font-weight: bold;color: green"> ข้อมูลผู้ดำเนินโครงการ </h5>
+             <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+                 <tr class="text-primary">
+                     <th class="col-1 text-center">ลำดับที่</th>
+                     <th class="col-3">ชื่อ-สกุล</th>
+                     <th class="col-4">สังกัด</th>
+                     <th class="col-4">หน้าที่ความรับผิดชอบ</th>
+                 </tr>
+                 {% for operator in operators %}
+                     <tr onclick="location.href='{% url 'personnelDetailReport' operator.personnel.id %}'" style="cursor:pointer;">
+                         <td class="text-center">{{ forloop.counter }}</td>
+                         <td>
+                             {% if operator.personnel.type == 'สายสนับสนุน'  %}
+                                {{ operator.personnel.title }}
+                             {% else %}
+                                {{ operator.personnel.status }}
+                             {% endif %}
+                             {{ operator.personnel.firstname_th }} {{ operator.personnel.lastname_th }}</td>
+                         <td>{{ operator.personnel.division.name_th }}</td>
+                         <td>{{ operator.status }}</td>
+                     </tr>
+                 {% endfor %}
+             </table>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-12">
+            <form method="post">
+                {% csrf_token %}
+                <p class="text-center">
+                    <input type="hidden" name="clickBack" value="000">
+                    <button type="button"  class="btn btn-secondary" onclick="history.back();">
+                        <i class="fa fa-rotate-back"></i> ย้อนกลับ
+                    </button>
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock %}
