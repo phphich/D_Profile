@@ -16,19 +16,26 @@
             <table class="table table-bordered table-hover" >
                 <tr class="text-center" style="color:white; background-color:#8bb2ec">
                     <th class="col-1 text-center">ลำดับที่</th>
-                    <th class="col-3">หัวข้อฝึกอบรม/สัมมนา </th>
-                    <th class="col-2">สถานที่/ผู้จัดโครงการ </th>
+                    <th class="col-3">บุคลากรผู้เข้าอบรม/สัมมนา </th>
+                    <th class="col-3">หัวข้อการฝึกอบรม/สัมมนา </th>
+                    <th class="col-3">สถานที่/ผู้จัดโครงการ </th>
                     <th class="col-2 text-center">วันที่ </th>
-                    <th class="col-1 text-end">งบประมาณ </th>
                 </tr>
                 {% for training in trainings %}
                     <tr>
                     <tr class="text-primary" onclick="location.href='{% url 'trainingDetailReport' training.id %}'" style="cursor:pointer;">
                         <td class="text-center">{{ forloop.counter }}</td>
+                        <td>
+                            {% if training.personnel.type == 'สายวิชาการ' %}
+                                {{ training.personnel.status }}
+                            {% else %}
+                                {{ training.personnel.title }}
+                            {% endif %}
+                            {{ training.personnel.firstname_th }} {{ training.personnel.lastname_th }}
+                        </td>
                         <td>{{ training.topic }}  </td>
                         <td>{{ training.place }}</td>
                         <td class="text-center">{{ training.startDate |date:'d/m/y' }}-{{ training.endDate |date:'d/m/y' }}</td>
-                        <td class="text-end">{{ training.budget | floatformat:2 | intcomma  }}  </td>
                     </tr>
                 {% endfor %}
                 <tr style="background-color: rgba(244,245,246,0.88);color: #484343">

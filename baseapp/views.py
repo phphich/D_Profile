@@ -170,8 +170,8 @@ def helpReset(request):
 
 def devteam(request):
     return  render(request, 'about/devteam.html')
-def objective(request):
-    return  render(request, 'about/objective.html')
+def system(request):
+    return  render(request, 'about/system.html')
 
 
 def permissionerror(request):

@@ -178,7 +178,7 @@
                             <tr onclick="location.href='{% url 'trainingSubReport' '2' 'None' row.Year %}'" style="cursor:pointer;">
                                 <td class="text-center">{{ row.Year }}</td>
                                 <td class="text-center">{{ row.Count }}</td>
-                                <td class="text-center">{{ row.Budget }}</td>
+                                <td class="text-end">{{ row.Budget | floatformat:2|intcomma}}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}

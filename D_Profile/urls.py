@@ -33,7 +33,7 @@ urlpatterns = [
     path('helpReset', baseapp.views.helpReset, name='helpReset'),
     path('permissionerror', baseapp.views.permissionerror, name='permissionerror'),
     path('devteam', baseapp.views.devteam, name='devteam'),
-    path('objective', baseapp.views.objective, name='objective'),
+    path('system', baseapp.views.system, name='system'),
     path('baseapp/', include('baseapp.urls')),
     path('workapp/', include('workapp.urls')),
     path('reportapp/', include('reportapp.urls')),

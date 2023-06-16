@@ -606,6 +606,23 @@ def trainingSubReport(request, subNo, divName=None, paraValue=None):
         context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'count': count}
     return render(request, 'report/trainingSubReport.html', context)
 
+# ********************* Sub Report - Leave ******************** #
+def leaveSubReport(request, subNo, name=None, paraValue=None):
+    request.session['last_url'] = request.path_info
+    if subNo=='1':
+        name_th = name
+        fiscalYear = int(paraValue)
+        division = Division.objects.filter(name_th=name_th).first()
+        leaves = Leave.objects.filter(fiscalYear=fiscalYear, personnel__division = division)
+        count = leaves.count()
+        context = {'leaves': leaves, 'subNo': subNo, 'parameter': paraValue, 'division': division, 'count': count}
+    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
+        leaveType = name
+        fiscalYear = int(paraValue)
+        leaves = Leave.objects.filter(fiscalYear=fiscalYear, leaveType=leaveType)
+        count = leaves.count()
+        context = {'leaves': leaves, 'subNo': subNo, 'parameter': paraValue, 'leaveType':leaveType, 'count': count}
+    return render(request, 'report/leaveSubReport.html', context)
 
 # ********************* Sub Report - Research ******************** #
 def researchSubReport(request, subNo, budgetType, paraValue):
@@ -661,12 +678,12 @@ def personnelDetailReport(request, personnelId):
     expertises = Expertise.objects.filter(personnel_id=personnelId)
     curraffs = CurrAffiliation.objects.filter(personnel__id=personnelId)
 
-    trainings = Training.objects.filter(personnel_id=personnelId)
-    researchs = Research.objects.filter(researchperson__personnel__id=personnelId)
-    socialservices = SocialService.objects.filter(socialserviceperson__personnel__id=personnelId)
-    performances = Performance.objects.filter(personnel_id=personnelId)
-    leaves = Leave.objects.filter(personnel_id=personnelId)
-    commands = Command.objects.filter(commandperson__personnel__id=personnelId)
+    trainings = Training.objects.filter(personnel_id=personnelId).order_by('-fiscalYear')
+    leaves = Leave.objects.filter(personnel_id=personnelId).order_by('-fiscalYear')
+    performances = Performance.objects.filter(personnel_id=personnelId).order_by('-fiscalYear')
+    researchs = Research.objects.filter(researchperson__personnel__id=personnelId).order_by('-fiscalYear')
+    socialservices = SocialService.objects.filter(socialserviceperson__personnel__id=personnelId).order_by('-fiscalYear')
+    commands = Command.objects.filter(commandperson__personnel__id=personnelId).order_by('-fiscalYear')
     choices = None
     if 'choices' in request.POST:
         choices = request.POST.getlist('choices')
@@ -707,9 +724,13 @@ def commandDetailReport(request, commandId):
 def trainingDetailReport(request, trainingId):
     request.session['last_url'] = request.path_info
     training = Training.objects.filter(id=trainingId).first()
-    # staffs = CommandPerson.objects.filter(command=command)
     context = {'training':training }
     return render(request, 'report/trainingDetailReport.html', context)
-    return redirect('home')
 
+# *************************** Leave Detail Report ************************
+def leaveDetailReport(request, leaveId):
+    request.session['last_url'] = request.path_info
+    leave = Leave.objects.filter(id=leaveId).first()
+    context = {'leave':leave }
+    return render(request, 'report/leaveDetailReport.html', context)
 

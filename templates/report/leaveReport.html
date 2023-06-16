@@ -142,32 +142,35 @@
     {% if reportType == 'table' %}
         <div class="row">
             <div class="col-1"></div>
-            <div class="col-4">
-                <label class="text-primary" style="font-weight: bold"> จำนวนครั้งในการลาแยกตามสาขา: </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+            <div class="col-5">
+                <label class="text-primary" style="font-weight: bold"> ข้อมูลการลาแยกตามสาขา: </label>
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr style="{{ lineColor }}">
                         {% for col in dfLeaveCount.columns %}
                             <th class="text-center">{{ col }}</th>
                         {% endfor %}
                     </tr>
                     {% for index, row in dfLeaveCount.iterrows %}
-                        <tr>
+                        <tr onclick="location.href='{% url 'leaveSubReport' '1' row.Division row.Year  %}'" style="cursor:pointer;">
+                            <td class="text-center">{{ row.Year }}</td>
                             <td class="text-start">{{ row.Division }}</td>
                             <td class="text-center">{{ row.Count }}</td>
+                            <td class="text-center">{{ row.Days }}</td>
                         </tr>
                     {% endfor %}
                     <tr style="background-color: rgba(239,240,243,0.88)">
-                        <td class="text-center">รวม</td>
+                        <td class="text-center" colspan="2">รวม</td>
                         <td class="text-center">{{ count }}</td>
+                        <td class="text-center">{{ sum }}</td>
                     </tr>
                 </table>
             </div>
 
-            <div class="col-1"></div>
+{#            <div class="col-1"></div>#}
 
-            <div class="col-4">
-                <label class="text-primary" style="font-weight: bold"> จำนวนวันลาแยกตามประเภท:  </label>
-                <table class="table table-bordered text-primary" style="width: 100%">
+            <div class="col-6">
+                <label class="text-primary" style="font-weight: bold"> ข้อมูลการลาแยกตามประเภท:  </label>
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
                     <tr style="{{ lineColor }}">
                     {% for col in dfLeaveType.columns %}
                         <th class="text-center">{{ col }}</th>
@@ -175,8 +178,9 @@
                     </tr>
                     {% for index, row in dfLeaveType.iterrows %}
                         {% if row.Year != '0' %}
-                            <tr>
-                                <td class="text-center">{{ row.Type }}</td>
+                            <tr onclick="location.href='{% url 'leaveSubReport' '2' row.Type row.Year %}'" style="cursor:pointer;">
+                                <td class="text-center">{{ row.Year }}</td>
+                                <td class="col-6">{{ row.Type }}</td>
                                 <td class="text-center">{{ row.Count }}</td>
                                 <td class="text-center">{{ row.Days }}</td>
                             </tr>
@@ -184,6 +188,7 @@
                     {% endfor %}
                     <tr style="background-color: rgba(239,240,243,0.88)">
                         <td class="text-center" colspan="2">รวม</td>
+                        <td class="text-center">{{ sum }}</td>
                         <td class="text-center">{{ sum }}</td>
                     </tr>
                 </table>

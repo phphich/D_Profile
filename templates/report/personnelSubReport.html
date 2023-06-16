@@ -2,7 +2,7 @@
 {% load static %}
 {% load custom_tags %}
 {% block content %}
-    <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานรายชื่อบุคลากร  </h2>
+    <h2 class="text-primary"> <i class="fa fa-user-group"></i><i class="far fa-id-card"></i> รายงานรายชื่อบุคลากร  </h2>
     <hr class="text-primary">
     <div class="row">
         <div class="col-1"></div>
@@ -15,7 +15,7 @@
                     <th class="col-3">ชื่อ-สกุล (ภาษาไทย) </th>
                     <th class="col-3">ชื่อ-สกุล (ภาษาอังกฤษ) </th>
                     <th class="col-2">ตำแหน่ง </th>
-                    <th class="col-3">คุณวุฒิการศึกษา</th>
+                    <th class="col-3">คุณวุฒิทางการศึกษา</th>
                 </tr>
                 {% for personnel in personnels %}
                     <tr class="text-primary" onclick="location.href='{% url 'personnelDetailReport' personnel.id %}'" style="cursor:pointer;">
@@ -34,11 +34,11 @@
                     </tr>
                 {% endfor %}
                 <tr style="background-color: rgba(244,245,246,0.88);color: #484343">
-                    <td class="text-center" colspan="5">รวมบุคลากร:  {{ count }} ราย</td>
+                    <td class="text-center" colspan="5">รวมจำนวนบุคลากร:  {{ count }} ราย</td>
                 </tr>
             </table>
         {% elif subNo == '2' %} {# level #}
-            <h5> คุณระะดับวุฒิการศึกษา: {{ parameter }} </h5>
+            <h5> ระะดับการศึกษา: {{ parameter }} </h5>
             <table class="table table-bordered table-hover" >
                 <tr class="text-center" style="color:white; background-color:#8bb2ec">
                     <th class="col-1 text-center">ลำดับที่</th>

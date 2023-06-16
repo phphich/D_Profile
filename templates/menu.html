@@ -2,16 +2,17 @@
 <div class="list-group">
     <li class="list-group-item  list-group-item-primary bg-primary text-white">
         <i class="fa-solid fa-bars"></i><b> Main:</b></li>
-    <a href="{% url 'home' %}" class="list-group-item list-group-item-action list-group-item-light text-primary">
+    <a href="{% url 'home' %}" class="list-group-item list-group-item-action list-group-item-light"
+       style="color: #063575;font-weight: bold">
         <i class="fa fa-home"></i> Home </a>
     <a href="{% url 'facultyDetail'  %}"
-       class="list-group-item list-group-item-action list-group-item-light text-info">
+       class="list-group-item list-group-item-action list-group-item-light" style="color: #063575">
         <i class="fa fa-school"></i> คณะ </a>
     <a href="{% url 'divisionList' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-info">
+       class="list-group-item list-group-item-action list-group-item-light" style="color: #063575">
         <i class="fa fa-layer-group"></i> สาขา/หน่วยงานย่อย </a>
     <a href="{% url 'curriculumList' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-info">
+       class="list-group-item list-group-item-action list-group-item-light" style="color: #063575">
         <i class="fa fa-graduation-cap"></i> หลักสูตร </a>
 {#    <a href="{% url 'personnelList' %}"#}
 {#       class="list-group-item list-group-item-action list-group-item-light text-primary">#}
@@ -27,69 +28,71 @@
        class="list-group-item list-group-item-action list-group-item-light text-primary">
        <i class="fa-solid fa-sun"></i> ความเชี่ยวชาญ </a>
     <a href="{% url 'currAffiliationList' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-warning">
+       class="list-group-item list-group-item-action list-group-item-light" style="color: rgba(239,88,116,0.89)">
         <i class="fas fa-users-cog"></i> การบริหารหลักสูตร </a>
     {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager'%}
         <a href="{% url 'managerList' %}"
-           class="list-group-item list-group-item-action list-group-item-light" style="color: rgba(239,88,116,0.89)">
+           class="list-group-item list-group-item-action list-group-item-light" style="color: #fd1cd0">
           <i class="fas fa-user-tie"></i></i> ผู้บริหารหน่วยงาน </a>
         <a href="{% url 'headerList' %}"
-           class="list-group-item list-group-item-action list-group-item-light" style="color: rgba(239,88,116,0.89)">
+           class="list-group-item list-group-item-action list-group-item-light" style="color: #fd1cd0">
           <i class="fas fa-user-astronaut"></i> หัวหน้าสาขา/หน่วยงานย่อย </a>
         <a href="{% url 'responsibleList' %}"
-           class="list-group-item list-group-item-action list-group-item-light" style="color: rgba(239,88,116,0.89)">
+           class="list-group-item list-group-item-action list-group-item-light" style="color: #fd1cd0">
           <i class="fas fa-chalkboard-teacher"></i> ผู้รับผิดชอบข้อมูลสาขา/หน่วยงานย่อย </a>
     {% endif %}
 </div>
-
 
 <br>
 <div class="list-group">
     <li class="list-group-item  list-group-item-warning bg-success text-white">
         <i class="fas fa-chalkboard-teacher"></i><b> Working profiles:</b></li>
     <a href="{% url 'trainingList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fa fa-person-dots-from-line"></i> การฝึกอบรม/สัมมนา <i class="fas fa-check"></i> </a>
+        <i class="fa fa-person-dots-from-line"></i> การฝึกอบรม/สัมมนา </a>
     <a href="{% url 'leaveList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fa-solid fa-person-hiking"></i> การลา <i class="fas fa-check"></i> </a>
+        <i class="fa-solid fa-person-hiking"></i> การลา  </a>
     <i class="fa-solid fa-person-walking-luggage"></i>
     <a href="{% url 'performanceList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fa-solid fa-award"></i> การรับตำแหน่ง/ผลงาน/รางวัล <i class="fas fa-check"></i> </a>
-    <a href="{% url 'commandList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fas fa-clipboard-list"></i> คำสั่ง  <i class="fas fa-check"></i></a>
-    <a href="{% url 'researchList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fas fa-flask"></i> การวิจัย <i class="fas fa-check"></i> </a>
-    <a href="{% url 'socialserviceList' %}" class="list-group-item list-group-item-action list-group-item-light text-success">
-        <i class="fas fa-person-booth"></i> การบริการทางวิชาการแก่สังคม <i class="fas fa-check"></i>  </a>
-
+        <i class="fa-solid fa-award"></i> การรับตำแหน่ง/ผลงาน/รางวัล </a>
+    <a href="{% url 'researchList' %}" class="list-group-item list-group-item-action list-group-item-light" style="color: #04c20a">
+        <i class="fas fa-flask"></i> การวิจัย  </a>
+    <a href="{% url 'socialserviceList' %}" class="list-group-item list-group-item-action list-group-item-light" style="color: #04c20a">
+        <i class="fas fa-person-booth"></i> การบริการทางวิชาการแก่สังคม  </a>
+    <a href="{% url 'commandList' %}" class="list-group-item list-group-item-action list-group-item-light " style="color: #04c20a">
+        <i class="fas fa-clipboard-list"></i> คำสั่ง </a>
 </div>
 <br>
 
 <div class="list-group">
-    <li class="list-group-item  list-group-item-warning bg-warning text-secondary">
+    <li class="list-group-item  list-group-item-warning text-white" style="background-color: #458aee">
         <i class="fa fa-chart-column"></i><b> Reporting:</b></li>
-    <a href="{% url 'personnelReport' %} "
-       class="list-group-item list-group-item-action list-group-item-light text-primary">
-        <i class="fas fa-chart-bar"></i> รายงานข้อมูลบุคลากร </a>
-    <a href="{% url 'researchReport' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-primary">
-        <i class="fas fa-chart-pie"></i> รายงานข้อมูลการวิจัย </a>
-    <a href="{% url 'socialserviceReport' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-primary">
-        <i class="fas fa-chart-line"></i> รายงานการบริการทางวิชาการแก่สังคม </a>
     <a href="{% url 'trainingReport' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-primary">
-        <i class="fas fa-chart-area"></i> รายงานการฝึกอบรม/สัมมนา </a>
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+        <i class="fa fa-person-dots-from-line"></i><i class="fas fa-chart-area"></i> รายงานการฝึกอบรม/สัมมนา </a>
     <a href="{% url 'leaveReport' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-primary">
-        <i class="fas fa-chart-area"></i> รายงานการลา </a>
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+        <i class="fa-solid fa-person-hiking"></i><i class="fas fa-signal"></i> รายงานการลา </a>
     <a href="{% url 'commandReport' %}"
-       class="list-group-item list-group-item-action list-group-item-light text-primary">
-        <i class="fas fa-project-diagram"></i> รายงานข้อมูลคำสั่ง  </a>
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+        <i class="fa-solid fa-award"></i><i class="fas fa-project-diagram"></i> รายงานการรับตำแหน่ง/ผลงาน/รางวัล** </a>
+    <a href="{% url 'researchReport' %}"
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+        <i class="fas fa-flask"></i><i class="fas fa-chart-pie"></i> รายงานข้อมูลการวิจัย </a>
+    <a href="{% url 'socialserviceReport' %}"
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+        <i class="fas fa-person-booth"></i><i class="fas fa-chart-line"></i> รายงานการบริการทางวิชาการแก่สังคม </a>
+    <a href="{% url 'commandReport' %}"
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+       <i class="fas fa-clipboard-list"></i><i class="fas fa-chart-bar"></i>  รายงานข้อมูลคำสั่ง  </a>
+
+    <a href="{% url 'personnelReport' %} "
+       class="list-group-item list-group-item-action list-group-item-light text-info">
+        <i class="fa fa-user-group"></i><i class="far fa-id-card"></i> รายงานข้อมูลบุคลากร </a>
 </div>
 <br>
 
 <div class="list-group">
-    <li class="list-group-item list-group-item-warning text-dark"><b>
+    <li class="list-group-item list-group-item-warning text-white" style="background-color: #6b7381"><b>
         <i class="fas fa-address-card"></i> User:</b></li>
     <li class="list-group-item text-success">
         {% if request.session.userEmail %}
@@ -144,9 +147,9 @@
 </div>
 <br>
 <div class="list-group">
-    <li class="list-group-item  list-group-item-warning bg-dark text-white">
+    <li class="list-group-item  list-group-item-warningtext-white" style="background-color: #a8bfe7">
         <i class="fas fa-cogs"></i><b> System:</b></li>
-    <a href="{% url 'objective' %}"
+    <a href="{% url 'system' %}"
        class="list-group-item list-group-item-action list-group-item-light text-dark">
         <i class="fas fa-bullseye"></i> เกี่ยวกับระบบ </a>
     <a href="{% url 'devteam' %}"
