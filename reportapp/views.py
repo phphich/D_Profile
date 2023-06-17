@@ -784,7 +784,7 @@ def personnelDetailReport(request, personnelId):
     if 'clickBack' in request.POST:
         return redirect(request.session['last_url'])
     personnel = Personnel.objects.filter(id=personnelId).first()
-    educations = Education.objects.filter(personnel_id=personnelId)
+    educations = Education.objects.filter(personnel_id=personnelId).order_by('-yearGraduate')
     expertises = Expertise.objects.filter(personnel_id=personnelId)
     curraffs = CurrAffiliation.objects.filter(personnel__id=personnelId)
 
