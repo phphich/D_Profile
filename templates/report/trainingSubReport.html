@@ -22,7 +22,6 @@
                     <th class="col-2 text-center">วันที่ </th>
                 </tr>
                 {% for training in trainings %}
-                    <tr>
                     <tr class="text-primary" onclick="location.href='{% url 'trainingDetailReport' training.id %}'" style="cursor:pointer;">
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>
@@ -39,7 +38,7 @@
                     </tr>
                 {% endfor %}
                 <tr style="background-color: rgba(244,245,246,0.88);color: #484343">
-                    <td class="text-center" colspan="6">รวมจำนวนครั้งการฝึกอบรม/สัมมนา:  {{ count }} </td>
+                    <td class="text-center" colspan="6">รวมจำนวนการฝึกอบรม/สัมมนา:  {{ count }} ครั้ง </td>
                 </tr>
             </table>
         </div>

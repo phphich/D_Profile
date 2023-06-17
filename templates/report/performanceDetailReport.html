@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load humanize %}
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2> <i class="fa fa-user"></i> ข้อมูลรายละเอียดผลงานและรางวัล </h2>
+            <h4> หัวข้อ: {{ performance.topic }} ({{ performance.fiscalYear }})   </h4>
+        </div>
+    </div>
+    <hr class="text-primary">
+
+    {#    ข้อมูลผลงานและรางวัล  #}
+    <div class="row">
+        <div class="col-12">
+            <h5 style="font-weight: bold;color: green"> รายละเอียดผลงานและรางวัล </h5>
+            <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                <tr>
+                    <th class="col-2 text-primary">ชื่อ-สกุล </th>
+                    <td class="col-4">
+                        {% if performance.personnel.type == 'สายวิชาการ' %}
+                            {{ performance.personnel.status }}
+                        {% else %}
+                            {{ performance.personnel.title }}
+                        {% endif %}
+                        {{ performance.personnel.firstname_th }} {{ performance.personnel.lastname_th }}
+                    </td>
+                    <th class="col-2 text-primary">สังกัดสาขา </th>
+                    <td class="col-4" colspan="3">{{ performance.personnel.division.name_th }}</td>
+                </tr>
+                <tr>
+                    <th class="col-2 text-primary">ชื่อผลงาน/รางวัล </th>
+                    <td class="col-10" colspan="3">{{ performance.topic }}</td>
+                </tr>
+                <tr>
+                    <th class="col-2 text-primary">รายละเอียด </th>
+                    <td class="col-10" colspan="3">{{ performance.detail | linebreaks}}</td>
+                </tr>
+                <tr>
+                    <th class="col-2 text-primary">ผู้มอบ/ได้รับจาก </th>
+                    <td class="col-4">{{ performance.source }}</td>
+                    <th class="col-2 text-primary">วันที่ได้รับ </th>
+                    <td class="col-4"> {{ performance.getDate |date:'d/m/y' }}</td>
+                </tr>
+                <tr>
+                    <th class="col-2 text-primary">ปีงบประมาณ </th>
+                    <td class="col-4"> {{ performance.fiscalYear }} </td>
+                    <th class="col-2 text-primary">ปีการศึกษา </th>
+                    <td  class="col-4"> {{ performance.eduSemeter }}/{{ performance.eduYear }} </td>
+                </tr>
+                <tr>
+                    <th class="text-primary">งบประมาณที่ใช้ </th> <td> {{ performance.budget |floatformat:2|intcomma }}</td>
+                    <th class="text-primary">ประเภทงบประมาณ </th> <td> {{ performance.budgetType }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+        <div class="col-12">
+            <form method="post">
+                {% csrf_token %}
+                <p class="text-center">
+                    <input type="hidden" name="clickBack" value="000">
+                    <button type="button"  class="btn btn-secondary" onclick="history.back();">
+                        <i class="fa fa-rotate-back"></i> ย้อนกลับ
+                    </button>
+                </p>
+            </form>
+        </div>
+    </div>
+{% endblock %}

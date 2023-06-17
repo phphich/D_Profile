@@ -117,6 +117,7 @@ def researchReport(request, budgetType=None, fiscalYearStart=None, fiscalYearEnd
         strsum = "{:,.2f}".format(sum/1000000)+"M."
     else:
         strsum = "0.00M."
+        sum = 0.00
 
     #ปีงบประมาณ
     fiscalYearResearchs = list(reversed(fiscalYearResearchs)) #กลับด้านลิสต์ จากมากไปน้อย
@@ -211,6 +212,7 @@ def socialserviceReport(request, budgetType=None, fiscalYearStart=None, fiscalYe
         strsum = "{:,.2f}".format(sum/1000000)+"M."
     else:
         strsum = "0.00M."
+        sum = 0.00
 
     #ปีงบประมาณ
     fiscalYearSocialServices = list(reversed( fiscalYearSocialServices))
@@ -321,6 +323,7 @@ def trainingReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None
         strsum = "{:,.2f}".format(sum/1000000)+"M."
     else:
         strsum = "0.00M."
+        sum = 0.00
 
     #ปีงบประมาณ
     fiscalYearTrainings = list(reversed(fiscalYearTrainings)) #กลับด้านลิสต์ จากมากไปน้อย
@@ -370,7 +373,7 @@ def leaveReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, r
         messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
-    fiscalYearLeaves = statistic.getLeaveFiscalYears() #ปีวิจัยที่มีในฐานข้อมูล
+    fiscalYearLeaves = statistic.getLeaveFiscalYears() #ปีที่ลาที่มีในฐานข้อมูล
     divisions = Division.objects.all().order_by('name_th')
 
     if divId is not None:#มาจากคลิ้กลิงก์
@@ -450,6 +453,96 @@ def leaveReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, r
 
                'count':count, 'sum': sum}
     return render(request, 'report/leaveReport.html', context)
+
+# ********************* การรับตำแหน่งผลงาน/รางวัล *********************
+def performanceReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, reportType=None):
+    performanceCount = Performance.objects.all().count()
+    if performanceCount == 0:
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    fiscalYearPerformances = statistic.getPerformanceFiscalYears() #ปีรับผลงานที่มีในฐานข้อมูล
+    divisions = Division.objects.all().order_by('name_th')
+
+    if divId is not None:#มาจากคลิ้กลิงก์
+        divId=divId
+        fiscalYearStart = int(fiscalYearStart)
+        fiscalYearEnd = int(fiscalYearEnd)
+        reportType = reportType
+    elif 'divId' in request.POST:#มาจากเลือก Selecct box
+        divId = request.POST['divId']
+        fiscalYearStart = int(request.POST['fiscalYearStart'])
+        fiscalYearEnd = int(request.POST['fiscalYearEnd'])
+        if fiscalYearEnd < fiscalYearStart:
+            fiscalYearEnd = fiscalYearStart
+        reportType = request.POST['reportType']
+    else:
+        print("c")
+        division = None
+        fiscalYearStart = fiscalYearPerformances[len(fiscalYearPerformances)-1]
+        fiscalYearEnd = fiscalYearPerformances[len(fiscalYearPerformances)-1]
+        reportType = 'dashboard'
+    if divId is None or divId =='None' or divId == '0' or divId == '':  # เลือกทั้งหมด
+        division = None
+        count = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd).count()
+        rsum = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd).aggregate(
+            sum=Sum('budget'))
+        sum = rsum['sum']
+    else:
+        print("e")
+        division = Division.objects.filter(id=divId).first()
+        count = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd, personnel__division=division).count()
+        rsum = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                        personnel__division=division).aggregate(sum=Sum('budget'))
+        sum = rsum['sum']
+
+    if sum is not None:
+        strsum = "{:,.2f}".format(sum/1000000)+"M."
+    else:
+        strsum = "0.00M."
+        sum = 0.00
+    #ปีงบประมาณ
+    fiscalYearPerformances = list(reversed(fiscalYearPerformances)) #กลับด้านลิสต์ จากมากไปน้อย
+    print("**************************")
+    print('fiscalYearSocialService')
+    print(fiscalYearPerformances)
+    print('division')
+    print(division)
+    print('fiscalYearStart')
+    print(fiscalYearStart)
+    print('fiscalYearEnd')
+    print(fiscalYearEnd)
+    print("count")
+    print(count)
+
+    print("**************************")
+
+    dfPerformanceCount = statistic.getPerformanceCountSet(division=division, fiscalYearStart=fiscalYearStart,
+                                                    fiscalYearEnd=fiscalYearEnd)
+    print('dfPerformanceCount')
+    print(dfPerformanceCount)
+    dfPerformanceBudget = statistic.getPerformanceBudgetSet(division=division, fiscalYearStart=fiscalYearStart,
+                                                      fiscalYearEnd=fiscalYearEnd)
+    print('dfPerformanceBudget')
+    print(dfPerformanceBudget)
+    figPerformanceCount = px.bar(dfPerformanceCount, x='Division', y='Count', title='จำนวนครั้งที่ได้รับผลงานและรางวัล')
+    figPerformanceCount.update_layout(autosize=False, width=450, height=350,
+                                   margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    chartPerformanceCount = figPerformanceCount.to_html()
+
+    figPerformanceBudget = px.line(dfPerformanceBudget, x="Year", y="Budget",
+                                title='งบประมาณที่ใช้สำหรับการได้รับผลงานและรางวัล')
+    figPerformanceBudget.update_layout(autosize=False, width=400, height=300,
+                                    margin=dict(l=10, r=10, b=10, t=50, pad=5, ), paper_bgcolor="white")
+    chartPerformanceBudget = figPerformanceBudget.to_html()
+
+    context = {'divisions': divisions, 'division': division,
+               'fiscalYearPerformances': fiscalYearPerformances,
+               'fiscalYearStart': fiscalYearStart, 'fiscalYearEnd': fiscalYearEnd, 'reportType': reportType,
+               'dfPerformanceCount': dfPerformanceCount, 'chartPerformanceCount': chartPerformanceCount,
+               'dfPerformanceBudget': dfPerformanceBudget, 'chartPerformanceBudget': chartPerformanceBudget,
+               'count': count, 'sum':sum, 'strsum':strsum }
+    return render(request, 'report/performanceReport.html', context)
 
 # ********************* คำสั่ง  ***********************
 def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, reportType=None):
@@ -589,23 +682,6 @@ def reportSubPersonnel(request, subNo, divId, paraValue):
     context = {'personnels': personnels, 'subNo': subNo, 'parameter': paraValue, 'count':count}
     return render(request, 'report/personnelSubReport.html', context)
 
-# ********************* Sub Report - Training ******************** #
-def trainingSubReport(request, subNo, divName=None, paraValue=None):
-    request.session['last_url'] = request.path_info
-    if subNo=='1': #วิจัย ปี/จำนวน
-        name_th = divName
-        fiscalYear = int(paraValue)
-        division = Division.objects.filter(name_th=name_th).first()
-        trainings = Training.objects.filter(fiscalYear=fiscalYear, personnel__division = division)
-        count = trainings.count()
-        context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'division': division, 'count': count}
-    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
-        fiscalYear = int(paraValue)
-        trainings = Training.objects.filter(fiscalYear=fiscalYear)
-        count = trainings.count()
-        context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'count': count}
-    return render(request, 'report/trainingSubReport.html', context)
-
 # ********************* Sub Report - Leave ******************** #
 def leaveSubReport(request, subNo, name=None, paraValue=None):
     request.session['last_url'] = request.path_info
@@ -623,6 +699,40 @@ def leaveSubReport(request, subNo, name=None, paraValue=None):
         count = leaves.count()
         context = {'leaves': leaves, 'subNo': subNo, 'parameter': paraValue, 'leaveType':leaveType, 'count': count}
     return render(request, 'report/leaveSubReport.html', context)
+
+# ********************* Sub Report - Training ******************** #
+def trainingSubReport(request, subNo, divName=None, paraValue=None):
+    request.session['last_url'] = request.path_info
+    if subNo=='1': # ปี/จำนวน
+        name_th = divName
+        fiscalYear = int(paraValue)
+        division = Division.objects.filter(name_th=name_th).first()
+        trainings = Training.objects.filter(fiscalYear=fiscalYear, personnel__division = division)
+        count = trainings.count()
+        context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'division': division, 'count': count}
+    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
+        fiscalYear = int(paraValue)
+        trainings = Training.objects.filter(fiscalYear=fiscalYear)
+        count = trainings.count()
+        context = {'trainings': trainings, 'subNo': subNo, 'parameter': paraValue, 'count': count}
+    return render(request, 'report/trainingSubReport.html', context)
+
+# ********************* Sub Report - Performance ******************** #
+def performanceSubReport(request, subNo, divName=None, paraValue=None):
+    request.session['last_url'] = request.path_info
+    if subNo=='1': # ปี/จำนวน
+        name_th = divName
+        fiscalYear = int(paraValue)
+        division = Division.objects.filter(name_th=name_th).first()
+        performances = Performance.objects.filter(fiscalYear=fiscalYear, personnel__division = division)
+        count = performances.count()
+        context = {'performances': performances, 'subNo': subNo, 'parameter': paraValue, 'division': division, 'count': count}
+    elif subNo=='2':  #บุคลากรตามระดับการศึกษา
+        fiscalYear = int(paraValue)
+        performances = Performance.objects.filter(fiscalYear=fiscalYear)
+        count = performances.count()
+        context = {'performances': performances,  'subNo': subNo, 'parameter': paraValue, 'count': count}
+    return render(request, 'report/performanceSubReport.html', context)
 
 # ********************* Sub Report - Research ******************** #
 def researchSubReport(request, subNo, budgetType, paraValue):
@@ -720,12 +830,19 @@ def commandDetailReport(request, commandId):
     context = {'command':command, 'staffs':staffs }
     return render(request, 'report/commandDetailReport.html', context)
 
-# *************************** Command Detail Report ************************
+# *************************** Training Detail Report ************************
 def trainingDetailReport(request, trainingId):
     request.session['last_url'] = request.path_info
     training = Training.objects.filter(id=trainingId).first()
     context = {'training':training }
     return render(request, 'report/trainingDetailReport.html', context)
+
+# *************************** Performance Detail Report ************************
+def performanceDetailReport(request, performanceId):
+    request.session['last_url'] = request.path_info
+    performance = Performance.objects.filter(id=performanceId).first()
+    context = {'performance':performance }
+    return render(request, 'report/performanceDetailReport.html', context)
 
 # *************************** Leave Detail Report ************************
 def leaveDetailReport(request, leaveId):

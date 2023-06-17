@@ -24,7 +24,6 @@
                     <th class="col-1 text-center">จำนวนวันลา </th>
                 </tr>
                 {% for leave in leaves %}
-                    <tr>
                     <tr class="text-primary" onclick="location.href='{% url 'leaveDetailReport' leave.id %}'" style="cursor:pointer;">
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>

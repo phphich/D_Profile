@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% load humanize %}
+{% block content %}
+    <h2 class="text-primary"><i class="fa fa-user-group"></i> รายงานข้อมูลผลงานและรางวัล  </h2>
+    <hr class="text-primary">
+    <div class="row">
+        <div class="col-12">
+            <h5> ปีงบประมาณ : {{ parameter }}
+                {% if subNo == '1' %}
+                     สาขา: {{ division.name_th }}
+                {% endif %}
+            </h5>
+            <table class="table table-bordered table-hover" >
+                <tr class="text-center" style="color:blue; background-color:#ffb3b3">
+                    <th class="col-1 text-center">ลำดับที่</th>
+                    <th class="col-3">บุคลากรผู้รับผลงาน/รางวัล </th>
+                    <th class="col-4">ชื่อผลงาน/รางวัล </th>
+                    <th class="col-2">ได้รับจาก/ผู้มอบ </th>
+                    <th class="col-2 text-center">วันที่ได้รับ </th>
+                </tr>
+                {% for performance in performances %}
+                    <tr class="text-primary" onclick="location.href='{% url 'performanceDetailReport' performance.id %}'" style="cursor:pointer;">
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td>
+                            {% if performance.personnel.type == 'สายวิชาการ' %}
+                                {{ performance.personnel.status }}
+                            {% else %}
+                                {{ performance.personnel.title }}
+                            {% endif %}
+                            {{ performance.personnel.firstname_th }} {{ performance.personnel.lastname_th }}
+                        </td>
+                        <td>{{ performance.topic }}  </td>
+                        <td>{{ performance.source }}</td>
+                        <td class="text-center">{{ performance.getDate |date:'d/m/y' }}</td>
+                    </tr>
+                {% endfor %}
+                <tr style="background-color: rgba(244,245,246,0.88);color: #484343">
+                    <td class="text-center" colspan="5">รวมผลงานและรางวัล :  {{ count }} รายการ </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br><br>
+    <p class="text-center">
+        <button type="button" class="btn btn-secondary" onclick="history.back()">
+            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        </button>
+    </p>
+    <br><br>
+{% endblock %}

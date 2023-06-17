@@ -729,7 +729,7 @@ def performanceNew(request, id):
         if form.is_valid():
             form.save()
             performance = Performance.objects.last()
-            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลผลงาน/รางวัลเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "บันทึกข้อมูลผลงานและรางวัลเรียบร้อย")
             return redirect('performanceDetail', id=performance.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")

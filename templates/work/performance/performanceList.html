@@ -4,7 +4,7 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <h2><i class="fas fa-award text-primary"></i> ประวัติการรับตำแหน่ง/ผลงาน/รางวัล </h2>
+            <h2><i class="fas fa-award text-primary"></i> ประวัติผลงานและรางวัล </h2>
         </div>
     </div>
 
@@ -40,6 +40,7 @@
                         <select name="personnelId" onchange="this.form.submit();" class="form-control text-success">
                             {% if recorderOnly == True %}
                                 <option value="{{ recorder.id }}" selected> {{ recorder }} (*คุณ) </option>
+                            {% else %}
                                 {% for person in division.getPersonnels %}
                                     {% if person == personnel %}
                                         <option value="{{ person.id }}" selected> {{ person }}
@@ -156,7 +157,7 @@
                 </div>
             </div>
         {% endif %}
-         <p class="text-end text-info">[ข้อมูลการรับตำแหน่ง/ผลงาน/รางวัล: {{ count }} ครั้ง]</p>
+         <p class="text-end text-info">[ข้อมูลผลงานและรางวัล: {{ count }} รายการ]</p>
         <br>
     {% endif %}
 {% endblock %}

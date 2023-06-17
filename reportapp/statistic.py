@@ -90,9 +90,9 @@ def getGenderSet(division=None):
 
 # *********************** Research ************************
 def getResearchFiscalYears():
-    fiscalYearDatas = Research.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYearDates = Research.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
     fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
-    for f in fiscalYearDatas:
+    for f in fiscalYearDates:
         fiscalYears.append(f['fiscalYear'])
     return fiscalYears
 
@@ -167,9 +167,9 @@ def getResearchBudgetTypeSet(budgetType, fiscalYearStart, fiscalYearEnd):
 
 #  ******************** Social Service *********************
 def getSocialServiceFiscalYears():
-    fiscalYearDatas = SocialService.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYearDates = SocialService.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
     fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
-    for f in fiscalYearDatas:
+    for f in fiscalYearDates:
         fiscalYears.append(f['fiscalYear'])
     return fiscalYears
 
@@ -234,9 +234,9 @@ def getSocialServiceBudgetTypeSet(budgetType, fiscalYearStart, fiscalYearEnd):
 
 # *********************** Command ************************
 def getCommandEduYears():
-    eduYearDatas = Command.objects.all().values('eduYear').distinct().order_by('eduYear')
+    eduYearDates = Command.objects.all().values('eduYear').distinct().order_by('eduYear')
     eduYears = []  # ปีงบประมาณแบบไม่ซ้ำ
-    for f in eduYearDatas:
+    for f in eduYearDates:
         eduYears.append(f['eduYear'])
     return eduYears
 
@@ -282,9 +282,9 @@ def getCommandMissionSet(mission, eduYearStart, eduYearEnd):
 
 # *********************** Trainning ************************
 def getTrainingFiscalYears():
-    fiscalYearDatas = Training.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYearDates = Training.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
     fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
-    for f in fiscalYearDatas:
+    for f in fiscalYearDates:
         fiscalYears.append(f['fiscalYear'])
     return fiscalYears
 
@@ -337,9 +337,9 @@ def getTrainingBudgetSet(division, fiscalYearStart, fiscalYearEnd):
 
 # *********************** Leave ************************
 def getLeaveFiscalYears():
-    fiscalYearDatas = Leave.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYearDates = Leave.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
     fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
-    for f in fiscalYearDatas:
+    for f in fiscalYearDates:
         fiscalYears.append(f['fiscalYear'])
     return fiscalYears
 
@@ -385,3 +385,77 @@ def getLeaveTypeSet(division, fiscalYearStart, fiscalYearEnd):
         leaveDays.append(leave['days'])
     dfLeaveBudget = pd.DataFrame({'Year':leaveYear, 'Type': leaveType, 'Count': leaveCount, 'Days' : leaveDays}, columns=['Year', 'Type', 'Count', 'Days'])
     return dfLeaveBudget
+
+# *********************** Performance ************************
+def getPerformanceFiscalYears():
+    fiscalYearDates = Performance.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
+    fiscalYears = []  #ปีงบประมาณแบบไม่ซ้ำ
+    for f in fiscalYearDates:
+        fiscalYears.append(f['fiscalYear'])
+    return fiscalYears
+
+def getPerformanceCountSet(division, fiscalYearStart, fiscalYearEnd):
+    if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
+        performances = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('fiscalYear', 'personnel__division__name_th').annotate(count=Count('personnel__division'))\
+            .order_by('fiscalYear', 'personnel__division__name_th')
+    else:
+        performances = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             personnel__division=division).values('fiscalYear', 'personnel__division__name_th').\
+            annotate(count=Count('personnel__division'))\
+            .order_by('fiscalYear', 'personnel__division__name_th')
+    performanceYear = []
+    performanceDivision = []
+    performanceCount = []
+    for performance in performances:
+        performanceYear.append(str(performance['fiscalYear']))
+        performanceDivision.append(str(performance['personnel__division__name_th']))
+        performanceCount.append(performance['count'])
+    dfLeaveCount = pd.DataFrame({'Year': performanceYear, 'Division': performanceDivision, 'Count': performanceCount}, columns=['Year', 'Division', 'Count'])
+    return dfLeaveCount
+
+def getPerformanceTypeSet(division, fiscalYearStart, fiscalYearEnd):
+    if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
+        performanceTypes = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('fiscalYear', 'performanceType').annotate(count=Count('performanceType'))\
+            .order_by('fiscalYear', 'performanceType')
+    else:
+        performanceTypes = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             personnel__division=division).values('fiscalYear', 'performanceType').annotate(count=Count('performanceType'))\
+            .order_by('fiscalYear', 'performanceType')
+    performanceYear = []
+    performanceType = []
+    performanceCount = []
+    for performance in performanceTypes:
+        performanceYear.append(str(performance['fiscalYear']))
+        performanceType.append(str(performance['performanceType']))
+        performanceCount.append(performance['count'])
+    dfPerformanceBudget = pd.DataFrame({'Year':performanceYear, 'Type': performanceType, 'Count': performanceCount}, columns=['Year', 'Type', 'Count'])
+    return dfPerformanceBudget
+
+def getPerformanceBudgetSet(division, fiscalYearStart, fiscalYearEnd):
+    if division is None or division =='None' or division == '0':  # เลือกทั้งหมด
+        performances = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd
+                                             ).values('fiscalYear').annotate(count=Count('fiscalYear'), sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    else:
+        performances = Performance.objects.filter(fiscalYear__gte=fiscalYearStart, fiscalYear__lte=fiscalYearEnd,
+                                             personnel__division=division).values('fiscalYear').annotate(count=Count('fiscalYear'),sum=Sum('budget'))\
+            .order_by('fiscalYear')
+    performanceYear = []
+    performanceCount = []
+    performanceSum = []
+    if fiscalYearStart == fiscalYearEnd:  # ใส่ค่าล่วงหน้า 1 ปี มีค่าเป็น 0 สำหรับให้เ
+        performanceYear.append("0")
+        performanceCount.append((0))
+        performanceSum.append(0.00)
+    elif performances.count() == 1:
+        performanceYear.append(str(fiscalYearStart))
+        performanceCount.append(0)
+        performanceSum.append(0.00)
+    for performance in performances:
+        performanceYear.append(str(performance['fiscalYear']))
+        performanceCount.append(performance['count'])
+        performanceSum.append(performance['sum'])
+    dfPerformanceBudget = pd.DataFrame({'Year': performanceYear, 'Count': performanceCount,  'Budget': performanceSum}, columns=['Year', 'Count', 'Budget'])
+    return dfPerformanceBudget
