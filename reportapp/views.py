@@ -862,11 +862,11 @@ def search(request):
     elif group == 'education':
         strgroup = "คุณวุฒิทางการศึกษา"
         results = Education.objects.filter(Q(degree_th__icontains=keyword) | Q(degree_en__icontains=keyword) |
-                                           Q(degree_th_sh__icontains=keyword) | Q(degree_en_sh__icontains=keyword) |
-                                           Q(institute__icontains=keyword)).order_by('degree_th')
+                                           Q(degree_th_sh__icontains=keyword) | Q(degree_en_sh__icontains=keyword)
+                                            ).order_by('degree_th')
     elif group == 'expertise':
         strgroup = "ความเชี่ยวชาญ"
-        results = Expertise.objects.filter(topic__icontains=keyword).order_by('topic')
+        results = Expertise.objects.filter(Q(topic__icontains=keyword)| Q(experience__icontains=keyword)).order_by('topic')
 
     elif group == 'training':
         strgroup = "การฝึกอบรม/สัมมนา"
@@ -877,11 +877,11 @@ def search(request):
     elif group == 'research':
         strgroup = "การวิจัย"
         results = Research.objects.filter(Q(title_th__icontains=keyword) or Q(title_en__icontains=keyword) or
-                                          Q(objective__icontains=keyword)).order_by('title_th')
+                                          Q(objective__icontains=keyword)|Q(keyword__icontains=keyword)).order_by('title_th')
     elif group == 'socialservice':
         strgroup = "การบริการทางวิชาการแก่สังคม"
         results = SocialService.objects.filter(Q(topic__icontains=keyword) or Q(place__icontains=keyword) or
-                                          Q(objective__icontains=keyword)).order_by('topic')
+                                          Q(receiver__icontains=keyword)).order_by('topic')
     if results is not None:
         count = results.count()
     else:
@@ -889,7 +889,7 @@ def search(request):
 
     print('keyword', 'group', 'count')
     print(keyword, group, count)
-    # results = Expertise.objects.all()
+    # results = SocialService.objects.all()
     context = {'keyword':keyword, 'group':group, 'strgroup':strgroup, 'results':results, 'count':count}
     return render(request, 'report/resultSearch.html', context)
     

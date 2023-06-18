@@ -62,7 +62,7 @@
 {#    </div>#}
 
 
-        <br><br>
+        <br>
         <div class="row" >
             <div class="col-1"></div>
 {#            <div class="col-10" style="background-color: #d9f5fc">#}
@@ -72,10 +72,10 @@
                     {% csrf_token %}
                     <div class="row">
                         <div class="col-2 text-primary text-end">
-                            <label for="id_keyword">คำค้น:</label>
+                            <label for="id_keyword"></label>
                         </div>
                         <div class="col-6">
-                            <input type="text"  name="keyword" class="form-control text-secondary" required="required">
+                            <input type="text" placeholder="ระบุคำค้น (Keyword)" name="keyword" class="form-control text-secondary" required="required">
                         </div>
                         <div class="col-3">
                             <button type="submit" class="btn btn-primary">

@@ -5,7 +5,7 @@
     <h2 class="text-primary"> <i class="fas fa-search text-success"></i> ผลลัพธ์การค้นหา > {{ strgroup }} </h2>
     <hr class="text-primary">
     <h5 class="text-secondary">
-        คำค้น: "{{ keyword }}":
+        คำค้น: "<span style="color: black;font-weight: bold">{{ keyword }}</span>":
         {% if count == 0  %}
              <i>ไม่พบข้อมูล{{ strgroup }} ที่ตรงกับคำที่ระบุในการค้นหา </i>
         {% else %}
@@ -43,18 +43,12 @@
                     <br>
                     {% for result in results %}
                         {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
-                            <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.personnel.id %}'" style="cursor:pointer;">
+                            <a class="text-primary" onclick="location.href='{% url 'educationDetail' result.id %}'" style="cursor:pointer;">
                         {% endif %}
                         &nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
-                        {% if result.type == 'สายสนับสนุน' %}
-                            {{ result.title }}
-                        {% else %}
-                            {{ result.status }}
-                        {% endif %}
-                        {{ result.degree_th | setHilight:keyword}} ({{ result.degree_th_sh|setHilight:keyword }})/
-                        {{ result.degree_en |setHilight:keyword}} ({{ result.degree_en_sh|setHilight:keyword }}) /
-                        จาก:{{ result.institute |setHilight:keyword }} / ปีที่สำเร็จ: {{ result.yearGraduate }},
+                        วุฒิการศึกษา: {{ result.degree_th | setHilight:keyword}} / {{ result.degree_th_sh|setHilight:keyword }} /
+                        ชื่อย่อ: {{ result.degree_en |setHilight:keyword}} / {{ result.degree_en_sh|setHilight:keyword }},
                         ({% if result.personnel.type == 'สายสนับสนุน' %}
                             {{ result.personnel.title }}
                         {% else %}
@@ -70,23 +64,110 @@
                     <br>
                     {% for result in results %}
                         {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
-                            <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.personnel.id %}'" style="cursor:pointer;">
+                            <a class="text-primary" onclick="location.href='{% url 'expertiseDetail' result.id %}'" style="cursor:pointer;">
                         {% endif %}
                         &nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
-                        {% if result.type == 'สายสนับสนุน' %}
-                            {{ result.title }}
-                        {% else %}
-                            {{ result.status }}
-                        {% endif %}
-                        {{ result.topic | setHilight:keyword}} / {{ result.detail | setHilight:keyword}} /
-                        {{ result.experience|setHilight:keyword }},
+                        เรื่อง: {{ result.topic | setHilight:keyword}} / ประสบการณ์: {{ result.experience|setHilight:keyword }},
                         ({% if result.personnel.type == 'สายสนับสนุน' %}
                             {{ result.personnel.title }}
                         {% else %}
                             {{ result.personnel.status }}
                         {% endif %}
                         {{ result.personnel.firstname_th  }} {{ result.personnel.lastname_th }}, {{ result.personnel.division  }})
+                        </a>
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% elif group == 'training'%}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
+                            <a class="text-primary" onclick="location.href='{% url 'trainingDetail' result.id %}'" style="cursor:pointer;">
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        {{ forloop.counter }}.
+                        เรื่อง: {{ result.topic | setHilight:keyword}} / สถานที่: {{ result.place|setHilight:keyword }} /
+                        ปีงบประมาณ: {{ result.fiscalYear }},
+                        ({% if result.personnel.type == 'สายสนับสนุน' %}
+                            {{ result.personnel.title }}
+                        {% else %}
+                            {{ result.personnel.status }}
+                        {% endif %}
+                        {{ result.personnel.firstname_th  }} {{ result.personnel.lastname_th }}, {{ result.personnel.division  }})
+                        </a>
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% elif group == 'performance'%}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
+                            <a class="text-primary" onclick="location.href='{% url 'performanceDetail' result.id %}'" style="cursor:pointer;">
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        {{ forloop.counter }}.
+                        ผลงาน/รางวัล:{{ result.topic | setHilight:keyword}} / ผู้มอบ: {{ result.source|setHilight:keyword }} /
+                        ปีงบประมาณ: {{ result.fiscalYear }},
+                        ({% if result.personnel.type == 'สายสนับสนุน' %}
+                            {{ result.personnel.title }}
+                        {% else %}
+                            {{ result.personnel.status }}
+                        {% endif %}
+                        {{ result.personnel.firstname_th  }} {{ result.personnel.lastname_th }}, {{ result.personnel.division  }})
+                        </a>
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% elif group == 'research'%}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
+                            <a class="text-primary" onclick="location.href='{% url 'researchDetail' result.id %}'" style="cursor:pointer;">
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        {{ forloop.counter }}.
+                        เรื่อง: {{ result.title_th | setHilight:keyword}} / {{ result.title_en|setHilight:keyword }} /
+                        คำสำคัญ: {{ result.keyword }} / ปีงบประมาณ: {{ result.fiscalYear }},
+                        (
+                        {% for researcher in result.getResearchPerson %}
+                                {% if researcher.personnel.type == 'สายสนับสนุน' %}
+                                    {{ researcher.personnel.title }}
+                                {% else %}
+                                    {{ researcher.personnel.status }}
+                                {% endif %}
+                                {{ researcher.personnel }}
+                            {% endfor %}
+                            )
+                        </a>
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% elif group == 'socialservice'%}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
+                            <a class="text-primary" onclick="location.href='{% url 'socialserviceDetail' result.id %}'" style="cursor:pointer;">
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        {{ forloop.counter }}.
+                        เรื่อง: {{ result.topic | setHilight:keyword}} / สถานที่: {{ result.place|setHilight:keyword }} /
+                        ผู้รับบริการ: {{ result.receiver }} / ปีงบประมาณ: {{ result.fiscalYear }}
+{#                        ,  (#}
+{#                        {% for researcher in result.getSocialServicePerson %}#}
+{#                                {% if researcher.personnel.type == 'สายสนับสนุน' %}#}
+{#                                    {{ researcher.personnel.title }}#}
+{#                                {% else %}#}
+{#                                    {{ researcher.personnel.status }}#}
+{#                                {% endif %}#}
+{#                                {{ researcher.personnel }}#}
+{##}
+{#                            {% endfor %}#}
+{#                            )#}
                         </a>
                         <br><br>
                     {% endfor %}

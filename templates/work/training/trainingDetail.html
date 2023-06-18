@@ -62,7 +62,8 @@
     <p class="text-center">
         {% if request.session.userType != 'Personnel' %}
             <button type="button" class="btn btn-secondary"
-                    onclick="location.href='{% url 'trainingList' training.personnel.division.id training.personnel.id %}'">
+{#                    onclick="location.href='{% url 'trainingList' training.personnel.division.id training.personnel.id %}'">#}
+                onclick="history.back();">
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
         {% else %}

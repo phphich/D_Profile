@@ -79,7 +79,8 @@
     </p>
     <p class="text-center">
         <button type="button" class="btn btn-secondary"
-                onclick="location.href='{% url 'socialserviceList' %}'">
+{#                onclick="location.href='{% url 'socialserviceList' %}'">#}
+            onclick="history.back();">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ
         </button>
         {% if request.session.userType in 'Administrator, Staff' or request.session.userId == socialservice.recorder.id %}
