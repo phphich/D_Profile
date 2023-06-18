@@ -2,14 +2,14 @@
 {% load static %}
 {% load custom_tags %}
 {% block content %}
-    <h2 class="text-primary"> <i class="fas fa-search text-success"></i> ผลลัพธ์การค้นหา {{ strgroup }} </h2>
+    <h2 class="text-primary"> <i class="fas fa-search text-success"></i> ผลลัพธ์การค้นหา > {{ strgroup }} </h2>
     <hr class="text-primary">
     <h5 class="text-secondary">
-        คำค้น: "{{ keyword }}"
+        คำค้น: "{{ keyword }}":
         {% if count == 0  %}
-             <i>ไม่พบผลลัพธ์การค้นหา</i>
+             <i>ไม่พบข้อมูล{{ strgroup }} ที่ตรงกับคำที่ระบุในการค้นหา </i>
         {% else %}
-            <i>พบข้อมูล จำนวน {{ count }} รายการ: </i>
+            <i>พบข้อมูล จำนวน {{ count }} รายการ </i>
         {% endif %}
     </h5>
     <br>
@@ -17,72 +17,85 @@
     <div class="row">
         <div class="col-1"></div>
         <div class="col-10">
-        {% if group == 'personnel' %}
-            {% for result in results %}
-                {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
-                    <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.id %}'" style="cursor:pointer;">
-                {% endif %}
-                {{ forloop.counter }}.
-                {% if result.type == 'สายสนับสนุน' %}
-                    {{ result.title }}
-                {% else %}
-                    {{ result.status }}
-                {% endif %}
-                {{ result.firstname_th | setHilight:keyword }} {{ result.lastname_th |setHilight:keyword}},
-                ({{ result.firstname_en |setHilight:keyword}} {{ result.lastname_en |setHilight:keyword}}),
-                 {{ result.division }}
-                </a>
-                <br><br>
-            {% endfor %}
-            <span style="font-weight: bold;color: #0b5ed7">
-        {% elif group == 'education'%}
-            {% for result in results %}
-                {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
-                    <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.personnel.id %}'" style="cursor:pointer;">
-                {% endif %}
-                {{ forloop.counter }}.
-                {% if result.type == 'สายสนับสนุน' %}
-                    {{ result.title }}
-                {% else %}
-                    {{ result.status }}
-                {% endif %}
-
-                {{ result.degree_th | setHilight:keyword}} ({{ result.degree_th_sh|setHilight:keyword }}),
-                {{ result.degree_en |setHilight:keyword}} ({{ result.degree_en_sh|setHilight:keyword }}),
-                จาก:{{ result.institute |setHilight:keyword }} ปีที่สำเร็จ: {{ result.yearGraduate }},
-                ({% if result.personnel.type == 'สายสนับสนุน' %}
-                    {{ result.personnel.title }}
-                {% else %}
-                    {{ result.personnel.status }}
-                {% endif %}
-                {{ result.personnel.firstname_th  }} {{ result.personnel.lastname_th }}, {{ result.personnel.division  }})
-                </a>
-                <br><br>
-            {% endfor %}
-        {% elif group == 'expertise'%}
-            {% for result in results %}
-                {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
-                    <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.id %}'" style="cursor:pointer;">
-                {% endif %}
-                {{ forloop.counter }}.
-                {% if result.type == 'สายสนับสนุน' %}
-                    {{ result.title }}
-                {% else %}
-                    {{ result.status }}
-                {% endif %}
-                {{ result.firstname_th | setHilight:keyword }} {{ result.lastname_th |setHilight:keyword}},
-                ({{ result.firstname_en |setHilight:keyword}} {{ result.lastname_en |setHilight:keyword}}),
-                 {{ result.division }}
-                </a>
-                <br><br>
-            {% endfor %}
-
-
-
-        {% endif %}
+            {% if group == 'personnel' %}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
+                            <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.id %}'" style="cursor:pointer;">
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        {{ forloop.counter }}.
+                        {% if result.type == 'สายสนับสนุน' %}
+                            {{ result.title }}
+                        {% else %}
+                            {{ result.status }}
+                        {% endif %}
+                        {{ result.firstname_th | setHilight:keyword }}  {{ result.lastname_th |setHilight:keyword}} /
+                        ({{ result.firstname_en |setHilight:keyword}}  {{ result.lastname_en |setHilight:keyword}}),
+                         {{ result.division }}
+                        </a>
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% elif group == 'education'%}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
+                            <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.personnel.id %}'" style="cursor:pointer;">
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        {{ forloop.counter }}.
+                        {% if result.type == 'สายสนับสนุน' %}
+                            {{ result.title }}
+                        {% else %}
+                            {{ result.status }}
+                        {% endif %}
+                        {{ result.degree_th | setHilight:keyword}} ({{ result.degree_th_sh|setHilight:keyword }})/
+                        {{ result.degree_en |setHilight:keyword}} ({{ result.degree_en_sh|setHilight:keyword }}) /
+                        จาก:{{ result.institute |setHilight:keyword }} / ปีที่สำเร็จ: {{ result.yearGraduate }},
+                        ({% if result.personnel.type == 'สายสนับสนุน' %}
+                            {{ result.personnel.title }}
+                        {% else %}
+                            {{ result.personnel.status }}
+                        {% endif %}
+                        {{ result.personnel.firstname_th  }} {{ result.personnel.lastname_th }}, {{ result.personnel.division  }})
+                        </a>
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% elif group == 'expertise'%}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
+                            <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.personnel.id %}'" style="cursor:pointer;">
+                        {% endif %}
+                        &nbsp;&nbsp;&nbsp;
+                        {{ forloop.counter }}.
+                        {% if result.type == 'สายสนับสนุน' %}
+                            {{ result.title }}
+                        {% else %}
+                            {{ result.status }}
+                        {% endif %}
+                        {{ result.topic | setHilight:keyword}} / {{ result.detail | setHilight:keyword}} /
+                        {{ result.experience|setHilight:keyword }},
+                        ({% if result.personnel.type == 'สายสนับสนุน' %}
+                            {{ result.personnel.title }}
+                        {% else %}
+                            {{ result.personnel.status }}
+                        {% endif %}
+                        {{ result.personnel.firstname_th  }} {{ result.personnel.lastname_th }}, {{ result.personnel.division  }})
+                        </a>
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% endif %}
+        </div>
     </div>
-
     <br><br>
+
     <p class="text-center">
         <button type="button" class="btn btn-secondary" onclick="history.back()">
             <i class="fa fa-rotate-back"></i> ย้อนกลับ

@@ -863,12 +863,11 @@ def search(request):
         strgroup = "คุณวุฒิทางการศึกษา"
         results = Education.objects.filter(Q(degree_th__icontains=keyword) | Q(degree_en__icontains=keyword) |
                                            Q(degree_th_sh__icontains=keyword) | Q(degree_en_sh__icontains=keyword) |
-                                           Q(degree_en__icontains=keyword) | Q(degree_en__icontains=keyword) |
-                                           Q(degree_en_sh__icontains=keyword) | Q(degree_en_sh__icontains=keyword) |
                                            Q(institute__icontains=keyword)).order_by('degree_th')
     elif group == 'expertise':
         strgroup = "ความเชี่ยวชาญ"
         results = Expertise.objects.filter(topic__icontains=keyword).order_by('topic')
+
     elif group == 'training':
         strgroup = "การฝึกอบรม/สัมมนา"
         results = Training.objects.filter(Q(topic__icontains=keyword) or Q (place__icontains=keyword)).order_by('topic')
@@ -890,7 +889,7 @@ def search(request):
 
     print('keyword', 'group', 'count')
     print(keyword, group, count)
-    # results = Education.objects.all()
+    # results = Expertise.objects.all()
     context = {'keyword':keyword, 'group':group, 'strgroup':strgroup, 'results':results, 'count':count}
     return render(request, 'report/resultSearch.html', context)
     

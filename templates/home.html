@@ -61,50 +61,58 @@
 {#        <div class="col-1"></div>#}
 {#    </div>#}
 
-    <form method="post" action="{% url 'search' %}">
-        <div class="row">
-            {% csrf_token %}
+
+        <br><br>
+        <div class="row" >
             <div class="col-1"></div>
-            <div class="col-2 text-primary text-end">
-                <label for="id_keyword">คำค้น:</label>
-            </div>
-            <div class="col-6">
-                <input type="text"  name="keyword" class="form-control text-secondary">
-            </div>
-            <div class="col-3">
-                <button class="btn btn-outline-secondary" onclick="this.form.submit();">
-                    <i class="fas fa-search text-success"></i> ค้นหา
-                </button>
+{#            <div class="col-10" style="background-color: #d9f5fc">#}
+            <div class="col-10" style="background-color: #ffffff">
+                <br>
+                <form method="post" action="{% url 'search' %}" >
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-2 text-primary text-end">
+                            <label for="id_keyword">คำค้น:</label>
+                        </div>
+                        <div class="col-6">
+                            <input type="text"  name="keyword" class="form-control text-secondary" required="required">
+                        </div>
+                        <div class="col-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search text-white"></i> ค้นหา
+                            </button>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-1"></div>
+                        <div class="col-2 text-end text-primary"> ประเด็นที่ต้องการค้นหา</div>
+                        <div class="col-2 text-primary">
+                            <input type="radio" name="group" value="personnel" checked> บุคลากร
+                        </div>
+                        <div class="col-2 text-primary">
+                            <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
+                        </div>
+                        <div class="col-2 text-primary">
+                            <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
+                        </div>
+                        <div class="col-2 text-primary">
+                            <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3"></div>
+                        <div class="col-2 text-primary">
+                            <input type="radio" name="group" value="performance"> ผลงานและรางวัล
+                        </div>
+                        <div class="col-2 text-primary">
+                            <input type="radio" name="group" value="research"> การวิจัย
+                        </div>
+                        <div class="col-4 text-primary">
+                            <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-        <br>
-        <div class="row">
-            <div class="col-1"></div>
-            <div class="col-2 text-end text-primary"> ประเด็นที่ต้องการค้นหา</div>
-            <div class="col-2 text-primary">
-                <input type="radio" name="group" value="personnel" checked> บุคลากร
-            </div>
-            <div class="col-2 text-primary">
-                <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
-            </div>
-            <div class="col-2 text-primary">
-                <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
-            </div>
-            <div class="col-2 text-primary">
-                <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3"></div>
-            <div class="col-2 text-primary">
-                <input type="radio" name="group" value="performance"> ผลงานและรางวัล
-            </div>
-            <div class="col-2 text-primary">
-                <input type="radio" name="group" value="research"> การวิจัย
-            </div>
-            <div class="col-4 text-primary">
-                <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
-            </div>
-        </div>
-    </form>
 {% endblock %}
