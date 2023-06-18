@@ -19,37 +19,92 @@
         </div>
     </div>
 
-    <hr class="text-primary">
-        <div class="row text-center align-content-center">
-            <div class="col-1"></div>
-            <div class="col-md-4 text-center" style="alignment: center">
-                {% if chartDiv is not None %}
-                    {{ chartDiv | safe }}
-                 {% endif %}
-            </div>
-            <div class="col-md-1"></div>
-            <div class="col-md-4 text-center" style="alignment: center">
-                {% if chartResearchBudget is not None %}
-                    {{ chartResearchBudget | safe }}
-                {% endif %}
-            </div>
-            <div class="col-md-1"></div>
-        </div>
-
-        <div class="row text-center align-content-center">
-            <div class="col-2"></div>
-            <div class="col-md-3 text-center" style="alignment: center">
-                {% if chartSocialService is not None %}
-                    {{ chartSocialService | safe }}
-                {% endif %}
-            </div>
-            <div class="col-2"></div>
-            <div class="col-md-4 text-center" style=" alignment: center">
-                {% if chartStatus is not None %}
-                    {{ chartStatus | safe }}
-                {% endif %}
-            </div>
-            <div class="col-md-1"></div>
-        </div>
+{#    <hr class="text-primary">#}
+{#        <div class="row text-center align-content-center">#}
+{#            <div class="col-1"></div>#}
+{#            <div class="col-md-4 text-center" style="alignment: center">#}
+{#                {% if chartDiv is not None %}#}
+{#                    {{ chartDiv | safe }}#}
+{#                 {% endif %}#}
+{#            </div>#}
+{#            <div class="col-md-1"></div>#}
+{#            <div class="col-md-4 text-center" style="alignment: center">#}
+{#                {% if chartResearchBudget is not None %}#}
+{#                    {{ chartResearchBudget | safe }}#}
+{#                {% endif %}#}
+{#            </div>#}
+{#            <div class="col-md-1"></div>#}
+{#        </div>#}
+{##}
+{#        <div class="row text-center align-content-center">#}
+{#            <div class="col-2"></div>#}
+{#            <div class="col-md-3 text-center" style="alignment: center">#}
+{#                {% if chartSocialService is not None %}#}
+{#                    {{ chartSocialService | safe }}#}
+{#                {% endif %}#}
+{#            </div>#}
+{#            <div class="col-2"></div>#}
+{#            <div class="col-md-4 text-center" style=" alignment: center">#}
+{#                {% if chartStatus is not None %}#}
+{#                    {{ chartStatus | safe }}#}
+{#                {% endif %}#}
+{#            </div>#}
+{#            <div class="col-md-1"></div>#}
+{#        </div>#}
     <br><br>
+{##}
+{#    <div class="row">#}
+{#        <div class="col-1"></div>#}
+{#        <div class="col-10">#}
+{#            <hr class="text-primary">#}
+{#        </div>#}
+{#        <div class="col-1"></div>#}
+{#    </div>#}
+
+    <form method="post" action="{% url 'search' %}">
+        <div class="row">
+            {% csrf_token %}
+            <div class="col-1"></div>
+            <div class="col-2 text-primary text-end">
+                <label for="id_keyword">คำค้น:</label>
+            </div>
+            <div class="col-6">
+                <input type="text"  name="keyword" class="form-control text-secondary">
+            </div>
+            <div class="col-3">
+                <button class="btn btn-outline-secondary" onclick="this.form.submit();">
+                    <i class="fas fa-search text-success"></i> ค้นหา
+                </button>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-1"></div>
+            <div class="col-2 text-end text-primary"> ประเด็นที่ต้องการค้นหา</div>
+            <div class="col-2 text-primary">
+                <input type="radio" name="group" value="personnel" checked> บุคลากร
+            </div>
+            <div class="col-2 text-primary">
+                <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
+            </div>
+            <div class="col-2 text-primary">
+                <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
+            </div>
+            <div class="col-2 text-primary">
+                <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3"></div>
+            <div class="col-2 text-primary">
+                <input type="radio" name="group" value="performance"> ผลงานและรางวัล
+            </div>
+            <div class="col-2 text-primary">
+                <input type="radio" name="group" value="research"> การวิจัย
+            </div>
+            <div class="col-4 text-primary">
+                <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
+            </div>
+        </div>
+    </form>
 {% endblock %}

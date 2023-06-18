@@ -145,8 +145,9 @@
              <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
                  <tr class="text-primary">
                      <th class="col-2">ระดับการศึกษา</th>
-                     <th class="col-3">คุณวุฒิการศึกษา</th>
-                     <th class="col-5">สถาบันการศึกษาที่สำเร็จ</th>
+                     <th class="col-3">คุณวุฒิการศึกษา(เต็ม)</th>
+                     <th class="col-2">คุณวุฒิการศึกษา(ย่อ)</th>
+                     <th class="col-3">สถาบันการศึกษาที่สำเร็จ</th>
                      <th class="col-2 text-center">ปีที่สำเร็จ</th>
                  </tr>
                  {% if expertises.count == 0 %}
@@ -156,7 +157,13 @@
                  {% for education in educations %}
                      <tr>
                          <td>{{ education.level }}</td>
-                         <td>{{ education.degree_th_sh }}</td>
+                         <td> {{ education.degree_th }} <br>
+                              {{ education.degree_en }}
+                         </td>
+                         <td>
+                             {{ education.degree_th_sh }} <br>
+                             {{ education.degree_en_sh }}
+                         </td>
                          <td>{{ education.institute }}</td>
                          <td class="text-center">{{ education.yearGraduate }}</td>
                      </tr>

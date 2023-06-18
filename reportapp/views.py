@@ -851,3 +851,47 @@ def leaveDetailReport(request, leaveId):
     context = {'leave':leave }
     return render(request, 'report/leaveDetailReport.html', context)
 
+def search(request):
+    if request.method == 'POST':
+        keyword= request.POST['keyword']
+        group = request.POST['group']
+    if group == 'personnel':
+        strgroup = "บุคลากร"
+        results = Personnel.objects.filter(Q(firstname_th__icontains=keyword) | Q(lastname_th__icontains=keyword) |
+                                           Q(firstname_en__icontains=keyword) | Q(lastname_en__icontains=keyword)).order_by('firstname_th','lastname_th')
+    elif group == 'education':
+        strgroup = "คุณวุฒิทางการศึกษา"
+        results = Education.objects.filter(Q(degree_th__icontains=keyword) | Q(degree_en__icontains=keyword) |
+                                           Q(degree_th_sh__icontains=keyword) | Q(degree_en_sh__icontains=keyword) |
+                                           Q(degree_en__icontains=keyword) | Q(degree_en__icontains=keyword) |
+                                           Q(degree_en_sh__icontains=keyword) | Q(degree_en_sh__icontains=keyword) |
+                                           Q(institute__icontains=keyword)).order_by('degree_th')
+    elif group == 'expertise':
+        strgroup = "ความเชี่ยวชาญ"
+        results = Expertise.objects.filter(topic__icontains=keyword).order_by('topic')
+    elif group == 'training':
+        strgroup = "การฝึกอบรม/สัมมนา"
+        results = Training.objects.filter(Q(topic__icontains=keyword) or Q (place__icontains=keyword)).order_by('topic')
+    elif group == 'performance':
+        strgroup = "ผลงานและรางวัล"
+        results = Performance.objects.filter(Q(topic__icontains=keyword) or Q(source__icontains=keyword)).order_by('topic')
+    elif group == 'research':
+        strgroup = "การวิจัย"
+        results = Research.objects.filter(Q(title_th__icontains=keyword) or Q(title_en__icontains=keyword) or
+                                          Q(objective__icontains=keyword)).order_by('title_th')
+    elif group == 'socialservice':
+        strgroup = "การบริการทางวิชาการแก่สังคม"
+        results = SocialService.objects.filter(Q(topic__icontains=keyword) or Q(place__icontains=keyword) or
+                                          Q(objective__icontains=keyword)).order_by('topic')
+    if results is not None:
+        count = results.count()
+    else:
+        count = 0
+
+    print('keyword', 'group', 'count')
+    print(keyword, group, count)
+    # results = Education.objects.all()
+    context = {'keyword':keyword, 'group':group, 'strgroup':strgroup, 'results':results, 'count':count}
+    return render(request, 'report/resultSearch.html', context)
+    
+

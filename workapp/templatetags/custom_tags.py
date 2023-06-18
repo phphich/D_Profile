@@ -50,3 +50,11 @@ def getCountsocialservicePersonnelDivision(divId, socialserviceId):
     count = SocialServicePerson.objects.filter(socialservice=socialservice).filter(personnel__in=personnels).aggregate(count=Count('id'))
     return count['count']
 
+from django.utils.safestring import mark_safe
+import re
+@register.filter(name='setHilight')
+def setHilight(text, keyword):
+    rekeyword =  re.compile(re.escape(keyword), re.IGNORECASE)
+    text = rekeyword.sub(keyword, text)
+    hilightText = text.replace(keyword, '<span style = "font-weight: bold; background-color:yellow;color:green">{}</span>'.format(keyword))
+    return mark_safe(hilightText)

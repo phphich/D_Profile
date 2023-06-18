@@ -36,10 +36,12 @@ urlpatterns = [
     path('<subNo>/<budgetType>/<paraValue>/socialserviceSubReport', views.socialserviceSubReport, name='socialserviceSubReport'),
     path('<socialserviceId>/soreserviceDetailReport', views.socialserviceDetailReport, name='socialserviceDetailReport'),
     # -------------------------------- #
-
     path('commandReport', views.commandReport, name='commandReport'),
     path('<mission>/<eduYearStart>/<eduYearEnd>/<reportType>/commandReport', views.commandReport,
          name='commandReport'),
     path('<subNo>/<mission>/<paraValue>/commandSubReport', views.commandSubReport, name='commandSubReport'),
     path('<commandId>/commandDetailReport', views.commandDetailReport, name='commandDetailReport'),
+    # -------------------------------- #
+    path('search', views.search, name='search'),
+
 ]
