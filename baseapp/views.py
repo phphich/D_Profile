@@ -107,14 +107,19 @@ def userAuthen(request):
         if user is not None:
             login(request, user)
             personnel = Personnel.objects.filter(email=userName).first()
-            request.session['userEmail'] = personnel.email
-            request.session['userName'] = personnel.firstname_th + " " + personnel.lastname_th
-            request.session['userType'] = str(user.groups.first())
-            request.session['userId'] = personnel.id
-            request.session['userPicture'] = personnel.picture.name
-            messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ, ยินดีต้อนรับ: " +
-                                 personnel.status + ' ' + personnel.firstname_th + ' ' + personnel.lastname_th +
-                                 ' เข้าสู่ระบบ.. ')
+            if personnel is None: #กรณีใช้ user admin
+                messages.add_message(request, messages.ERROR, "ขออภัย ท่านไม่ได้รับสิทธิ์ในการใช้ระบบ.. ") #
+                logout(request)
+            else:
+                request.session['userEmail'] = personnel.email
+                request.session['userName'] = personnel.firstname_th + " " + personnel.lastname_th
+                request.session['userType'] = str(user.groups.first())
+                request.session['userId'] = personnel.id
+                request.session['userPicture'] = personnel.picture.name
+                messages.add_message(request, messages.SUCCESS, "ตรวจสอบสิทธิ์การเข้าใช้ระบบสำเร็จ, ยินดีต้อนรับ: " +
+                                     personnel.status + ' ' + personnel.firstname_th + ' ' + personnel.lastname_th +
+                                     ' เข้าสู่ระบบ.. ')
+
             return redirect('home')
         else:
             messages.add_message(request,messages.ERROR, "รหัสผู้ใช้หรือรหัสผ่านไม่ถูกต้อง.!!!")
