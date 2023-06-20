@@ -30,12 +30,15 @@ def getSession(request, dtype=None, did=None):
     global msgErrorPermission
     msgErrorPermission='ท่านกำลังพยายามเข้าถึงข้อมูลหรือระบบย่อย ในส่วนที่ไม่ได้รับอนุญาตให้เข้าใช้งานได้!'
 
+    if 'userId' not in request.session:
+        return userAuthen(request)
+    else:
+        uId = request.session['userId']
     docType = dtype
     docId = did
-    if 'userId' in request.session:
-        uId = request.session['userId']
     if 'userType' in request.session:
         uType = request.session['userType']
+
     # print("uid in getsession"+ str(uId))
     # print("utype in getsession" + str(uType))
 
@@ -139,7 +142,7 @@ def userLogout(request):
     del request.session["userId"]
     del request.session['userPicture']
     logout(request)
-    return  redirect('userAuthen')
+    return redirect('userAuthen')
 
 from django.contrib.auth.hashers import make_password
 def helpme(request): # เมธอดพิเศษ
@@ -184,10 +187,12 @@ def permissionerror(request):
 
 @login_required(login_url='userAuthen')
 def userChgPassword(request):
-    # getSession(request)
+    if 'userId' not in request.session:
+        return userAuthen()
     # if common.chkPermission(facultyUpdate.__name__, uType=uType) == False:
     #     messages.add_message(request, messages.ERROR, msgErrorPermission)
     #     return redirect('home')
+
     email = request.session['userEmail']
     personnel = Personnel.objects.filter(email=email).first()
     if request.method == 'POST':
@@ -217,6 +222,8 @@ def userChgPassword(request):
 
 @login_required(login_url='userAuthen')
 def userResetPassword(request, id):
+    if 'userId' not in request.session:
+        return userAuthen()
     if request.session['userType'] != 'Administrator':
         # messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect('permissionerror')
@@ -250,8 +257,6 @@ def userResetPassword(request, id):
 
 #Factulty Data
 def facultyDetail(request):
-    if Personnel.objects.all().count() == 0:
-        return redirect('home')
     request.session['last_url']= request.path_info
     faculty = Faculty.objects.first()
     context = {'faculty': faculty}
@@ -259,7 +264,6 @@ def facultyDetail(request):
 
 @login_required(login_url='userAuthen')
 def facultyUpdate(request):
-    getSession(request)
     if common.chkPermission(facultyUpdate.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR, msgErrorPermission)
         return redirect(request.session['last_url'])
@@ -277,8 +281,6 @@ def facultyUpdate(request):
 
 # Division CRUD.
 def divisionList(request):
-    if Personnel.objects.all().count() == 0:
-        return redirect('home')
     request.session['last_url'] = request.path_info
     divisions = Division.objects.all().order_by('name_th')
     context = {'divisions': divisions}
@@ -286,7 +288,6 @@ def divisionList(request):
 
 @login_required(login_url='userAuthen')
 def divisionNew(request):
-    getSession(request)
     if common.chkPermission(divisionNew.__name__,uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
@@ -439,8 +440,8 @@ def curriculumDelete(request, id):
 
 # Personnel CRUD.
 def personnelList(request, pageNo=None, divId=None):
-    if Personnel.objects.all().count() == 0:
-        return redirect('home')
+    # if Personnel.objects.all().count() == 0:
+    #     return redirect('home')
     # if 'userType' not in request.session:
     #     return redirect('userAuthen')
     request.session['last_url'] = request.path_info
@@ -725,6 +726,8 @@ def personnelDelete(request, id):
 # Education CRUD.
 @login_required(login_url='userAuthen')
 def educationList(request, divisionId=None, personnelId=None):
+    if 'userId' not in request.session: #เช็คซ้ำ กรณีล็อกเป็น admin เข้าหลังบ้าน
+        return userAuthen(request)
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.session['userType'] == "Personnel":
@@ -867,6 +870,8 @@ def educationDelete(request, id):
 # Expertise CRUD.
 @login_required(login_url='userAuthen')
 def expertiseList(request, divisionId=None, personnelId=None):
+    if 'userId' not in request.session: #เช็คซ้ำ กรณีล็อกเป็น admin เข้าหลังบ้าน
+        return userAuthen(request)
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.session['userType'] == "Personnel":
@@ -1002,6 +1007,8 @@ def expertiseDelete(request, id):
 # CurrAffiliation CRUD.
 @login_required(login_url='userAuthen')
 def currAffiliationList(request, curriculumId = None):
+    if 'userId' not in request.session: #เช็คซ้ำ กรณีล็อกเป็น admin เข้าหลังบ้าน
+        return userAuthen(request)
     curriculum = None
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
     if request.method == 'POST':

@@ -2,9 +2,9 @@
 {% load static %}
 
 {% block content %}
-    <div class="jumbotron jumbotron">
-        <div class="mt-4 p-5 text-white rounded text-end" style="background-color: #b6d4fe">
-            <div class="row">
+    <div class="jumbotron jumbotron" >
+        <div class="mt-4 p-5 text-white rounded text-end" style="background-color: #b6d4fe;" >
+            <div class="row"">
                 <div class="col-2">
                     <img src="{% static 'images/iconfiles/pdps_in_folder.png' %}" width="210px" height="auto">
                 </div>
@@ -51,68 +51,87 @@
 {#            </div>#}
 {#            <div class="col-md-1"></div>#}
 {#        </div>#}
-    <br><br>
-{##}
-{#    <div class="row">#}
-{#        <div class="col-1"></div>#}
-{#        <div class="col-10">#}
-{#            <hr class="text-primary">#}
-{#        </div>#}
-{#        <div class="col-1"></div>#}
-{#    </div>#}
-
-
-        <br>
-        <div class="row" >
-            <div class="col-1"></div>
-{#            <div class="col-10" style="background-color: #d9f5fc">#}
-            <div class="col-10" style="background-color: #ffffff">
-                <br>
-                <form method="post" action="{% url 'search' %}" >
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-2 text-primary text-end">
-                            <label for="id_keyword"></label>
-                        </div>
-                        <div class="col-6">
-                            <input type="text" placeholder="ระบุคำค้น (Keyword)" name="keyword" class="form-control text-secondary" required="required">
-                        </div>
-                        <div class="col-3">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-search text-white"></i> ค้นหา
-                            </button>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-1"></div>
-                        <div class="col-2 text-end text-primary"> ประเด็นที่ต้องการค้นหา</div>
-                        <div class="col-2 text-primary">
-                            <input type="radio" name="group" value="personnel" checked> บุคลากร
-                        </div>
-                        <div class="col-2 text-primary">
-                            <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
-                        </div>
-                        <div class="col-2 text-primary">
-                            <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
-                        </div>
-                        <div class="col-2 text-primary">
-                            <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-3"></div>
-                        <div class="col-2 text-primary">
-                            <input type="radio" name="group" value="performance"> ผลงานและรางวัล
-                        </div>
-                        <div class="col-2 text-primary">
-                            <input type="radio" name="group" value="research"> การวิจัย
-                        </div>
-                        <div class="col-4 text-primary">
-                            <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
-                        </div>
-                    </div>
-                </form>
-            </div>
+    <br style="display: block;height: 1rem;margin-top:0;font-size: 24%;">
+    {##}
+    <div class="row" style="background-color: #f0f2f6;margin-left: 1px;margin-right: 1px">
+        <div class="col-1"></div>
+        <div class="col-2 text-center">
+            <img src="{% static '/images/iconfiles/main-img3.png' %}" style="width: 80px;height:auto">
         </div>
+        <div class="col-2 text-center">
+            <img src="{% static '/images/iconfiles/main-img4.png' %}" style="width: 80px;height:auto">
+        </div>
+        <div class="col-2 text-center">
+            <img src="{% static '/images/iconfiles/main-img2.png' %}" style="width: 80px;height:auto">
+        </div>
+        <div class="col-2 text-center">
+            <img src="{% static '/images/iconfiles/main-img5.png' %}" style="width: 80px;height:auto">
+        </div>
+        <div class="col-2 text-center">
+            <img src="{% static '/images/iconfiles/main-img1.png' %}" style="width: 80px;height:auto">
+        </div>
+        <div class="col-1"></div>
+    </div>
+
+    {#    <div class="row">#}
+    {#        <div class="col-1"></div>#}
+    {#        <div class="col-10">#}
+    {#            <hr class="text-primary">#}
+    {#        </div>#}
+    {#        <div class="col-1"></div>#}
+    {#    </div>#}
+    <BR>
+    <div class="row">
+        <div class="col-1"></div>
+        {#            <div class="col-10" style="background-color: #d9f5fc">#}
+        <div class="col-10" style="background-color: #ffffff">
+            <br>
+            <form method="post" action="{% url 'search' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-2 text-primary text-end">
+                        <label for="id_keyword"></label>
+                    </div>
+                    <div class="col-6">
+                        <input type="text" placeholder="ระบุคำค้น (Keyword)" name="keyword"
+                               class="form-control text-secondary" required="required">
+                    </div>
+                    <div class="col-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search text-white"></i> ค้นหา
+                        </button>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-1"></div>
+                    <div class="col-2 text-end text-primary"> ประเด็นที่ต้องการค้นหา</div>
+                    <div class="col-2 text-primary">
+                        <input type="radio" name="group" value="personnel" checked> บุคลากร
+                    </div>
+                    <div class="col-2 text-primary">
+                        <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
+                    </div>
+                    <div class="col-2 text-primary">
+                        <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
+                    </div>
+                    <div class="col-2 text-primary">
+                        <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3"></div>
+                    <div class="col-2 text-primary">
+                        <input type="radio" name="group" value="performance"> ผลงานและรางวัล
+                    </div>
+                    <div class="col-2 text-primary">
+                        <input type="radio" name="group" value="research"> การวิจัย
+                    </div>
+                    <div class="col-4 text-primary">
+                        <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

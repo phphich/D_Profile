@@ -32,7 +32,7 @@
                             {{ result.status }}
                         {% endif %}
                         {{ result.firstname_th | setHilight:keyword }}  {{ result.lastname_th |setHilight:keyword}} /
-                        ({{ result.firstname_en |setHilight:keyword}}  {{ result.lastname_en |setHilight:keyword}}),
+                        {{ result.firstname_en |setHilight:keyword}}  {{ result.lastname_en |setHilight:keyword}},
                          {{ result.division }}
                         </a>
                         <br><br>
@@ -131,7 +131,7 @@
                         &nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
                         เรื่อง: {{ result.title_th | setHilight:keyword}} / {{ result.title_en|setHilight:keyword }} /
-                        คำสำคัญ: {{ result.keyword }} / ปีงบประมาณ: {{ result.fiscalYear }},
+                         ปีงบประมาณ: {{ result.fiscalYear }},
                         (
                         {% for researcher in result.getResearchPerson %}
                                 {% if researcher.personnel.type == 'สายสนับสนุน' %}
@@ -141,7 +141,8 @@
                                 {% endif %}
                                 {{ researcher.personnel }}
                             {% endfor %}
-                            )
+                            ) /
+                            อ้างอิง (Reference): {{ result.keyword }}
                         </a>
                         <br><br>
                     {% endfor %}
@@ -172,6 +173,11 @@
                         <br><br>
                     {% endfor %}
                 </p>
+            {% endif %}
+            {% if count > 0 %}
+                {% if request.sesssion.userId is None %}
+                    <i class="text-danger">*เฉพาะผู้ที่ผ่านการตรวจสอบสิทธิ์ (Log in) เท่านั้น ที่มีสิทธิ์ในการเข้าไปดูข้อมูลรายละเอียดเชิงลึกได้ </i>
+                {% endif %}
             {% endif %}
         </div>
     </div>

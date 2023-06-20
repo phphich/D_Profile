@@ -39,7 +39,7 @@
                     <th class="text-center col-1">บุคลากรสาขา/รวม</th>
                 {% endif %}
                 <th class="col col-2">
-                    {% if request.session.userType in 'Administrator, Staff, Header' or request.session.userId == personnel.id %}
+                    {% if request.session.userType in 'Administrator, Staff, Header, Manager' or request.session.userId == personnel.id %}
                         <a href="{% url 'socialserviceNew' %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
                             <i class="fa fa-plus"></i> เพิ่มโครงการบริการฯ </a>
                     {% endif %}

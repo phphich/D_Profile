@@ -83,17 +83,17 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
     methodDenyManager =['userResetPassword', 'facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
                         'curriculumNew','curriculumUpdate','curriculumDelete',
                         'personnelNew', 'personnelDelete',
-                        'managerDelete', 'headerDelete', 'responsibleList', 'responsibleDelete',
+                        'managerDelete', 'headerDelete',  'responsibleDelete', 'responsibleList',
                     ] # method ที่ไม่อนุญาตสำหรับ Manager
     methodDenyHeader = ['userResetPassword', 'facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
                          'curriculumNew', 'curriculumUpdate', 'curriculumDelete',
                          'personnelNew', 'personnelDelete',
-                         'managerDelete', 'headerDelete', 'responsibleList', 'responsibleDelete',
+                         'managerDelete', 'headerDelete', 'responsibleDelete', #'responsibleList',
                          ]  # method ที่ไม่อนุญาตสำหรับ Header
     methodDenyPersonnel =['userResetPassword', 'facultyUpdate', 'divisionNew', 'divisionUpdate', 'divisionDelete',
                         'curriculumNew','curriculumUpdate','curriculumDelete',
                         'personnelNew', 'personnelDelete',
-                         'managerDelete', 'headerDelete', 'responsibleList', 'responsibleDelete',
+                         'managerDelete', 'headerDelete', 'responsibleDelete', #'responsibleList',
                     ] # method ที่ไม่อนุญาตสำหรับ Personnel
     # print('method: ' + methodName)
     # print('type: ' + uType)
@@ -123,13 +123,6 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
             userDocIds = Training.objects.filter(personnel_id=uId).only('id')
         elif docType == 'Performance': #เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             userDocIds = Performance.objects.filter(personnel_id=uId).only('id')
-        elif docType == 'Command':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
-            if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
-                userDocIds = Command.objects.filter(recorder_id=uId).only('id')
-            else:
-                userDocIds1 = Command.objects.filter(recorder_id=uId).only('id')
-                userDocIds2 = Command.objects.filter(commandperson__personnel_id=uId).only('id')
-                userDocIds = userDocIds1.union(userDocIds2)
         elif docType == 'Research':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
                 userDocIds = Research.objects.filter(recorder_id=uId).only('id')
@@ -144,6 +137,13 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds1 = SocialService.objects.filter(recorder_id=uId).only('id')
                 userDocIds2 = SocialService.objects.filter(commandperson__personnel_id=uId).only('id')
                 userDocIds = userDocIds1.union(userDocIds2)
+        elif docType == 'Command':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
+                    userDocIds = Command.objects.filter(recorder_id=uId).only('id')
+                else:
+                    userDocIds1 = Command.objects.filter(recorder_id=uId).only('id')
+                    userDocIds2 = Command.objects.filter(commandperson__personnel_id=uId).only('id')
+                    userDocIds = userDocIds1.union(userDocIds2)
         else:
             userDocIds = None
     elif uType == 'Manager':
@@ -172,6 +172,27 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Training.objects.filter(personnel_id=uId).only('id')
             elif docType == 'Performance':
                 userDocIds = Performance.objects.filter(personnel_id=uId).only('id')
+            elif docType == 'Command':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
+                    userDocIds = Command.objects.filter(recorder_id=uId).only('id')
+                else:
+                    userDocIds1 = Command.objects.filter(recorder_id=uId).only('id')
+                    userDocIds2 = Command.objects.filter(commandperson__personnel_id=uId).only('id')
+                    userDocIds = userDocIds1.union(userDocIds2)
+            elif docType == 'Research':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
+                    userDocIds = Research.objects.filter(recorder_id=uId).only('id')
+                else:
+                    userDocIds1 = Research.objects.filter(recorder_id=uId).only('id')
+                    userDocIds2 = Research.objects.filter(commandperson__personnel_id=uId).only('id')
+                    userDocIds = userDocIds1.union(userDocIds2)
+            elif docType == 'SocialService':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
+                    userDocIds = SocialService.objects.filter(recorder_id=uId).only('id')
+                else:
+                    userDocIds1 = SocialService.objects.filter(recorder_id=uId).only('id')
+                    userDocIds2 = SocialService.objects.filter(commandperson__personnel_id=uId).only('id')
+                    userDocIds = userDocIds1.union(userDocIds2)
             else:
                 userDocIds = None
     elif uType == 'Header':

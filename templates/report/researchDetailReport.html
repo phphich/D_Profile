@@ -30,17 +30,17 @@
                 </tr>
                 <tr>
                     <th class="col-2 text-primary">ทุนวิจัย</th> <td class="col-4"> {{ research.budget | floatformat:2 |intcomma}}</td>
-                    <th class="col-2 text-primary">ประเภทงบประมาณ</th> <td class="col-4"> {{ research.bugetType }}</td>
+                    <th class="col-2 text-primary">ประเภทงบประมาณ</th> <td class="col-4"> {{ research.budgetType }}</td>
                 </tr>
                 <tr>
-                    <th class="col-2 text-primary">หน่วยงานเจ้าของทุนวิจัย</th> {{ research.source  }}  <td colspan="3"> </td>
+                    <th class="col-2 text-primary">หน่วยงานเจ้าของทุนวิจัย</th> <td colspan="3"> {{ research.source  }} </td>
                 </tr>
                 <tr>
                     <th class="col-2 text-primary">ร้อยละความก้าวหน้า</th> <td> {{ research.percent_success }} </td>
                     <th class="col-2 text-primary">การเผยแพร่ผลการวิจัย</th> <td> {{ research.publish_method }} </td>
                 </tr>
                <tr>
-                    <th class="col-2 text-primary">คำสำคัญ (Keywords)</th>   <td colspan="3">{{ research.keyword }}</td>
+                    <th class="col-2 text-primary">อ้างอิง (Reference)</th>   <td colspan="3">{{ research.keyword |linebreaks}}</td>
                </tr>
             </table>
         </div>

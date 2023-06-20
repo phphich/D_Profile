@@ -1431,6 +1431,7 @@ def researchUpdate(request, id):
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
     getSession(request, dtype='Research', did=research.id)
+    print('uType:{}, uId:{}, docType:{}, docId:{}'.format(uType, uId, docType, docId))
     if common.chkPermission(researchUpdate.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
