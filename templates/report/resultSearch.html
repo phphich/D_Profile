@@ -151,6 +151,9 @@
                 <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
                     <br>
                     {% for result in results %}
+{#                        {% if chkPerReport == True %}#}
+{#                            #}
+{#                        {% endif %}#}
                         {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
                             <a class="text-primary" onclick="location.href='{% url 'socialserviceDetail' result.id %}'" style="cursor:pointer;">
                         {% endif %}
@@ -175,8 +178,8 @@
                 </p>
             {% endif %}
             {% if count > 0 %}
-                {% if request.session.userId is None %}
-                    <i class="text-danger">*เฉพาะผู้ที่ผ่านการตรวจสอบสิทธิ์ (Log in) เท่านั้น ที่มีสิทธิ์ในการเข้าไปดูข้อมูลรายละเอียดเชิงลึกได้ </i>
+                {% if request.session.userType != 'Administrator' and request.session.userType !=  'Manager' %}
+                    <i class="text-danger">*เฉพาะผู้ที่ผ่านการตรวจสอบสิทธิ์ (Log in) ในระดับ<span class="text-success">ผู้บริหาร</span>เท่านั้น ที่มีสิทธิ์ในการเข้าไปดูข้อมูลรายละเอียดเชิงลึกได้ </i>
                 {% endif %}
             {% endif %}
         </div>

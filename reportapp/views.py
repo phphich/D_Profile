@@ -886,9 +886,6 @@ def search(request):
         count = results.count()
     else:
         count = 0
-
-    print('keyword', 'group', 'count')
-    print(keyword, group, count)
     # results = SocialService.objects.all()
     context = {'keyword':keyword, 'group':group, 'strgroup':strgroup, 'results':results, 'count':count}
     # return render(request, 'report/resultSearch.html', context)
