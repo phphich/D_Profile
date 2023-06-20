@@ -94,7 +94,7 @@
                     </div>
                     <div class="col-6">
                         <input type="text" placeholder="ระบุคำค้น (Keyword)" name="keyword"
-                               class="form-control text-secondary" required="required">
+                               class="form-control text-secondary" required="required" value={{ keyword }}>
                     </div>
                     <div class="col-3">
                         <button type="submit" class="btn btn-primary">
@@ -107,31 +107,65 @@
                     <div class="col-1"></div>
                     <div class="col-2 text-end text-primary"> ประเด็นที่ต้องการค้นหา</div>
                     <div class="col-2 text-primary">
-                        <input type="radio" name="group" value="personnel" checked> บุคลากร
+                        {% if group == 'personnel' or keyword is None %}
+                            <input type="radio" name="group" value="personnel" checked> บุคลากร
+                        {% else %}
+                            <input type="radio" name="group" value="personnel" > บุคลากร
+                        {% endif %}
                     </div>
                     <div class="col-2 text-primary">
-                        <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
+                        {% if group == 'education' %}
+                            <input type="radio" name="group" value="education" checked> คุณวุฒิทางการศึกษา
+                        {% else %}
+                            <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
+                        {% endif %}
                     </div>
                     <div class="col-2 text-primary">
-                        <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
+                        {% if group == 'expertise' %}
+                            <input type="radio" name="group" value="expertise" checked> ความเชี่ยวชาญ
+                        {% else %}
+                            <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
+                        {% endif %}
                     </div>
                     <div class="col-2 text-primary">
-                        <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
+                        {% if group == 'training' %}
+                            <input type="radio" name="group" value="training" checked> การฝึกอบรม/สัมมนา
+                        {% else %}
+                            <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-3"></div>
                     <div class="col-2 text-primary">
-                        <input type="radio" name="group" value="performance"> ผลงานและรางวัล
+                        {% if group == 'performance' %}
+                            <input type="radio" name="group" value="performance" checked> ผลงานและรางวัล
+                        {% else %}
+                            <input type="radio" name="group" value="performance"> ผลงานและรางวัล
+                        {% endif %}
                     </div>
                     <div class="col-2 text-primary">
-                        <input type="radio" name="group" value="research"> การวิจัย
+                        {% if group == 'research' %}
+                            <input type="radio" name="group" value="research" checked> การวิจัย
+                        {% else %}
+                            <input type="radio" name="group" value="research"> การวิจัย
+                        {% endif %}
                     </div>
                     <div class="col-4 text-primary">
-                        <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
+                        {% if group == 'socialservice' %}
+                            <input type="radio" name="group" value="socialservice" checked> การให้บริการทางวิชาการแก่สังคม
+                        {% else %}
+                            <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
+                        {% endif %}
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <br>
+    {% if keyword is not None %}
+        <div class="row">
+            {% include 'report/resultSearch.html' with keyword=keyword group=group strgroup=strgroup results=results count=count %}
+        </div>
+    {% endif %}
 {% endblock %}

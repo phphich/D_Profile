@@ -1,8 +1,8 @@
-{% extends 'base.html' %}
+{#{% extends 'base.html' %}#}
 {% load static %}
 {% load custom_tags %}
-{% block content %}
-    <h2 class="text-primary"> <i class="fas fa-search text-success"></i> ผลลัพธ์การค้นหา > {{ strgroup }} </h2>
+{#{% block content %}#}
+    <h4 class="text-primary"> <i class="fas fa-search text-success"></i> ผลลัพธ์การค้นหา > {{ strgroup }} </h4>
     <hr class="text-primary">
     <h5 class="text-secondary">
         คำค้น: "<span style="color: black;font-weight: bold">{{ keyword }}</span>":
@@ -175,7 +175,7 @@
                 </p>
             {% endif %}
             {% if count > 0 %}
-                {% if request.sesssion.userId is None %}
+                {% if request.session.userId is None %}
                     <i class="text-danger">*เฉพาะผู้ที่ผ่านการตรวจสอบสิทธิ์ (Log in) เท่านั้น ที่มีสิทธิ์ในการเข้าไปดูข้อมูลรายละเอียดเชิงลึกได้ </i>
                 {% endif %}
             {% endif %}
@@ -183,10 +183,17 @@
     </div>
     <br><br>
 
+{#    <p class="text-center">#}
+{#        <button type="button" class="btn btn-secondary" onclick="history.back()">#}
+{#            <i class="fa fa-rotate-back"></i> ย้อนกลับ#}
+{#        </button>#}
+{#    </p>#}
+{#    <br><br>#}
     <p class="text-center">
-        <button type="button" class="btn btn-secondary" onclick="history.back()">
-            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        <br> <br>
+        <button type="button" class="btn btn-info" onclick="location.href='{% url 'home' %}'">
+            <i class="fa fa-rotate-back text-white"></i> เคลียร์
         </button>
     </p>
-    <br><br>
-{% endblock %}
+
+{#{% endblock %}#}
