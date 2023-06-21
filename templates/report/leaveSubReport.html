@@ -24,7 +24,12 @@
                     <th class="col-1 text-center">จำนวนวันลา </th>
                 </tr>
                 {% for leave in leaves %}
-                    <tr class="text-primary" onclick="location.href='{% url 'leaveDetailReport' leave.id %}'" style="cursor:pointer;">
+                    {% chkPermissionReport 'leave' request.session.userId request.session.userType leave.id as right %}
+                    {% if right == True %}
+                        <tr class="text-primary" onclick="location.href='{% url 'leaveDetailReport' leave.id %}'" style="cursor:pointer;">
+                    {% else %}
+                        <tr class="text-primary">
+                    {% endif %}
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>
                             {% if leave.personnel.type == 'สายวิชาการ' %}

@@ -22,7 +22,12 @@
                     <th class="col-2 text-center">วันที่ </th>
                 </tr>
                 {% for training in trainings %}
+                    {% chkPermissionReport 'training' request.session.userId request.session.userType training.id as right %}
+                    {% if right == True %}
                     <tr class="text-primary" onclick="location.href='{% url 'trainingDetailReport' training.id %}'" style="cursor:pointer;">
+                    {% else %}
+                        <tr class="text-primary">
+                    {% endif %}
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>
                             {% if training.personnel.type == 'สายวิชาการ' %}

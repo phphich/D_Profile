@@ -22,7 +22,13 @@
                     <th class="col-3">รายชื่อนักวิจัย </th>
                 </tr>
                 {% for research in researchs %}
-                    <tr class="text-primary" onclick="location.href='{% url 'researchDetailReport' research.id %}'" style="cursor:pointer;">
+{#                    ???????????????????????????????? #}
+                    {% chkPermissionReport 'research' request.session.userId request.session.userType research.id as right %}
+                    {% if right == True %}
+                        <tr class="text-primary" onclick="location.href='{% url 'researchDetailReport' research.id %}'" style="cursor:pointer;">
+                    {% else %}
+                        <tr class="text-primary">
+                    {% endif %}
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>{{ research.title_th }} ({{ research.title_en }}) </td>
                         <td class="text-end">{{ research.budget | floatformat:2 | intcomma  }}  </td>
