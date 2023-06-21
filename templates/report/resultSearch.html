@@ -1,6 +1,7 @@
 {#{% extends 'base.html' %}#}
 {% load static %}
 {% load custom_tags %}
+
 {#{% block content %}#}
     <h4 class="text-primary"> <i class="fas fa-search text-success"></i> ผลลัพธ์การค้นหา > {{ strgroup }} </h4>
     <hr class="text-primary">
@@ -21,6 +22,7 @@
                 <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
                     <br>
                     {% for result in results %}
+                        {% chkPermissionReport|request.session.userType:request.session.userType:result.id %}
                         {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}
                             <a class="text-primary" onclick="location.href='{% url 'personnelDetailReport' result.id %}'" style="cursor:pointer;">
                         {% endif %}

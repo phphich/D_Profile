@@ -59,8 +59,9 @@ def setHilight(text, keyword):
     hilightText = text.replace(keyword, '<span style = "font-weight: bold; background-color:yellow;color:green">{}</span>'.format(keyword))
     return mark_safe(hilightText)
 
-@register.filter(name='chkPermissReport')
-def chkPermissReport(group, userId, userType, reportId):
+# @register.filter(name='chkPermissionReport')
+@register.simple_tag(name='chkPermissionReport')
+def chkPermissionReport(group, userId, userType, reportId):
     permission = False
     if userType == 'Header':
         header = Header.objects.filter(personnel_id=userId).first()
@@ -70,64 +71,73 @@ def chkPermissReport(group, userId, userType, reportId):
         personnelSet = Responsible.getPersonnelResponsibles()
 
     if group == 'personnel':
-        reportSet = Personnel.objects.filter(id=reportId).first()
-        if userId == reportSet.id:
+        report = Personnel.objects.filter(id=reportId).first()
+        if userId == report.id:
             permission = True
         else:
             for personnel in personnelSet:
-                if personnel.id == reportSet.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
+                if personnel.id == report.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
                     permission == True
                     break
     elif group == 'education':
-        reportSet = Education.objects.filter(id=reportId).first()
-        if userId == reportSet.personnel.id:
+        report = Education.objects.filter(id=reportId).first()
+        if userId == report.personnel.id:
             permission = True
         else:
             for personnel in personnelSet:
-                if personnel.id == reportSet.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
+                if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
                     permission == True
                     break
     elif group == 'expertise':
-        reportSet = Expertise.objects.filter(id=reportId).first()
-        if userId == reportSet.personnel.id:
+        report = Expertise.objects.filter(id=reportId).first()
+        if userId == report.personnel.id:
             permission = True
         else:
             for personnel in personnelSet:
-                if personnel.id == reportSet.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
+                if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
                     permission == True
                     break
     elif group == 'training':
-        reportSet = Training.objects.filter(id=reportId).first()
-        if userId == reportSet.personnel.id:
+        report = Training.objects.filter(id=reportId).first()
+        if userId == report.personnel.id:
             permission = True
         else:
             for personnel in personnelSet:
-                if personnel.id == reportSet.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
+                if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
                     permission == True
                     break
     elif group == 'performance':
-        reportSet = Performance.objects.filter(id=reportId).first()
-        if userId == reportSet.personnel.id:
+        report = Performance.objects.filter(id=reportId).first()
+        if userId == report.personnel.id:
             permission = True
         else:
             for personnel in personnelSet:
-                if personnel.id == reportSet.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
+                if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
                     permission == True
                     break
     elif group == 'leave':
-        reportSet = Leave.objects.filter(id=reportId).first()
-        if userId == reportSet.personnel.id:
+        report = Leave.objects.filter(id=reportId).first()
+        if userId == report.personnel.id:
             permission = True
         else:
             for personnel in personnelSet:
-                if personnel.id == reportSet.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
+                if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
                     permission == True
                     break
     elif group == 'resarch':
-        reportSet = Research.objects.filter(id=reportId).first()
-        # reportSet = ResearchPerson.objects.filter(id=reportId).first() 
-        researcherSet = reportSet.getResearchPerson()
-        if userId == reportSet.personnel.id:
-            permission = True
-    elif group == 'socialservice':
-        pass
+        report = Research.objects.filter(id=reportId).first()
+        if report.recorder_id == userId:
+            permission==True 
+        else:
+            researchers = report.getResearchPerson()
+            researcherSet = []
+            for researcher in researchers:
+                researcherSet.append(researcher.personnel)
+            for personnel in personnelSet:
+                if personnel in researcherSet:
+                    permission = True
+    # elif group == 'socialservice':
+    #     pass
+    
+
+    return permission
