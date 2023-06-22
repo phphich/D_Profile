@@ -47,6 +47,13 @@
             </table>
         </div>
     </div>
+    {% if request.session.userId == socialservice.recorder.id %}
+        <div class="row">
+            <div class="col-12 text-end text-secondary">
+                <i>(บันทึกข้อมูลโดย: {{ socialservice.recorder }}, เมื่อ: {{ socialservice.recordDate |date:"d/m/Y" }} ) </i>
+            </div>
+        </div>
+    {% endif %}
     <br>
 
     {#    นักวิจัย #}

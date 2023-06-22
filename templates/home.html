@@ -151,11 +151,18 @@
                             <input type="radio" name="group" value="research"> การวิจัย
                         {% endif %}
                     </div>
-                    <div class="col-4 text-primary">
+                    <div class="col-3 text-primary">
                         {% if group == 'socialservice' %}
                             <input type="radio" name="group" value="socialservice" checked> การให้บริการทางวิชาการแก่สังคม
                         {% else %}
                             <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
+                        {% endif %}
+                    </div>
+                    <div class="col-2 text-primary">
+                        {% if group == 'command' %}
+                            <input type="radio" name="group" value="command" checked> คำสั่ง
+                        {% else %}
+                            <input type="radio" name="group" value="command"> คำสั่ง
                         {% endif %}
                     </div>
                 </div>

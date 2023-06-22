@@ -23,11 +23,12 @@
                     <br>
                     {% for result in results %}
 {#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' or right == True %}#}
-                        {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
-                        {% if right == True %}
-                            <a class="text-success" onclick="location.href='{% url 'personnelDetailReport' result.id %}'" style="cursor:pointer;font-weight: bold">
-                        {% endif %}
-                        &nbsp;&nbsp;&nbsp;
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'personnelDetailReport' result.id %}'" style="cursor:pointer;font-weight: bold">
+                            {% endif %}
+                        {% endif %}&nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
                         {% if result.type == 'สายสนับสนุน' %}
                             {{ result.title }}
@@ -48,9 +49,11 @@
                     <br>
                     {% for result in results %}
 {#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}#}
-                        {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
-                        {% if right == True %}
-                            <a class="text-success" onclick="location.href='{% url 'educationDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'educationDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                            {% endif %}
                         {% endif %}
                         &nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}. {{ result.id }}.
@@ -73,9 +76,11 @@
                     <br>
                     {% for result in results %}
 {#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}#}
-                        {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
-                        {% if right == True %}
-                            <a class="text-success" onclick="location.href='{% url 'expertiseDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'expertiseDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                            {% endif %}
                         {% endif %}
                         &nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
@@ -97,10 +102,12 @@
                     <br>
                     {% for result in results %}
 {#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}#}
-                        {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
-                        {% if right == True %}
-                            <a class="text-success" onclick="location.href='{% url 'trainingDetail' result.id %}'" style="cursor:pointer;font-weight: bold;">
-                        {% endif %}                        &nbsp;&nbsp;&nbsp;
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'trainingDetail' result.id %}'" style="cursor:pointer;font-weight: bold;">
+                            {% endif %}                        &nbsp;&nbsp;&nbsp;
+                        {% endif %}
                         {{ forloop.counter }}.
                         เรื่อง: {{ result.topic | setHilight:keyword}} / สถานที่: {{ result.place|setHilight:keyword }} /
                         ปีงบประมาณ: {{ result.fiscalYear }},
@@ -121,10 +128,12 @@
                     <br>
                     {% for result in results %}
 {#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}#}
-                        {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
-                        {% if right == True %}
-                            <a class="text-success" onclick="location.href='{% url 'performanceDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
-                        {% endif %}                        &nbsp;&nbsp;&nbsp;
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'performanceDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                            {% endif %}                        &nbsp;&nbsp;&nbsp;
+                        {% endif %}
                         {{ forloop.counter }}.
                         ผลงาน/รางวัล:{{ result.topic | setHilight:keyword}} / ผู้มอบ: {{ result.source|setHilight:keyword }} /
                         ปีงบประมาณ: {{ result.fiscalYear }},
@@ -145,11 +154,12 @@
                     <br>
                     {% for result in results %}
 {#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}#}
-                        {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
-                        {% if right == True %}
-                            <a class="text-success" onclick="location.href='{% url 'researchDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
-                        {% endif %}
-                        &nbsp;&nbsp;&nbsp;
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'researchDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                            {% endif %}
+                        {% endif %}                        &nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
                         เรื่อง: {{ result.title_th | setHilight:keyword}} / {{ result.title_en|setHilight:keyword }} /
                          ปีงบประมาณ: {{ result.fiscalYear }},
@@ -160,7 +170,7 @@
                             {% else %}
                                 {{ researcher.personnel.status }}
                             {% endif %}
-                            {{ researcher.personnel }}
+                            {{ researcher.personnel.firstname_th  }} {{ researcher.personnel.lastname_th }},
                         {% endfor %}
                         ) /
                         อ้างอิง (Reference): {{ result.keyword }}
@@ -175,24 +185,44 @@
                     <br>
                     {% for result in results %}
 {#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}     #}
-                        {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
-                        {% if right == True %}
-                            <a class="text-primary" onclick="location.href='{% url 'socialserviceDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
-                        {% endif %}                        &nbsp;&nbsp;&nbsp;
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'socialserviceDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                            {% endif %}                        &nbsp;&nbsp;&nbsp;
+                        {% endif %}
                         {{ forloop.counter }}.
                         เรื่อง: {{ result.topic | setHilight:keyword}} / สถานที่: {{ result.place|setHilight:keyword }} /
-                        ผู้รับบริการ: {{ result.receiver }} / ปีงบประมาณ: {{ result.fiscalYear }}
-{#                        ,  (#}
-{#                        {% for researcher in result.getSocialServicePerson %}#}
-{#                                {% if researcher.personnel.type == 'สายสนับสนุน' %}#}
-{#                                    {{ researcher.personnel.title }}#}
-{#                                {% else %}#}
-{#                                    {{ researcher.personnel.status }}#}
-{#                                {% endif %}#}
-{#                                {{ researcher.personnel }}#}
-{##}
-{#                            {% endfor %}#}
-{#                            )#}
+                        ผู้รับบริการ: {{ result.receiver }} / ปีงบประมาณ: {{ result.fiscalYear }},
+                        (
+                            {% for operator in result.getSocialServicePerson %}
+                                {% if operator.personnel.type == 'สายสนับสนุน' %}
+                                    {{ operator.personnel.title }}
+                                {% else %}
+                                    {{ operator.personnel.status }}
+                                {% endif %}
+                                {{ operator.personnel.firstname_th  }} {{ operator.personnel.lastname_th }},
+                            {% endfor %}
+                            )
+                        {% if right == True %}
+                            </a>
+                        {% endif %}
+                        <br><br>
+                    {% endfor %}
+                </p>
+            {% elif group == 'command'%}
+                <p style="background-color: rgba(249,252,252,0.78); border: 1px solid #cecbcb">
+                    <br>
+                    {% for result in results %}
+{#                        {% if request.session.userType == 'Administrator' or request.session.userType == 'Manager' %}     #}
+                        {% if request.session.userId is not None %}
+                            {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
+                            {% if right == True %}
+                                <a class="text-success" onclick="location.href='{% url 'commandDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                            {% endif %}                        &nbsp;&nbsp;&nbsp;
+                        {% endif %}
+                        {{ forloop.counter }}.
+                        เลขที่คำสั่ง: {{ result.comId }} / เรื่อง: {{ result.topic | setHilight:keyword}} / พันธกิจ: {{ result.mission|setHilight:keyword }}
                         {% if right == True %}
                             </a>
                         {% endif %}
@@ -200,18 +230,12 @@
                     {% endfor %}
                 </p>
             {% endif %}
-            <i class="text-dark">*** การเข้าถึงรายละเอียดข้อมูลเชิงลึกนั้น ระบบจะอนุญาตให้เฉพาะที่ผ่านการตรวจสอบสิทธิ์ (Log in) ในระดับ<span class="text-success" style="font-weight: bold">ผู้บริหาร </span>
+            <i class="text-dark">*** การเข้าถึงรายละเอียดข้อมูลเชิงลึกนั้น ระบบจะอนุญาตให้เฉพาะผู้ที่ผ่านการตรวจสอบสิทธิ์ (Log in) ในระดับ<span class="text-success" style="font-weight: bold">ผู้บริหาร </span>
                 หรือ <span class="text-success" style="font-weight: bold">ผู้ที่มีความเกี่ยวข้องกับข้อมูลชุดนั้นๆ </span> เท่านั้น </i>
         </div>
     </div>
     <br><br>
 
-{#    <p class="text-center">#}
-{#        <button type="button" class="btn btn-secondary" onclick="history.back()">#}
-{#            <i class="fa fa-rotate-back"></i> ย้อนกลับ#}
-{#        </button>#}
-{#    </p>#}
-{#    <br><br>#}
     <p class="text-center">
         <br> <br>
         <button type="button" class="btn btn-info" onclick="location.href='{% url 'home' %}'">

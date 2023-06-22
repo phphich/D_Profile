@@ -45,8 +45,14 @@
             </table>
         </div>
     </div>
+    {% if request.session.userId == research.recorder.id %}
+        <div class="row">
+            <div class="col-12 text-end text-secondary">
+                <i>(บันทึกข้อมูลโดย: {{ research.recorder }}, เมื่อ: {{ research.recordDate |date:"d/m/Y" }} ) </i>
+            </div>
+        </div>
+    {% endif %}
     <br>
-
     {#    นักวิจัย #}
     <div class="row">
         <div class="12">

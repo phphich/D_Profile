@@ -41,6 +41,13 @@
             </table>
         </div>
     </div>
+    {% if request.session.userId == command.recorder.id %}
+        <div class="row">
+            <div class="col-12 text-end text-secondary">
+                <i>(บันทึกข้อมูลโดย:{{ command.recorder }}, เมื่อ: {{ command.recordDate |date:"d/m/Y" }} ) </i>
+            </div>
+        </div>
+    {% endif %}
     <br>
 
     {#    นักวิจัย #}
@@ -57,7 +64,7 @@
                  {% for operator in operators %}
                      {% chkPermissionReport 'personnel' request.session.userId request.session.userType operator.personnel.id as right %}
                      {% if right == True %}
-                     <tr onclick="location.href='{% url 'personnelDetailReport' operator.personnel.id %}'" style="cursor:pointer;">
+                        <tr onclick="location.href='{% url 'personnelDetailReport' operator.personnel.id %}'" style="cursor:pointer;">
                      {% else %}
                          <tr>
                      {% endif %}

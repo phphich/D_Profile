@@ -23,7 +23,12 @@
                     <th class="col-1 text-center">จำนวนผู้รับคำสั่ง</th>
                 </tr>
                 {% for command in commands %}
+                    {% chkPermissionReport 'command' request.session.userId request.session.userType command.id as right %}
+                    {% if right == True %}
                     <tr class="text-primary" onclick="location.href='{% url 'commandDetailReport' command.id %}'" style="cursor:pointer;">
+                    {% else %}
+                        <tr class="text-primary">
+                    {% endif %}
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td class="text-center">{{ command.comId }} </td>
                         <td>{{ command.topic }}  </td>

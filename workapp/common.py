@@ -128,14 +128,14 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Research.objects.filter(recorder_id=uId).only('id')
             else:
                 userDocIds1 = Research.objects.filter(recorder_id=uId).only('id')
-                userDocIds2 = Research.objects.filter(commandperson__personnel_id=uId).only('id')
+                userDocIds2 = Research.objects.filter(researchperson__personnel_id=uId).only('id')
                 userDocIds = userDocIds1.union(userDocIds2)
         elif docType == 'SocialService':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
                 userDocIds = SocialService.objects.filter(recorder_id=uId).only('id')
             else:
                 userDocIds1 = SocialService.objects.filter(recorder_id=uId).only('id')
-                userDocIds2 = SocialService.objects.filter(commandperson__personnel_id=uId).only('id')
+                userDocIds2 = SocialService.objects.filter(socialserviceperson__personnel_id=uId).only('id')
                 userDocIds = userDocIds1.union(userDocIds2)
         elif docType == 'Command':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
                 if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
@@ -184,14 +184,14 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                     userDocIds = Research.objects.filter(recorder_id=uId).only('id')
                 else:
                     userDocIds1 = Research.objects.filter(recorder_id=uId).only('id')
-                    userDocIds2 = Research.objects.filter(commandperson__personnel_id=uId).only('id')
+                    userDocIds2 = Research.objects.filter(researchperson__personnel_id=uId).only('id')
                     userDocIds = userDocIds1.union(userDocIds2)
             elif docType == 'SocialService':  # เอกสารข้อมูลผลงาน ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
                 if str(methodName).find('Update') != -1 or str(methodName).find('Delete') != -1:
                     userDocIds = SocialService.objects.filter(recorder_id=uId).only('id')
                 else:
                     userDocIds1 = SocialService.objects.filter(recorder_id=uId).only('id')
-                    userDocIds2 = SocialService.objects.filter(commandperson__personnel_id=uId).only('id')
+                    userDocIds2 = SocialService.objects.filter(socialserviceperson__personnel_id=uId).only('id')
                     userDocIds = userDocIds1.union(userDocIds2)
             else:
                 userDocIds = None
@@ -306,12 +306,14 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
             else:
                 userDocIds = None
 
+
     uDocId = []
-    if docId == uId:
+    print("docId: {}, uId: {}".format(docId, uId))
+    if int(docId) == int(uId):
         return True
     for x in userDocIds:
-        uDocId.append(x.id)
-    if docId not in uDocId:
+        uDocId.append(int(x.id))
+    if int(docId) not in uDocId:
         return False
     else:
         return True
