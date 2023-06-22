@@ -826,8 +826,8 @@ def socialserviceDetailReport(request, socialserviceId):
 def commandDetailReport(request, commandId):
     request.session['last_url'] = request.path_info
     command = Command.objects.filter(id=commandId).first()
-    staffs = CommandPerson.objects.filter(command=command)
-    context = {'command':command, 'staffs':staffs }
+    operators = CommandPerson.objects.filter(command=command)
+    context = {'command':command, 'operators':operators }
     return render(request, 'report/commandDetailReport.html', context)
 
 # *************************** Training Detail Report ************************

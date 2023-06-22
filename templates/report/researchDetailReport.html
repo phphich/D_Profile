@@ -60,7 +60,12 @@
                      <th class="col-2 text-center">สัดส่วน</th>
                  </tr>
                  {% for researcher in researchers %}
-                     <tr onclick="location.href='{% url 'personnelDetailReport' researcher.personnel.id %}'" style="cursor:pointer;">
+                     {% chkPermissionReport 'personnel' request.session.userId request.session.userType researcher.personnel.id as right %}
+                     {% if right == True %}
+                         <tr onclick="location.href='{% url 'personnelDetailReport' researcher.personnel.id %}'" style="cursor:pointer;">
+                     {% else %}
+                         <tr>
+                     {% endif %}
                          <td class="text-center">{{ forloop.counter }}</td>
                          <td>
                              {% if researcher.personnel.type == 'สายสนับสนุน'  %}

@@ -54,18 +54,23 @@
                      <th class="col-4">สังกัด</th>
                      <th class="col-3">หน้าที่ความรับผิดชอบ</th>
                  </tr>
-                 {% for staff in staffs %}
-                     <tr onclick="location.href='{% url 'personnelDetailReport' staff.personnel.id %}'" style="cursor:pointer;">
+                 {% for operator in operators %}
+                     {% chkPermissionReport 'personnel' request.session.userId request.session.userType operator.personnel.id as right %}
+                     {% if right == True %}
+                     <tr onclick="location.href='{% url 'personnelDetailReport' operator.personnel.id %}'" style="cursor:pointer;">
+                     {% else %}
+                         <tr>
+                     {% endif %}
                          <td class="text-center">{{ forloop.counter }}</td>
                          <td>
-                             {% if staff.personnel.type == 'สายสนับสนุน'  %}
-                                {{ staff.personnel.title }}
+                             {% if operator.personnel.type == 'สายสนับสนุน'  %}
+                                {{ operator.personnel.title }}
                              {% else %}
-                                {{ staff.personnel.status }}
+                                {{ operator.personnel.status }}
                              {% endif %}
-                             {{ staff.personnel.firstname_th }} {{ staff.personnel.lastname_th }}</td>
-                         <td>{{ staff.personnel.division.name_th }}</td>
-                         <td>{{ staff.status }}</td>
+                             {{ operator.personnel.firstname_th }} {{ operator.personnel.lastname_th }}</td>
+                         <td>{{ operator.personnel.division.name_th }}</td>
+                         <td>{{ operator.status }}</td>
                      </tr>
                  {% endfor %}
              </table>

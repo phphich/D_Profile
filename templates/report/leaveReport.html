@@ -151,7 +151,11 @@
                         {% endfor %}
                     </tr>
                     {% for index, row in dfLeaveCount.iterrows %}
-                        <tr onclick="location.href='{% url 'leaveSubReport' '1' row.Division row.Year  %}'" style="cursor:pointer;">
+                        {% if request.session.userId is not None %}
+                            <tr onclick="location.href='{% url 'leaveSubReport' '1' row.Division row.Year  %}'" style="cursor:pointer;">
+                        {% else %}
+                            <tr class="text-primary">
+                        {% endif %}
                             <td class="text-center">{{ row.Year }}</td>
                             <td class="text-start">{{ row.Division }}</td>
                             <td class="text-center">{{ row.Count }}</td>
@@ -178,7 +182,11 @@
                     </tr>
                     {% for index, row in dfLeaveType.iterrows %}
                         {% if row.Year != '0' %}
-                            <tr onclick="location.href='{% url 'leaveSubReport' '2' row.Type row.Year %}'" style="cursor:pointer;">
+                            {% if request.session.userId is not None %}
+                                <tr onclick="location.href='{% url 'leaveSubReport' '2' row.Type row.Year %}'" style="cursor:pointer;">
+                            {% else %}
+                                <tr class="text-primary">
+                            {% endif %}
                                 <td class="text-center">{{ row.Year }}</td>
                                 <td class="col-6">{{ row.Type }}</td>
                                 <td class="text-center">{{ row.Count }}</td>

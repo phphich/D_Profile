@@ -113,7 +113,11 @@
                         {% endfor %}
                     </tr>
                     {% for index, row in dfDiv.iterrows %}
-                        <tr onclick="location.href='{% url 'personnelSubReport'  '1' divValue row.Division %}'" style="cursor:pointer;">
+                        {% if request.session.userId is not None %}
+                            <tr onclick="location.href='{% url 'personnelSubReport'  '1' divValue row.Division %}'" style="cursor:pointer;">
+                        {% else %}
+                            <tr class="text-primary">
+                        {% endif %}
                             <td>{{ row.Division }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -134,7 +138,11 @@
                     {% endfor %}
                     </tr>
                     {% for index, row in dfEdu.iterrows %}
-                        <tr onclick="location.href='{% url 'personnelSubReport' '2' divValue row.Level %}'" style="cursor:pointer;">
+                        {% if request.session.userId is not None %}
+                            <tr onclick="location.href='{% url 'personnelSubReport' '2' divValue row.Level %}'" style="cursor:pointer;">
+                        {% else %}
+                            <tr class="text-primary">
+                        {% endif %}
                             <td>{{ row.Level }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -159,7 +167,11 @@
                     {% endfor %}
                     </tr>
                     {% for index, row in dfStatus.iterrows %}
-                        <tr onclick="location.href='{% url 'personnelSubReport' '3' divValue row.Status %}'" style="cursor:pointer;">
+                        {% if request.session.userId is not None %}
+                            <tr onclick="location.href='{% url 'personnelSubReport' '3' divValue row.Status %}'" style="cursor:pointer;">
+                        {% else %}
+                            <tr class="text-primary">
+                        {% endif %}
                             <td>{{ row.Status }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -180,7 +192,11 @@
                     {% endfor %}
                     </tr>
                     {% for index, row in dfGender.iterrows %}
-                        <tr onclick="location.href='{% url 'personnelSubReport' '4' divValue row.Gender %}'" style="cursor:pointer;">
+                        {% if request.session.userId is not None %}
+                            <tr onclick="location.href='{% url 'personnelSubReport' '4' divValue row.Gender %}'" style="cursor:pointer;">
+                        {% else %}
+                            <tr class="text-primary">
+                        {% endif %}
                             <td>{{ row.Gender }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>

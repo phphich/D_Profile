@@ -150,7 +150,11 @@
                         {% endfor %}
                     </tr>
                     {% for index, row in dfSocialServiceCount.iterrows %}
-                        <tr onclick="location.href='{% url 'socialserviceSubReport' '1' budgetType row.Year %}'" style="cursor:pointer;">
+                        {% if request.session.userId is not None %}
+                            <tr onclick="location.href='{% url 'socialserviceSubReport' '1' budgetType row.Year %}'" style="cursor:pointer;">
+                        {% else %}
+                            <tr class="text-primary">
+                        {% endif %}
                             <td class="text-center">{{ row.Year }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -174,7 +178,11 @@
                     </tr>
                     {% for index, row in dfSocialServiceBudget.iterrows %}
                         {% if row.Year != '0' %}
-                            <tr onclick="location.href='{% url 'socialserviceSubReport' '1' budgetType row.Year %}'" style="cursor:pointer;">
+                            {% if request.session.userId is not None %}
+                                <tr onclick="location.href='{% url 'socialserviceSubReport' '1' budgetType row.Year %}'" style="cursor:pointer;">
+                            {% else %}
+                                <tr class="text-primary">
+                            {% endif %}
                                 <td class="text-center">{{ row.Year }}</td>
                                 <td class="text-end">{{ row.Budget  | floatformat:2 | intcomma}}</td>
                             </tr>
@@ -202,7 +210,11 @@
                     {% groupValue '' as nYear %}
                     {% for index, row in dfSocialServiceBudgetType.iterrows %}
                         {% if row.Year != 0 %}
-                            <tr onclick="location.href='{% url 'socialserviceSubReport' '2' row.Type row.Year %}'" style="cursor:pointer;">
+                            {% if request.session.userId is not None %}
+                                <tr onclick="location.href='{% url 'socialserviceSubReport' '2' row.Type row.Year %}'" style="cursor:pointer;">
+                            {% else %}
+                                <tr class="text-primary">
+                            {% endif %}
                                 <td class="text-center">
                                     {% if nYear != row.Year %}
                                         {% groupValue row.Year as nYear %}

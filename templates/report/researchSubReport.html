@@ -34,9 +34,15 @@
                         <td class="text-center">{{ research.budgetType }}  </td>
                         <td >
                             {% for researcher in research.getResearchPerson  %}
-                                <a href="{% url 'personnelDetailReport'  researcher.personnel.id %}">
+                                {% chkPermissionReport 'personnel' request.session.userId request.session.userType researcher.personnel.id as right %}
+                                {% if right == True %}
+                                    <a href="{% url 'personnelDetailReport'  researcher.personnel.id %}">
+                                {% endif %}
                                 {{ researcher.personnel.firstname_th }} {{ researcher.personnel.lastname_th }}
-                                {{ researcher.personnel.lstname_th }} ({{ researcher.status }}) </a>
+                                {{ researcher.personnel.lstname_th }} ({{ researcher.status }})
+                                {% if right == True %}
+                                    </a>
+                                {% endif %}
                                 <br>
                             {% endfor %}
                         </td>

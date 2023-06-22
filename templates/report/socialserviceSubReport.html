@@ -36,10 +36,16 @@
                         <td class="text-end">{{ socialservice.budget | floatformat:2 | intcomma  }}  </td>
                         <td >
                             {% for operator in socialservice.getSocialServicePerson %}
-                                <a href="{% url 'personnelDetailReport'  operator.personnel.id %}"
-                                   style="--link-hover-color: red;">
+                                {% chkPermissionReport 'personnel' request.session.userId request.session.userType operator.personnel.id as right %}
+                                {% if right == True %}
+                                    <a href="{% url 'personnelDetailReport'  operator.personnel.id %}"
+                                       style="--link-hover-color: red;">
+                                {% endif %}
                                 {{ operator.personnel.firstname_th }} {{ operator.personnel.lastname_th }}
-                                {{ operator.personnel.lstname_th }} ({{ operator.status }}) </a>
+                                {{ operator.personnel.lstname_th }} ({{ operator.status }})
+                                {% if right == True %}
+                                    </a>
+                                {% endif %}
                                 <br>
                             {% endfor %}
                         </td>

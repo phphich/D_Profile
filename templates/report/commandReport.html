@@ -151,7 +151,11 @@
                         {% endfor %}
                     </tr>
                     {% for index, row in dfCommandCount.iterrows %}
-                        <tr onclick="location.href='{% url 'commandSubReport' '1' mission row.Year %}'" style="cursor:pointer;">
+                        {% if request.session.userId is not None %}
+                            <tr onclick="location.href='{% url 'commandSubReport' '1' mission row.Year %}'" style="cursor:pointer;">
+                        {% else %}
+                            <tr class="text-primary">
+                        {% endif %}
                             <td class="text-center">{{ row.Year }}</td>
                             <td class="text-center">{{ row.Count }}</td>
                         </tr>
@@ -176,7 +180,11 @@
                     {% groupValue '' as nValue %}
                     {% for index, row in dfCommandMission.iterrows %}
                         {% if row.Year != '0' %}
-                            <tr onclick="location.href='{% url 'commandSubReport' '2' row.Mission row.Year %}'" style="cursor:pointer;">
+                            {% if request.session.userId is not None %}
+                                <tr onclick="location.href='{% url 'commandSubReport' '2' row.Mission row.Year %}'" style="cursor:pointer;">
+                            {% else %}
+                                <tr class="text-primary">
+                            {% endif %}
                                 <td class="text-center">
                                     {% if row.Year != nValue %}
                                         {% groupValue row.Year as nValue %}

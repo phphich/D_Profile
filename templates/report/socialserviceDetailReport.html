@@ -61,7 +61,12 @@
                      <th class="col-4">หน้าที่ความรับผิดชอบ</th>
                  </tr>
                  {% for operator in operators %}
-                     <tr onclick="location.href='{% url 'personnelDetailReport' operator.personnel.id %}'" style="cursor:pointer;">
+                     {% chkPermissionReport 'personnel' request.session.userId request.session.userType operator.personnel.id as right %}
+                     {% if right == True %}
+                         <tr onclick="location.href='{% url 'personnelDetailReport' operator.personnel.id %}'" style="cursor:pointer;">
+                     {% else %}
+                         <tr>
+                     {% endif %}
                          <td class="text-center">{{ forloop.counter }}</td>
                          <td>
                              {% if operator.personnel.type == 'สายสนับสนุน'  %}
