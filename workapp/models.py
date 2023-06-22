@@ -16,7 +16,7 @@ class Leave(models.Model):
     editor = models.ForeignKey(Personnel, related_name='EditorLeave', on_delete=models.CASCADE, default=None)
     editDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
-        return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th +\
+        return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th +\
                 "  " + self.leaveType+ " : " + str(self.startDate) + " - " + str(self.endDate) + \
                 "  " + self.leaveType + " (" + str(self.days) + ")"
     def getLeaveFiles(self):
@@ -92,7 +92,7 @@ class Training(models.Model):
     editor = models.ForeignKey(Personnel, related_name='EditorTraining', on_delete=models.CASCADE, default=None)
     editDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
-        return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+        return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th + \
                "  " + self.topic + " : " + str(self.startDate) + " - " + str(self.endDate) + \
                " (" + str(self.days) + ")"
     def getTrainingFiles(self):
@@ -171,7 +171,7 @@ class Performance(models.Model):
     editor = models.ForeignKey(Personnel, related_name='EditorPerformance', on_delete=models.CASCADE, default=None)
     editDate = models.DateTimeField(auto_now_add = True)
     def __str__(self):
-        return self.personnel.status + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+        return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th + \
                "  " + self.topic + " : " + str(self.getDate)
     def getRecorder(self):
         return self.recorder.status + self.recorder.firstname_th + ' ' + self.recorder.lastname_th
@@ -298,7 +298,7 @@ class CommandPerson(models.Model):
     recorder = models.ForeignKey(Personnel, related_name='RecorderCommandPerson',on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.command.comId + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+        return self.command.comId + " : " + self.personnel.firstname_th + " " + self.personnel.lastname_th + \
                "  " +  " (" + self.status + ")"
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
@@ -454,7 +454,7 @@ class SocialService(models.Model):
     editor = models.ForeignKey(Personnel, related_name='EditorSocialService', on_delete=models.CASCADE, default=None)
     editDate = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return self.recorder.status + self.recorder.firstName_th + " " + self.recorder.lastName_th + \
+        return self.recorder.status + self.recorder.firstname_th + " " + self.recorder.lastname_th + \
                "  " + self.topic + " : " + self.place + " : " + str(self.startDate) + "-" + str(self.endDate)
     def getSocialServicePerson(self):
         personnels = SocialServicePerson.objects.filter(socialservice=self).order_by('personnel__firstname_th', 'personnel__lastname_th')
@@ -506,7 +506,7 @@ class SocialServicePerson(models.Model):
     recordDate = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.socialservice.id + " : " + self.personnel.firstName_th + " " + self.personnel.lastName_th + \
+        return str(self.socialservice.id) + " : " + self.personnel.firstname_th + " " + self.personnel.lastname_th + \
                "  " + " (" + self.status + ")"
 
     def getRecorderAndEditor(self):

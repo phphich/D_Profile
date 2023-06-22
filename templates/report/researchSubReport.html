@@ -22,7 +22,6 @@
                     <th class="col-3">รายชื่อนักวิจัย </th>
                 </tr>
                 {% for research in researchs %}
-{#                    ???????????????????????????????? #}
                     {% chkPermissionReport 'research' request.session.userId request.session.userType research.id as right %}
                     {% if right == True %}
                         <tr class="text-primary" onclick="location.href='{% url 'researchDetailReport' research.id %}'" style="cursor:pointer;">

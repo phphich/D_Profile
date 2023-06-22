@@ -23,7 +23,12 @@
                     <th class="col-3">ผู้ดำเนินการ</th>
                 </tr>
                 {% for socialservice in socialservices %}
-                    <tr class="text-primary" onclick="location.href='{% url 'socialserviceDetailReport' socialservice.id %}'" style="cursor:pointer;">
+                    {% chkPermissionReport 'socialservice' request.session.userId request.session.userType socialservice.id as right %}
+                    {% if right == True %}
+                        <tr class="text-primary" onclick="location.href='{% url 'socialserviceDetailReport' socialservice.id %}'" style="cursor:pointer;">
+                    {% else %}
+                        <tr class="text-primary">
+                    {% endif %}
                         <td class="text-center">{{ forloop.counter }}</td>
                         <td>{{ socialservice.topic }}  </td>
                         <td>{{ socialservice.place }}</td>

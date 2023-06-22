@@ -82,8 +82,7 @@ def chkPermissionReport(group, userId, userType, reportId):
         else:
             for personnel in personnelSet:
                 if personnel.id == report.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
-                    permission == True
-                    return True
+                    permission = True
     elif group == 'education':
         report = Education.objects.filter(id=reportId).first()
         if userId == report.personnel.id:
@@ -91,8 +90,7 @@ def chkPermissionReport(group, userId, userType, reportId):
         else:
             for personnel in personnelSet:
                 if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
-                    permission == True
-                    return True
+                    permission = True
     elif group == 'expertise':
         report = Expertise.objects.filter(id=reportId).first()
         if userId == report.personnel.id:
@@ -100,8 +98,7 @@ def chkPermissionReport(group, userId, userType, reportId):
         else:
             for personnel in personnelSet:
                 if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
-                    permission == True
-                    return True
+                    permission = True
     elif group == 'training':
         report = Training.objects.filter(id=reportId).first()
         if userId == report.personnel.id:
@@ -109,8 +106,7 @@ def chkPermissionReport(group, userId, userType, reportId):
         else:
             for personnel in personnelSet:
                 if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
-                    permission == True
-                    return True
+                    permission = True
     elif group == 'performance':
         report = Performance.objects.filter(id=reportId).first()
         if userId == report.personnel.id:
@@ -118,8 +114,7 @@ def chkPermissionReport(group, userId, userType, reportId):
         else:
             for personnel in personnelSet:
                 if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
-                    permission == True
-                    return True
+                    permission = True
     elif group == 'leave':
         report = Leave.objects.filter(id=reportId).first()
         if userId == report.personnel.id:
@@ -127,30 +122,35 @@ def chkPermissionReport(group, userId, userType, reportId):
         else:
             for personnel in personnelSet:
                 if personnel.id == report.personnel.id: #ถ้ารหัสบุคลากรที่รายงานตรงกับรหัสบุคลากรที่ผู้ล็อกอินบริหารหรือดูแลข้อมูลให้อยู่
-                    permission == True
-                    return True
+                    permission = True
     elif group == 'research':
         report = Research.objects.filter(id=reportId).first()
         if report.recorder_id == userId:
-            permission==True
+            permission=True
         else:
             researchers = ResearchPerson.objects.filter(research=report)
-            print('p :{}'.format(personnelSet))
-            print('rs :{}'.format(researchers))
-            researcherSet = []
             for researcher in researchers:
                 for personnel in personnelSet:
-                    # print('pid:{}, rid:{}'.format(personnel.id, researcher.personnel.id))
                     if personnel.id == researcher.personnel.id:
                         permission=True
-                        return True
-            #
-            #     researcherSet.append(researcher.personnel)
-            # for personnel in personnelSet:
-            #     if personnel in researcherSet:
-            #         permission = True
-            #         return True
-    # # elif group == 'socialservice':
-    #     pass
-
+    elif group == 'socialservice':
+        report = SocialService.objects.filter(id=reportId).first()
+        if report.recorder_id == userId:
+            permission=True
+        else:
+            operators = SocialServicePerson.objects.filter(socialservice=report)
+            for operator in operators:
+                for personnel in personnelSet:
+                    if personnel.id == operator.personnel.id:
+                        permission=True
+    elif group == 'command':
+        report = Command.objects.filter(id=reportId).first()
+        if report.recorder_id == userId:
+            permission=True
+        else:
+            operators = CommandPerson.objects.filter(command=report)
+            for operator in operators:
+                for personnel in personnelSet:
+                    if personnel.id == operator.personnel.id:
+                        permission=True
     return permission
