@@ -308,7 +308,7 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
 
 
     uDocId = []
-    print("docId: {}, uId: {}".format(docId, uId))
+    # print("docId: {}, uId: {}".format(docId, uId))
     if int(docId) == int(uId):
         return True
     for x in userDocIds:

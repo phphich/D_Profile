@@ -6,7 +6,7 @@
         <div class="mt-4 p-5 text-white rounded text-end" style="background-color: #b6d4fe;" >
             <div class="row">
                 <div class="col-2">
-                    <img src="{% static 'images/iconfiles/pdps_in_folder.png' %}" width="210px" height="auto">
+                    <img src="{% static 'images/iconfiles/pdps_in_folder.png' %}" height="auto">
                 </div>
                 <div class="col-10">
                     <h2 class="display-6 text-primary">ระบบบริหารจัดการแฟ้มข้อมูลดิจิทัลประจำตัวบุคลากร </h2>
@@ -19,40 +19,7 @@
         </div>
     </div>
 
-{#    <hr class="text-primary">#}
-{#        <div class="row text-center align-content-center">#}
-{#            <div class="col-1"></div>#}
-{#            <div class="col-md-4 text-center" style="alignment: center">#}
-{#                {% if chartDiv is not None %}#}
-{#                    {{ chartDiv | safe }}#}
-{#                 {% endif %}#}
-{#            </div>#}
-{#            <div class="col-md-1"></div>#}
-{#            <div class="col-md-4 text-center" style="alignment: center">#}
-{#                {% if chartResearchBudget is not None %}#}
-{#                    {{ chartResearchBudget | safe }}#}
-{#                {% endif %}#}
-{#            </div>#}
-{#            <div class="col-md-1"></div>#}
-{#        </div>#}
-{##}
-{#        <div class="row text-center align-content-center">#}
-{#            <div class="col-2"></div>#}
-{#            <div class="col-md-3 text-center" style="alignment: center">#}
-{#                {% if chartSocialService is not None %}#}
-{#                    {{ chartSocialService | safe }}#}
-{#                {% endif %}#}
-{#            </div>#}
-{#            <div class="col-2"></div>#}
-{#            <div class="col-md-4 text-center" style=" alignment: center">#}
-{#                {% if chartStatus is not None %}#}
-{#                    {{ chartStatus | safe }}#}
-{#                {% endif %}#}
-{#            </div>#}
-{#            <div class="col-md-1"></div>#}
-{#        </div>#}
-    <br style="display: block;height: 1rem;margin-top:0;font-size: 24%;">
-    {##}
+    <br>
     <div class="row" style="background-color: #f0f2f6;margin-left: 1px;margin-right: 1px">
         <div class="col-1"></div>
         <div class="col-2 text-center">
@@ -73,17 +40,9 @@
         <div class="col-1"></div>
     </div>
 
-    {#    <div class="row">#}
-    {#        <div class="col-1"></div>#}
-    {#        <div class="col-10">#}
-    {#            <hr class="text-primary">#}
-    {#        </div>#}
-    {#        <div class="col-1"></div>#}
-    {#    </div>#}
-    <BR>
+    <br>
     <div class="row">
         <div class="col-1"></div>
-        {#            <div class="col-10" style="background-color: #d9f5fc">#}
         <div class="col-10" style="background-color: #ffffff">
             <br>
             <form method="post" action="{% url 'search' %}">

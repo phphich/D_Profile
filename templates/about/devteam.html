@@ -2,85 +2,41 @@
 {% load static %}
 
 {% block content %}
-{#    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha256-2XFplPlrFClt0bIdPgpz8H7ojnk10H69xRqd9+uTShA=" crossorigin="anonymous" />#}
-<br>
-<div class="container">
-    <div class="card me-5" style="width: 18rem; margin: 10px;">
-    <img src="{% static 'images/dev/or-phich.jpg' %}" class="card-img-top rounded-circle" width="10px" height="20px">
-        <div class="card-body">
-            <h5 class="card-title">food</h5>
-            <p class="card-text">Lorem ipsum dolor sit amet consectetur adipisicing elit. Exercitationem, reprehenderit!</p>
-            <a href="#" class="card-link">lnik</a>
-        </div>
-    </div>
-    <br>
-<div class="row mt-n1-9">
-                    <div class="col-1"></div>
-                    <div class="col-md-6 col-xl-3 mt-1-9 wow fadeInUp" data-wow-delay=".2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                        <div class="team-style07">
-                            <div class="team-thumb mb-1-9">
-                                <div class="thumb"><img src="{% static 'images/dev/or-phich.jpg' %}" class="rounded-circle" alt="..."></div>
-                                <div class="team-social">
-                                    <ul class="styled-icons">
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <h3 class="h5 mb-1"><a href="#!">Dr. Phitchayaphak Phiphitphatphaisit </a></h3>
-                            <p class="mb-0">Project Manager & Developer </p>
-                        </div>
+    <br><br><br><br><br>
+    <div class="container-fluid" style="background-color: #e2e8ef;
+            background: url({% static 'images/iconfiles/developer.jpeg' %});">
+        <br><br><br>
+        <div class="row">
+            <div class="col-1"></div>
+{#            #b6d4fe#}
+            <div class="col-10 text-white rounded text-end" style="background-color: #d0d8da;">
+                <div class="row">
+                    <div class="col-2">
+                        <br><br>
+                        <img src="{% static 'images/iconfiles/pdps_in_folder.png' %}" height="auto">
                     </div>
-                    <div class="col-md-6 col-xl-3 mt-1-9 wow fadeInUp" data-wow-delay=".3s" style="visibility: visible; animation-delay: 0.3s; animation-name: fadeInUp;">
-                        <div class="team-style07">
-                            <div class="team-thumb mb-1-9">
-                                <div class="thumb"><img src="{% static 'images/dev/or-kea.jpg' %}" class="rounded-circle" alt="..."></div>
-                                <div class="team-social">
-                                    <ul class="styled-icons">
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <h3 class="h5 mb-1"><a href="#!">Dr. Pathamakorn Nethayawijit</a></h3>
-                            <p class="mb-0">Co-Founder</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3 mt-1-9 wow fadeInUp" data-wow-delay=".4s" style="visibility: visible; animation-delay: 0.4s; animation-name: fadeInUp;">
-                        <div class="team-style07">
-                            <div class="team-thumb mb-1-9">
-                                <div class="thumb"><img src="{% static 'images/dev/or-su.jpg' %}" class="rounded-circle" alt="..."></div>
-                                <div class="team-social">
-                                    <ul class="styled-icons">
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <h3 class="h5 mb-1"> <a href="#!">Aj. Supaporn Anuphaphaiboon</a></h3>
-                            <p class="mb-0">Team Member</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-3 mt-1-9 wow fadeInUp" data-wow-delay=".5s" style="visibility: visible; animation-delay: 0.5s; animation-name: fadeInUp;">
-                        <div class="team-style07">
-                            <div class="team-thumb mb-1-9">
-                                <div class="thumb"><img src="{% static 'images/dev/or-aom.jpg' %}" class="rounded-circle" alt="..."></div>
-                                <div class="team-social">
-                                    <ul class="styled-icons">
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-facebook-f"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-twitter"></i></a></li>
-                                        <li><a class="styled-icons-item" href="#!"><i class="fab fa-linkedin-in"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <h3 class="h5 mb-1"> <a href="#!">Aj. Thasanee Lunrasri Laueri</a></h3>
-                            <p class="mb-0">Team Member</p>
-                        </div>
+                    <div class="col-10 text-center" >
+                        <h2 class="display-7 text-primary" style="font-weight: bold">
+                            <br>
+                            Developed by: Division of Information System
+                        </h2>
+                        <label style="font-size:30px;font-weight: bold;color: rgba(250,91,56,0.9)">
+
+                            F&nbsp;&nbsp;B&nbsp;&nbsp;A&nbsp;&nbsp;I&nbsp;&nbsp;T.
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            K&nbsp;&nbsp;K&nbsp;&nbsp;C. <br>
+                            R&nbsp;M&nbsp;U&nbsp;T&nbsp;I
+                            <br>
+                            <img src="{% static 'images/iconfiles/miniheart.png' %}" width="75px" height="auto">
+
+                            <br><br>
+                        </label>
                     </div>
                 </div>
-</div>
-    <br><br>
+            </div>
+            <div class="col-1"></div>
+        </div>
+        <br><br><br>
+    </div>
+
 {% endblock %}

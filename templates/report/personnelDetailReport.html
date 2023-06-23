@@ -28,7 +28,7 @@
                 ความเชี่ยวชาญ
             </div>
         </div>
-    <div class="row">
+        <div class="row">
             <div class="col-2">
                 {% if 'training' in choices %}
                     <input type="checkbox" name="choices" value="training" checked onclick="this.form.submit();">
@@ -38,7 +38,7 @@
                     การฝึกอบรม/สัมมนา
                 {% endif %}
             </div>
-            <div class="col-1">
+            <div class="col-2">
                 {% if 'research' in choices %}
                     <input type="checkbox" name="choices" value="research" checked onclick="this.form.submit();">
                     การวิจัย
@@ -55,13 +55,13 @@
                     การบริการทางวิชาการแก่สังคม
                 {% endif %}
             </div>
-            <div class="col-3">
+            <div class="col-2">
                 {% if 'performance' in choices %}
                     <input type="checkbox" name="choices" value="performance" checked onclick="this.form.submit();">
-                    การรับตำแหน่ง/ผลงาน/รางวัล
+                    ผลงานและรางวัล
                 {% else %}
                     <input type="checkbox" name="choices" value="performance" onclick="this.form.submit();">
-                    การรับตำแหน่ง/ผลงาน/รางวัล
+                    ผลงานและรางวัล
                 {% endif %}
             </div>
             <div class="col-1">
@@ -178,24 +178,28 @@
     <div class="row">
         <div class="col-12">
             <h5 style="font-weight: bold;color: green"> ความเชี่ยวชาญ</h5>
-             <table class="table table-light table-striped" style="border-color: #0b5ed7">
-                 <tr class="text-primary">
-                     <th class="col-4">ความเชี่ยวชาญ</th>
-                     <th class="col-4">รายละเอียด</th>
-                     <th class="col-4">ประสบการณ์/ผลงาน</th>
-                 </tr>
-                 {% if expertises.count == 0 %}
-                     <tr> <td class="text-center text-secondary" colspan="3">--ไม่มีข้อมูลความเชี่ยวชาญของบุคลากรในระบบ--</td></tr>
-                 {% else %}
-                     {% for expert in expertises %}
-                         <tr>
-                             <td>{{ expert.topic }}</td>
-                             <td>{{ expert.detail }}</td>
-                             <td>{{ expert.experience }}</td>
-                         </tr>
-                     {% endfor %}
+            <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                <tr class="text-primary">
+                    <th class="col-4">ความเชี่ยวชาญ</th>
+                    <th class="col-4">รายละเอียด</th>
+                    <th class="col-4">ประสบการณ์/ผลงาน</th>
+                </tr>
+                {% if expertises.count == 0 %}
+                    <tr>
+                        <td class="text-center text-secondary" colspan="3">
+                            --ไม่มีข้อมูลความเชี่ยวชาญของบุคลากรในระบบ--
+                        </td>
+                    </tr>
+                {% else %}
+                    {% for expert in expertises %}
+                        <tr>
+                            <td>{{ expert.topic }}</td>
+                            <td>{{ expert.detail }}</td>
+                            <td>{{ expert.experience }}</td>
+                        </tr>
+                    {% endfor %}
                 {% endif %}
-             </table>
+            </table>
         </div>
     </div>
     <br>
@@ -264,45 +268,59 @@
         {#    ประวัติการวิจัย #}
         <div class="row">
             <div class="col-12">
-            <h5 style="font-weight: bold;color: green"> ประวัติการวิจัย </h5>
-                 <table class="table table-light table-striped" style="border-color: #0b5ed7">
-                     <tr class="text-primary">
-                         <th class="col-1 text-center">ปีงบประมาณ</th>
-                         <th class="col-5">ชื่องานวิจัย </th>
-                         <th class="col-1 text-center">สัดส่วนความรับผิดชอบ</th>
-                         <th class="col-2 text-end">งบประมาณ </th>
-                         <th class="col-3">หน่วยงานเจ้าของทุนวิจัย </th>
-                     </tr>
-                     {% if researchs.count == 0  %}
-                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการวิจัยของบุคลากรในระบบ--</td></tr>
-                     {% else %}
-                         {% groupValue '' as nValue %}
-                         {% for research in researchs %}
-                             <tr>
-                                 <td class="text-center">
-                                     {% if research.fiscalYear != nValue %}
-                                        {{ research.fiscalYear }}
-                                        {% groupValue research.fiscalYear as nValue %}
-                                     {% endif %}
-                                 </td>
-                                 <td>{{ research.title_th }}<br>
-                                     ({{ research.title_en }})</td>
-                                 <td class="text-center"> ?% </td>
-                                 <td class="text-end">{{ research.budget|floatformat:2|intcomma }}</td>
-                                 <td>{{ research.source }}</td>
-                             </tr>
-                         {% endfor %}
-                     {% endif %}
-                 </table>
-
-{#            *****************************************#}
-                 <div id="id_reference">
-
-                 </div>
-{#            *****************************************#}
-
+                <h5 style="font-weight: bold;color: green"> ประวัติการวิจัย </h5>
+                <table class="table table-light table-striped" style="border-color: #0b5ed7">
+                    <tr class="text-primary">
+                        <th class="col-1 text-center">ปีงบประมาณ</th>
+                        <th class="col-5">ชื่องานวิจัย</th>
+                        <th class="col-1 text-center">สัดส่วนความรับผิดชอบ</th>
+                        <th class="col-2 text-end">งบประมาณ</th>
+                        <th class="col-3">หน่วยงานเจ้าของทุนวิจัย</th>
+                    </tr>
+                    {% if researchs.count == 0 %}
+                        <tr>
+                            <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการวิจัยของบุคลากรในระบบ--</td>
+                        </tr>
+                    {% else %}
+                        {% groupValue '' as nValue %}
+                        {% for researcher in researchpersons %}
+                            <tr>
+                                <td class="text-center">
+                                    {% if researcher.research.fiscalYear != nValue %}
+                                        {{ researcher.research.fiscalYear }}
+                                        {% groupValue researcher.research.fiscalYear as nValue %}
+                                    {% endif %}
+                                </td>
+                                <td>{{ researcher.research.title_th }}<br>
+                                    ({{ researcher.research.title_en }})
+                                </td>
+                                <td class="text-center"> {{researcher.percent}}%</td>
+                                <td class="text-end">{{ researcher.research.budget|floatformat:2|intcomma }}</td>
+                                <td>{{ researcher.research.source }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </table>
             </div>
         </div>
+        {% if researchpersons.count != 0 %}
+            <div class="row">
+                <div class="col-2">
+                    <span class="text-dark"> </span>
+                    <a class="btn text-dark btn-light" data-bs-toggle="collapse"
+                         data-bs-target="#collapseReference">References <i class="fas fa-list-ol"></i>
+                    </a>
+                </div>
+                <div class="col-10">
+                    <div class="collapse text-secondary" id="collapseReference">
+                        {% for researcher in researchpersons %}
+                            {{ forloop.counter }}.
+                            {{ researcher.research.reference }} <br>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <br>
     {% endif %}
 
@@ -322,7 +340,7 @@
                          <th class="col-2 text-end">งบประมาณ </th>
                      </tr>
                      {% if socialservices.count == 0  %}
-                         <tr> <td class="text-center text-secondary" colspan="6">--ไม่มีข้อมูลการบริการทางวิชาการแก่สังคมของบุคลากรในระบบ--</td></tr>
+                         <tr> <td class="text-center text-secondary" colspan="7">--ไม่มีข้อมูลการบริการทางวิชาการแก่สังคมของบุคลากรในระบบ--</td></tr>
                      {% else %}
                          {% groupValue '' as nValue %}
                          {% for socialservice in socialservices %}
@@ -352,16 +370,16 @@
         {#    ประวัติการรับตำแหน่งผลงานรางวัล #}
         <div class="row">
             <div class="col-12">
-                <h5 style="font-weight: bold;color: green"> การรับตำแหน่ง/ผลงาน/รางวัล</h5>
+                <h5 style="font-weight: bold;color: green">  ผลงานและรางวัล</h5>
                  <table class="table table-light table-striped" style="border-color: #0b5ed7">
                      <tr class="text-primary">
                          <th class="col-2">วันที่</th>
-                         <th class="col-5">ชื่อตำแหน่ง/ผลงาน/รางวัล</th>
+                         <th class="col-5">ชื่อผลงาน/รางวัล</th>
                          <th class="col-7">รายละเอียด</th>
                          <th class="col-7">ผู้มอบ</th>
                      </tr>
                      {% if performances.count == 0  %}
-                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลการรับตำแหน่ง/ผลงาน/รางวัลของบุคลากรในระบบ--</td></tr>
+                         <tr> <td class="text-center text-secondary" colspan="5">--ไม่มีข้อมูลผลงานและรางวัลของบุคลากรในระบบ--</td></tr>
                      {% else %}
                          {% for performance in performances %}
                              <tr>
@@ -454,7 +472,7 @@
         </div>
         <br>
     {% endif %}
-
+    <br>
     <div class="row">
         <div class="col-12">
 {#            <form method="post">#}
@@ -468,4 +486,5 @@
 {#            </form>#}
         </div>
     </div>
+    <br><br>
 {% endblock %}

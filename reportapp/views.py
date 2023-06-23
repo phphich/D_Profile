@@ -712,7 +712,8 @@ def personnelDetailReport(request, personnelId):
     trainings = Training.objects.filter(personnel_id=personnelId).order_by('-fiscalYear')
     leaves = Leave.objects.filter(personnel_id=personnelId).order_by('-fiscalYear')
     performances = Performance.objects.filter(personnel_id=personnelId).order_by('-fiscalYear')
-    researchs = Research.objects.filter(researchperson__personnel__id=personnelId).order_by('-fiscalYear')
+    # researchs = Research.objects.filter(researchperson__personnel__id=personnelId).order_by('-fiscalYear')
+    researchpersons = ResearchPerson.objects.filter(personnel__id=personnelId).order_by('-research__fiscalYear')
     socialservices = SocialService.objects.filter(socialserviceperson__personnel__id=personnelId).order_by('-fiscalYear')
     commands = Command.objects.filter(commandperson__personnel__id=personnelId).order_by('-fiscalYear')
     choices = None
@@ -720,7 +721,7 @@ def personnelDetailReport(request, personnelId):
         choices = request.POST.getlist('choices')
 
     context = {'personnel':personnel, 'educations':educations, 'expertises':expertises, 'curraffs':curraffs,
-               'trainings':trainings, 'researchs':researchs, 'socialservices':socialservices,
+               'trainings':trainings, 'researchpersons':researchpersons, 'socialservices':socialservices,
                'performances':performances,'leaves':leaves, 'commands':commands, 'choices': choices,
                }
     return render(request, 'report/personnelDetailReport.html', context)
