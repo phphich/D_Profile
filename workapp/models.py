@@ -339,7 +339,7 @@ class Research(models.Model):
     budget = models.FloatField(default=0.00)
     budgetType = models.CharField(max_length=30, default="งบประมาณรายได้")
     source = models.CharField(max_length=255, default="")
-    keyword = models.TextField(default="")
+    reference = models.TextField(default="-")
     percent_success = models.IntegerField(default=0)
     publish_method = models.TextField(default="")
     recorder = models.ForeignKey(Personnel, related_name='RecorderResearch', on_delete=models.CASCADE, default=None)

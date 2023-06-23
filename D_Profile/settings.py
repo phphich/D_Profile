@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-$n6&%)#^og5o^x%ghu%x@ova8d_p(azvo_!e2)nrmk_*p$2@sj
 DEBUG = True
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ["https://fd45-203-158-200-55.ngrok-free.app","localhost","127.0.0.1", "192.168.0.101", "172.24.129.190"]
+ALLOWED_HOSTS = ["https://1963-203-158-200-5.ngrok-free.app","localhost","127.0.0.1", "192.168.0.101", "172.24.136.208"]
 
 # Application definition
 
@@ -85,7 +85,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_dprofile',
-        'USER': 'bisdev',
+        'USER': 'devfbi',
         'PASSWORD': '12345',
         'HOST': 'localhost',
         'PORT': '3306',

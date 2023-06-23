@@ -466,7 +466,7 @@ class ResearchForm(forms.ModelForm):
         model = Research
         fields = (
             'fiscalYear', 'title_th', 'title_en', 'objective', 'budget', 'budgetType', 'source',
-             'percent_success', 'publish_method', 'keyword','recorder', 'editor', )
+             'percent_success', 'publish_method', 'reference','recorder', 'editor', )
         widgets = {
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'title_th': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
@@ -476,7 +476,7 @@ class ResearchForm(forms.ModelForm):
             'budgetType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control',
                                                                     'onchange': 'javascript:chkBudgetType();'}),
             'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
-            'keyword': forms.Textarea(attrs={'class': 'form-control', 'cols':55, 'rows':2}),
+            'reference': forms.Textarea(attrs={'class': 'form-control', 'cols':55, 'rows':2}),
             'percent_success': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
             'publish_method': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
             'recorder': forms.HiddenInput(),
@@ -490,7 +490,7 @@ class ResearchForm(forms.ModelForm):
             'budget': 'ทุนวิจัย',
             'budgetType': 'ประเภทงบประมาณ',
             'source': 'หน่วยงานเจ้าของทุนวิจัย',
-            'keyword': 'อ้างอิง (Reference)',
+            'reference': 'อ้างอิง (Reference)',
             'percent_success': 'ร้อยละความก้าวหน้า (%)',
             'publish_method': 'การเผยแพร่ผลการวิจัย',
             'recorder': 'ผู้บันทึก',
@@ -505,7 +505,7 @@ class ResearchForm(forms.ModelForm):
         self.fields['budget'].widget.attrs['readonly'] = True
         self.fields['budgetType'].widget.attrs['readonly'] = True
         self.fields['source'].widget.attrs['readonly'] = True
-        self.fields['keyword'].widget.attrs['readonly'] = True
+        self.fields['reference'].widget.attrs['readonly'] = True
         self.fields['percent_success'].widget.attrs['readonly'] = True
         self.fields['publish_method'].widget.attrs['readonly'] = True
         self.fields['recorder'].widget.attrs['readonly'] = True
