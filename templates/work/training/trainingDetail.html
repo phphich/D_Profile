@@ -60,10 +60,14 @@
     </p>
 
     <p class="text-center">
-        {% if request.session.userType != 'Personnel' %}
+        {% if request.session.previous_url == 'None' %}
             <button type="button" class="btn btn-secondary"
-{#                    onclick="location.href='{% url 'trainingList' training.personnel.division.id training.personnel.id %}'">#}
-                onclick="history.back();">
+                    onclick="history.back();">
+                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+        {% elif request.session.userType != 'Personnel' %}
+            <button type="button" class="btn btn-secondary"
+                    onclick="location.href='{% url 'trainingList' training.personnel.division.id training.personnel.id %}'">
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
         {% else %}

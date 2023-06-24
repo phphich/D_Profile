@@ -53,6 +53,7 @@ def home(request):
         request.session['sess_university'] = "University: [N/A]"
     countPersonnel = Personnel.objects.all().count()
     request.session['last_url']= request.path_info
+    request.session['previous_url'] = request.path_info
     if countPersonnel == 0:
         messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
         return  redirect('personnelNew')
