@@ -909,6 +909,12 @@ def commandDetail(request, id):
     if common.chkPermission(commandDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
+    request.session['previous_url'] = request.path_info
+    if 'last_url' in request.session:
+        if str(request.session['last_url']).find('DetailReport') != -1 or str(request.session['last_url'])=='/':
+            request.session['previous_url'] = 'None'
+        else:
+            request.session['previous_url'] = '/workapp/commandList'
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
 
@@ -1276,10 +1282,16 @@ def researchDetail(request, id):
     if research is None:
         messages.add_message(request, messages.ERROR,msgErrorId)
         return redirect(request.session['last_url'])
-    # getSession(request, dtype='Research', did=research.id)
-    # if common.chkPermission(researchDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
-    #     messages.add_message(request, messages.ERROR,msgErrorPermission)
-    #     return redirect(request.session['last_url'])
+    getSession(request, dtype='Research', did=research.id)
+    if common.chkPermission(researchDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['previous_url'] = request.path_info
+    if 'last_url' in request.session:
+        if str(request.session['last_url']).find('DetailReport') != -1 or str(request.session['last_url'])=='/':
+            request.session['previous_url'] = 'None'
+        else:
+            request.session['previous_url'] = '/workapp/researchList'
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
 
@@ -1663,6 +1675,13 @@ def socialserviceDetail(request, id):
     if common.chkPermission(socialserviceDetail.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
+    request.session['previous_url'] = request.path_info
+    print('url:{}'.format(request.session['last_url']))
+    if 'last_url' in request.session:
+        if str(request.session['last_url']).find('DetailReport') != -1 or str(request.session['last_url']) =='/':
+            request.session['previous_url'] = 'None'
+        else:
+            request.session['previous_url'] = '/workapp/socialserviceList'
     request.session['last_url'] = request.path_info
     recorder = Personnel.objects.filter(id=request.session['userId']).first()
 

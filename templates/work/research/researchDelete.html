@@ -36,6 +36,8 @@
     <hr class="text-primary">
 
     <div class="row">
+        <br>
+        <h5 class="text-success"><i class="fa fa-book"></i> บุคลากรที่ร่วมวิจัย: </h5>
         <div class="col-2>"></div>
         <div class="col-8>">
             {% if research.getResearchPerson|length == 0  %}
@@ -67,7 +69,7 @@
                             <td class="text-end"><img src="{% static researchPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                      width="55px" height="65px"> </td>
                             <td>{{ researchPerson.personnel }} </td>
-                            <td>{{ researchPerson.status | slice:"0,30"}}</td>
+                            <td>{{ researchPerson.status }}</td>
                             <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ researchPerson.getRecorderAndEditor }}</td>
                             <td class="text-center">
 
@@ -78,7 +80,7 @@
             {% endif %}
         </div>
     </div>
-
+    <br>
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>

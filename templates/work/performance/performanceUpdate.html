@@ -16,8 +16,9 @@
         {{ form.as_p }}
         <p class="text-center">
             <button type="button" class="btn btn-secondary"
-                    onclick="location.href='{% url 'performanceList' %}'">
+                    onclick="location.href='{% url 'performanceList' personnel.division.id personnel.id %}'">
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
+
             </button>
             <button type="submit" class="btn btn-success">
                 <i class="fa-solid fa-floppy-disk"></i> บันทึกการแก้ไข

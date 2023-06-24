@@ -26,7 +26,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'personnelDetailReport' result.id %}'" style="cursor:pointer;font-weight: bold">
+                                <a class="text-success" onclick="location.href='{% url 'personnelDetailReport' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}
                         {% endif %}&nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
@@ -52,7 +53,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'educationDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                                <a class="text-success" onclick="location.href='{% url 'educationDetail' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}
                         {% endif %}
                         &nbsp;&nbsp;&nbsp;
@@ -79,7 +81,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'expertiseDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                                <a class="text-success" onclick="location.href='{% url 'expertiseDetail' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}
                         {% endif %}
                         &nbsp;&nbsp;&nbsp;
@@ -105,7 +108,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'trainingDetail' result.id %}'" style="cursor:pointer;font-weight: bold;">
+                                <a class="text-success" onclick="location.href='{% url 'trainingDetail' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}                        &nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {{ forloop.counter }}.
@@ -131,7 +135,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'performanceDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                                <a class="text-success" onclick="location.href='{% url 'performanceDetail' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}                        &nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {{ forloop.counter }}.
@@ -157,7 +162,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'researchDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                                <a class="text-success" onclick="location.href='{% url 'researchDetail' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}
                         {% endif %}                        &nbsp;&nbsp;&nbsp;
                         {{ forloop.counter }}.
@@ -188,7 +194,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'socialserviceDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                                <a class="text-success" onclick="location.href='{% url 'socialserviceDetail' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}                        &nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {{ forloop.counter }}.
@@ -218,7 +225,8 @@
                         {% if request.session.userId is not None %}
                             {% chkPermissionReport group request.session.userId request.session.userType result.id as right %}
                             {% if right == True %}
-                                <a class="text-success" onclick="location.href='{% url 'commandDetail' result.id %}'" style="cursor:pointer;font-weight: bold">
+                                <a class="text-success" onclick="location.href='{% url 'commandDetail' result.id %}'"
+                                   style="cursor:pointer;font-weight: bold;text-decoration: none;">
                             {% endif %}                        &nbsp;&nbsp;&nbsp;
                         {% endif %}
                         {{ forloop.counter }}.

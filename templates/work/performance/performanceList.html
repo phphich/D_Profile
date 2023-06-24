@@ -80,7 +80,7 @@
                 <th class="col col-2">
                     {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
                         <a href="{% url 'performanceNew' personnel.id %}" class="btn btn-sm btn-primary  text-white" style="width: 100%">
-                            <i class="fa fa-plus"></i> เพิ่มการฝึกอบรม/สัมมนา </a>
+                            <i class="fa fa-plus"></i> เพิ่มผลงานและรางวัล </a>
                     {% endif %}
                 </th>
             </tr>

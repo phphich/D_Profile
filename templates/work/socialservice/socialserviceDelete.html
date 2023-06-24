@@ -36,9 +36,11 @@
     <hr class="text-primary">
 
     <div class="row">
+        <br>
+        <h5 class="text-success"><i class="fa fa-book"></i> บุคลากรที่ร่วมบริการทางวิชาการแก่สังคม: </h5>
         <div class="col-2>"></div>
         <div class="col-8>">
-            {% if research.getResearchPerson|length == 0  %}
+            {% if socialservice.getSocialServicePerson|length == 0  %}
                 <div class="row">
                     <div class="col-2"></div>
                     <div class="alert-warning col-8 text-center">
@@ -57,18 +59,18 @@
                         </th>
                     </tr>
 
-                    {% for researchPerson in research.getResearchPerson %}
+                    {% for socialservicePerson in socialservice.getSocialServicePerson %}
                         {% if personnel.id == researchPerson.personnel.id %}
                             <tr class="text-success" style="font-weight:bold">
                         {% else %}
                             <tr>
                         {% endif %}
                             <td class="text-center">{{ forloop.counter }}</td>
-                            <td class="text-end"><img src="{% static researchPerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
+                            <td class="text-end"><img src="{% static socialservicePerson.personnel.picture %}" style="margin:0px;" class="rounded-circle"
                                      width="55px" height="65px"> </td>
-                            <td>{{ researchPerson.personnel }} </td>
-                            <td>{{ researchPerson.status | slice:"0,30"}}</td>
-                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ researchPerson.getRecorderAndEditor }}</td>
+                            <td>{{ socialservicePerson.personnel }} </td>
+                            <td>{{ socialservicePerson.status }}</td>
+                            <td style="font-size:small;font-style:italic;color:#4d4a4a" >{{ socialservicePerson.getRecorderAndEditor }}</td>
                             <td class="text-center">
 
                             </td>
@@ -78,7 +80,7 @@
             {% endif %}
         </div>
     </div>
-
+    <br>
     <div class="row">
         <div class="col-12 text-success">
             <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ: </h5>

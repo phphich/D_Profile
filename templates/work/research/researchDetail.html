@@ -66,11 +66,17 @@
         <i>{{ research.getRecorderAndEditor }} </i>
     </p>
     <p class="text-center">
-        <button type="button" class="btn btn-secondary"
-{#                onclick="location.href='{% url 'researchList' %}'">#}
-                    onclick="history.back();">
-            <i class="fa fa-rotate-back"></i> ย้อนกลับ
-        </button>
+        {% if request.session.previous_url != 'None' %}
+            <button type="button" class="btn btn-secondary"
+                      onclick="location.href='{{ request.session.previous_url }}'">
+                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+        {% else %}
+            <button type="button" class="btn btn-secondary"
+                          onclick="history.back();">
+                    <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+        {% endif %}
         {% if request.session.userType in 'Administrator, Staff' or request.session.userId == research.recorder.id %}
             {% if request.session.userId == research.recorder.id and research.recordDate|getTimeUpdate == False %}
                 <button type="button" class="btn btn-secondary" disabled>
