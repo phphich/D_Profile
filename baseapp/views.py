@@ -662,7 +662,9 @@ def personnelUpdate(request, id):
             form = PersonnelForm(instance=personnel)
         else:
             form = PersonnelForm(userType=request.session['userType'], userId=request.session['userId'], instance=personnel)
-        form.updateForm()
+        if request.session['userType'] in ['Manager','Header', 'Personnel']:
+            print("type: {}".format(request.session['userType']))
+            form.updateForm()
         context = {'form': form, 'personnel': personnel, 'userType':userType}
         return render(request, 'base/personnel/personnelUpdate.html', context)
 

@@ -78,7 +78,12 @@
                 </tr>
             </table>
             <p class="text-end text-secondary" style="border-color: #6c757d">
-                <i>{{ personnel.getRecorderAndEditor }} </i>
+                <i>{{ personnel.getRecorderAndEditor }}
+                    {% if personnel.editable == False %}
+                        <<กำหนดสถานะการป้องกันการแก้ไขไว้>>
+                    {% endif %}
+
+                </i>
             </p>
         </div>
 
@@ -94,10 +99,19 @@
                 <button type="button" class="btn btn-secondary" onclick="location.href='{% url 'personnelList' %}'">
                     <i class="fa fa-rotate-back"></i> ย้อนกลับ
                 </button>
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id %}
-                        <button type="button" class="btn btn-warning"
+                {% if request.session.userType in 'Administrator, Staff' %}
+                    <button type="button" class="btn btn-warning"
                             onclick="location.href='{% url 'personnelUpdate' personnel.id %}'">
                         <i class="fa fa-tools"></i> แก้ไข
+                    </button>
+                {% elif request.session.userId == personnel.id and personnel.editable == True %}
+                    <button type="button" class="btn btn-warning"
+                            onclick="location.href='{% url 'personnelUpdate' personnel.id %}'">
+                        <i class="fa fa-tools"></i> แก้ไข
+                    </button>
+                {% elif request.session.userId == personnel.id %}
+                    <button type="button" class="btn btn-secondary">
+                        <i class="fa fa-ban"></i> ชุดข้อมูลได้รับการป้องกันการแก้ไข
                     </button>
                 {% endif %}
             </p>

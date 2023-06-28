@@ -79,9 +79,10 @@
                         <td class="text-center">{{ personnel.gender }}</td>
                         <td>{{ personnel.division.name_th }}</td>
                         <td class="text-center">
-                            {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-    {#                            <a href="{% url 'personnelDetail' personnel.id %}" class="btn btn-light">#}
-    {#                                <i class="fa fa-search"> </i> </a>#}
+                            {% if request.session.userType in 'Administrator, Staff'  %}
+                                <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-warning">
+                                    <i class="fa fa-tools"> </i> </a>
+                            {% elif request.session.userId == personnel.id and personnel.editable == True %}
                                 <a href="{% url 'personnelUpdate' personnel.id %}" class="btn btn-warning">
                                     <i class="fa fa-tools"> </i> </a>
                             {% endif %}
@@ -181,7 +182,5 @@
             <div class="col-3"></div>
         </div>
     {% endif %}
-
-    <br><br>
 
 {% endblock %}

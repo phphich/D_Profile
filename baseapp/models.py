@@ -81,6 +81,7 @@ class Personnel(models.Model):
     hiringDate = models.DateField(default=None)
     picture = models.ImageField(upload_to ='static/images/personnels/', default=None)
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
+    editable = models.BooleanField(default=True)
     recorderId = models.IntegerField(default=None)
     recordDate = models.DateTimeField(auto_now_add=True)
     editorId = models.IntegerField(default=None)

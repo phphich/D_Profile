@@ -136,10 +136,14 @@ class PersonnelForm(forms.ModelForm):
             ('สายวิชาการ', 'สายวิชาการ'),
             ('สายสนับสนุน', 'สายสนับสนุน'),
         )
+        EDITABLE_CHOICES = (
+            (True, 'อนุญาตให้แก้ไขได้'),
+            (False, 'ไม่อนุญาตให้แก้ไข'),
+        )
 
         model = Personnel
         fields = ('sId', 'title', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
-                  'birthDate', 'hiringDate', 'division', 'picture', 'email', 'recorderId', 'editorId')
+                  'birthDate', 'hiringDate', 'division', 'picture', 'email', 'editable', 'recorderId', 'editorId')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
             'sId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
@@ -156,6 +160,7 @@ class PersonnelForm(forms.ModelForm):
             'hiringDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'picture': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'division': forms.Select(attrs={'class': 'form-control'}),
+            'editable':forms.RadioSelect(choices=EDITABLE_CHOICES, attrs={'class': ''}),
             'recorderId': forms.HiddenInput(),
             'editorId': forms.HiddenInput(),
         }
@@ -176,6 +181,7 @@ class PersonnelForm(forms.ModelForm):
             'hiringDate': 'วันที่เริ่มบรรจุเข้าทำงาน',
             'picture': 'รูปภาพ',
             'division':'สังกัดสาขา',
+            'editable': 'การแก้ไขโดยบุคลากร',
             'recorderId':'รหัสผู้บันทึก',
             'editorId': 'รหัสผู้แก้ไข',
         }
@@ -183,7 +189,10 @@ class PersonnelForm(forms.ModelForm):
     def updateForm(self):
         # self.fields['email'].widget.attrs['readonly'] = True
         # self.fields['email'].label = 'ที่อยู่อีเมล์ [ไม่อนุญาตให้แก้ไขได้]'
-        pass
+        del self.fields['editable']
+
+
+        # pass
 
     def deleteForm(self):
         self.fields['email'].widget.attrs['readonly'] = True
@@ -200,6 +209,7 @@ class PersonnelForm(forms.ModelForm):
         self.fields['hiringDate'].widget.attrs['readonly'] = True
         self.fields['picture'].widget.attrs['readonly'] = True
         self.fields['division'].widget.attrs['readonly'] = True
+
 
 class EducationForm(forms.ModelForm):
     class Meta:

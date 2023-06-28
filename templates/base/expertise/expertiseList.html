@@ -75,7 +75,11 @@
                 <th class="col-5">เรื่อง/ประเด็นที่เชี่ยวชาญ</th>
                 <th class="col-5">ประสบการณ์</th>
                 <th class="col col-2">
-                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
+                    {% if request.session.userType in 'Administrator, Staff' %}
+                        <a href="{% url 'expertiseNew' personnel.id %}"
+                                             class="btn btn-sm btn-primary  text-white" style="width: 100%"><i
+                            class="fa fa-plus"></i> เพิ่มความเชี่ยวชาญ </a>
+                    {% elif request.session.userId == personnel.id and personnel.editable == True %}
                         <a href="{% url 'expertiseNew' personnel.id %}"
                                              class="btn btn-sm btn-primary  text-white" style="width: 100%"><i
                             class="fa fa-plus"></i> เพิ่มความเชี่ยวชาญ </a>
@@ -94,9 +98,12 @@
 {#                        {% endif %}#}
                     </td>
                     <td class="col-2 text-center">
-                        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == personnel.id%}
-    {#                        <a href="{% url 'expertiseDetail' expert.id %}" class="btn btn-light"> <i#}
-    {#                                class="fa fa-search"> </i> </a>#}
+                        {% if request.session.userType in 'Administrator, Staff' %}
+                            <a href="{% url 'expertiseUpdate' expert.id %}" class="btn btn-warning"> <i
+                                    class="fa fa-tools"> </i> </a>
+                            <a href="{% url 'expertiseDelete' expert.id %}" class="btn btn-danger"> <i
+                                    class="fa fa-trash"> </i> </a>
+                        {% elif request.session.userId == personnel.id and personnel.editable == True %}
                             <a href="{% url 'expertiseUpdate' expert.id %}" class="btn btn-warning"> <i
                                     class="fa fa-tools"> </i> </a>
                             <a href="{% url 'expertiseDelete' expert.id %}" class="btn btn-danger"> <i
@@ -107,5 +114,12 @@
             {% endfor %}
         </table>
     {% endif %}
-
+    <div class="row">
+        <div class="col-12 text-center">
+            <br><br>
+            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            </button>
+        </div>
+    </div>
 {% endblock %}
