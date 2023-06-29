@@ -2,276 +2,285 @@
 {% load static %}
 {% load custom_tags %}
 {% block content %}
-    <div class="row">
-        <div class="col-10">
-            <h2><i class="fa fa-person-hiking"></i> รายละเอียดการลา </h2>
-            <h4> {{ leave.personnel }},  สังกัด: {{ leave.personnel.division }}  </h4>
-        </div>
-        <div class="col-2">
-            <img src="{% static leave.personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"
-                 class="rounded-circle">
-        </div>
+<div class="row">
+    <div class="col-10">
+        <h2><i class="fa fa-person-hiking"></i> รายละเอียดการลา </h2>
+        <h4> {{ leave.personnel }}, สังกัด: {{ leave.personnel.division }}  </h4>
     </div>
+    <div class="col-2">
+        <img src="{% static leave.personnel.picture %}" width="75px" height="auto" style="margin-top:10px;"
+             class="rounded-circle">
+    </div>
+</div>
 
-    <hr class="text-primary">
-    <table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
-        <tr>
-            <th class="col-3 text-primary">ปีงบประมาณ</th>
-            <td class="col-9">{{ leave.fiscalYear }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">ประเภทการลา</th>
-            <td>{{ leave.leaveType }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">ปีการศึกษา</th>
-            <td>{{ leave.eduYear }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">วันที่เริ่มต้น</th>
-            <td>{{ leave.startDate }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">วันที่สิ้นสุด</th>
-            <td>{{ leave.endDate }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">จำนวนวันลา</th>
-            <td>{{ leave.days }}</td>
-        </tr>
-        <tr>
-            <th class="text-primary">เหตุผลประกอบการลา</th>
-            <td>{{ leave.reason | linebreaks }}</td>
-        </tr>
-    </table>
-    <p class="text-end text-secondary" style="border-color: #6c757d">
-        <i>{{ leave.getRecorderAndEditor }} </i>
-    </p>
+<hr class="text-primary">
+<table class="table table-light table-striped table-hover" style="border:2px; border-color: #0b5ed7">
+    <tr>
+        <th class="col-3 text-primary">ปีงบประมาณ</th>
+        <td class="col-9">{{ leave.fiscalYear }}</td>
+    </tr>
+    <tr>
+        <th class="text-primary">ประเภทการลา</th>
+        <td>{{ leave.leaveType }}</td>
+    </tr>
+    <tr>
+        <th class="text-primary">ปีการศึกษา</th>
+        <td>{{ leave.eduYear }}</td>
+    </tr>
+    <tr>
+        <th class="text-primary">วันที่เริ่มต้น</th>
+        <td>{{ leave.startDate }}</td>
+    </tr>
+    <tr>
+        <th class="text-primary">วันที่สิ้นสุด</th>
+        <td>{{ leave.endDate }}</td>
+    </tr>
+    <tr>
+        <th class="text-primary">จำนวนวันลา</th>
+        <td>{{ leave.days }}</td>
+    </tr>
+    <tr>
+        <th class="text-primary">เหตุผลประกอบการลา</th>
+        <td>{{ leave.reason | linebreaks }}</td>
+    </tr>
+</table>
+<p class="text-end text-secondary" style="border-color: #6c757d">
+    <i>{{ leave.getRecorderAndEditor }}
+        {% if leave.editable == False %}
+            &lt;&lt;กำหนดสถานะการป้องกันการแก้ไขไว้&gt;&gt;
+        {% endif %}
+    </i>
+</p>
 
-    <p class="text-center">
-        {% if request.session.previous_url == 'None' %}
-            <button type="button" class="btn btn-secondary"
-                    onclick="history.back();">
-                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+<p class="text-center">
+    {% if request.session.previous_url == 'None' %}
+        <button type="button" class="btn btn-secondary"
+                onclick="history.back();">
+            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        </button>
+    {% elif request.session.userType != 'Personnel' %}
+        <button type="button" class="btn btn-secondary"
+                onclick="location.href='{% url 'leaveList' leave.personnel.division.id leave.personnel.id %}'">
+            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        </button>
+    {% else %}
+        <button type="button" class="btn btn-secondary"
+                onclick="location.href='{% url 'leaveList' %}'">
+            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        </button>
+    {% endif %}
+    {% if request.session.userType in 'Administrator, Staff, Personnel' %}
+        {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+            <button type="button" class="btn btn-secondary" disabled>
+                <i class="fa fa-tools"></i> (หมดอายุแก้ไข)
             </button>
-        {% elif request.session.userType != 'Personnel' %}
-            <button type="button" class="btn btn-secondary"
-                    onclick="location.href='{% url 'leaveList' leave.personnel.division.id leave.personnel.id %}'">
-                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        {% elif request.session.userId == leave.personnel.id and leave.editable == False %}
+            <button type="button" class="btn btn-secondary">
+                <i class="fa fa-ban"></i> ชุดข้อมูลได้รับการป้องกันการแก้ไข
             </button>
         {% else %}
-            <button type="button" class="btn btn-secondary"
-                    onclick="location.href='{% url 'leaveList' %}'">
-                <i class="fa fa-rotate-back"></i> ย้อนกลับ
+            <button type="button" class="btn btn-warning"
+                    onclick="location.href='{% url 'leaveUpdate' leave.id %}'">
+                <i class="fa fa-tools"></i> แก้ไข
             </button>
         {% endif %}
-        {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
-            {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
-                <button type="button" class="btn btn-secondary" disabled>
-                    <i class="fa fa-tools"></i> (หมดอายุแก้ไข)
-                </button>
-            {% else %}
-                <button type="button" class="btn btn-warning"
-                        onclick="location.href='{% url 'leaveUpdate' leave.id %}'">
-                    <i class="fa fa-tools"></i> แก้ไข
-                </button>
-            {% endif %}
-        {% endif %}
-    </p>
+    {% endif %}
+</p>
 
-    <div class="row">
-        <div class="col-12 text-success">
-            <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
-                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
-                    {% else %}
-                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
-                            <i class="fa fa-plus text-primary"></i>
-                        </button>
-                    {% endif %}
-                {% endif %}
-            </h5>
-            <div id="uploadfiles" class="collapse">
-                <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
-                    {% csrf_token %}
-                    <div class="row text-danger">
-                        <div class="col-3">
-                            {{ fileForm.as_table }}
-                        </div>
-                        <div class="col-9" id="fileList">
-                            <p class="text-danger"><i> *** หมายเหตุ:
-                                ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทยหรือใช้สัญลักษณ์พิเศษ </i>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-5 text-center">
-                            <input type="hidden" name="id" value="{{ leave.id }}">
-                            <input type="hidden" name="action" value="uploadfile">
-                        </div>
-                        <div class="col-2 text-center" id="upload">
-                            <br>
-                            <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload"></i>
-                                อัพโหลดไฟล์เอกสาร
-                            </button>
-                            <br>
-                        </div>
-                        <div class="col-5 text-center"></div>
-                    </div>
-                </form>
-            </div>
-            <p class="text-info">
-                {% if leave.getLeaveFiles|length == 0 %}
-                    <div class="row">
-                        <div class="col-2"></div>
-                        <div class="alert-warning col-8 text-center">
-                            <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบการลานี้ในระบบ....<br><br></div>
-                        <div class="col-2"></div>
-                    </div>
+<div class="row">
+    <div class="col-12 text-success">
+        <h5><i class="fa fa-book"></i> รายการไฟล์เอกสารแนบ:
+            {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
                 {% else %}
-                    <div class="row">
-                        {% for f in leave.getLeaveFiles %}
-                            <div class="col-3">
-                                <a href="{% static 'documents/leave/' %}{{ f.file }}" target="_blank">
-                                    {% if f.filetype == "pdf" %}
-                                        <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadfiles">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                {% endif %}
+            {% endif %}
+        </h5>
+        <div id="uploadfiles" class="collapse">
+            <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
+                {% csrf_token %}
+                <div class="row text-danger">
+                    <div class="col-3">
+                        {{ fileForm.as_table }}
+                    </div>
+                    <div class="col-9" id="fileList">
+                        <p class="text-danger"><i> *** หมายเหตุ:
+                            ระบบอาจไม่รองรับบางไฟล์กรณีที่ตั้งชื่อไฟล์เป็นภาษาไทยหรือใช้สัญลักษณ์พิเศษ </i>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5 text-center">
+                        <input type="hidden" name="id" value="{{ leave.id }}">
+                        <input type="hidden" name="action" value="uploadfile">
+                    </div>
+                    <div class="col-2 text-center" id="upload">
+                        <br>
+                        <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload"></i>
+                            อัพโหลดไฟล์เอกสาร
+                        </button>
+                        <br>
+                    </div>
+                    <div class="col-5 text-center"></div>
+                </div>
+            </form>
+        </div>
+        <p class="text-info">
+            {% if leave.getLeaveFiles|length == 0 %}
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="alert-warning col-8 text-center">
+                        <br>....ยังไม่ได้อัพโหลดไฟล์เอกสารแนบการลานี้ในระบบ....<br><br></div>
+                    <div class="col-2"></div>
+                </div>
+            {% else %}
+                <div class="row">
+                    {% for f in leave.getLeaveFiles %}
+                        <div class="col-3">
+                            <a href="{% static 'documents/leave/' %}{{ f.file }}" target="_blank">
+                                {% if f.filetype == "pdf" %}
+                                    <img src="{% static 'images/iconfiles/pdf-icon.png' %}" width="70px"
+                                         class="img-thumbnail">
+                                {% else %}
+                                    {% if f.filetype == "doc" or f.filetype == "docx" %}
+                                        <img src="{% static 'images/iconfiles/doc-icon.png' %}" width="80px"
                                              class="img-thumbnail">
                                     {% else %}
-                                        {% if f.filetype == "doc" or f.filetype == "docx" %}
-                                            <img src="{% static 'images/iconfiles/doc-icon.png' %}" width="80px"
+                                        {% if f.filetype == "xls" or f.filetype == "xlsx" %}
+                                            <img src="{% static 'images/iconfiles/xls-icon.png' %}" width="80px"
                                                  class="img-thumbnail">
                                         {% else %}
-                                            {% if f.filetype == "xls" or f.filetype == "xlsx" %}
-                                                <img src="{% static 'images/iconfiles/xls-icon.png' %}" width="80px"
+                                            {% if f.filetype == "ppt" or f.filetype == "pptx" %}
+                                                <img src="{% static 'images/iconfiles/ppt-icon.png' %}" width="80px"
                                                      class="img-thumbnail">
                                             {% else %}
-                                                {% if f.filetype == "ppt" or f.filetype == "pptx" %}
-                                                    <img src="{% static 'images/iconfiles/ppt-icon.png' %}" width="80px"
-                                                         class="img-thumbnail">
+                                                {% if f.filetype == "jpg" or f.filetype == "png" or f.filetype == "jpeg" or f.filetype == "gif" %}
+                                                    <img src="{% static 'images/iconfiles/img-icon.png' %}"
+                                                         width="80px" class="img-thumbnail">
                                                 {% else %}
-                                                    {% if f.filetype == "jpg" or f.filetype == "png" or f.filetype == "jpeg" or f.filetype == "gif" %}
-                                                        <img src="{% static 'images/iconfiles/img-icon.png' %}"
-                                                             width="80px" class="img-thumbnail">
-                                                    {% else %}
-                                                        <img src="{% static 'images/iconfiles/txt-icon.png' %}"
-                                                             width="80px" class="img-thumbnail">
-                                                    {% endif %}
+                                                    <img src="{% static 'images/iconfiles/txt-icon.png' %}"
+                                                         width="80px" class="img-thumbnail">
                                                 {% endif %}
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
-                                    <br>
-                                </a>
-                                <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
-                                    {% if f.file.name|length|get_digit:"-1" > 30 %}
-                                        {{ f.file.name|slice:"0:30" }}...
-                                    {% else %}
-                                        {{ f.file.name }}
-                                    {% endif %}
-                                </a>
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
-                                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
-                                    {% else %}
-                                        <a href="{% url 'leaveDeleteFile' f.id %}"
-                                           onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
-                                            <i class="fas fa-minus text-danger"></i>
-                                        </a>
-                                    {% endif %}
                                 {% endif %}
-                            </div>
-                        {% endfor %}
-                    </div>
-                    {% if leave.getLeaveFiles|length > 1 %}
-                        <div class="row">
-                            <div class="col-3">
-                                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
-                                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
-                                    {% else %}
-                                        <a href="{% url 'leaveDeleteFileAll' leave.id %}"
-                                           onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
-                                           class="btn btn-danger">
-                                            <i class="fas fa-trash text-white"></i>
-                                            ลบไฟล์เอกสารแนบทั้งหมด!
-                                        </a>
-                                    {% endif %}
+                                <br>
+                            </a>
+                            <a href="{% static 'documents/leave/' %}{{ f.file }}" class="filelink" target="_blank">
+                                {% if f.file.name|length|get_digit:"-1" > 30 %}
+                                    {{ f.file.name|slice:"0:30" }}...
+                                {% else %}
+                                    {{ f.file.name }}
                                 {% endif %}
-                            </div>
-                            <div class="col-9"></div>
+                            </a>
+                            {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                                {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                                {% else %}
+                                    <a href="{% url 'leaveDeleteFile' f.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารแนบนี้' )">
+                                        <i class="fas fa-minus text-danger"></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
                         </div>
-                    {% endif %}
-                {% endif %}
-            </p>
-        </div>
-    </div>
-    <br><br>
-
-    <div class="row">
-        <div class="col-12 text-success">
-            <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
-                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
-                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
-                    {% else %}
-                        <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
-                            <i class="fa fa-plus text-primary"></i>
-                        </button>
-                    {% endif %}
-                {% endif %}
-            </h5>
-        </div>
-        <div id="uploadlinks" class="collapse">
-            <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
-                {% csrf_token %}
-                {{ urlForm.as_table }}
-                <p class="text-center">
-                    <br>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
-                    </button>
-                    <input type="hidden" name="id" value="{{ leave.id }}">
-                    <input type="hidden" name="action" value="uploadLink">
-                </p>
-            </form>
-        </div>
-        <p class="text-primary">
-        <ul class="list-group">
-            {% for link in leave.getLeaveURLs %}
-                <li class="list-group-item text-primary">
-                    <img src="{% static 'images/iconfiles/web-icon.png' %}" width="40px">
-                    <a href={{ link.url }} class="filelink" target="_blank">
-                        <i class="fas fa-caret-right"></i> {{ link }}
-                    </a>
-                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
-                        {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
-                        {% else %}
-                            <a href="{% url 'leaveDeleteURL' link.id %}"
-                               onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
-                                <i class="fas fa-minus text-danger"></i>
-                            </a>
-                        {% endif %}
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-
-        {% if leave.getLeaveURLs|length > 1 %}
-            <div class="row">
-                <div class="col-3">
-                    {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id%}
-                        {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
-                        {% else %}
-                            <a href="{% url 'leaveDeleteURLAll' leave.id %}"   onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
-                               class="btn btn-danger">
-                                <i class="fas fa-trash text-white"></i>
-                                ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
-                            </a>
-                        {% endif %}
-                    {% endif %}
+                    {% endfor %}
                 </div>
-                <div class="col-9"></div>
-            </div>
-        {% endif %}
+                {% if leave.getLeaveFiles|length > 1 %}
+                    <div class="row">
+                        <div class="col-3">
+                            {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                                {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                                {% else %}
+                                    <a href="{% url 'leaveDeleteFileAll' leave.id %}"
+                                       onclick="return confirm('โปรดยืนยันการลบไฟล์เอกสารทั้งหมด!!!' )"
+                                       class="btn btn-danger">
+                                        <i class="fas fa-trash text-white"></i>
+                                        ลบไฟล์เอกสารแนบทั้งหมด!
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="col-9"></div>
+                    </div>
+                {% endif %}
+            {% endif %}
         </p>
     </div>
-    <br><br>
+</div>
+<br><br>
+
+<div class="row">
+    <div class="col-12 text-success">
+        <h5><i class="fas fa-link"></i> ลิงก์(Link)ตำแหน่งไฟล์เอกสารแนบ:
+            {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                {% else %}
+                    <button class="btn text-danger btn-light" data-bs-toggle="collapse" data-bs-target="#uploadlinks">
+                        <i class="fa fa-plus text-primary"></i>
+                    </button>
+                {% endif %}
+            {% endif %}
+        </h5>
+    </div>
+    <div id="uploadlinks" class="collapse">
+        <form method="post" enctype="multipart/form-data" class="form-control text-primary" lang="th">
+            {% csrf_token %}
+            {{ urlForm.as_table }}
+            <p class="text-center">
+                <br>
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-floppy-disk"></i> บันทึกลิงก์
+                </button>
+                <input type="hidden" name="id" value="{{ leave.id }}">
+                <input type="hidden" name="action" value="uploadLink">
+            </p>
+        </form>
+    </div>
+    <p class="text-primary">
+    <ul class="list-group">
+        {% for link in leave.getLeaveURLs %}
+            <li class="list-group-item text-primary">
+                <img src="{% static 'images/iconfiles/web-icon.png' %}" width="40px">
+                <a href={{ link.url }} class="filelink" target="_blank">
+                    <i class="fas fa-caret-right"></i> {{ link }}
+                </a>
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <a href="{% url 'leaveDeleteURL' link.id %}"
+                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารแนบนี้' )">
+                            <i class="fas fa-minus text-danger"></i>
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if leave.getLeaveURLs|length > 1 %}
+        <div class="row">
+            <div class="col-3">
+                {% if request.session.userType in 'Administrator, Staff' or request.session.userId == leave.personnel.id %}
+                    {% if request.session.userId == leave.personnel.id and leave.recordDate|getTimeUpdate == False %}
+                    {% else %}
+                        <a href="{% url 'leaveDeleteURLAll' leave.id %}"
+                           onclick="return confirm('โปรดยืนยันการลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!!!' )"
+                           class="btn btn-danger">
+                            <i class="fas fa-trash text-white"></i>
+                            ลบลิงก์ตำแหน่งไฟล์เอกสารทั้งหมด!
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="col-9"></div>
+        </div>
+    {% endif %}
+    </p>
+</div>
+<br><br>
 
 {% endblock %}

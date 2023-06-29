@@ -16,10 +16,14 @@ class LeaveForm(forms.ModelForm):
             ("ลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน", "ลาไปศึกษา/ฝึกอบรม/ปฏิบัติการวิจัย/ดูงาน"),
             ("ลาไปปฏิบัติงานในองค์กรระหว่างประเทศ", "ลาไปปฏิบัติงานในองค์กรระหว่างประเทศ")
         )
+        EDITABLE_CHOICES = (
+            (True, 'อนุญาตให้แก้ไขได้'),
+            (False, 'ป้องกันการแก้ไข'),
+        )
         model = Leave
         fields = (
             'fiscalYear', 'leaveType', 'eduYear', 'startDate', 'endDate', 'days', 'reason', 'personnel',
-            'recorder', 'editor')
+            'editable', 'recorder', 'editor')
         widgets = {
             'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date',
                                                   'onchange': 'javascript:chkDateDiff();'}),
@@ -31,6 +35,7 @@ class LeaveForm(forms.ModelForm):
             'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'leaveType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
             'reason': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
+            'editable':forms.RadioSelect(choices=EDITABLE_CHOICES, attrs={'class': ''}),
             'personnel': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
             'editor': forms.HiddenInput(),
@@ -44,9 +49,13 @@ class LeaveForm(forms.ModelForm):
             'days': 'จำนวนวันที่ลา',
             'reason': 'เหตุผลประกอบการลา',
             'personnel': 'บุคลากร',
+            'editable': 'การแก้ไขโดยบุคลากร',
             'recorder': 'ผู้บันทึก',
             'editor': 'ผู้แก้ไข'
         }
+
+    def updateForm(self):
+        del self.fields['editable']
 
     def deleteForm(self):
         self.fields['startDate'].widget.attrs['readonly'] = True
@@ -79,7 +88,6 @@ class LeaveFileForm(forms.ModelForm):
             'leave': 'ใบลา',
             'recorder': 'ผู้บันทึก',
         }
-
 
 class LeaveURLForm(forms.ModelForm):
     class Meta:

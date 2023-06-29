@@ -1,6 +1,5 @@
 from django import forms
 from .models import *
-from django.contrib.admin.widgets import AdminDateWidget
 
 class FacultyForm(forms.ModelForm):
     class Meta:
@@ -138,7 +137,7 @@ class PersonnelForm(forms.ModelForm):
         )
         EDITABLE_CHOICES = (
             (True, 'อนุญาตให้แก้ไขได้'),
-            (False, 'ไม่อนุญาตให้แก้ไข'),
+            (False, 'ป้องกันการแก้ไข'),
         )
 
         model = Personnel
@@ -190,9 +189,6 @@ class PersonnelForm(forms.ModelForm):
         # self.fields['email'].widget.attrs['readonly'] = True
         # self.fields['email'].label = 'ที่อยู่อีเมล์ [ไม่อนุญาตให้แก้ไขได้]'
         del self.fields['editable']
-
-
-        # pass
 
     def deleteForm(self):
         self.fields['email'].widget.attrs['readonly'] = True

@@ -102,8 +102,12 @@
                             {% if request.session.userId == personnel.id and leave.recordDate|getTimeUpdate == False %}
                                 <button class="btn btn-secondary" disabled>  <i class="fas fa-file-archive"></i> </button>
                             {% else %}
-                                <a href="{% url 'leaveUpdate' leave.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
-                                <a href="{% url 'leaveDelete' leave.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                                {% if request.session.userId == personnel.id and leave.editable == False %}
+                                    <button class="btn btn-secondary" disabled>  <i class="fas fa-file-archive"></i> </button>
+                                {% else %}
+                                    <a href="{% url 'leaveUpdate' leave.id %}" class="btn btn-warning"> <i class="fa fa-tools"> </i> </a>
+                                    <a href="{% url 'leaveDelete' leave.id %}" class="btn btn-danger"> <i class="fa fa-trash"> </i> </a>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
                     </td>

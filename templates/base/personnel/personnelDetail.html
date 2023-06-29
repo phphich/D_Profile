@@ -79,10 +79,9 @@
             </table>
             <p class="text-end text-secondary" style="border-color: #6c757d">
                 <i>{{ personnel.getRecorderAndEditor }}
-                    {% if personnel.editable == False %}
-                        <<กำหนดสถานะการป้องกันการแก้ไขไว้>>
+                    {% if request.session.userType in 'Administrator, Staff' and personnel.editable == False %}
+                        &lt;&lt;กำหนดสถานะการป้องกันการแก้ไขไว้&gt;&gt;
                     {% endif %}
-
                 </i>
             </p>
         </div>

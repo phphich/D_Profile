@@ -11,6 +11,7 @@ class Leave(models.Model):
     leaveType = models.CharField(max_length=50, default=None)
     reason = models.CharField(max_length=255, default=None)
     personnel = models.ForeignKey(Personnel, related_name='PersonnelLeave', on_delete=models.CASCADE, default=None)
+    editable = models.BooleanField(default=True)
     recorder = models.ForeignKey(Personnel, related_name='RecorderLeave', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     editor = models.ForeignKey(Personnel, related_name='EditorLeave', on_delete=models.CASCADE, default=None)
