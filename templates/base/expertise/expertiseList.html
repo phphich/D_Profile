@@ -120,6 +120,11 @@
             <button type="button" class="btn btn-secondary" onclick="history.back()">
                 <i class="fa fa-rotate-back"></i> ย้อนกลับ
             </button>
+            {% if personnel.editable == False %}
+                <button type="button" class="btn btn-secondary">
+                    <i class="fa fa-ban"></i> ชุดข้อมูลได้รับการป้องกันการแก้ไข
+                </button>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
