@@ -30,7 +30,7 @@ def getSession(request, dtype=None, did=None):
 def personnelReport(request, divId=None, reportType=None):
     divisions = Division.objects.all().order_by('name_th')
     if divisions is None:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงานข้อมูลบุคลากร')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
 
@@ -87,7 +87,7 @@ def personnelReport(request, divId=None, reportType=None):
 def trainingReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, reportType=None):
     trainingCount = Training.objects.all().count()
     if trainingCount == 0:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงานข้อมูลการฝึกอบรม/สัมมนา')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     fiscalYearTrainings = statistic.getTrainingFiscalYears() #ปีฝึกอบรมที่มีในฐานข้อมูล
@@ -157,7 +157,7 @@ def trainingReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None
 def leaveReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, reportType=None):
     leaveCount = Leave.objects.all().count()
     if leaveCount == 0:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงานข้อมูลการลา')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     fiscalYearLeaves = statistic.getLeaveFiscalYears() #ปีที่ลาที่มีในฐานข้อมูล
@@ -228,7 +228,7 @@ def leaveReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, r
 def performanceReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=None, reportType=None):
     performanceCount = Performance.objects.all().count()
     if performanceCount == 0:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงานข้อมูลผลงานและรางวัล')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     fiscalYearPerformances = statistic.getPerformanceFiscalYears() #ปีรับผลงานที่มีในฐานข้อมูล
@@ -299,7 +299,7 @@ def performanceReport(request, divId=None, fiscalYearStart=None, fiscalYearEnd=N
 def researchReport(request, budgetType=None, fiscalYearStart=None, fiscalYearEnd=None, reportType=None):
     researchCount = Research.objects.all().count()
     if researchCount == 0:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงานข้อมูลการวิจัย')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     fiscalYearResearchs = statistic.getResearchFiscalYears() #ปีวิจัยที่มีในฐานข้อมูล
@@ -393,7 +393,7 @@ def researchReport(request, budgetType=None, fiscalYearStart=None, fiscalYearEnd
 def socialserviceReport(request, budgetType=None, fiscalYearStart=None, fiscalYearEnd=None, reportType=None):
     socialserviceCount = SocialService.objects.all().count()
     if socialserviceCount == 0:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงานข้อมูลการบริการทางวิชาการแก่สังคม')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     fiscalYearSocialServices = statistic.getSocialServiceFiscalYears() #ปีวิจัยที่มีในฐานข้อมูล
@@ -484,7 +484,7 @@ def socialserviceReport(request, budgetType=None, fiscalYearStart=None, fiscalYe
 def commandReport(request, mission=None, eduYearStart=None, eduYearEnd=None, reportType=None):
     commandCount = Command.objects.all().count()
     if commandCount == 0:
-        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงาน')
+        messages.add_message(request, messages.ERROR, 'ข้อมูลไม่เพียงพอต่อการนำเสนอรายงานข้อมูลคำสั่ง')
         return redirect(request.session['last_url'])
     request.session['last_url'] = request.path_info
     eduYearCommands = statistic.getCommandEduYears() #ปีออกคำสั้่งที่มีในฐานข้อมูล

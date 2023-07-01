@@ -35,7 +35,7 @@ class LeaveForm(forms.ModelForm):
             'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'leaveType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
             'reason': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
-            'editable':forms.RadioSelect(choices=EDITABLE_CHOICES, attrs={'class': ''}),
+            'editable': forms.RadioSelect(choices=EDITABLE_CHOICES, attrs={'class': ''}),
             'personnel': forms.HiddenInput(),
             'recorder': forms.HiddenInput(),
             'editor': forms.HiddenInput(),

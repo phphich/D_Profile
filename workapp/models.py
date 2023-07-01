@@ -1,4 +1,4 @@
-import fileinput
+# import fileinput
 from django.db import models
 from baseapp.models import *
 
