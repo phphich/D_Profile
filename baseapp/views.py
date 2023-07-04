@@ -1081,7 +1081,7 @@ def decorationNew(request, id):
             name_sh = common.getDecorationName_sh(name_full)
             newForm.name_sh = name_sh
             newForm.save()
-            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลเครื่องราชอิสริยาภรณ์เรียบร้อย')
+            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลการรับเครื่องราชอิสริยาภรณ์เรียบร้อย')
             return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
@@ -1129,7 +1129,7 @@ def decorationUpdate(request, id):
             updateForm.editor = recorder
             updateForm.editDate = datetime.datetime.now()
             updateForm.save()
-            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลเครื่องราชอิสริยาภรณ์เรียบร้อย')
+            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลการรับเครื่องราชอิสริยาภรณ์เรียบร้อย')
             return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
@@ -1141,20 +1141,20 @@ def decorationUpdate(request, id):
 
 @login_required(login_url='userAuthen')
 def decorationDelete(request, id):
-    decoration =  Education.objects.filter(id=id).first()
+    decoration =  Decoration.objects.filter(id=id).first()
     if decoration is None:
         messages.add_message(request, messages.ERROR, msgErrorId)
         return redirect(request.session['last_url'])
-    getSession(request, dtype='Education', did=decoration.id)
+    getSession(request, dtype='Decoration', did=decoration.id)
     if common.chkPermission(decorationDelete.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
         messages.add_message(request, messages.ERROR, msgErrorPermission)
         return redirect(request.session['last_url'])
     personnel = decoration.personnel
-    form = EducationForm(instance=decoration)
+    form = DecorationForm(instance=decoration)
     if request.method == 'POST':
         divisions = Division.objects.all().order_by('name_th')
         decoration.delete()
-        messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลการศึกษาที่เลือกเรียบร้อย')
+        messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลการรับเครื่องราชอิสริยาภรณ์ที่เลือกเรียบร้อย')
         return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
     else:
         form.deleteForm()
