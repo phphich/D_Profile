@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="row">
+        <div class="col-10">
+            <h2> <i class="fas fa-crown"></i> รายละเอียดเครื่องราชอิสริยาภรณ์ </h2>
+            <h4> {{ decoration.personnel.status }},  สังกัด: {{ decoration.personnel.division }}  </h4>
+        </div>
+        <div class="col-2">
+            <img src="{% static decoration.personnel.picture %}" width="100px" height="auto" style="margin-top:10px;" class="rounded-circle">
+        </div>
+    </div>
+
+    <hr class="text-primary">
+    <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
+        <tr>
+            <th class="col-3 text-primary">วันที่ได้รับ</th>
+            <td class="col-9">{{ decoration.getDate | date:'d/m/Y' }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ลำดับชั้น </th>
+            <td>{{ decoration.level }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ชื่อชั้นเครื่องราชอิสริยาภรณ์</th>
+            <td>{{ decoration.name }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ชื่อย่อ </th>
+            <td>{{ decoration.name_sh }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ประเภท</th>
+            <td>{{ decoration.type }}</td>
+        </tr>         
+    </table>
+    <p class="text-end text-secondary" style="border-color: #6c757d">
+        <i>{{ decoration.getRecorderAndEditor }} </i>
+    </p>
+    <p class="text-center">
+        <button type="button" class="btn btn-secondary" onclick="history.back()">
+            <i class="fa fa-rotate-back"></i> ย้อนกลับ
+        </button>
+        {% if request.session.userType in 'Administrator, Staff' %}
+            <button type="button" class="btn btn-warning"
+                    onclick="location.href='{% url 'decorationUpdate' decoration.id  %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
+        {% elif request.session.userId == decoration.personnel.id and decoration.personnel.editable == True %}
+            <button type="button" class="btn btn-warning"
+                    onclick="location.href='{% url 'decorationUpdate' decoration.id  %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
+        {% elif request.session.userType in 'Manager, Header' and request.session.userId == decoration.personnel.id and decoration.personnel.editable == True %}
+            <button type="button" class="btn btn-warning"
+                    onclick="location.href='{% url 'decorationUpdate' decoration.id  %}'">
+                <i class="fa fa-tools"></i> แก้ไข
+            </button>
+        {% else %}
+            <button type="button" class="btn btn-secondary">
+                <i class="fa fa-ban"></i> ชุดข้อมูลได้รับการป้องกันการแก้ไข
+            </button>
+        {% endif %}
+    </p>
+{% endblock %}

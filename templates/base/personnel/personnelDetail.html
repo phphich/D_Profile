@@ -42,6 +42,26 @@
                     <th class="text-primary">นามสกุล (ภาษาอังกฤษ)</th>
                     <td>{{ personnel.lastname_en }}</td>
                 </tr>
+                <tr>
+                    <th class="text-primary">เพศ</th>
+                    <td>{{ personnel.gender }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">ที่อยู่</th>
+                    <td>{{ personnel.address }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">เบอร์โทรศัพท์</th>
+                    <td>{{ personnel.telephone }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">วันเดือนปีเกิด</th>
+                    <td>{{ personnel.birthDate }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">วันที่เริ่มบรรจุเข้าทำงาน</th>
+                    <td>{{ personnel.hiringDate }}</td>
+                </tr>
                 {% if personnel.type != 'สายสนับสนุน' %}
                     <tr>
                         <th class="text-primary">ตำแหน่ง</th>
@@ -53,24 +73,12 @@
                     <td>{{ personnel.type }}</td>
                 </tr>
                 <tr>
-                    <th class="text-primary">ที่อยู่</th>
-                    <td>{{ personnel.address }}</td>
-                </tr>
-                <tr>
-                    <th class="text-primary">เพศ</th>
-                    <td>{{ personnel.gender }}</td>
-                </tr>
-                <tr>
-                    <th class="text-primary">วันเดือนปีเกิด</th>
-                    <td>{{ personnel.birthDate }}</td>
-                </tr>
-                <tr>
-                    <th class="text-primary">วันที่เริ่มบรรจุเข้าทำงาน</th>
-                    <td>{{ personnel.hiringDate }}</td>
-                </tr>
-                <tr>
                     <th class="text-primary">สังกัดสาขา</th>
                     <td>{{ personnel.division.name_th }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">สถานะการปฏิบัติหน้าที่</th>
+                    <td>{{ personnel.currently }}</td>
                 </tr>
                 <tr>
                     <th class="text-primary">อีเมล์</th>

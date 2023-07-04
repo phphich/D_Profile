@@ -74,12 +74,14 @@ class Personnel(models.Model):
     firstname_en = models.CharField(max_length=50, default="")
     lastname_en = models.CharField(max_length=50, default="")
     status  = models.CharField(max_length=30, default="อาจารย์")
-    type = models.CharField(max_length=30, default="สายวิชาการ")
+    type = models.CharField(max_length=50, default="ข้าราชการ(สายวิชาการ)")
     gender = models.CharField(max_length=15, default="ชาย")
     address = models.TextField(default="")
+    telephone = models.CharField(max_length=20, default="")
     birthDate = models.DateField(default=None)
     hiringDate = models.DateField(default=None)
     picture = models.ImageField(upload_to ='static/images/personnels/', default=None)
+    currently = models.CharField(max_length=50, default="ปฏิบัติหน้าที่ปกติ")
     division = models.ForeignKey(Division, on_delete=models.CASCADE, default=None)
     editable = models.BooleanField(default=True)
     recorderId = models.IntegerField(default=None)
@@ -96,6 +98,9 @@ class Personnel(models.Model):
     def getEducations(self):
         educations = Education.objects.filter(personnel=self).order_by('-yearGraduate')
         return educations
+    def getDecorations(self):
+        decorations = Decoration.objects.filter(personnel=self).order_by('-getDate')
+        return decorations
     def getExpertise(self):
         expertises = Expertise.objects.filter(personnel=self).order_by('id')
         return expertises
@@ -213,6 +218,34 @@ class Education(models.Model):
     def __str__(self):
         return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th +\
                " " + self.degree_th + " " + str(self.yearGraduate)
+    def getRecorderAndEditor(self):
+        recorder = Personnel.objects.filter(id=self.recorder.id).first()
+        editor  = Personnel.objects.filter(id=self.editor.id).first()
+        recordDate = self.recordDate.strftime('%d/%m/%Y %H:%M:%S')
+        editDate = self.editDate.strftime('%d/%m/%Y %H:%M:%S')
+        if recorder == editor and recordDate == editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate +')'
+        elif recorder == editor and recordDate != editDate:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' ('+ recordDate + \
+                   '), แก้ไขเมื่อ:' + ' ('+ editDate +')'
+        else:
+            return 'บันทึกโดย: ' + recorder.firstname_th + ' ' + recorder.lastname_th + ' (' + recordDate + \
+                   '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
+
+class Decoration(models.Model):
+    getDate = models.DateTimeField(default=None)
+    level = models.CharField(max_length=15, default="ชั้นที่ 5")
+    name = models.CharField(max_length=100, default="")
+    name_sh = models.CharField(max_length=30, default="")
+    type  = models.CharField(max_length=30, default="ต่ำกว่าสายสะพาย")
+    personnel = models.ForeignKey(Personnel, related_name='PersonnelDecoration', on_delete=models.CASCADE, default=None)
+    recorder = models.ForeignKey(Personnel, related_name='RecorderDecoration', on_delete=models.CASCADE, default=None)
+    recordDate = models.DateTimeField(auto_now_add=True)
+    editor = models.ForeignKey(Personnel, related_name='EditorDecoration', on_delete=models.CASCADE, default=None)
+    editDate = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return self.personnel.status + self.personnel.firstname_th + " " + self.personnel.lastname_th +\
+               " " + self.name + " " + str(self.name_sh)
     def getRecorderAndEditor(self):
         recorder = Personnel.objects.filter(id=self.recorder.id).first()
         editor  = Personnel.objects.filter(id=self.editor.id).first()

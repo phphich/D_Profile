@@ -51,12 +51,21 @@
         </tr>
         <tr>
             <th class="text-primary">ร้อยละความก้าวหน้า</th>
-            <td>{{ research.percent_success }}%</td>
+            <td>{{ research.percentSuccess }}%</td>
         </tr>
         <tr>
             <th class="text-primary">การเผยแพร่ผลการวิจัย</th>
-            <td>{{ research.publish_method }}</td>
+            <td>{{ research.publishMethod }}</td>
         </tr>
+        <tr>
+            <th class="text-primary">วันที่ตีพิมพ์เผยแพร่</th>
+            <td>{{ research.publishDate }}</td>
+        </tr>
+        <tr>
+            <th class="text-primary">ฐานข้อมูลที่ตีพิมพ์</th>
+            <td>{{ research.publishDb }}</td>
+        </tr>
+
         <tr>
             <th class="text-primary">อ้างอิง (Reference) </th>
             <td>{{ research.reference |linebreaks}}</td>

@@ -24,11 +24,18 @@ urlpatterns = [
     path('<id>/personnelDelete', views.personnelDelete, name='personnelDelete'),
 
     path('educatonList', views.educationList, name='educationList'),
-    path('<divisionId>/<personnelId>/educatonList', views.educationList, name='educationList'),
+    path('<divisionId>/<personnelId>/educationList', views.educationList, name='educationList'),
     path('<id>/educationNew', views.educationNew, name='educationNew'),
     path('<id>/educationDetail', views.educationDetail, name='educationDetail'),
     path('<id>/educationUpdate', views.educationUpdate, name='educationUpdate'),
     path('<id>/educationDelete', views.educationDelete, name='educationDelete'),
+
+    path('decorationList', views.decorationList, name='decorationList'),
+    path('<divisionId>/<personnelId>/decorationList', views.decorationList, name='decorationList'),
+    path('<id>/decorationNew', views.decorationNew, name='decorationNew'),
+    path('<id>/decorationDetail', views.decorationDetail, name='decorationDetail'),
+    path('<id>/decorationUpdate', views.decorationUpdate, name='decorationUpdate'),
+    path('<id>/decorationDelete', views.decorationDelete, name='decorationDelete'),
 
     path('expertiseList', views.expertiseList, name='expertiseList'),
     path('<divisionId>/<personnelId>/expertiseList', views.expertiseList, name='expertiseList'),

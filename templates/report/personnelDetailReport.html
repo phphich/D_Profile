@@ -102,24 +102,28 @@
                     <td>{{ personnel.firstname_en }} {{ personnel.lastname_en }}</td>
                 </tr>
                 <tr>
-                    <th class="text-primary">ประเภทบุคลากร</th>
-                    <td> {{ personnel.status }}</td>
-                    <th class="text-primary">ประเภทบุคลากร</th>
-                    <td>{{ personnel.type }}</td>
+                    <th class="text-primary">เพศ</th>
+                    <td colspan="4">{{ personnel.gender }}</td>
                 </tr>
                 <tr>
                     <th class="text-primary">ที่อยู่</th>
                     <td colspan="4">{{ personnel.address }}</td>
                 </tr>
                 <tr>
-                    <th class="text-primary">เพศ</th>
-                    <td>{{ personnel.gender }}</td>
+                    <th class="text-primary">เบอร์โทรศัพท์</th>
+                    <td>{{ personnel.telephone }}</td>
                     <th class="text-primary">วันเดือนปีเกิด</th>
                     <td>{{ personnel.birthDate |date:'d/m/Y' }}</td>
                 </tr>
                 <tr>
                     <th class="text-primary">วันที่เริ่มบรรจุเข้าทำงาน</th>
                     <td>{{ personnel.hiringDate |date:'d/m/Y' }}</td>
+                    <th class="text-primary">ตำแหน่ง</th>
+                    <td>{{ personnel.status }}</td>
+                </tr>
+                <tr>
+                    <th class="text-primary">ประเภทบุคลากร</th>
+                    <td>{{ personnel.type }}</td>
                     <th class="text-primary">สังกัดสาขา</th>
                     <td>{{ personnel.division.name_th }}</td>
                 </tr>

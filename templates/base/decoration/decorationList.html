@@ -3,10 +3,9 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <h2><i class="fa-solid fa-sun"></i> ข้อมูลความเชี่ยวชาญ </h2>
+            <h2><i class="fas fa-crown"></i> ข้อมูลประวัติการรับเครื่องราชอิสริยาภรณ์ </h2>
         </div>
     </div>
-
     {% if divisions is not None %}
         <div class="row">
             <div class="col-5">
@@ -52,10 +51,11 @@
                                     </option>
                                 {% endfor %}
                             {% endif %}
-                        </select>
+                            </select>
                         <input type="hidden" name="divisionId" value="{{ division.id }}">
                     </form>
                 {% endif %}
+
             </div>
         </div>
     {% endif %}
@@ -63,50 +63,50 @@
     {% if personnel != None %}
         <div class="row">
             <div class="col-10"><br>
-                <h4 class="align-bottom"> {{ personnel }},  สังกัด: {{ personnel.division }} </h4>
+                <h4 class="align-bottom"> {{ personnel }}, สังกัด: {{ personnel.division }}  </h4>
             </div>
             <div class="col-2">
                 <img src="{% static personnel.picture %}" width="75px" height="auto" style="margin-top:5px;" class="rounded-circle">
             </div>
         </div>
         <hr class="text-primary">
-        <table class="table table-light table-striped table-hover"  style="border-color: #0b5ed7">
+        <table class="table table-light table-striped table-hover" style="border-color: #0b5ed7">
             <tr class="text-primary">
-                <th class="col-5">เรื่อง/ประเด็นที่เชี่ยวชาญ</th>
-                <th class="col-5">ประสบการณ์</th>
+                <th class="text-center col-2">วันที่ได้รับ</th>
+                <th class="text-center col-1">ลำดับชั้น</th>
+                <th class="col-3">ชื่อชั้นเครื่องราชอิสริยาภรณ์</th>
+                <th class="col-2">ชื่อย่อ </th>
+                <th class="col-2">ประเภท </th>
                 <th class="col col-2">
                     {% if request.session.userType in 'Administrator, Staff' %}
-                        <a href="{% url 'expertiseNew' personnel.id %}"
+                        <a href="{% url 'decorationNew' personnel.id %}"
                                              class="btn btn-sm btn-primary  text-white" style="width: 100%"><i
-                            class="fa fa-plus"></i> เพิ่มความเชี่ยวชาญ </a>
+                            class="fa fa-plus"></i> เพิ่มเครื่องราชฯ </a>
                     {% elif request.session.userId == personnel.id and personnel.editable == True %}
-                        <a href="{% url 'expertiseNew' personnel.id %}"
+                        <a href="{% url 'decorationNew' personnel.id %}"
                                              class="btn btn-sm btn-primary  text-white" style="width: 100%"><i
-                            class="fa fa-plus"></i> เพิ่มความเชี่ยวชาญ </a>
+                            class="fa fa-plus"></i> เพิ่มเครื่องราชฯ </a>
                     {% endif %}
                 </th>
+
             </tr>
-            {% for expert in personnel.getExpertise %}
-                <tr class="text-dark" onclick="location.href='{% url 'expertiseDetail' expert.id %}'" style="cursor: pointer">
-                    <td class="col-5">{{ expert.topic |truncatechars:50  }}</td>
-                    <td  class="col-5">
-                        {{ expert.experience|truncatechars:50 }}...
-{#                        {% if expert.experience|length|get_digit:"-1" > 5 %}#}
-{#                            {{ expert.experience|slice:"0:50" }}... <br>#}
-{#                        {% else %}#}
-{#                            {{ expert.experience }}#}
-{#                        {% endif %}#}
-                    </td>
-                    <td class="col-2 text-center">
+            {% for decorate in personnel.getDecorations %}
+                <tr class="text-dark" onclick="location.href='{% url 'decorationDetail' decorate.id %}'" style="cursor: pointer">
+                    <td class="text-center">{{ decorate.getDate | date:'d/m/Y' }}</td>
+                    <td class="text-center">{{ decorate.level }}</td>
+                    <td>{{ decorate.name }}</td>
+                    <td>{{ decorate.name_sh }}</td>
+                    <td>{{ decorate.type }}</td>
+                    <td class="text-center">
                         {% if request.session.userType in 'Administrator, Staff' %}
-                            <a href="{% url 'expertiseUpdate' expert.id %}" class="btn btn-warning"> <i
+                            <a href="{% url 'decorationUpdate' decorate.id %}" class="btn btn-warning"> <i
                                     class="fa fa-tools"> </i> </a>
-                            <a href="{% url 'expertiseDelete' expert.id %}" class="btn btn-danger"> <i
+                            <a href="{% url 'decorationDelete' decorate.id %}" class="btn btn-danger"> <i
                                     class="fa fa-trash"> </i> </a>
                         {% elif request.session.userId == personnel.id and personnel.editable == True %}
-                            <a href="{% url 'expertiseUpdate' expert.id %}" class="btn btn-warning"> <i
+                            <a href="{% url 'decorationUpdate' decorate.id %}" class="btn btn-warning"> <i
                                     class="fa fa-tools"> </i> </a>
-                            <a href="{% url 'expertiseDelete' expert.id %}" class="btn btn-danger"> <i
+                            <a href="{% url 'decorationDelete' decorate.id %}" class="btn btn-danger"> <i
                                     class="fa fa-trash"> </i> </a>
                         {% endif %}
                     </td>

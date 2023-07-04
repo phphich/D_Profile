@@ -132,8 +132,11 @@ class PersonnelForm(forms.ModelForm):
             ("ศาสตราจารย์", "ศาสตราจารย์"),
         )
         TYPE_CHOICES = (
-            ('สายวิชาการ', 'สายวิชาการ'),
-            ('สายสนับสนุน', 'สายสนับสนุน'),
+            ('ข้าราชการ(สายวิชาการ)', 'ข้าราชการ(สายวิชาการ)'),
+            ('พนักงานในสถาบันอุดมศึกษา(สายวิชาการ)', 'พนักงานในสถาบันอุดมศึกษา(สายวิชาการ)'),
+            ('ลูกจ้างเงินรายได้(สายวิชาการ)', 'ลูกจ้างเงินรายได้(สายวิชาการ)'),
+            ('พนักงานในสถาบันอุดมศึกษา(สายสนับสนุน)', 'พนักงานในสถาบันอุดมศึกษา(สายวิชาการ)'),
+            ('ลูกจ้างเงินรายได้(สายสนับสนุน)', 'ลูกจ้างเงินรายได้(สายวิชาการ)'),
         )
         EDITABLE_CHOICES = (
             (True, 'อนุญาตให้แก้ไขได้'),
@@ -141,8 +144,9 @@ class PersonnelForm(forms.ModelForm):
         )
 
         model = Personnel
-        fields = ('sId', 'title', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'status', 'type', 'gender', 'address',
-                  'birthDate', 'hiringDate', 'division', 'picture', 'email', 'editable', 'recorderId', 'editorId')
+        fields = ('sId', 'title', 'firstname_th', 'lastname_th', 'firstname_en', 'lastname_en', 'gender', 'address',
+                  'telephone', 'picture', 'birthDate', 'hiringDate','status', 'type',
+                  'division', 'currently', 'email', 'editable', 'recorderId', 'editorId')
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'form-control', 'size': 35, 'maxlength': 30}),
             'sId': forms.TextInput(attrs={'class': 'form-control', 'size': 20, 'maxlength': 15}),
@@ -154,11 +158,13 @@ class PersonnelForm(forms.ModelForm):
             'status': forms.Select(choices=STATUS_CHOICES, attrs={'class': 'form-control'}),
             'type': forms.RadioSelect(choices=TYPE_CHOICES, attrs={'class': ''}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
+            'telephone':forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 20}),
             'gender': forms.RadioSelect(choices=GENDER_CHOICES, attrs={'class': ''}),
             'birthDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'hiringDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
             'picture': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
             'division': forms.Select(attrs={'class': 'form-control'}),
+            'currently': forms.TextInput(attrs={'class': 'form-control', 'size': 55, 'maxlength': 50}),
             'editable':forms.RadioSelect(choices=EDITABLE_CHOICES, attrs={'class': ''}),
             'recorderId': forms.HiddenInput(),
             'editorId': forms.HiddenInput(),
@@ -172,13 +178,15 @@ class PersonnelForm(forms.ModelForm):
             'lastname_th': 'สกุล (ไทย)',
             'firstname_en': 'ชื่อ (อังกฤษ)',
             'lastname_en': 'สกุล (อังกฤษ)',
-            'status': 'ตำแหน่งทางวิชาการ',
-            'type': 'ประเภท',
             'gender': 'เพศ',
             'address': 'ที่อยู่',
+            'telephone': 'เบอร์โทรศัพท์',
             'birthDate': 'วันเดือนปีเกิด',
             'hiringDate': 'วันที่เริ่มบรรจุเข้าทำงาน',
+            'status': 'ตำแหน่งทางวิชาการ',
+            'type': 'ประเภท',
             'picture': 'รูปภาพ',
+            'currently': 'สถานะการปฏิบัติหน้าที่',
             'division':'สังกัดสาขา',
             'editable': 'การแก้ไขโดยบุคลากร',
             'recorderId':'รหัสผู้บันทึก',
@@ -201,10 +209,12 @@ class PersonnelForm(forms.ModelForm):
         self.fields['type'].widget.attrs['readonly'] = True
         self.fields['gender'].widget.attrs['readonly'] = True
         self.fields['address'].widget.attrs['readonly'] = True
+        self.fields['telephone'].widget.attrs['readonly'] = True
         self.fields['birthDate'].widget.attrs['readonly'] = True
         self.fields['hiringDate'].widget.attrs['readonly'] = True
         self.fields['picture'].widget.attrs['readonly'] = True
         self.fields['division'].widget.attrs['readonly'] = True
+        self.fields['currently'].widget.attrs['readonly'] = True
 
 
 class EducationForm(forms.ModelForm):
@@ -252,6 +262,94 @@ class EducationForm(forms.ModelForm):
         self.fields['degree_en_sh'].widget.attrs['readonly'] = True
         self.fields['yearGraduate'].widget.attrs['readonly'] = True
         self.fields['institute'].widget.attrs['readonly'] = True
+        self.fields['personnel'].widget.attrs['readonly'] = True
+
+class DecorationForm(forms.ModelForm):
+    class Meta:
+        LEVEL_CHOICES = (
+            ("ชั้นที่ 7", "ชั้นที่ 7"),
+            ("ชั้นที่ 6", "ชั้นที่ 6"),
+            ("ชั้นที่ 5", "ชั้นที่ 5"),
+            ("ชั้นที่ 4", "ชั้นที่ 4"),
+            ("ชั้นที่ 3", "ชั้นที่ 3"),
+            ("ชั้นที่ 2", "ชั้นที่ 2"),
+            ("ชั้นที่ 1", "ชั้นที่ 1"),
+            ("ชั้นสูงสุด", "ชั้นสูงสุด"),
+            ("-", "-"),
+        )
+        NAME_CHOICES = (
+            ("เหรียญเงินมงกุฏไทย", "เหรียญเงินมงกุฏไทย"),
+            ("เหรียญเงินช้างเผือก", "เหรียญเงินช้างเผือก"),
+            ("เหรียญทองมงกุฏไทย", "เหรียญทองมงกุฏไทย"),
+            ("เหรียญทองช้างเผือก", "เหรียญทองช้างเผือก"),
+            ("เบญจมาภรณ์มงกุฏไทย", "เบญจมาภรณ์มงกุฏไทย"),
+            ("เบญจมาภรณ์ช้างเผือก", "เบญจมาภรณ์ช้างเผือก"),
+            ("จัตุรถาภรณ์มงกุฏไทย", "จัตุรถาภรณ์มงกุฏไทย"),
+            ("จัตุรถาภรณ์ช้างเผือก", "จัตุรถาภรณ์ช้างเผือก"),
+            ("ตริตาภรณ์มงกุฏไทย", "ตริตาภรณ์มงกุฏไทย"),
+            ("ตริตาภรณ์ช้างเผือก", "ตริตาภรณ์ช้างเผือก"),
+            ("ทวีติยาภรณ์มงกุฏไทย", "ทวีติยาภรณ์มงกุฏไทย"),
+            ("ทวีติยาภรณ์ช้างเผือก", "ทวีติยาภรณ์ช้างเผือก"),
+            ("ประถมาภรณ์มงกุฏไทย", "ประถมาภรณ์มงกุฏไทย"),
+            ("ประถมาภรณ์ช้างเผือก", "ประถมาภรณ์ช้างเผือก"),
+            ("มหาวชิรมงกุฏ", "มหาวชิรมงกุฏ"),
+            ("มหาปรมาภรณ์ช้างเผือก", "มหาปรมาภรณ์ช้างเผือก"),
+            ("เหรียญจักรพรรดิมาลา", "เหรียญจักรพรรดิมาลา"),
+        )
+        NAME_SH_CHOICES = (
+            ("ร.ง.ม.", "ร.ง.ม."),
+            ("ร.ง.ช.", "ร.ง.ช."),
+            ("ร.ท.ม.", "ร.ท.ม."),
+            ("ร.ท.ช.", "ร.ท.ช."),
+            ("บ.ม.", "บ.ม."),
+            ("บ.ช.", "บ.ช."),
+            ("จ.ม.", "จ.ม."),
+            ("จ.ช.", "จ.ช."),
+            ("ต.ม.", "ต.ม."),
+            ("ต.ช.", "ต.ช."),
+            ("ท.ม.", "ท.ม."),
+            ("ท.ช.", "ท.ช."),
+            ("ป.ม.", "ป.ม."),
+            ("ป.ช.", "ป.ช."),
+            ("ม.ว.ม.", "ม.ว.ม."),
+            ("ม.ป.ช.", "ม.ป.ช."),
+            ("ร.จ.พ.", "ร.จ.พ."),
+        )
+
+        TYPE_CHOICES = (
+            ("เหรียญตรา", "เหรียญตรา"),
+            ("ต่ำกว่าสายสะพาย", "ต่ำกว่าสายสะพาย"),
+            ("ชั้นสายสะพาย", "ชั้นสายสะพาย"),
+        )
+        model = Decoration
+        fields = ('getDate', 'level', 'name', 'name_sh', 'type',  'personnel', 'recorder', 'editor')
+        widgets = {
+            'getDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'level': forms.Select(choices=LEVEL_CHOICES, attrs={'class': 'form-control'}),
+            'name': forms.Select(choices=NAME_CHOICES, attrs={'class': 'form-control'}),
+            'name_sh': forms.HiddenInput(),
+            'type': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
+            'personnel':forms.HiddenInput(),
+            'recorder':forms.HiddenInput(),
+            'editor': forms.HiddenInput(),
+        }
+        labels = {
+            'getDate': 'วันที่ได้รับ',
+            'level': 'ลำดับชั้น',
+            'name': 'ชื่อชั้นเครื่องราชฯ',
+            'name_sh': 'ชื่อย่อ',
+            'type': 'ประเภท',
+            'personnel': 'บุคลากร',
+            'recorder': 'ผู้บันทึก',
+            'editor': 'ผู้แก้ไข',
+        }
+
+    def deleteForm(self):
+        self.fields['getDate'].widget.attrs['readonly'] = True
+        self.fields['level'].widget.attrs['readonly'] = True
+        self.fields['name'].widget.attrs['readonly'] = True
+        self.fields['name_sh'].widget.attrs['readonly'] = True
+        self.fields['type'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
 
 class ExpertiseForm(forms.ModelForm):

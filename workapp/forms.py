@@ -22,7 +22,7 @@ class LeaveForm(forms.ModelForm):
         )
         model = Leave
         fields = (
-            'fiscalYear', 'leaveType', 'eduYear', 'startDate', 'endDate', 'days', 'reason', 'personnel',
+            'fiscalYear', 'leaveType', 'startDate', 'endDate', 'days', 'reason', 'personnel',
             'editable', 'recorder', 'editor')
         widgets = {
             'startDate': forms.NumberInput(attrs={'class': 'form-control', 'type': 'date',
@@ -32,7 +32,6 @@ class LeaveForm(forms.ModelForm):
             'days': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 20,
                                              'onfocusout': 'javascript:chkDays();'}),
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
-            'eduYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'leaveType': forms.Select(choices=TYPE_CHOICES, attrs={'class': 'form-control'}),
             'reason': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
             'editable': forms.RadioSelect(choices=EDITABLE_CHOICES, attrs={'class': ''}),
@@ -42,7 +41,6 @@ class LeaveForm(forms.ModelForm):
         }
         labels = {
             'fiscalYear': 'ปีงบประมาณ',
-            'eduYear': 'ปีการศึกษา',
             'leaveType': 'ประเภทการลา',
             'startDate': 'วันที่เริ่มต้น',
             'endDate': 'วันที่สิ้นสุด',
@@ -62,7 +60,6 @@ class LeaveForm(forms.ModelForm):
         self.fields['endDate'].widget.attrs['readonly'] = True
         self.fields['days'].widget.attrs['readonly'] = True
         self.fields['fiscalYear'].widget.attrs['readonly'] = True
-        self.fields['eduYear'].widget.attrs['readonly'] = True
         self.fields['leaveType'].widget.attrs['readonly'] = True
         self.fields['reason'].widget.attrs['readonly'] = True
         self.fields['personnel'].widget.attrs['readonly'] = True
@@ -471,10 +468,19 @@ class ResearchForm(forms.ModelForm):
             ('งบประมาณส่วนตัว', 'งบประมาณส่วนตัว'),
             ('ไม่ใช้งบประมาณ', 'ไม่ใช้งบประมาณ')
         )
+        DB_CHOICES = (
+            ('TCI 1', 'TCI 1'),
+            ('TCI 2', 'TCI 2'),
+            ('TCI 3', 'TCI 3'),
+            ('Scopus', 'Scopus'),
+            ('ISI', 'ISI'),
+            ('N/A', 'N/A'),
+            ('-', '-'),
+        )
         model = Research
         fields = (
             'fiscalYear', 'title_th', 'title_en', 'objective', 'budget', 'budgetType', 'source',
-             'percent_success', 'publish_method', 'reference','recorder', 'editor', )
+             'percentSuccess', 'publishMethod', 'publishDate', 'publishDb', 'reference','recorder', 'editor', )
         widgets = {
             'fiscalYear': forms.NumberInput(attrs={'class': 'form-control', 'size': 10}),
             'title_th': forms.Textarea(attrs={'class': 'form-control', 'cols': 55, 'rows': 3}),
@@ -485,8 +491,10 @@ class ResearchForm(forms.ModelForm):
                                                                     'onchange': 'javascript:chkBudgetType();'}),
             'source': forms.TextInput(attrs={'class': 'form-control', 'size': 255, 'maxlength': 255}),
             'reference': forms.Textarea(attrs={'class': 'form-control', 'cols':55, 'rows':2}),
-            'percent_success': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
-            'publish_method': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
+            'percentSuccess': forms.NumberInput(attrs={'class': 'form-control', 'size': 10, 'min': 1, 'max': 100}),
+            'publishMethod': forms.TextInput(attrs={'class': 'form-control', 'size': 255}),
+            'publishDate': forms.NumberInput(attrs={'class': 'form-control', 'type':'date'}),
+            'publishDb': forms.Select(choices=DB_CHOICES, attrs={'class': 'form-control'}),
             'recorder': forms.HiddenInput(),
             'editor': forms.HiddenInput(),
         }
@@ -499,8 +507,10 @@ class ResearchForm(forms.ModelForm):
             'budgetType': 'ประเภทงบประมาณ',
             'source': 'หน่วยงานเจ้าของทุนวิจัย',
             'reference': 'อ้างอิง (Reference)',
-            'percent_success': 'ร้อยละความก้าวหน้า (%)',
-            'publish_method': 'การเผยแพร่ผลการวิจัย',
+            'percentSuccess': 'ร้อยละความก้าวหน้า (%)',
+            'publishMethod': 'การเผยแพร่ผลการวิจัย',
+            'publishDate': 'วันที่ตีพิมพ์เผยแพร่',
+            'publishDb': 'ฐานข้อมูลวิจัยที่ตีพิมพ์',
             'recorder': 'ผู้บันทึก',
             'editor': 'ผู้แก้ไข'
         }
@@ -514,8 +524,10 @@ class ResearchForm(forms.ModelForm):
         self.fields['budgetType'].widget.attrs['readonly'] = True
         self.fields['source'].widget.attrs['readonly'] = True
         self.fields['reference'].widget.attrs['readonly'] = True
-        self.fields['percent_success'].widget.attrs['readonly'] = True
-        self.fields['publish_method'].widget.attrs['readonly'] = True
+        self.fields['percentSuccess'].widget.attrs['readonly'] = True
+        self.fields['publishMethod'].widget.attrs['readonly'] = True
+        self.fields['publishDate'].widget.attrs['readonly'] = True
+        self.fields['publishDb'].widget.attrs['readonly'] = True
         self.fields['recorder'].widget.attrs['readonly'] = True
         # self.fields[all].widget.attrs['class'] = 'form-control text-danger'
 

@@ -39,8 +39,7 @@
                 <th class="col-1"></th>
                 <th class="col-3">ชื่อ - สกุล</th>
                 <th class="col-2">ตำแหน่ง</th>
-                <th class="col-1 text-center">ประเภท</th>
-                <th class="col-1 text-center">เพศ</th>
+                <th class="col-2">ประเภท</th>
                 <th class="col-2">สังกัด</th>
                 <th class="col col-2"}>
                 {% if request.session.userType in 'Administrator, Staff' %}
@@ -75,8 +74,7 @@
                         </td>
                         <td>{{ personnel.firstname_th }} {{ personnel.lastname_th }}  </td>
                         <td>{{ personnel.status }}</td>
-                        <td class="text-center">{{ personnel.type }}</td>
-                        <td class="text-center">{{ personnel.gender }}</td>
+                        <td>{{ personnel.type }}</td>
                         <td>{{ personnel.division.name_th }}</td>
                         <td class="text-center">
                             {% if request.session.userType in 'Administrator, Staff'  %}
