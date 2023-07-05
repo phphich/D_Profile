@@ -572,16 +572,17 @@ def personnelNew(request):
             context = {'form': form, 'fistTime':firstTime}
             return render(request, 'base/personnel/personnelNew.html', context)
     else:
-        if request.session['userType'] == 'Administrator':
-            form = PersonnelForm()
-        else:
-            form = PersonnelForm(userType=request.session['userType'],userId=request.session['userId'])
         countPersonnel = Personnel.objects.all().count()
         if countPersonnel == 0:
             firstTime = True
             division = Division.objects.first();
+            form = PersonnelForm()
             form.initial={'division':division, 'recorderId':'0000', 'editorId':'0000'}
         else:
+            if request.session['userType'] == 'Administrator':
+                form = PersonnelForm()
+            else:
+                form = PersonnelForm(userType=request.session['userType'], userId=request.session['userId'])
             firstTime = False
             form.initial = {'recorderId': recorder.id, 'editorId': recorder.id}
         context = {'form': form, 'firstTime':firstTime}
