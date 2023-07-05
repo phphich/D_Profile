@@ -529,6 +529,10 @@ def personnelNew(request):
             newfilename = 'images/personnels/' + str(personnel.id) + ext
             personnel.picture.name = newfilename
             personnel.save()
+            if personnelCount ==0:
+                personnel.recorderId = personnel.id
+                personnel.editorId=personnel.id
+                personnel.save()
             if personnelCount == 0: # กรณีบันทึกเป็นรายแรก  (Admin)
                 personnel.recorderId = personnel.id
                 personnel.editorId = personnel.id
