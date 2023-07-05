@@ -502,7 +502,9 @@ def personnelNew(request):
         division = Division(name_th="สำนักงานคณะ", name_en="Office", name_sh="")
         division.save()
     if request.method == 'POST':
-        if request.session['userType'] == 'Administrator' or personnelCount==0:
+        if personnelCount==0:
+            form = PersonnelForm(data=request.POST or None, files=request.FILES)
+        elif request.session['userType'] == 'Administrator':
             form = PersonnelForm(data=request.POST or None, files=request.FILES)
         else:
             form = PersonnelForm(staffId=request.session['userId'], data=request.POST or None, files=request.FILES)
@@ -572,8 +574,8 @@ def personnelNew(request):
             context = {'form': form, 'fistTime':firstTime}
             return render(request, 'base/personnel/personnelNew.html', context)
     else:
-        countPersonnel = Personnel.objects.all().count()
-        if countPersonnel == 0:
+        # countPersonnel = Personnel.objects.all().count()
+        if personnelCount == 0:
             firstTime = True
             division = Division.objects.first();
             form = PersonnelForm()
