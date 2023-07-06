@@ -55,7 +55,7 @@ def home(request):
     request.session['last_url']= request.path_info
     request.session['previous_url'] = request.path_info
     if countPersonnel == 0:
-        messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดระบบในลำดับถัดไป...")
+        messages.add_message(request, messages.INFO, "นี่เป็นการเข้าใช้ระบบเป็นครั้งแรก จำเป็นต้องบันทึกข้อมูลผู้ดูแลระบบเพื่อบริหารจัดการระบบในลำดับถัดไป...")
         return  redirect('personnelNew')
     else:
         # if 'userId' not in request.session:
@@ -572,17 +572,18 @@ def personnelNew(request):
             context = {'form': form, 'fistTime':firstTime}
             return render(request, 'base/personnel/personnelNew.html', context)
     else:
-        if request.session['userType'] == 'Administrator':
-            form = PersonnelForm()
-        else:
-            form = PersonnelForm(userType=request.session['userType'],userId=request.session['userId'])
-        countPersonnel = Personnel.objects.all().count()
-        if countPersonnel == 0:
+        # countPersonnel = Personnel.objects.all().count()
+        if personnelCount == 0:
             firstTime = True
             division = Division.objects.first();
+            form = PersonnelForm()
             form.initial={'division':division, 'recorderId':'0000', 'editorId':'0000'}
         else:
             firstTime = False
+            if request.session['userType'] == 'Administrator':
+                form = PersonnelForm()
+            else:
+                form = PersonnelForm(userType=request.session['userType'], userId=request.session['userId'])
             form.initial = {'recorderId': recorder.id, 'editorId': recorder.id}
         context = {'form': form, 'firstTime':firstTime}
         return render(request, 'base/personnel/personnelNew.html', context)
