@@ -228,7 +228,7 @@ def leaveUpdate(request, id):
             return render(request, 'work/leave/leaveUpdate.html', context)
     else:
         if request.session['userType'] in ['Manager','Header', 'Personnel']:
-            print("type: {}".format(request.session['userType']))
+            # print("type: {}".format(request.session['userType']))
             form.updateForm()
         context = {'form': form, 'personnel': personnel}
         return render(request, 'work/leave/leaveUpdate.html', context)

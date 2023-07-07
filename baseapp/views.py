@@ -871,7 +871,107 @@ def educationDelete(request, id):
         form.deleteForm()
         context = {'form': form, 'personnel': education.personnel}
         return render(request, 'base/education/educationDelete.html', context)
-    
+
+@login_required(login_url='userAuthen')
+def decorationNew(request, id):
+    personnel = Personnel.objects.filter(id=id).first()
+    if personnel is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Decoration', did=personnel.id)
+    if common.chkPermission(decorationNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
+        messages.add_message(request, messages.ERROR,msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    if request.method == 'POST':
+        form = DecorationForm(data=request.POST)
+        if form.is_valid():
+            newForm = form.save(commit=False)
+            name_full = newForm.name
+            name_sh = common.getDecorationName_sh(name_full)
+            newForm.name_sh = name_sh
+            newForm.save()
+            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลการรับเครื่องราชอิสริยาภรณ์เรียบร้อย')
+            return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
+        else:
+            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'base/decoration/decorationNew.html', context)
+    else:
+        form = DecorationForm(initial={'name_sh':'N/A', 'personnel': personnel, 'recorder': recorder, 'editor':recorder})
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'base/decoration/decorationNew.html', context)
+
+@login_required(login_url='userAuthen')
+def decorationDetail(request, id):
+    decoration = Decoration.objects.filter(id=id).first()
+    if decoration is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Decoration', did=decoration.id)
+    if common.chkPermission(decorationDetail.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    context = {'decoration': decoration}
+    return render(request, 'base/decoration/decorationDetail.html', context)
+
+@login_required(login_url='userAuthen')
+def decorationUpdate(request, id):
+    decoration = Decoration.objects.filter(id=id).first()
+    if decoration is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Decoration', did=decoration.id)
+    if common.chkPermission(decorationUpdate.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect(request.session['last_url'])
+    request.session['last_url'] = request.path_info
+    personnel = decoration.personnel
+    recorder = Personnel.objects.filter(id=request.session['userId']).first()
+    form = DecorationForm(data=request.POST or None, instance=decoration)
+    if request.method == 'POST':
+        if form.is_valid():
+            updateForm = form.save(commit=False)
+            name_full = updateForm.name
+            name_sh = common.getDecorationName_sh(name_full)
+            updateForm.name_sh = name_sh
+            updateForm.editor = recorder
+            updateForm.editDate = datetime.datetime.now()
+            updateForm.save()
+            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลการรับเครื่องราชอิสริยาภรณ์เรียบร้อย')
+            return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
+        else:
+            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
+            context = {'form': form, 'personnel': personnel}
+            return render(request, 'base/decoration/decorationUpdate.html', context)
+    else:
+        context = {'form': form, 'personnel': personnel}
+        return render(request, 'base/decoration/decorationUpdate.html', context)
+
+@login_required(login_url='userAuthen')
+def decorationDelete(request, id):
+    decoration =  Decoration.objects.filter(id=id).first()
+    if decoration is None:
+        messages.add_message(request, messages.ERROR, msgErrorId)
+        return redirect(request.session['last_url'])
+    getSession(request, dtype='Decoration', did=decoration.id)
+    if common.chkPermission(decorationDelete.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
+        messages.add_message(request, messages.ERROR, msgErrorPermission)
+        return redirect(request.session['last_url'])
+    personnel = decoration.personnel
+    form = DecorationForm(instance=decoration)
+    if request.method == 'POST':
+        divisions = Division.objects.all().order_by('name_th')
+        decoration.delete()
+        messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลการรับเครื่องราชอิสริยาภรณ์ที่เลือกเรียบร้อย')
+        return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
+    else:
+        form.deleteForm()
+        context = {'form': form, 'personnel': decoration.personnel}
+        return render(request, 'base/decoration/decorationDelete.html', context)
+
 #*******************************
 # Expertise CRUD.
 @login_required(login_url='userAuthen')
@@ -923,6 +1023,8 @@ def expertiseList(request, divisionId=None, personnelId=None):
                 personnel = division.getPersonnels().first()
         context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'onlyStaff':onlyStaff, 'recorder':recorder}
     return render(request, 'base/expertise/expertiseList.html', context)
+
+
 
 @login_required(login_url='userAuthen')
 def expertiseNew(request, id):
@@ -1061,106 +1163,6 @@ def decorationList(request, divisionId=None, personnelId=None):
                 personnel = division.getPersonnels().first()
         context = {'divisions': divisions, 'division': division, 'personnel': personnel, 'onlyStaff':onlyStaff, 'recorder':recorder}
     return render(request, 'base/decoration/decorationList.html', context)
-
-@login_required(login_url='userAuthen')
-def decorationNew(request, id):
-    personnel = Personnel.objects.filter(id=id).first()
-    if personnel is None:
-        messages.add_message(request, messages.ERROR, msgErrorId)
-        return redirect(request.session['last_url'])
-    getSession(request, dtype='Decoration', did=personnel.id)
-    if common.chkPermission(decorationNew.__name__,uType=uType, uId=uId, docType=docType, docId=docId)==False:
-        messages.add_message(request, messages.ERROR,msgErrorPermission)
-        return redirect(request.session['last_url'])
-    request.session['last_url'] = request.path_info
-    recorder = Personnel.objects.filter(id=request.session['userId']).first()
-    if request.method == 'POST':
-        form = DecorationForm(data=request.POST)
-        if form.is_valid():
-            newForm = form.save(commit=False)
-            name_full = newForm.name
-            name_sh = common.getDecorationName_sh(name_full)
-            newForm.name_sh = name_sh
-            newForm.save()
-            messages.add_message(request, messages.SUCCESS, 'บันทึกข้อมูลการรับเครื่องราชอิสริยาภรณ์เรียบร้อย')
-            return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
-        else:
-            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
-            context = {'form': form, 'personnel': personnel}
-            return render(request, 'base/decoration/decorationNew.html', context)
-    else:
-        form = DecorationForm(initial={'name_sh':'N/A', 'personnel': personnel, 'recorder': recorder, 'editor':recorder})
-        context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/decoration/decorationNew.html', context)
-
-@login_required(login_url='userAuthen')
-def decorationDetail(request, id):
-    decoration = Decoration.objects.filter(id=id).first()
-    if decoration is None:
-        messages.add_message(request, messages.ERROR, msgErrorId)
-        return redirect(request.session['last_url'])
-    getSession(request, dtype='Decoration', did=decoration.id)
-    if common.chkPermission(decorationDetail.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
-        messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect(request.session['last_url'])
-    request.session['last_url'] = request.path_info
-    context = {'decoration': decoration}
-    return render(request, 'base/decoration/decorationDetail.html', context)
-
-@login_required(login_url='userAuthen')
-def decorationUpdate(request, id):
-    decoration = Decoration.objects.filter(id=id).first()
-    if decoration is None:
-        messages.add_message(request, messages.ERROR, msgErrorId)
-        return redirect(request.session['last_url'])
-    getSession(request, dtype='Decoration', did=decoration.id)
-    if common.chkPermission(decorationUpdate.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
-        messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect(request.session['last_url'])
-    request.session['last_url'] = request.path_info
-    personnel = decoration.personnel
-    recorder = Personnel.objects.filter(id=request.session['userId']).first()
-    form = DecorationForm(data=request.POST or None, instance=decoration)
-    if request.method == 'POST':
-        if form.is_valid():
-            updateForm = form.save(commit=False)
-            name_full = updateForm.name
-            name_sh = common.getDecorationName_sh(name_full)
-            updateForm.name_sh = name_sh
-            updateForm.editor = recorder
-            updateForm.editDate = datetime.datetime.now()
-            updateForm.save()
-            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลการรับเครื่องราชอิสริยาภรณ์เรียบร้อย')
-            return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
-        else:
-            messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')
-            context = {'form': form, 'personnel': personnel}
-            return render(request, 'base/decoration/decorationUpdate.html', context)
-    else:
-        context = {'form': form, 'personnel': personnel}
-        return render(request, 'base/decoration/decorationUpdate.html', context)
-
-@login_required(login_url='userAuthen')
-def decorationDelete(request, id):
-    decoration =  Decoration.objects.filter(id=id).first()
-    if decoration is None:
-        messages.add_message(request, messages.ERROR, msgErrorId)
-        return redirect(request.session['last_url'])
-    getSession(request, dtype='Decoration', did=decoration.id)
-    if common.chkPermission(decorationDelete.__name__, uType=uType, uId=uId, docType=docType, docId=docId) == False:
-        messages.add_message(request, messages.ERROR, msgErrorPermission)
-        return redirect(request.session['last_url'])
-    personnel = decoration.personnel
-    form = DecorationForm(instance=decoration)
-    if request.method == 'POST':
-        divisions = Division.objects.all().order_by('name_th')
-        decoration.delete()
-        messages.add_message(request, messages.SUCCESS, 'ลบข้อมูลการรับเครื่องราชอิสริยาภรณ์ที่เลือกเรียบร้อย')
-        return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
-    else:
-        form.deleteForm()
-        context = {'form': form, 'personnel': decoration.personnel}
-        return render(request, 'base/decoration/decorationDelete.html', context)
 
 #***************************
 # CurrAffiliation CRUD.
