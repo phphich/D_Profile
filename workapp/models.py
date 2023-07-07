@@ -343,7 +343,7 @@ class Research(models.Model):
     percentSuccess = models.IntegerField(default=0)
     publishMethod = models.TextField(default="")
     publishDate = models.DateField(default=None)
-    publishDb = models.CharField(max_length=50, default="")
+    publishDb = models.TextField(default="N/A")
     recorder = models.ForeignKey(Personnel, related_name='RecorderResearch', on_delete=models.CASCADE, default=None)
     recordDate = models.DateTimeField(auto_now_add = True)
     editor = models.ForeignKey(Personnel, related_name='EditorResearch', on_delete=models.CASCADE, default=None)
