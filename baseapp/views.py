@@ -950,7 +950,7 @@ def decorationUpdate(request, id):
             updateForm.editor = recorder
             updateForm.editDate = datetime.datetime.now()
             updateForm.save()
-            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลการรับเครื่องราชอิสริยาภรณ์เรียบร้อย')
+            messages.add_message(request, messages.SUCCESS, 'แก้ไขข้อมูลเครื่องราชอิสริยาภรณ์เรียบร้อย')
             return redirect('decorationList', divisionId=personnel.division.id, personnelId=personnel.id)
         else:
             messages.add_message(request, messages.WARNING, 'ข้อมูลไม่สมบูรณ์')

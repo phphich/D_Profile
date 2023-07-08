@@ -137,6 +137,8 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
             userDocIds = Personnel.objects.filter(id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
         elif docType == 'Education':
             userDocIds = Education.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+        elif docType == 'Decoration':
+            userDocIds = Decoration.objects.filter(personnel_id=uId).only('id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
         elif docType == 'Expertise':
             userDocIds = Expertise.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
         elif docType == 'Leave': #เอกสารข้อมูลการลา ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
@@ -186,6 +188,8 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Personnel.objects.filter(id=uId).only('id')  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
             elif docType == 'Education':
                 userDocIds = Education.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+            elif docType == 'Decoration':
+                userDocIds = Decoration.objects.filter(personnel_id=uId).only('id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Expertise':
                 userDocIds = Expertise.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Leave':
@@ -232,6 +236,8 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Personnel.objects.filter(id__in=personnels) # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
             elif docType == 'Education':
                 userDocIds = Education.objects.filter(personnel__in=personnels).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+            elif docType == 'Decoration':
+                userDocIds = Decoration.objects.filter(personnel_id=uId).only('id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Expertise':
                 userDocIds = Expertise.objects.filter(personnel__in=personnels).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Leave':
@@ -260,6 +266,8 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds = Personnel.objects.filter(id=uId).only('id')  # เอกสาร Personnel ส่วนตัว ที่มีสิทธิ์เข้าถึงทั้งหมด
             elif docType == 'Education':
                 userDocIds = Education.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+            elif docType == 'Decoration':
+                userDocIds = Decoration.objects.filter(personnel_id=uId).only('id')  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Expertise':
                 userDocIds = Expertise.objects.filter(personnel_id=uId).only('id')  #เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
             elif docType == 'Leave':
@@ -297,6 +305,10 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
                 userDocIds1 = Education.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
                 userDocIds2 = Education.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
                 userDocIds = userDocIds1.union(userDocIds2)
+            elif docType == 'Decoration':
+                userDocIds1 = Decoration.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
+                userDocIds2 = Decoration.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
+                userDocIds = userDocIds1.union(userDocIds2)
             elif docType == 'Expertise':
                 userDocIds1 = Expertise.objects.filter(personnel__in=personnels)  # เอกสารข้อมูลส่วนตัว ที่มีสิทธิ์เข้าถึงของตัวเองทั้งหมด
                 userDocIds2 = Expertise.objects.filter(personnel__in=personnel)  # เอกสารข้อมูลส่วนตัว
@@ -328,7 +340,6 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
             else:
                 userDocIds = None
 
-
     uDocId = []
     # print("docId: {}, uId: {}".format(docId, uId))
     if int(docId) == int(uId):
@@ -339,18 +350,5 @@ def chkPermission(methodName, uType=None, uId=None, docType=None, docId=None):
         return False
     else:
         return True
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

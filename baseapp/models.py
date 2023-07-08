@@ -233,7 +233,7 @@ class Education(models.Model):
                    '), แก้ไขโดย:' + editor.firstname_th + ' ' + editor.lastname_th + ' ('+ editDate +')'
 
 class Decoration(models.Model):
-    getDate = models.DateTimeField(default=None)
+    getDate = models.DateField(default=None)
     level = models.CharField(max_length=15, default="ชั้นที่ 5")
     name = models.CharField(max_length=100, default="")
     name_sh = models.CharField(max_length=30, default="")

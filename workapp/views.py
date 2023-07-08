@@ -1877,7 +1877,7 @@ def socialserviceUpdate(request, id):
             socialservice.editor = recorder
             socialservice.editDate = datetime.datetime.now()
             socialservice.save()
-            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการบริการทางวิขาการแก่สังคมเรียบร้อย")
+            messages.add_message(request, messages.SUCCESS, "แก้ไขข้อมูลการบริการทางวิชาการแก่สังคมเรียบร้อย")
             return redirect('socialserviceDetail', id=socialservice.id)
         else:
             messages.add_message(request, messages.WARNING, "ข้อมูลไม่สมบูรณ์")

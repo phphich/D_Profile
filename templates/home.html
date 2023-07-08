@@ -62,9 +62,9 @@
                     </div>
                 </div>
                 <br>
+
                 <div class="row">
-                    <div class="col-1"></div>
-                    <div class="col-2 text-end text-primary"> ประเด็นที่ต้องการค้นหา</div>
+                    <div class="col-3 text-end text-primary"><B> ประเด็นที่ต้องการค้นหา: </B> </div>
                     <div class="col-2 text-primary">
                         {% if group == 'personnel' or keyword is None %}
                             <input type="radio" name="group" value="personnel" checked> บุคลากร
@@ -79,6 +79,13 @@
                             <input type="radio" name="group" value="education"> คุณวุฒิทางการศึกษา
                         {% endif %}
                     </div>
+                    <div class="col-3 text-primary">
+                        {% if group == 'decoration' %}
+                            <input type="radio" name="group" value="decoration" checked> เครื่องราชอิสริยาภรณ์
+                        {% else %}
+                            <input type="radio" name="group" value="decoration"> เครื่องราชอิสริยาภรณ์
+                        {% endif %}
+                    </div>
                     <div class="col-2 text-primary">
                         {% if group == 'expertise' %}
                             <input type="radio" name="group" value="expertise" checked> ความเชี่ยวชาญ
@@ -86,6 +93,9 @@
                             <input type="radio" name="group" value="expertise"> ความเชี่ยวชาญ
                         {% endif %}
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-1"></div>
                     <div class="col-2 text-primary">
                         {% if group == 'training' %}
                             <input type="radio" name="group" value="training" checked> การฝึกอบรม/สัมมนา
@@ -93,9 +103,6 @@
                             <input type="radio" name="group" value="training"> การฝึกอบรม/สัมมนา
                         {% endif %}
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-3"></div>
                     <div class="col-2 text-primary">
                         {% if group == 'performance' %}
                             <input type="radio" name="group" value="performance" checked> ผลงานและรางวัล
@@ -112,9 +119,9 @@
                     </div>
                     <div class="col-3 text-primary">
                         {% if group == 'socialservice' %}
-                            <input type="radio" name="group" value="socialservice" checked> การให้บริการทางวิชาการแก่สังคม
+                            <input type="radio" name="group" value="socialservice" checked> การบริการทางวิชาการแก่สังคม
                         {% else %}
-                            <input type="radio" name="group" value="socialservice"> การให้บริการทางวิชาการแก่สังคม
+                            <input type="radio" name="group" value="socialservice"> การบริการทางวิชาการแก่สังคม
                         {% endif %}
                     </div>
                     <div class="col-2 text-primary">
