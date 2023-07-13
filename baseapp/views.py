@@ -267,6 +267,7 @@ def facultyDetail(request):
 
 @login_required(login_url='userAuthen')
 def facultyUpdate(request):
+    getSession(request)
     if common.chkPermission(facultyUpdate.__name__, uType=uType)==False:
         messages.add_message(request, messages.ERROR, msgErrorPermission)
         return redirect(request.session['last_url'])
@@ -291,6 +292,7 @@ def divisionList(request):
 
 @login_required(login_url='userAuthen')
 def divisionNew(request):
+    getSession(request)
     if common.chkPermission(divisionNew.__name__,uType=uType)==False:
         messages.add_message(request, messages.ERROR,msgErrorPermission)
         return redirect(request.session['last_url'])
