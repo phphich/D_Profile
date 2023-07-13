@@ -499,7 +499,7 @@ def personnelNew(request):
     else:
         recorder = None
     if divisionCount == 0:
-        division = Division(name_th="สำนักงานคณะ", name_en="Office", name_sh="")
+        division = Division(name_th="สำนักงานคณะ", name_en="Faculty Office", name_sh="")
         division.save()
     if request.method == 'POST':
         if personnelCount==0:
