@@ -85,14 +85,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_dprofile',
-        # 'USER': 'fbidev',
-        # 'PASSWORD': 'fbidev2023rmuti',
-        # 'HOST': '203.158.202.26',
-        # 'PORT': '30001',
-        'USER': 'devfbi',
-        'PASSWORD': '12345',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'USER': 'fbidev',
+        'PASSWORD': 'fbidev2023rmuti',
+        'HOST': '203.158.202.26',
+        'PORT': '30001',
+        # 'USER': 'devfbi',
+        # 'PASSWORD': '12345',
+        # 'HOST': 'localhost',
+        # 'PORT': '3306',
     }
 }
 
