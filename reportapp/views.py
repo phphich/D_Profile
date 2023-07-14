@@ -56,6 +56,7 @@ def personnelReport(request, divId=None, reportType=None):
     dfEdu = statistic.getEducationSet(division=division)
     dfStatus = statistic.getStatusSet(division=division)
     dfGender = statistic.getGenderSet(division=division)
+    dfType = statistic.getTypeSet(division=division)
 
     figDiv = px.bar(dfDiv, x='Division', y='Count', title='บุคลากรแยกตามสาขา/หน่วยงานย่อย')
     figDiv.update_layout(autosize=False, width=450, height=350,
@@ -69,7 +70,7 @@ def personnelReport(request, divId=None, reportType=None):
     chartEdu = figEdu.to_html()
 
     figStatus = px.pie(dfStatus, names='Status', values='Count', title='บุคลากรแยกตามตำแหน่งทางวิชาการ')
-    figStatus.update_layout(autosize=False, width=300, height=300,
+    figStatus.update_layout(autosize=False, width=320, height=320,
                       margin=dict(l=10, r=10, b=10, t=50, pad=5, ),  paper_bgcolor="white")
     chartStatus = figStatus.to_html()
 
@@ -78,8 +79,15 @@ def personnelReport(request, divId=None, reportType=None):
                       margin=dict(l=10, r=10, b=10, t=50, pad=5, ),  paper_bgcolor="white")
     chartGender = figGender.to_html()
 
-    context = {'divisions': divisions, 'division':division, 'reportType':reportType, 'dfDiv':dfDiv,  'dfEdu': dfEdu, 'dfStatus':dfStatus, 'dfGender':dfGender,
+    figType = px.pie(dfType, names='Type', values='Count', title='บุคลากรแยกตามประเภท')
+    figType.update_layout(autosize=False, width=400, height=400,
+                      margin=dict(l=10, r=10, b=10, t=50, pad=5, ),  paper_bgcolor="white")
+    chartType = figType.to_html()
+
+    context = {'divisions': divisions, 'division':division, 'reportType':reportType, 'dfDiv':dfDiv,  'dfEdu': dfEdu,
+               'dfStatus':dfStatus, 'dfGender':dfGender,'dfType':dfType,
                'chartDiv': chartDiv, 'chartEdu': chartEdu, 'chartStatus':chartStatus, 'chartGender':chartGender,
+               'chartType': chartType,
                'count': count}
     return render(request, 'report/personnelReport.html', context)
 

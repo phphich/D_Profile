@@ -210,6 +210,35 @@
             </div>
             <div class="col-1"></div>
         </div>
+         <div class="row">
+            <div class="col-1"></div>
+            <div class="col-10">
+                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรแยกตามประเภท: </label>
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
+                    <tr style="{{ lineColor }}">
+                        {% for col in dfType.columns %}
+                            <th class="text-center">{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </table>
+            </div>
+             <div class="col-1"></div>
+        </div>
+         <div class="row">
+            <div class="col-1"></div>
+            <div class="col-10">
+                <label class="text-primary" style="font-weight: bold"> จำนวนบุคลากรตามการรับเครื่องราชอิสริยาภรณ์: </label>
+                <table class="table table-bordered text-primary table-hover" style="width: 100%">
+                    <tr style="{{ lineColor }}">
+                        <th>ประเภท </th> <th>จำนวน</th>
+{#                    {% for col in dfGender.columns %}#}
+{#                        <th class="text-center">{{ col }}</th>#}
+{#                    {% endfor %}#}
+                    </tr>
+                </table>
+            </div>
+            <div class="col-1"> </div>
+         </div>
         <br><br>
     {% else %}
         {# ************************ Dashboard *****************************#}
@@ -229,6 +258,17 @@
             <div class="col-1"></div>
             <div class="col-md-4 text-center" style="alignment: center">
                 {{ chartStatus | safe }}
+            </div>
+            <div class="col-md-1"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartGender | safe }}
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <div class="row text-center align-content-center">
+            <div class="col-1"></div>
+            <div class="col-md-4 text-center" style="alignment: center">
+                {{ chartType | safe }}
             </div>
             <div class="col-md-1"></div>
             <div class="col-md-4 text-center" style="alignment: center">

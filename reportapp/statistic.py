@@ -88,6 +88,21 @@ def getGenderSet(division=None):
     dfGender = pd.DataFrame({'Gender': genderName, 'Count': genderCount}, columns=['Gender', 'Count'])
     return dfGender
 
+def getTypeSet(division=None):
+    # personnels = Personnel.objects.all()
+    types = Personnel.objects.all().values('type').distinct().order_by('type')
+    typeName = []
+    typeCount = []
+    for s in types:
+        if division is None:
+            count = Personnel.objects.filter(type=s['type']).count()
+        else:
+            count = Personnel.objects.filter(division=division, type=s['type']).count()
+        typeName.append(s['type'])
+        typeCount.append(count)
+    dfType = pd.DataFrame({'Type': typeName, 'Count': typeCount}, columns=['Type', 'Count'])
+    return dfType
+
 # *********************** Research ************************
 def getResearchFiscalYears():
     fiscalYearDates = Research.objects.all().values('fiscalYear').distinct().order_by('fiscalYear')
